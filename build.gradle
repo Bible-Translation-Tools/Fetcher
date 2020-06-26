@@ -12,6 +12,7 @@ buildscript {
 plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version "$kotlin_ver"
+    id 'io.gitlab.arturbosch.detekt' version "$detekt_ver"
 }
 
 group 'org.bibletranslationtools'
@@ -30,6 +31,8 @@ dependencies {
 
     implementation "io.ktor:ktor-server-netty:$ktor_ver"
     implementation "org.thymeleaf:thymeleaf:$thymeleaf_ver"
+
+    detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_ver"
 }
 
 compileKotlin {
@@ -37,4 +40,10 @@ compileKotlin {
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "11"
+}
+
+detekt {
+    toolVersion = "$detekt_ver"
+    config = files("config/detekt/detekt.yml")
+    buildUponDefaultConfig = true
 }
