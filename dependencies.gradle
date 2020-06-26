@@ -1,3 +1,5 @@
 ext {
     kotlin_ver = '1.3.72'
+    ktor_version = '1.3.2'
+    thymeleaf_ver = '3.0.11.RELEASE'
 }
