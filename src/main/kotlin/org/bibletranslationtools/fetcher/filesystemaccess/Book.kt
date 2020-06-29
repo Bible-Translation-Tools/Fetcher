@@ -1,4 +1,4 @@
-package org.bibletranslationtools.fetcher
+package org.bibletranslationtools.fetcher.filesystemaccess
 
 data class Book(
     val id: String,

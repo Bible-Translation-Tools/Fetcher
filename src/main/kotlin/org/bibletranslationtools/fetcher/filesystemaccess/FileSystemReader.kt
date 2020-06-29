@@ -1,4 +1,4 @@
-package org.bibletranslationtools.fetcher
+package org.bibletranslationtools.fetcher.filesystemaccess
 
 interface FileSystemReader {
     fun getLanguages(): List<Language>

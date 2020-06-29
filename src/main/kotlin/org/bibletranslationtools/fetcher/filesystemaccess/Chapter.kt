@@ -1,4 +1,4 @@
-package org.bibletranslationtools.fetcher
+package org.bibletranslationtools.fetcher.filesystemaccess
 
 data class Chapter(
     val language: Language,
