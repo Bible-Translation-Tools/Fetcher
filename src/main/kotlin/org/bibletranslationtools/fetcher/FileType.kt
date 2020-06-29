@@ -1,6 +1,6 @@
 package org.bibletranslationtools.fetcher
 
-enum class FileTypes {
+enum class FileType {
     MP3,
     TR;
 }
