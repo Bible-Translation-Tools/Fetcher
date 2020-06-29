@@ -6,6 +6,6 @@ interface FileSystemReader {
 
     fun getFileTypes(): List<FileTypes>
 
-    // TODO: what books are there for a given language?
+    fun getBooks(language: Language): List<Book>
     // TODO: what chapters are there for a given language, book, and file type?
 }
