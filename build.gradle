@@ -6,6 +6,7 @@ buildscript {
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_ver"
+        classpath "org.jlleitschuh.gradle:ktlint-gradle:$ktlint_ver"
     }
 }
 
@@ -13,6 +14,7 @@ plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version "$kotlin_ver"
     id 'io.gitlab.arturbosch.detekt' version "$detekt_ver"
+    id 'org.jlleitschuh.gradle.ktlint' version "$ktlint_ver"
 }
 
 group 'org.bibletranslationtools'
