@@ -6,9 +6,4 @@ data class Chapter(
     val book: Book,
     val chapterNumber: Int,
     val fileType: FileType
-) {
-    fun getDownloadLink(): String {
-        // TODO: use the FilePathGenerator to return a link where the grouping is 'chapter'
-        return ""
-    }
-}
+)
