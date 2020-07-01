@@ -53,6 +53,10 @@ detekt {
     buildUponDefaultConfig = true
 }
 
+ktlint {
+    ignoreFailures = true
+}
+
 application {
     mainClassName = "org.bibletranslationtools.fetcher.mainKt"
 }
