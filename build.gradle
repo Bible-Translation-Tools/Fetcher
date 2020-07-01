@@ -33,6 +33,7 @@ dependencies {
 
     implementation "io.ktor:ktor-server-netty:$ktor_ver"
     implementation "org.thymeleaf:thymeleaf:$thymeleaf_ver"
+    implementation "com.github.doyaaaaaken:kotlin-csv-jvm:$kotlin_csv_ver"
 
     detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_ver"
 }
