@@ -49,3 +49,7 @@ detekt {
     config = files("config/detekt/detekt.yml")
     buildUponDefaultConfig = true
 }
+
+ktlint {
+    ignoreFailures = true
+}
