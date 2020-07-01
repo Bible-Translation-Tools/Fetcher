@@ -16,6 +16,6 @@ class SourceAudioLanguages(private val languageRepository: LanguageRepository) {
 
     private fun getAvailableLanguageCodes(): List<String> {
         val dirs = Files.list(Paths.get(sourceAudioRoot)).filter { Files.isDirectory(it) }
-        return dirs.map{ it.fileName.toString() }.toList()
+        return dirs.map { it.fileName.toString() }.toList()
     }
 }

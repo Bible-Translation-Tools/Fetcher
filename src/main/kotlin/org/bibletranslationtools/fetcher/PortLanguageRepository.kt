@@ -14,7 +14,7 @@ class PortLanguageRepository : LanguageRepository {
         val languageList = mutableListOf<Language>()
         val rows: List<Map<String, String>> = try {
             getPortLanguagesList()
-        } catch(e: FileNotFoundException) {
+        } catch (e: FileNotFoundException) {
             e.printStackTrace()
             listOf()
         }
