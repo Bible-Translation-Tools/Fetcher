@@ -10,10 +10,14 @@ class PortLanguageRepository : LanguageRepository {
 
     private val portLanguageFileName = "port_gateway_languages.csv"
 
-    @Throws(FileNotFoundException::class)
     override fun getLanguages(): List<Language> {
-        val rows = getPortLanguagesList()
         val languageList = mutableListOf<Language>()
+        val rows: List<Map<String, String>> = try {
+            getPortLanguagesList()
+        } catch(e: FileNotFoundException) {
+            e.printStackTrace()
+            listOf()
+        }
 
         for (row in rows) {
             val languageCode = row["IETF Tag"] ?: ""
