@@ -1,4 +1,4 @@
-package org.bibletranslationtools.fetcher.entities
+package org.bibletranslationtools.fetcher.data
 
 data class Language(
     val languageCode: String,
