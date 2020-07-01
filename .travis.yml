@@ -1,6 +1,5 @@
 language: java
-dist: trusty
-sudo: required
+dist: bionic
 jdk:
   - openjdk11
 addons:
