@@ -1,10 +1,11 @@
-package org.bibletranslationtools.fetcher
+package org.bibletranslationtools.fetcher.application
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import java.io.File
 import java.io.FileNotFoundException
 import java.net.URL
 import org.bibletranslationtools.fetcher.data.Language
+import org.bibletranslationtools.fetcher.domain.LanguageRepository
 
 class PortLanguageRepository : LanguageRepository {
 

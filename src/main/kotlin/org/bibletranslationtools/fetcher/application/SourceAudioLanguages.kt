@@ -1,9 +1,10 @@
-package org.bibletranslationtools.fetcher
+package org.bibletranslationtools.fetcher.application
 
 import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.streams.toList
 import org.bibletranslationtools.fetcher.data.Language
+import org.bibletranslationtools.fetcher.domain.LanguageRepository
 
 class SourceAudioLanguages(private val languageRepository: LanguageRepository) {
 

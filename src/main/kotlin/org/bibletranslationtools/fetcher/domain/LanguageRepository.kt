@@ -1,4 +1,4 @@
-package org.bibletranslationtools.fetcher
+package org.bibletranslationtools.fetcher.domain
 
 import org.bibletranslationtools.fetcher.data.Language
 
