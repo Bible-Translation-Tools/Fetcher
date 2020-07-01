@@ -7,7 +7,7 @@ import org.bibletranslationtools.fetcher.data.Language
 
 class SourceAudioLanguages(private val languageRepository: LanguageRepository) {
 
-    private val sourceAudioRoot = "/home/dj/SourceAudio"
+    private val sourceAudioRoot = "/SourceAudio"
 
     fun getAvailableLanguages(): List<Language> {
         val availableLanguageCodes = getAvailableLanguageCodes()
