@@ -2,6 +2,6 @@ package org.bibletranslationtools.fetcher.domain
 
 import org.bibletranslationtools.fetcher.data.Language
 
-interface LanguageRepository {
+interface LanguageCatalog {
     fun getLanguages(): List<Language>
 }

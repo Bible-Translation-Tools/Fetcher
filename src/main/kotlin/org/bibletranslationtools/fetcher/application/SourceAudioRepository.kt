@@ -6,11 +6,11 @@ import kotlin.streams.toList
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.domain.LanguageCatalog
 
-class SourceAudioLanguages(private val languageRepository: LanguageCatalog) {
+class SourceAudioRepository(private val languageRepository: LanguageCatalog) {
 
     private val sourceAudioRoot = "/SourceAudio"
 
-    fun getAvailableLanguages(): List<Language> {
+    fun getLanguages(): List<Language> {
         val availableLanguageCodes = getAvailableLanguageCodes()
         return languageRepository.getLanguages().filter { availableLanguageCodes.contains(it.languageCode) }
     }
