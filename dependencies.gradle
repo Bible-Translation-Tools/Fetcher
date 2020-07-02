@@ -7,4 +7,5 @@ ext {
     kotlin_ver = '1.3.72'
     ktor_ver = '1.3.2'
     thymeleaf_ver = '3.0.11.RELEASE'
+    jackson_ver = '2.9.8'
 }
