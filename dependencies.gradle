@@ -11,4 +11,6 @@ ext {
     csv_ver = '0.10.4'
     jackson_csv_ver = '2.8.8'
     jackson_kotlin_module_ver = '2.11.0'
+    slf4j_api_ver = '2.0.0-alpha1'
+    slf4j_simple_ver = '2.0.0-alpha1'
 }

@@ -38,6 +38,8 @@ dependencies {
     implementation "org.thymeleaf:thymeleaf:$thymeleaf_ver"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv:$jackson_csv_ver"
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_kotlin_module_ver"
+    implementation "org.slf4j:slf4j-api:$slf4j_api_ver"
+    implementation "org.slf4j:slf4j-simple:$slf4j_simple_ver"
 
     detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_ver"
 }

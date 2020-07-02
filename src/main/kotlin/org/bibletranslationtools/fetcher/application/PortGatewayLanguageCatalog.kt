@@ -9,6 +9,7 @@ import java.io.FileNotFoundException
 import java.net.URL
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.domain.LanguageCatalog
+import org.slf4j.LoggerFactory
 
 const val PORT_LANGUAGE_CODE_ID = "IETF Tag"
 const val PORT_ANGLICIZED_NAME_ID = "Name"
@@ -16,13 +17,14 @@ const val PORT_LOCALIZED_NAME_ID = "National Name"
 
 class PortGatewayLanguageCatalog : LanguageCatalog {
 
+    private val logger = LoggerFactory.getLogger(javaClass)
     private val portLanguageFileName = "port_gateway_languages.csv"
 
     override fun getLanguages(): List<Language> {
         val languagesFile: File = try {
             getLanguagesFile()
         } catch (e: FileNotFoundException) {
-            e.printStackTrace()
+            logger.error("PORT Languages File Not Found")
             return listOf()
         }
 
