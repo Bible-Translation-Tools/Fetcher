@@ -36,7 +36,8 @@ dependencies {
 
     implementation "io.ktor:ktor-server-netty:$ktor_ver"
     implementation "org.thymeleaf:thymeleaf:$thymeleaf_ver"
-    implementation "com.github.doyaaaaaken:kotlin-csv-jvm:$csv_ver"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv:$jackson_csv_ver"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_kotlin_module_ver"
 
     detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_ver"
 }

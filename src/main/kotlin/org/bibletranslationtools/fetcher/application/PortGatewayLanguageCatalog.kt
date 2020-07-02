@@ -1,6 +1,9 @@
 package org.bibletranslationtools.fetcher.application
 
-import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
+import com.fasterxml.jackson.databind.MappingIterator
+import com.fasterxml.jackson.dataformat.csv.CsvMapper
+import com.fasterxml.jackson.dataformat.csv.CsvSchema
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import java.io.File
 import java.io.FileNotFoundException
 import java.net.URL
@@ -16,18 +19,26 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
     private val portLanguageFileName = "port_gateway_languages.csv"
 
     override fun getLanguages(): List<Language> {
-        val languageList = mutableListOf<Language>()
-        val rows: List<Map<String, String>> = try {
-            getPortLanguagesList()
+        val languagesFile: File = try {
+            getLanguagesFile()
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
-            listOf()
+            return listOf()
         }
 
-        for (row in rows) {
-            val languageCode = row[PORT_LANGUAGE_CODE_ID] ?: ""
-            val anglicizedName = row[PORT_ANGLICIZED_NAME_ID] ?: ""
-            val localizedName = row[PORT_LOCALIZED_NAME_ID] ?: ""
+        val languageList = mutableListOf<Language>()
+        val mapper = CsvMapper().registerModule(KotlinModule())
+        val schema = CsvSchema.emptySchema().withHeader()
+        val languagesIterator: MappingIterator<Map<String, String>> = mapper.readerFor(Map::class.java)
+            .with(schema)
+            .readValues(languagesFile.readText())
+
+        while(languagesIterator.hasNext()) {
+            val language = languagesIterator.next()
+
+            val languageCode = language[PORT_LANGUAGE_CODE_ID] ?: ""
+            val anglicizedName = language[PORT_ANGLICIZED_NAME_ID] ?: ""
+            val localizedName = language[PORT_LOCALIZED_NAME_ID] ?: ""
 
             languageList.add(Language(languageCode, anglicizedName, localizedName))
         }
@@ -35,13 +46,12 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
         return languageList
     }
 
-    @Throws(FileNotFoundException::class)
-    private fun getPortLanguagesList(): List<Map<String, String>> {
+    private fun getLanguagesFile(): File {
         val portLanguagesResource: URL? = javaClass.classLoader.getResource(portLanguageFileName)
-        if (portLanguagesResource == null) throw FileNotFoundException("$portLanguageFileName not found in resources.")
+        if (portLanguagesResource == null) {
+            throw FileNotFoundException("$portLanguageFileName not found in resources.")
+        }
 
-        val portLanguagesFile = File(portLanguagesResource.file)
-
-        return csvReader().readAllWithHeader(portLanguagesFile)
+        return File(portLanguagesResource.file)
     }
 }
