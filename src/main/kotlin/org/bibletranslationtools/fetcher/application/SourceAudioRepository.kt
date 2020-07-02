@@ -11,11 +11,13 @@ class SourceAudioRepository(private val languageRepository: LanguageCatalog) {
     private val sourceAudioRoot = "/SourceAudio"
 
     fun getLanguages(): List<Language> {
-        val availableLanguageCodes = getAvailableLanguageCodes()
-        return languageRepository.getLanguages().filter { availableLanguageCodes.contains(it.languageCode) }
+        val availableLanguageCodes = getLanguageCodes()
+        return languageRepository.getLanguages().filter {
+            availableLanguageCodes.contains(it.languageCode)
+        }
     }
 
-    private fun getAvailableLanguageCodes(): List<String> {
+    private fun getLanguageCodes(): List<String> {
         val dirs = Files.list(Paths.get(sourceAudioRoot)).filter { Files.isDirectory(it) }
         return dirs.map { it.fileName.toString() }.toList()
     }
