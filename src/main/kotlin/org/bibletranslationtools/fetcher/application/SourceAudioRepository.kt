@@ -13,7 +13,7 @@ class SourceAudioRepository(private val languageRepository: LanguageCatalog) {
     fun getLanguages(): List<Language> {
         val availableLanguageCodes = getLanguageCodes()
         return languageRepository.getLanguages().filter {
-            availableLanguageCodes.contains(it.languageCode)
+            availableLanguageCodes.contains(it.code)
         }
     }
 
