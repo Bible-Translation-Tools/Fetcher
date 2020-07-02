@@ -35,7 +35,7 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
             .with(schema)
             .readValues(languagesFile.readText())
 
-        while(languagesIterator.hasNext()) {
+        while (languagesIterator.hasNext()) {
             val language = languagesIterator.next()
 
             val languageCode = language[PORT_LANGUAGE_CODE_ID] ?: ""
