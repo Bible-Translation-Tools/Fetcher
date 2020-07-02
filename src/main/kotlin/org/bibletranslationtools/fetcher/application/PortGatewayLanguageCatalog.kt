@@ -5,9 +5,13 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.net.URL
 import org.bibletranslationtools.fetcher.data.Language
-import org.bibletranslationtools.fetcher.domain.LanguageRepository
+import org.bibletranslationtools.fetcher.domain.LanguageCatalog
 
-class PortLanguageRepository : LanguageRepository {
+const val PORT_LANGUAGE_CODE_ID = "IETF Tag"
+const val PORT_ANGLICIZED_NAME_ID = "Name"
+const val PORT_LOCALIZED_NAME_ID = "National Name"
+
+class PortGatewayLanguageCatalog : LanguageCatalog {
 
     private val portLanguageFileName = "port_gateway_languages.csv"
 
@@ -21,9 +25,9 @@ class PortLanguageRepository : LanguageRepository {
         }
 
         for (row in rows) {
-            val languageCode = row["IETF Tag"] ?: ""
-            val anglicizedName = row["Name"] ?: ""
-            val localizedName = row["National Name"] ?: ""
+            val languageCode = row[PORT_LANGUAGE_CODE_ID] ?: ""
+            val anglicizedName = row[PORT_ANGLICIZED_NAME_ID] ?: ""
+            val localizedName = row[PORT_LOCALIZED_NAME_ID] ?: ""
 
             languageList.add(Language(languageCode, anglicizedName, localizedName))
         }
