@@ -1,5 +1,7 @@
 package org.bibletranslationtools.fetcher.application
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.MappingIterator
 import com.fasterxml.jackson.dataformat.csv.CsvMapper
 import com.fasterxml.jackson.dataformat.csv.CsvSchema
@@ -17,6 +19,13 @@ const val PORT_LOCALIZED_NAME_ID = "National Name"
 
 class PortGatewayLanguageCatalog : LanguageCatalog {
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private data class PortLanguageModel(
+        @JsonProperty(PORT_LANGUAGE_CODE_ID) val code: String,
+        @JsonProperty(PORT_ANGLICIZED_NAME_ID) val anglicizedName: String,
+        @JsonProperty(PORT_LOCALIZED_NAME_ID) val localizedName: String
+    )
+
     private val logger = LoggerFactory.getLogger(javaClass)
     private val portLanguageFileName = "port_gateway_languages.csv"
 
@@ -28,22 +37,14 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
             return listOf()
         }
 
-        val languageList = mutableListOf<Language>()
         val mapper = CsvMapper().registerModule(KotlinModule())
         val schema = CsvSchema.emptySchema().withHeader()
-        val languagesIterator: MappingIterator<Map<String, String>> = mapper.readerFor(Map::class.java)
+        val languagesIterator: MappingIterator<PortLanguageModel> = mapper.readerFor(PortLanguageModel::class.java)
             .with(schema)
-            .readValues(languagesFile.readText())
+            .readValues(languagesFile)
 
-        while (languagesIterator.hasNext()) {
-            val language = languagesIterator.next()
-
-            val languageCode = language[PORT_LANGUAGE_CODE_ID] ?: ""
-            val anglicizedName = language[PORT_ANGLICIZED_NAME_ID] ?: ""
-            val localizedName = language[PORT_LOCALIZED_NAME_ID] ?: ""
-
-            languageList.add(Language(languageCode, anglicizedName, localizedName))
-        }
+        val languageList = mutableListOf<Language>()
+        languagesIterator.forEach { languageList.add(Language(it.code, it.anglicizedName, it.localizedName)) }
 
         return languageList
     }
