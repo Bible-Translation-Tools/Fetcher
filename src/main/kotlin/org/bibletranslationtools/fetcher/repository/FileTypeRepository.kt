@@ -1,4 +1,4 @@
-package org.bibletranslationtools.fetcher.domain
+package org.bibletranslationtools.fetcher.repository
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
