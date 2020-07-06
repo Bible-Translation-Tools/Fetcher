@@ -1,27 +1,26 @@
 package org.bibletranslationtools.fetcher.application
 
-import java.nio.file.Files
-import java.nio.file.Paths
-import kotlin.streams.toList
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.domain.LanguageCatalog
+import java.io.File
 
 class SourceAudioRepository(
-    private val languageRepository: LanguageCatalog,
+    private val languageCatalog: LanguageCatalog,
     private val directoryProvider: DirectoryProvider
 ) {
     fun getLanguages(): List<Language> {
         val availableLanguageCodes = getLanguageCodes()
 
-        return languageRepository.getLanguages().filter {
+        return languageCatalog.getLanguages().filter {
             availableLanguageCodes.contains(it.code)
         }
     }
 
     private fun getLanguageCodes(): List<String> {
         val sourceAudioRoot = directoryProvider.getSourceAudioDir()
-        val dirs = Files.list(Paths.get(sourceAudioRoot)).filter { Files.isDirectory(it) }
+        val dirs = sourceAudioRoot.listFiles(File::isDirectory)
 
-        return dirs.map { it.fileName.toString() }.toList()
+        if(dirs.isNullOrEmpty()) return listOf()
+        return dirs.map { it.name.toString() }.toList()
     }
 }
