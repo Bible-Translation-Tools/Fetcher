@@ -39,7 +39,7 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
 
         val mapper = CsvMapper().registerModule(KotlinModule())
         val schema = CsvSchema.emptySchema().withHeader()
-        val languagesIterator: MappingIterator<PortLanguageModel> = mapper.readerFor(PortLanguageModel::class.java)
+        val languagesIterator: MappingIterator<PortGatewayLanguage> = mapper.readerFor(PortGatewayLanguage::class.java)
             .with(schema)
             .readValues(languagesFile)
 
