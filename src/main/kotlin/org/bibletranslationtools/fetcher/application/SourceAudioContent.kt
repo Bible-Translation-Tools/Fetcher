@@ -4,7 +4,7 @@ import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.domain.LanguageCatalog
 import java.io.File
 
-class SourceAudioRepository(
+class SourceAudioContent(
     private val languageCatalog: LanguageCatalog,
     private val directoryProvider: DirectoryProvider
 ) {
