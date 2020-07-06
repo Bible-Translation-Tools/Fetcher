@@ -48,6 +48,7 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
         return languageList
     }
 
+    @Throws(FileNotFoundException::class)
     private fun getLanguagesFile(): File {
         val portLanguagesResource: URL? = javaClass.classLoader.getResource(portLanguageFileName)
         if (portLanguagesResource == null) {
