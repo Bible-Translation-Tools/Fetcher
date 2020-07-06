@@ -9,15 +9,14 @@ class SourceAudioContent(
     private val directoryProvider: DirectoryProvider
 ) {
     fun getLanguages(): List<Language> {
-        val availableLanguageCodes = getLanguageCodes()
+        val availableLanguageCodes = getLanguageCodes(directoryProvider.getSourceAudioRoot())
 
         return languageCatalog.getLanguages().filter {
             availableLanguageCodes.contains(it.code)
         }
     }
 
-    private fun getLanguageCodes(): List<String> {
-        val sourceAudioRoot = directoryProvider.getSourceAudioDir()
+    private fun getLanguageCodes(sourceAudioRoot: File): List<String> {
         val dirs = sourceAudioRoot.listFiles(File::isDirectory)
 
         if(dirs.isNullOrEmpty()) return listOf()
