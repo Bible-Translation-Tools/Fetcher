@@ -5,8 +5,10 @@ import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import java.io.File
 import java.io.FileNotFoundException
 import org.bibletranslationtools.fetcher.data.FileType
+import org.slf4j.LoggerFactory
 
 class FileTypeRepository {
+    private val logger = LoggerFactory.getLogger(javaClass)
     private val fileTypesResourceName = "audio-file-types.json"
 
     fun getFileTypes(): List<FileType> {
@@ -15,7 +17,7 @@ class FileTypeRepository {
         val jsonData: String = try {
             File(pathToFileType).readText()
         } catch (e: FileNotFoundException) {
-            println(e.message)
+            logger.error("Resource File Not Found")
             return listOf()
         }
 
