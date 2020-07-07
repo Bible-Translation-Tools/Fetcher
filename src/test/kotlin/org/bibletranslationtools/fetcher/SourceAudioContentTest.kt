@@ -11,6 +11,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileFilter
 import java.net.URL
@@ -22,6 +23,8 @@ class SourceAudioContentTest {
         val mockCatalogLanguages: List<Language>,
         val expectedResult: List<Language>
     )
+
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     @Test
     fun testGetLanguages() {
@@ -47,9 +50,13 @@ class SourceAudioContentTest {
     }
 
     private fun getTestCases(): List<SourceAudioContentTestCase> {
-        val jsonTestFile = File("./src/test/resources/SourceAudioContentTestCases.json")
-        val mapper = jacksonObjectMapper()
+        val testCasesResource: URL? = javaClass.classLoader.getResource("SourceAudioContentTestCases.json")
+        if(testCasesResource == null) {
+            logger.error("Source Audio Content JSON test file not found.")
+        }
 
-        return mapper.readValue(jsonTestFile.readText())
+        val testCasesFile = File(testCasesResource!!.file)
+
+        return jacksonObjectMapper().readValue(testCasesFile.readText())
     }
 }
