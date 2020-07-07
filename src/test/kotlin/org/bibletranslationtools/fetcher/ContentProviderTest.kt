@@ -53,10 +53,10 @@ class ContentProviderTest {
         val testCasesResource: URL? = javaClass.classLoader.getResource("ContentProviderLanguageTestCases.json")
         if (testCasesResource == null) {
             logger.error("Source Content JSON test file not found.")
+            return listOf()
         }
 
-        val testCasesFile = File(testCasesResource!!.file)
-
+        val testCasesFile = File(testCasesResource.file)
         return jacksonObjectMapper().readValue(testCasesFile.readText())
     }
 }
