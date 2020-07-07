@@ -2,19 +2,19 @@ package org.bibletranslationtools.fetcher
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import java.io.File
+import java.io.FileFilter
+import java.net.URL
 import junit.framework.Assert.assertEquals
 import org.bibletranslationtools.fetcher.data.Language
-import org.bibletranslationtools.fetcher.domain.DirectoryProvider
 import org.bibletranslationtools.fetcher.domain.ContentProvider
+import org.bibletranslationtools.fetcher.domain.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.slf4j.LoggerFactory
-import java.io.File
-import java.io.FileFilter
-import java.net.URL
 
 class ContentProviderTest {
 
@@ -32,7 +32,7 @@ class ContentProviderTest {
         val mockFile = Mockito.mock(File::class.java)
         val mockCatalog = Mockito.mock(LanguageCatalog::class.java)
 
-        for(testCase in getLanguageTestCases()) {
+        for (testCase in getLanguageTestCases()) {
             `when`(mockFile.listFiles(any(FileFilter::class.java)))
                 .thenReturn(testCase.mockDirs.map { File(it) }.toTypedArray())
             `when`(mockDirectoryProvider.getContentRoot())
@@ -51,7 +51,7 @@ class ContentProviderTest {
 
     private fun getLanguageTestCases(): List<LanguageTestCase> {
         val testCasesResource: URL? = javaClass.classLoader.getResource("ContentProviderLanguageTestCases.json")
-        if(testCasesResource == null) {
+        if (testCasesResource == null) {
             logger.error("Source Content JSON test file not found.")
         }
 
