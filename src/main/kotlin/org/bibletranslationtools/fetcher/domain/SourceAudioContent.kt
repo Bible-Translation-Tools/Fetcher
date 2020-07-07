@@ -1,7 +1,7 @@
-package org.bibletranslationtools.fetcher.application
+package org.bibletranslationtools.fetcher.domain
 
 import org.bibletranslationtools.fetcher.data.Language
-import org.bibletranslationtools.fetcher.domain.LanguageCatalog
+import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import java.io.File
 
 class SourceAudioContent(

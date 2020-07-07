@@ -1,4 +1,4 @@
-package org.bibletranslationtools.fetcher.application
+package org.bibletranslationtools.fetcher.repository
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -10,7 +10,6 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.net.URL
 import org.bibletranslationtools.fetcher.data.Language
-import org.bibletranslationtools.fetcher.domain.LanguageCatalog
 import org.slf4j.LoggerFactory
 
 const val PORT_LANGUAGE_CODE_ID = "IETF Tag"

@@ -1,4 +1,4 @@
-package org.bibletranslationtools.fetcher.application
+package org.bibletranslationtools.fetcher.domain
 
 import java.io.File
 
