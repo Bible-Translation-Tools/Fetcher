@@ -8,7 +8,7 @@ const val PORT = 8080
 const val CLASS_LOADER = "Fetcher"
 
 fun main(args: Array<String>) {
-    val server = embeddedServer(
+    embeddedServer(
         factory = Netty,
         port = PORT,
         watchPaths = listOf(CLASS_LOADER),
