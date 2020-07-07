@@ -5,11 +5,11 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
 import java.io.FileFilter
 import java.net.URL
-import junit.framework.Assert.assertEquals
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.domain.ContentProvider
 import org.bibletranslationtools.fetcher.domain.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
