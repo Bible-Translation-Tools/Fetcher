@@ -1,5 +1,7 @@
 package org.bibletranslationtools.fetcher
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import junit.framework.Assert.assertEquals
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.domain.DirectoryProvider
@@ -11,38 +13,43 @@ import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import java.io.File
 import java.io.FileFilter
+import java.net.URL
 
 class SourceAudioContentTest {
 
+    private data class SourceAudioContentTestCase(
+        val mockDirs: List<String>,
+        val mockCatalogLanguages: List<Language>,
+        val expectedResult: List<Language>
+    )
+
     @Test
-    fun dirProvider() {
+    fun testGetLanguages() {
         val mockDirectoryProvider = Mockito.mock(DirectoryProvider::class.java)
         val mockFile = Mockito.mock(File::class.java)
-
-        `when`(mockFile.listFiles(any(FileFilter::class.java)))
-            .thenReturn(arrayOf(
-                File("/SourceAudio/en"), File("/SourceAudio/lo"), File("/SourceAudio/ja")
-            ))
-        `when`(mockDirectoryProvider.getSourceAudioRoot())
-            .thenReturn(mockFile)
-
         val mockCatalog = Mockito.mock(LanguageCatalog::class.java)
 
-        `when`(mockCatalog.getLanguages())
-            .thenReturn(listOf(
-                Language("en", "English", "English"),
-                Language("lo", "Laotian", "ພາສາລາວ"),
-                Language("pmy", "Papuan Malay", "Papuan Malay")
-            ))
+        for(testCase in getTestCases()) {
+            `when`(mockFile.listFiles(any(FileFilter::class.java)))
+                .thenReturn(testCase.mockDirs.map { File(it) }.toTypedArray())
+            `when`(mockDirectoryProvider.getSourceAudioRoot())
+                .thenReturn(mockFile)
+            `when`(mockCatalog.getLanguages())
+                .thenReturn(testCase.mockCatalogLanguages)
 
-        val saContent = SourceAudioContent(mockCatalog, mockDirectoryProvider)
-        assertEquals(
-            listOf(
-                Language("en", "English", "English"),
-                Language("lo", "Laotian", "ພາສາລາວ")
-            ),
-            saContent.getLanguages()
-        )
+            val sourceAudioContent = SourceAudioContent(mockCatalog, mockDirectoryProvider)
+
+            assertEquals(
+                testCase.expectedResult,
+                sourceAudioContent.getLanguages()
+            )
+        }
     }
 
+    private fun getTestCases(): List<SourceAudioContentTestCase> {
+        val jsonTestFile = File("./src/test/resources/SourceAudioContentTestCases.json")
+        val mapper = jacksonObjectMapper()
+
+        return mapper.readValue(jsonTestFile.readText())
+    }
 }

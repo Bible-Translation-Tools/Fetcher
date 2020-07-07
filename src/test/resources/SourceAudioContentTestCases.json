@@ -1,0 +1,38 @@
+[
+  {
+    "mockDirs": [
+      "/SourceAudio/en",
+      "/SourceAudio/lo",
+      "/SourceAudio/ja"
+    ],
+    "mockCatalogLanguages": [
+      {
+        "code": "en",
+        "anglicizedName": "English",
+        "localizedName": "English"
+      },
+      {
+        "code": "lo",
+        "anglicizedName": "Laotian",
+        "localizedName": "ພາສາລາວ"
+      },
+      {
+        "code": "pmy",
+        "anglicizedName": "Papuan Malay",
+        "localizedName": "Papuan Malay"
+      }
+    ],
+    "expectedResult": [
+      {
+        "code": "en",
+        "anglicizedName": "English",
+        "localizedName": "English"
+      },
+      {
+        "code": "lo",
+        "anglicizedName": "Laotian",
+        "localizedName": "ພາສາລາວ"
+      }
+    ]
+  }
+]
