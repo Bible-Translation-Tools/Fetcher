@@ -7,11 +7,11 @@ import java.io.FileNotFoundException
 import org.bibletranslationtools.fetcher.data.FileType
 import org.slf4j.LoggerFactory
 
-class FileTypeRepository {
+class FileTypeRepository: FileTypeCatalog {
     private val logger = LoggerFactory.getLogger(javaClass)
     private val fileTypesResourceName = "audio-file-types.json"
 
-    fun getFileTypes(): List<FileType> {
+    override fun getFileTypes(): List<FileType> {
         val mapper = jacksonObjectMapper()
         val pathToFileType = javaClass.classLoader.getResource(fileTypesResourceName).path
         val jsonData: String = try {
