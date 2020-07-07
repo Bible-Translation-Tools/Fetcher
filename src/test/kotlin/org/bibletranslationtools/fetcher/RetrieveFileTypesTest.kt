@@ -7,7 +7,7 @@ import org.junit.Assert.assertEquals
 import org.mockito.Mockito.*
 
 class RetrieveFileTypesTest {
-    private val fileTypes = setOf("tr", "mp3")
+    private val expectedFileTypes = setOf("tr", "mp3")
 
     @Test
     fun `getFileTypes_implementationTest`() {
