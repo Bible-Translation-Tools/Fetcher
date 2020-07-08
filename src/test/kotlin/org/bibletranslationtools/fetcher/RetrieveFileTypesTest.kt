@@ -1,6 +1,6 @@
 package org.bibletranslationtools.fetcher
 
-import org.bibletranslationtools.fetcher.repository.FileTypeRepository
+import org.bibletranslationtools.fetcher.repository.implementations.FileTypeRepository
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -11,9 +11,10 @@ class RetrieveFileTypesTest {
     }
 
     @Test
-    fun `testGetFileTypes`() {
+    fun testGetFileTypes() {
         val expectedFileTypes = AvailableFileType.values().map { it.type }
-        val actualTypes = FileTypeRepository().getFileTypes().map { it.type }
+        val actualTypes = FileTypeRepository()
+            .getAll().map { it.type }
 
         assertEquals(expectedFileTypes.toSet(), actualTypes.toSet())
     }
