@@ -1,0 +1,18 @@
+[
+  {
+    "mockFileDirs": ["/en", "/ja", "/vi"],
+    "expectedResult": ["en", "ja", "vi"]
+  },
+  {
+    "mockFileDirs": [],
+    "expectedResult": []
+  },
+  {
+    "mockFileDirs": ["/Source/fr", "/Source/zh", "/Source/vi"],
+    "expectedResult": ["fr", "zh", "vi"]
+  },
+  {
+    "mockFileDirs": ["/Source/en", "/OtherSource/lo", "/Other/OtherSource/vi"],
+    "expectedResult": ["en", "lo", "vi"]
+  }
+]
