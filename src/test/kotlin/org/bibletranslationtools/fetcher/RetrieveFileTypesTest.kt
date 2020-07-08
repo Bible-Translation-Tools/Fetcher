@@ -15,6 +15,6 @@ class RetrieveFileTypesTest {
         val expectedFileTypes = AvailableFileType.values().map { it.type }
         val actualTypes = FileTypeRepository().getFileTypes().map { it.type }
 
-        assertEquals(expectedFileTypes.toHashSet(), actualTypes.toHashSet())
+        assertEquals(expectedFileTypes.toSet(), actualTypes.toSet())
     }
 }
