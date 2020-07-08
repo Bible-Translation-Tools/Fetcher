@@ -1,14 +1,14 @@
 [
   {
     "type": "tr",
-    "title": "BTT Recorder",
-    "description": "Download source audio that is compatible with Recorder.",
+    "titleKey": "tr_title",
+    "descriptionKey": "tr_description",
     "resourceDir": "img/Recorder.png"
   },
   {
     "type": "mp3",
-    "title": "MP3 File",
-    "description": "Download source audio you can listen on any device or application.",
+    "titleKey": "mp3_title",
+    "descriptionKey": "mp3_description",
     "resourceDir": "img/Mp3.png"
   }
 ]
