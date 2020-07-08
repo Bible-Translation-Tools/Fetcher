@@ -1,4 +1,4 @@
-package org.bibletranslationtools.fetcher.repository
+package org.bibletranslationtools.fetcher.repository.implementations
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -10,6 +10,7 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.net.URL
 import org.bibletranslationtools.fetcher.data.Language
+import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.slf4j.LoggerFactory
 
 const val PORT_LANGUAGE_CODE_ID = "IETF Tag"
@@ -28,7 +29,7 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
     private val logger = LoggerFactory.getLogger(javaClass)
     private val portLanguageFileName = "port_gateway_languages.csv"
 
-    override fun getLanguages(): List<Language> {
+    override fun getAll(): List<Language> {
         val languagesFile: File = try {
             getLanguagesFile()
         } catch (e: FileNotFoundException) {
@@ -38,12 +39,15 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
 
         val mapper = CsvMapper().registerModule(KotlinModule())
         val schema = CsvSchema.emptySchema().withHeader()
-        val languagesIterator: MappingIterator<PortGatewayLanguage> = mapper.readerFor(PortGatewayLanguage::class.java)
+        val languagesIterator: MappingIterator<PortGatewayLanguage> = mapper.readerFor(
+            PortGatewayLanguage::class.java)
             .with(schema)
             .readValues(languagesFile)
 
         val languageList = mutableListOf<Language>()
-        languagesIterator.forEach { languageList.add(Language(it.code, it.anglicizedName, it.localizedName)) }
+        languagesIterator.forEach {
+            languageList.add(Language(it.code, it.anglicizedName, it.localizedName))
+        }
 
         return languageList
     }
