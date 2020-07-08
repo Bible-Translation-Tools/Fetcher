@@ -16,7 +16,7 @@ import java.net.URL
 
 class LanguageRepositoryImplTest {
 
-    data class GetLanguagesTest(
+    data class GetLanguagesTestCase(
         val languageCodes: List<String>,
         val catalogLanguages: List<Language>,
         val expectedResult: List<Language>
@@ -43,7 +43,7 @@ class LanguageRepositoryImplTest {
         }
     }
 
-    private fun retrieveGetLanguagesTestCases(): List<GetLanguagesTest> {
+    private fun retrieveGetLanguagesTestCases(): List<GetLanguagesTestCase> {
         val testCasesResource: URL? = javaClass.classLoader.getResource("LanguageRepositoryImpl_GetLanguages_TestCases.json")
         if (testCasesResource == null) {
             logger.error("Language Repository Implementation JSON test file not found.")

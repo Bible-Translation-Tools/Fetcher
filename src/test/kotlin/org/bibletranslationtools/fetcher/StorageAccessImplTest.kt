@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory
 
 class StorageAccessImplTest {
 
-    data class GetLanguageCodeTestCase(
+    data class GetLanguageCodesTestCase(
         val mockFileDirs: List<File>,
         val expectedResult: Set<String>
     )
@@ -42,7 +42,7 @@ class StorageAccessImplTest {
         }
     }
 
-    private fun retrieveGetLanguageCodeTestCases(): List<GetLanguageCodeTestCase> {
+    private fun retrieveGetLanguageCodeTestCases(): List<GetLanguageCodesTestCase> {
         val testCasesResource: URL? = javaClass.classLoader.getResource("StorageAccessImpl_GetLanguageCodes_TestCases.json")
         if (testCasesResource == null) {
             logger.error("Storage Access Implementation JSON test file not found.")
