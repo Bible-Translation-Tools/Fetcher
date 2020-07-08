@@ -12,15 +12,23 @@ class FileTypeRepository : FileTypeCatalog {
     private val fileTypesResourceName = "audio-file-types.json"
 
     override fun getFileTypes(): List<FileType> {
-        val mapper = jacksonObjectMapper()
-        val pathToFileType = javaClass.classLoader.getResource(fileTypesResourceName).path
-        val jsonData: String = try {
-            File(pathToFileType).readText()
+        val jsonFileTypes: String = try {
+            val resourceFile = getResourceFile()
+            resourceFile.readText()
         } catch (e: FileNotFoundException) {
             logger.error("Resource File Not Found")
             return listOf()
         }
 
-        return mapper.readValue(jsonData, jacksonTypeRef<List<FileType>>())
+        val mapper = jacksonObjectMapper()
+        return mapper.readValue(jsonFileTypes, jacksonTypeRef<List<FileType>>())
+    }
+
+    @Throws(FileNotFoundException::class)
+    private fun getResourceFile(): File {
+        val resourceFileURL = javaClass.classLoader.getResource(fileTypesResourceName)
+            ?: throw FileNotFoundException()
+
+        return File(resourceFileURL.path)
     }
 }
