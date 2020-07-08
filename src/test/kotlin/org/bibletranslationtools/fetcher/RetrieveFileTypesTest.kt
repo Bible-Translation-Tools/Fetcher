@@ -13,8 +13,7 @@ class RetrieveFileTypesTest {
     @Test
     fun testGetFileTypes() {
         val expectedFileTypes = AvailableFileType.values().map { it.type }
-        val actualTypes = FileTypeRepository()
-            .getAll().map { it.type }
+        val actualTypes = FileTypeRepository().getAll().map { it.type }
 
         assertEquals(expectedFileTypes.toSet(), actualTypes.toSet())
     }
