@@ -1,14 +1,14 @@
 [
   {
-    "type": "tr",
+    "slug": "BTTr",
     "titleKey": "tr_title",
     "descriptionKey": "tr_description",
-    "resourceDir": "img/Recorder.png"
+    "iconLink": "img/Recorder_icon.png"
   },
   {
-    "type": "mp3",
+    "slug": "mp3",
     "titleKey": "mp3_title",
     "descriptionKey": "mp3_description",
-    "resourceDir": "img/Mp3.png"
+    "iconLink": "img/Mp3_icon.png"
   }
 ]
