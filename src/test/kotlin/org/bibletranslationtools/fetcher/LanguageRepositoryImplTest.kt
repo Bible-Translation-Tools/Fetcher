@@ -35,7 +35,10 @@ class LanguageRepositoryImplTest {
             `when`(mockLanguageCatalog.getAll())
                 .thenReturn(testCase.catalogLanguages)
 
-            val languageRepository = LanguageRepositoryImpl(mockStorageAccess, mockLanguageCatalog)
+            val languageRepository = LanguageRepositoryImpl(
+                mockStorageAccess,
+                mockLanguageCatalog
+            )
             assertEquals(
                 testCase.expectedResult,
                 languageRepository.getLanguages()

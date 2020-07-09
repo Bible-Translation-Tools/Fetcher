@@ -31,7 +31,7 @@ class StorageAccessImplTest {
         for (testCase in retrieveGetLanguageCodeTestCases()) {
             `when`(mockFile.listFiles(any(FileFilter::class.java)))
                 .thenReturn(testCase.mockFileDirs.toTypedArray())
-            `when`(mockDirectoryProvider.getSourceFileRootDir())
+            `when`(mockDirectoryProvider.getContentRoot())
                 .thenReturn(mockFile)
 
             val storageAccessImpl = StorageAccessImpl(mockDirectoryProvider)
@@ -43,7 +43,9 @@ class StorageAccessImplTest {
     }
 
     private fun retrieveGetLanguageCodeTestCases(): List<GetLanguageCodesTestCase> {
-        val testCasesResource: URL? = javaClass.classLoader.getResource("StorageAccessImpl_GetLanguageCodes_TestCases.json")
+        val testCasesResource: URL? = javaClass.classLoader.getResource(
+            "StorageAccessImpl_GetLanguageCodes_TestCases.json"
+        )
         if (testCasesResource == null) {
             logger.error("Storage Access Implementation JSON test file not found.")
             return listOf()
