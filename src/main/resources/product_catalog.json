@@ -3,12 +3,12 @@
     "slug": "BTTr",
     "titleKey": "tr_title",
     "descriptionKey": "tr_description",
-    "iconLink": "img/Recorder_icon.png"
+    "iconLink": "img/recorder_icon.png"
   },
   {
     "slug": "mp3",
     "titleKey": "mp3_title",
     "descriptionKey": "mp3_description",
-    "iconLink": "img/Mp3_icon.png"
+    "iconLink": "img/mp3_icon.png"
   }
 ]
