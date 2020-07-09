@@ -2,6 +2,8 @@ package org.bibletranslationtools.fetcher
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import java.io.File
+import java.net.URL
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.StorageAccess
@@ -11,8 +13,6 @@ import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.slf4j.LoggerFactory
-import java.io.File
-import java.net.URL
 
 class LanguageRepositoryImplTest {
 
@@ -44,7 +44,9 @@ class LanguageRepositoryImplTest {
     }
 
     private fun retrieveGetLanguagesTestCases(): List<GetLanguagesTestCase> {
-        val testCasesResource: URL? = javaClass.classLoader.getResource("LanguageRepositoryImpl_GetLanguages_TestCases.json")
+        val testCasesResource: URL? = javaClass.classLoader.getResource(
+            "LanguageRepositoryImpl_GetLanguages_TestCases.json"
+        )
         if (testCasesResource == null) {
             logger.error("Language Repository Implementation JSON test file not found.")
             return listOf()
