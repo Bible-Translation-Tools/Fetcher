@@ -14,7 +14,7 @@ class ProductCatalogImpl : ProductCatalog {
         val slug: String,
         val titleKey: String,
         val descriptionKey: String,
-        val iconLink: String
+        val iconUrl: String
     )
 
     private val products: List<Product> = parseCatalog()
@@ -35,7 +35,7 @@ class ProductCatalogImpl : ProductCatalog {
                 it.slug,
                 it.titleKey,
                 it.descriptionKey,
-                File(it.iconLink)
+                File(it.iconUrl)
             )
         }
     }
