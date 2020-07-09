@@ -5,6 +5,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+const val TOTAL_LANGUAGES = 44
+
 class PortGatewayLanguageCatalogTest {
 
     private val portGatewayLanguageCatalog = PortGatewayLanguageCatalog()
@@ -13,7 +15,7 @@ class PortGatewayLanguageCatalogTest {
     fun testGetAll() {
         val languages = portGatewayLanguageCatalog.getAll()
 
-        assertEquals(44, languages.size)
+        assertEquals(TOTAL_LANGUAGES, languages.size)
 
         for (language in languages) {
             assertTrue(language.code.isNotEmpty())
