@@ -1,8 +1,10 @@
 package org.bibletranslationtools.fetcher.data
 
-data class FileType(
-    val type: String,
+import java.io.File
+
+data class Product(
+    val slug: String,
     val titleKey: String,
     val descriptionKey: String,
-    val resourceDir: String
+    val icon: File
 )
