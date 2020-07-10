@@ -5,9 +5,9 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
 import java.net.URL
 import org.bibletranslationtools.fetcher.data.Language
+import org.bibletranslationtools.fetcher.impl.repository.LanguageRepositoryImpl
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.StorageAccess
-import org.bibletranslationtools.fetcher.impl.repository.LanguageRepositoryImpl
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.Mockito

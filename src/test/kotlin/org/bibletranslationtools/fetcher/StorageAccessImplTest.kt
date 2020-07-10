@@ -5,8 +5,8 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
 import java.io.FileFilter
 import java.net.URL
-import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
+import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
