@@ -28,8 +28,11 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
 
     private val logger = LoggerFactory.getLogger(javaClass)
     private val portLanguageFileName = "port_gateway_languages.csv"
+    private val languageList: List<Language> = parseCatalog()
 
-    override fun getAll(): List<Language> {
+    override fun getAll(): List<Language> = this.languageList
+
+    private fun parseCatalog(): List<Language> {
         val languagesFile: File = try {
             getLanguagesFile()
         } catch (e: FileNotFoundException) {
