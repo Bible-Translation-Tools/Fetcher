@@ -68,7 +68,7 @@ ktlint {
 }
 
 application {
-    mainClassName = "org.bibletranslationtools.fetcher.mainKt"
+    mainClassName = "org.bibletranslationtools.fetcher.web.MainKt"
 }
 
 shadowJar {
@@ -76,7 +76,7 @@ shadowJar {
     mergeServiceFiles()
     manifest {
         attributes(
-            'Main-Class': "org.bibletranslationtools.fetcher.mainKt"
+            'Main-Class': "org.bibletranslationtools.fetcher.web.MainKt"
         )
     }
 }
