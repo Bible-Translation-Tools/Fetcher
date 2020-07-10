@@ -7,7 +7,7 @@ import java.net.URL
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.StorageAccess
-import org.bibletranslationtools.fetcher.repository.implementations.LanguageRepositoryImpl
+import org.bibletranslationtools.fetcher.impl.repository.LanguageRepositoryImpl
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.Mockito
@@ -35,10 +35,11 @@ class LanguageRepositoryImplTest {
             `when`(mockLanguageCatalog.getAll())
                 .thenReturn(testCase.catalogLanguages)
 
-            val languageRepository = LanguageRepositoryImpl(
-                mockStorageAccess,
-                mockLanguageCatalog
-            )
+            val languageRepository =
+                LanguageRepositoryImpl(
+                    mockStorageAccess,
+                    mockLanguageCatalog
+                )
             assertEquals(
                 testCase.expectedResult,
                 languageRepository.getLanguages()

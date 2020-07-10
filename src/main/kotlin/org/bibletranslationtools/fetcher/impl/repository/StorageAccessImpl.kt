@@ -1,4 +1,4 @@
-package org.bibletranslationtools.fetcher.repository.implementations
+package org.bibletranslationtools.fetcher.impl.repository
 
 import java.io.File
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider

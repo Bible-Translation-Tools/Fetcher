@@ -6,7 +6,7 @@ import java.io.File
 import java.io.FileFilter
 import java.net.URL
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
-import org.bibletranslationtools.fetcher.repository.implementations.StorageAccessImpl
+import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
@@ -34,7 +34,10 @@ class StorageAccessImplTest {
             `when`(mockDirectoryProvider.getContentRoot())
                 .thenReturn(mockFile)
 
-            val storageAccessImpl = StorageAccessImpl(mockDirectoryProvider)
+            val storageAccessImpl =
+                StorageAccessImpl(
+                    mockDirectoryProvider
+                )
             assertEquals(
                 testCase.expectedResult,
                 storageAccessImpl.getLanguageCodes().toSet()

@@ -1,6 +1,6 @@
 package org.bibletranslationtools.fetcher
 
-import org.bibletranslationtools.fetcher.repository.implementations.PortGatewayLanguageCatalog
+import org.bibletranslationtools.fetcher.impl.repository.PortGatewayLanguageCatalog
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -9,7 +9,8 @@ const val TOTAL_LANGUAGES = 44
 
 class PortGatewayLanguageCatalogTest {
 
-    private val portGatewayLanguageCatalog = PortGatewayLanguageCatalog()
+    private val portGatewayLanguageCatalog =
+        PortGatewayLanguageCatalog()
 
     @Test
     fun testGetAll() {

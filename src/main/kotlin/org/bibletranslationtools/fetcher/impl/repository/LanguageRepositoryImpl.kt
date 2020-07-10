@@ -1,4 +1,4 @@
-package org.bibletranslationtools.fetcher.repository.implementations
+package org.bibletranslationtools.fetcher.impl.repository
 
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
