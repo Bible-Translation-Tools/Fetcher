@@ -9,14 +9,6 @@ import org.bibletranslationtools.fetcher.repository.ProductCatalog
 
 class ProductCatalogImpl : ProductCatalog {
     private val productCatalogFileName = "product_catalog.json"
-
-    private data class ProductSchema(
-        val slug: String,
-        val titleKey: String,
-        val descriptionKey: String,
-        val iconUrl: String
-    )
-
     private val products: List<Product> = parseCatalog()
 
     override fun getAll(): List<Product> = this.products
@@ -29,15 +21,7 @@ class ProductCatalogImpl : ProductCatalog {
             return listOf()
         }
 
-        val productsFromSchema: List<ProductSchema> = jacksonObjectMapper().readValue(jsonFileTypes)
-        return productsFromSchema.map {
-            Product(
-                it.slug,
-                it.titleKey,
-                it.descriptionKey,
-                File(it.iconUrl)
-            )
-        }
+        return jacksonObjectMapper().readValue(jsonFileTypes)
     }
 
     @Throws(FileNotFoundException::class)

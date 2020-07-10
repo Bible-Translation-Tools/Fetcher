@@ -6,5 +6,5 @@ data class Product(
     val slug: String,
     val titleKey: String,
     val descriptionKey: String,
-    val icon: File
+    val iconUrl: String
 )
