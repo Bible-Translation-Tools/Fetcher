@@ -1,4 +1,4 @@
-package org.bibletranslationtools.fetcher.repository.implementations
+package org.bibletranslationtools.fetcher.impl.repository
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
