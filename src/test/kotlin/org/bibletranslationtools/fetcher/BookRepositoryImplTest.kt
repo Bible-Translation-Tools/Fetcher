@@ -48,7 +48,7 @@ class BookRepositoryImplTest {
             "BookRepositoryImpl_GetBooks_TestCases.json"
         )
         if (testCasesResource == null) {
-            logger.error("Language Repository Implementation JSON test file not found.")
+            logger.error("Book Repository Implementation JSON test file not found.")
             return listOf()
         }
 
