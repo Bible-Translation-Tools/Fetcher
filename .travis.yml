@@ -24,7 +24,7 @@ cache:
 script:
 - "./gradlew check build"
 - sonar-scanner
-- docker build -t bibletranlationtools/fetcher .
+- docker build -t bibletranslationtools/fetcher .
 deploy:
   provider: script
   script: bash docker_push.sh
