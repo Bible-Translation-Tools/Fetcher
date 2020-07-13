@@ -2,6 +2,7 @@ package org.bibletranslationtools.fetcher
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import java.io.File
 import junit.framework.Assert.assertEquals
 import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.impl.repository.BookRepositoryImpl
@@ -11,7 +12,6 @@ import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.slf4j.LoggerFactory
-import java.io.File
 
 class BookRepositoryImplTest {
     private data class BookTestCases(
@@ -35,7 +35,7 @@ class BookRepositoryImplTest {
             `when`(mockBookCatalog.getAll()).thenReturn(testCase.bookCatalog)
 
             val bookRepo = BookRepositoryImpl(
-                storageAccess =  mockStorageAccess,
+                storageAccess = mockStorageAccess,
                 bookCatalog = mockBookCatalog
             )
 
@@ -45,7 +45,7 @@ class BookRepositoryImplTest {
 
     private fun getTestCasesForBooksRetrieval(): List<BookTestCases> {
         val testCasesResource = javaClass.classLoader.getResource(
-            "StorageAccessImpl_GetBookCodes_TestCases.json"
+            "BookRepositoryImpl_GetBooks_TestCases.json"
         )
         if (testCasesResource == null) {
             logger.error("Language Repository Implementation JSON test file not found.")
