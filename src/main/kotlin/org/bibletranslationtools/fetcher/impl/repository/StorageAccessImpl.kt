@@ -13,8 +13,8 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
     }
 
     override fun getBookSlugs(languageCode: String): List<String> {
-        val bookDir = directoryProvider.getProjectsDir(languageCode)
-        val dirs = bookDir.listFiles(File::isDirectory)
+        val projectsDir = directoryProvider.getProjectsDir(languageCode)
+        val dirs = projectsDir.listFiles(File::isDirectory)
 
         return if (dirs.isNullOrEmpty()) listOf() else dirs.map { it.name }
     }
