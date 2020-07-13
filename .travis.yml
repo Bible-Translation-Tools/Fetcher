@@ -1,20 +1,32 @@
 language: java
 dist: bionic
 jdk:
-  - openjdk11
+- openjdk11
+services:
+- docker
+env:
+  global:
+  - secure: EssD3iawbRgymVZEk2erBErS/ywfgkq7Pu2cnjc2jOhBH+id7cUJi3fT0QNXRG1LrbmiMalqeHUvkcbgGSlfbKonjdeTd2MTQyCc3Tqh6ZCV+CHVA0O7hN9Lyy8pQ5Q9nMmSSC07kYYM///DDbMRDaWePXojxMrCeRxnmj30xDFIdu3hTnck5cUDCIlVeXeZXChiFn63grSGj93pFDmK981vNqrZEqV8VksP58OEuuVUoWmnGUWrhyIfQ7rncyLIm8DGUZDJPNT9nfWGsxU4/7ug9RtpuvBj7AozS9e2TYmIy0PSLNZMnzv2BRYY4mMUUMSOoEv3qgRfOKcWS0fMsQp/ca8qhLg6UI39mHbrSK6lp6dcWwWQS07O7nkWKhJ1tpCegAuj+yo6L2F+Mm3PeEsiIrRrJsdiUSA8liwGh92sn0E1T5HkcfrbG71aXo79xG7Hs6XN4o95uBfKLoDkVHl0kowKu6mOsEs/DH5ffbsqJ8L5zpFok0qkWFYuw83oqZE7ePOpp1Mc/oASAwIWbjz1uv09lZZ3Krq8fSNdvxkuAjzi3ZLb/ce9WK7lJhONPCB2dmi8g8IVbkVXI9QyAv7khU3Qwvr03edL3d8i4G/3YzfWJ+Plm7JbrDtyfIefzcyTa2PbO0q+AJUXCR9ex0HjonDaqjB5qg5mZHMCEyo=
+  - secure: dmAStPoCIgO76bhDZdevjeqG3Sca8wlFcspBdCLHWrBN4xIvGZM+h1JOeMH/ILuemtuZBU68JAHrb4oLu+y8ZZre0z4we0aAVdIy6pPFzud+RYyOJ/MG04Mja38C1C3iy7/sGlGCYPDck62vTzR5UPWfVaDPB6FtY8jNMZkkwSddzwPrqlnbZf/mEFTZuI4fFGDt4bpmTRMmOvPPcPHG7Up/U7sxvBBnMOYGF6l2COmgWG2iofeW1dqq05U4snmo9Wp7+738AoHOlnjAB9w04YCgqJNdc0ifG1h3o9jGXm2z10HivNMMrTH9gwM/X8yrt+zmH7x2CVghsvEz741ZdP89tRPyB5ZOucTCQevgOMa2sBvvwGYkOJtL4rJT+WFwz8xXl/U5H+zLo5Yr5X+144COLUooFyzkiGvbwWP/sunnwCGw8Ku+v+dVfCvOFu/uxC24e3V5lrCs/B10szbt99VeRXBLT6x0rAy4/booiwCW9U74e7zJRpdU2UfbWci7pUVK9vszAV4Wg1vNm6yBSGrnjqIgEZ+x0H5XemcA8HEs97NJEPu9tNmVwU4ZnNCLj+YKHZ/LB2Gk1Wys5Y0KTmVNZxLHmugzM/UASwJ3F2hXWDNYK+q4kWJCTkrLz+nYVTQSPpILMsQcEEqIMHvQcxcD3OrZs9yR5UazYMhBE8w=
 addons:
   sonarcloud:
-    organization: "bible-translation-tools"
+    organization: bible-translation-tools
     token:
-      secure: "YRaM3BHHJlbniYs9zNTt5KmxqiFZPB3bBN29LQi+QR3LeFUCHVyp0A5Kz01i2XCbnL76lmxlmFT1jvG9dzWJkqzkgGYAenKqeHIK7FSVIddatG6h/jQC0oIQpZejJXfpY5ixag+v3Tyw9t6a0Sje3PHF4KnnwzJogA8Ahyix2WqyT062HhOHILbIlKqC6qASMVZWid6YBkTWVUqpnAKgk5EM56YtuO4+JcIsC/x4P7IZJ7rznXqMb2HCiuN8A9aDU5g66EP7UZMif/C7645P3u6cQLm0sUIcCrOXobBv5MvULow6uschNtZ9u1r1Y0GiBmdU5sc4a17j4bHIeWP1QrF8gnQETKRerzdlK2+/BhBb8hehPdLLFs0twgJWMXbeLJcgga7TQVhBVEU99l4W5+NJ6pDZndD1a1hchlMHkAdxEB6XMvw3KhoigewHLBhVo/VdxG9NRI3lF4uaMIPXz9k0Qm41qCwijrmZBms2t3pHJEViJpYC4OWs1e1MvuWqDIfYypSeMd+tacGRjnUrui603WZFSeMf7LAXnMWFLMkf6pcywcMclRZ0A5Kut59+0m3FnNSCq65OmB6gYfsCDsUwf7rd3XP5VdfPJ6Q1mxzSrdy/yby8+onXP95hm0oUUBO1B3KcL1uyDwphZxkOZAFtAjBUg7I6ViWJaf3Bncc="
+      secure: YRaM3BHHJlbniYs9zNTt5KmxqiFZPB3bBN29LQi+QR3LeFUCHVyp0A5Kz01i2XCbnL76lmxlmFT1jvG9dzWJkqzkgGYAenKqeHIK7FSVIddatG6h/jQC0oIQpZejJXfpY5ixag+v3Tyw9t6a0Sje3PHF4KnnwzJogA8Ahyix2WqyT062HhOHILbIlKqC6qASMVZWid6YBkTWVUqpnAKgk5EM56YtuO4+JcIsC/x4P7IZJ7rznXqMb2HCiuN8A9aDU5g66EP7UZMif/C7645P3u6cQLm0sUIcCrOXobBv5MvULow6uschNtZ9u1r1Y0GiBmdU5sc4a17j4bHIeWP1QrF8gnQETKRerzdlK2+/BhBb8hehPdLLFs0twgJWMXbeLJcgga7TQVhBVEU99l4W5+NJ6pDZndD1a1hchlMHkAdxEB6XMvw3KhoigewHLBhVo/VdxG9NRI3lF4uaMIPXz9k0Qm41qCwijrmZBms2t3pHJEViJpYC4OWs1e1MvuWqDIfYypSeMd+tacGRjnUrui603WZFSeMf7LAXnMWFLMkf6pcywcMclRZ0A5Kut59+0m3FnNSCq65OmB6gYfsCDsUwf7rd3XP5VdfPJ6Q1mxzSrdy/yby8+onXP95hm0oUUBO1B3KcL1uyDwphZxkOZAFtAjBUg7I6ViWJaf3Bncc=
 before_cache:
-  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -f $HOME/.gradle/caches/*/plugin-resoloution/
+- rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -f $HOME/.gradle/caches/*/plugin-resoloution/
 cache:
   directories:
-    - "$HOME/.gradle/caches/"
-    - "$HOME/.gradle/wrapper"
-    - '$HOME/.sonar/cache'
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper"
+  - "$HOME/.sonar/cache"
 script:
-  - ./gradlew check
-  - sonar-scanner
+- "./gradlew check build"
+- sonar-scanner
+- docker build -t bibletranlationtools/fetcher .
+deploy:
+  provider: script
+  script: bash docker_push.sh
+  on:
+    branch: dev
