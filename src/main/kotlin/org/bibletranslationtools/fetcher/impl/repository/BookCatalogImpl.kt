@@ -11,11 +11,11 @@ import org.bibletranslationtools.fetcher.repository.BookCatalog
 
 class BookCatalogImpl : BookCatalog {
 
-    companion object {
-        private const val CATALOG_SLUG_ID = "slug"
-        private const val CATALOG_NUMBER_ID = "num"
-        private const val CATALOG_ANGLICIZED_NAME_ID = "name"
-        private const val BOOK_CATALOG_FILE_NAME: String = "book_catalog.json"
+    private companion object {
+        const val CATALOG_SLUG_ID = "slug"
+        const val CATALOG_NUMBER_ID = "num"
+        const val CATALOG_ANGLICIZED_NAME_ID = "name"
+        const val BOOK_CATALOG_FILE_NAME = "book_catalog.json"
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
