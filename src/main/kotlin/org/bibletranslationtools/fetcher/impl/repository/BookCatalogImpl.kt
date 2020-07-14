@@ -25,7 +25,11 @@ class BookCatalogImpl : BookCatalog {
         @JsonProperty(CATALOG_ANGLICIZED_NAME_ID) val anglicizedName: String
     )
 
-    override fun getAll(): List<Book> {
+    private val books: List<Book> = parseCatalog()
+
+    override fun getAll(): List<Book> = this.books
+
+    private fun parseCatalog(): List<Book> {
         val jsonBookCatalog: String = try {
             val catalogFile = getBookCatalogFile()
             catalogFile.readText()
