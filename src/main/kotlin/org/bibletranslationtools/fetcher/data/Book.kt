@@ -5,5 +5,5 @@ data class Book(
     val slug: String,
     val anglicizedName: String,
     var availability: Boolean = false,
-    val localizedName: String = ""
+    var localizedName: String = ""
 )

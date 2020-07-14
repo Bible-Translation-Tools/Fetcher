@@ -4,4 +4,5 @@ import org.bibletranslationtools.fetcher.data.Book
 
 interface BookCatalog {
     fun getAll(): List<Book>
+    fun getBook(slug: String): Book?
 }

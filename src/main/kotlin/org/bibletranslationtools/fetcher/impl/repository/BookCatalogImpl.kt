@@ -29,6 +29,12 @@ class BookCatalogImpl : BookCatalog {
 
     override fun getAll(): List<Book> = this.books
 
+    override fun getBook(slug: String): Book? {
+        if (slug.isNullOrEmpty()) return null
+        val book = books.firstOrNull { it.slug == slug }
+        return book?.apply { book.localizedName = book.anglicizedName }
+    }
+
     private fun parseCatalog(): List<Book> {
         val jsonBookCatalog: String = try {
             val catalogFile = getBookCatalogFile()
