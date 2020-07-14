@@ -26,7 +26,6 @@ class BookCatalogImpl : BookCatalog {
     )
 
     override fun getAll(): List<Book> {
-        PORT_ANGLICIZED_NAME_ID
         val jsonBookCatalog: String = try {
             val catalogFile = getBookCatalogFile()
             catalogFile.readText()
