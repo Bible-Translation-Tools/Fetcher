@@ -14,14 +14,14 @@ class ProductCatalogImpl : ProductCatalog {
     override fun getAll(): List<Product> = this.products
 
     private fun parseCatalog(): List<Product> {
-        val jsonFileTypes: String = try {
+        val jsonProducts: String = try {
             val productsFile = getProductCatalogFile()
             productsFile.readText()
         } catch (e: FileNotFoundException) {
             return listOf()
         }
 
-        return jacksonObjectMapper().readValue(jsonFileTypes)
+        return jacksonObjectMapper().readValue(jsonProducts)
     }
 
     @Throws(FileNotFoundException::class)
