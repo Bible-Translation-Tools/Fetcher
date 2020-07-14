@@ -21,7 +21,7 @@ class ProductCatalogImpl : ProductCatalog {
             val productsFile = getProductCatalogFile()
             productsFile.readText()
         } catch (e: FileNotFoundException) {
-            logger.error("\"$productCatalogFileName\" file not found", e)
+            logger.error("$productCatalogFileName file not found", e)
             throw e // crash on fatal exception: critical resource not found
         }
 
