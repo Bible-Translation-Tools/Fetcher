@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
 
 class ProductCatalogImpl : ProductCatalog {
     private val logger = LoggerFactory.getLogger(javaClass)
-    private val productCatalogFileName = "roduct_catalog.json"
+    private val productCatalogFileName = "product_catalog.json"
     private val products: List<Product> = parseCatalog()
 
     override fun getAll(): List<Product> = this.products
