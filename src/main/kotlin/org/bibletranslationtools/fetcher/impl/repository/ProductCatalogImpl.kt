@@ -17,7 +17,7 @@ class ProductCatalogImpl : ProductCatalog {
 
     @Throws(FileNotFoundException::class)
     private fun parseCatalog(): List<Product> {
-        val jsonFileTypes: String = try {
+        val jsonProducts: String = try {
             val productsFile = getProductCatalogFile()
             productsFile.readText()
         } catch (e: FileNotFoundException) {
@@ -25,7 +25,7 @@ class ProductCatalogImpl : ProductCatalog {
             throw e // crash on fatal exception: critical resource not found
         }
 
-        return jacksonObjectMapper().readValue(jsonFileTypes)
+        return jacksonObjectMapper().readValue(jsonProducts)
     }
 
     @Throws(FileNotFoundException::class)
