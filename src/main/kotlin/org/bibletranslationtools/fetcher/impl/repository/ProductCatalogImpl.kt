@@ -21,7 +21,7 @@ class ProductCatalogImpl : ProductCatalog {
             return listOf()
         }
 
-        return jacksonObjectMapper().readValue(jsonFileTypes)
+        return jacksonObjectMapper().readValue(jsonProducts)
     }
 
     @Throws(FileNotFoundException::class)
