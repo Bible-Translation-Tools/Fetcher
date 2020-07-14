@@ -21,11 +21,11 @@ class ChapterCatalogImpl : ChapterCatalog {
         fun getChapter(): Int = id.split("-")[0].toInt()
     }
 
-    override fun getChapterCount(language: Language, book: Book): Int {
+    override fun getChapterCount(languageCode: String, bookSlug: String): Int {
         val client = HttpClient()
         val response: ByteArray? = runBlocking {
             try {
-                client.get<ByteArray>(getChunksURL(language, book))
+                client.get<ByteArray>(getChunksURL(languageCode, bookSlug))
             } catch (ex: ClientRequestException) {
                 null
             }
@@ -40,8 +40,8 @@ class ChapterCatalogImpl : ChapterCatalog {
         return lastChunk.getChapter()
     }
 
-    private fun getChunksURL(language: Language, book: Book): String {
-        return "https://api.unfoldingword.org/ts/txt/2/${book.slug}/${language.code}/ulb/chunks.json"
+    private fun getChunksURL(languageCode: String, bookSlug: String): String {
+        return "https://api.unfoldingword.org/ts/txt/2/${bookSlug}/${languageCode}/ulb/chunks.json"
     }
 
     private fun getLastChunk(chunkList: MutableList<Chunk>): Chunk {

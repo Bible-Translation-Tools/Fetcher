@@ -1,27 +1,27 @@
 [
   {
-    "language": { "code":  "en", "anglicizedName": "English", "localizedName": "English" },
-    "book": { "index": 1, "slug": "gen", "anglicizedName": "Genesis" },
+    "languageCode": "en",
+    "bookSlug": "gen",
     "expectedResult": 50
   },
   {
-    "language": { "code":  "en", "anglicizedName": "English", "localizedName": "English" },
-    "book": { "index": 3, "slug": "exo", "anglicizedName": "Exodus" },
+    "languageCode": "en",
+    "bookSlug": "exo",
     "expectedResult": 40
   },
   {
-    "language": { "code":  "en", "anglicizedName": "English", "localizedName": "English" },
-    "book": { "index": 42, "slug": "mat", "anglicizedName": "Matthew" },
+    "languageCode": "en",
+    "bookSlug": "mat",
     "expectedResult": 28
   },
   {
-    "language": { "code":  "en", "anglicizedName": "English", "localizedName": "English" },
-    "book": { "index": 40, "slug": "jhn", "anglicizedName": "John" },
+    "languageCode": "en",
+    "bookSlug": "jhn",
     "expectedResult": 21
   },
   {
-    "language": { "code":  "en", "anglicizedName": "English", "localizedName": "English" },
-    "book": { "index": 9, "slug": "rut", "anglicizedName": "Ruth" },
+    "languageCode": "en",
+    "bookSlug": "rut",
     "expectedResult": 4
   }
 ]

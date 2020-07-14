@@ -4,5 +4,5 @@ import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.Language
 
 interface ChapterCatalog {
-    fun getChapterCount(language: Language, book: Book): Int
+    fun getChapterCount(languageCode: String, bookSlug: String): Int
 }

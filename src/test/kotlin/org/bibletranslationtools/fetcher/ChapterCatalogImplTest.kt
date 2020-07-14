@@ -14,8 +14,8 @@ import org.slf4j.LoggerFactory
 class ChapterCatalogImplTest {
 
     data class GetChapterCountTestCase(
-        val language: Language,
-        val book: Book,
+        val languageCode: String,
+        val bookSlug: String,
         val expectedResult: Int
     )
 
@@ -28,7 +28,7 @@ class ChapterCatalogImplTest {
         for (testCase in retrieveGetChapterCountTestCases()) {
             assertEquals(
                 testCase.expectedResult,
-                chapterCatalog.getChapterCount(testCase.language, testCase.book)
+                chapterCatalog.getChapterCount(testCase.languageCode, testCase.bookSlug)
             )
         }
     }
