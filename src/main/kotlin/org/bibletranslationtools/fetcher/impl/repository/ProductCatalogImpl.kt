@@ -9,7 +9,8 @@ import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.slf4j.LoggerFactory
 
 class ProductCatalogImpl : ProductCatalog {
-    private val productCatalogFileName = "product_catalog.json"
+    private val logger = LoggerFactory.getLogger(javaClass)
+    private val productCatalogFileName = "roduct_catalog.json"
     private val products: List<Product> = parseCatalog()
 
     override fun getAll(): List<Product> = this.products
@@ -20,8 +21,7 @@ class ProductCatalogImpl : ProductCatalog {
             val productsFile = getProductCatalogFile()
             productsFile.readText()
         } catch (e: FileNotFoundException) {
-            val logger = LoggerFactory.getLogger(javaClass)
-            logger.error("\"$productCatalogFileName\" file not found")
+            logger.error("\"$productCatalogFileName\" file not found", e)
             throw e // crash on fatal exception: critical resource not found
         }
 

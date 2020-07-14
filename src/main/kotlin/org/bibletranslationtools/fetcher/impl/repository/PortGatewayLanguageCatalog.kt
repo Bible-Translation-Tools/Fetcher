@@ -37,7 +37,7 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
         val languagesFile: File = try {
             getLanguagesFile()
         } catch (e: FileNotFoundException) {
-            logger.error("PORT Languages File Not Found")
+            logger.error("$portLanguageFileName file not found", e)
             throw e // crash on fatal exception: critical resource not found
         }
 
