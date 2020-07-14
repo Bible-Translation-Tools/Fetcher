@@ -32,12 +32,13 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
 
     override fun getAll(): List<Language> = this.languageList
 
+    @Throws(FileNotFoundException::class)
     private fun parseCatalog(): List<Language> {
         val languagesFile: File = try {
             getLanguagesFile()
         } catch (e: FileNotFoundException) {
             logger.error("PORT Languages File Not Found")
-            return listOf()
+            throw e // crash on fatal exception: critical resource not found
         }
 
         val mapper = CsvMapper().registerModule(KotlinModule())

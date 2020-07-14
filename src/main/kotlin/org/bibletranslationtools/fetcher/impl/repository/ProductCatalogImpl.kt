@@ -6,6 +6,7 @@ import java.io.File
 import java.io.FileNotFoundException
 import org.bibletranslationtools.fetcher.data.Product
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
+import org.slf4j.LoggerFactory
 
 class ProductCatalogImpl : ProductCatalog {
     private val productCatalogFileName = "product_catalog.json"
@@ -13,12 +14,15 @@ class ProductCatalogImpl : ProductCatalog {
 
     override fun getAll(): List<Product> = this.products
 
+    @Throws(FileNotFoundException::class)
     private fun parseCatalog(): List<Product> {
         val jsonFileTypes: String = try {
             val productsFile = getProductCatalogFile()
             productsFile.readText()
         } catch (e: FileNotFoundException) {
-            return listOf()
+            val logger = LoggerFactory.getLogger(javaClass)
+            logger.error("\"$productCatalogFileName\" file not found")
+            throw e // crash on fatal exception: critical resource not found
         }
 
         return jacksonObjectMapper().readValue(jsonFileTypes)
