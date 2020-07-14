@@ -3,16 +3,15 @@ package org.bibletranslationtools.fetcher.impl.repository
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
-import kotlinx.coroutines.runBlocking
-import org.bibletranslationtools.fetcher.data.Book
-import org.bibletranslationtools.fetcher.data.Chapter
-import org.bibletranslationtools.fetcher.data.Language
-import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import io.ktor.client.HttpClient
 import io.ktor.client.features.ClientRequestException
 import io.ktor.client.request.get
+import kotlinx.coroutines.runBlocking
+import org.bibletranslationtools.fetcher.data.Book
+import org.bibletranslationtools.fetcher.data.Language
+import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 
-class ChapterCatalogImpl: ChapterCatalog {
+class ChapterCatalogImpl : ChapterCatalog {
 
     private data class Chunk(
         val firstvs: String,
@@ -27,12 +26,12 @@ class ChapterCatalogImpl: ChapterCatalog {
         val response: ByteArray? = runBlocking {
             try {
                 client.get<ByteArray>(getChunksURL(language, book))
-            } catch(ex: ClientRequestException) {
+            } catch (ex: ClientRequestException) {
                 null
             }
         }
 
-        if(response == null) return 0
+        if (response == null) return 0
 
         val mapper = ObjectMapper().registerModule(KotlinModule())
         val chunkList: MutableList<Chunk> = mapper.readValue(response)
