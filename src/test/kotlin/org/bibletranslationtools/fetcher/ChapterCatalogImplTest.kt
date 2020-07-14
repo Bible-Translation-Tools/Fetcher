@@ -2,14 +2,14 @@ package org.bibletranslationtools.fetcher
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import java.io.File
+import java.net.URL
 import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.impl.repository.ChapterCatalogImpl
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.slf4j.LoggerFactory
-import java.io.File
-import java.net.URL
 
 class ChapterCatalogImplTest {
 
@@ -31,14 +31,13 @@ class ChapterCatalogImplTest {
                 chapterCatalog.getChapterCount(testCase.language, testCase.book)
             )
         }
-
     }
 
     private fun retrieveGetChapterCountTestCases(): List<GetChapterCountTestCase> {
         val testCasesResource: URL? = javaClass.classLoader.getResource(
             "ChapterCatalogImpl_GetChapterCount_TestCases.json"
         )
-        if(testCasesResource == null) {
+        if (testCasesResource == null) {
             logger.error("Chapter Catalog Implementation JSON test file not found.")
             return listOf()
         }
