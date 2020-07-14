@@ -30,7 +30,11 @@ class BookRepositoryImpl(
     }
 
     override fun getBook(slug: String, languageCode: String): Book? {
-        return if (languageCode == englishLanguageCode) bookCatalog.getBook(slug) else null // This will get the localized name
+        if (languageCode == englishLanguageCode) {
+            return bookCatalog.getBook(slug)
+        } else {
+            return null // This will get the localized name
+        }
     }
 
     override fun getBook(slug: String, language: Language): Book? {
