@@ -1,8 +1,6 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
-import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.Chapter
-import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.ChapterRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
@@ -10,7 +8,7 @@ import org.bibletranslationtools.fetcher.repository.StorageAccess
 class ChapterRepositoryImpl(
     private val storageAccess: StorageAccess,
     private val chapterCatalog: ChapterCatalog
-): ChapterRepository {
+) : ChapterRepository {
     override fun getChapters(
         languageCode: String,
         bookSlug: String,
@@ -21,7 +19,7 @@ class ChapterRepositoryImpl(
         val totalChapters = chapterCatalog.getChapterCount(languageCode, bookSlug)
 
         val chapterList = mutableListOf<Chapter>()
-        for(chapterNumber in 1..totalChapters) {
+        for (chapterNumber in 1..totalChapters) {
             chapterList.add(storageAccess.getChapter(
                 languageCode,
                 bookSlug,

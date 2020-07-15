@@ -7,8 +7,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.features.ClientRequestException
 import io.ktor.client.request.get
 import kotlinx.coroutines.runBlocking
-import org.bibletranslationtools.fetcher.data.Book
-import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 
 class ChapterCatalogImpl : ChapterCatalog {
@@ -41,7 +39,7 @@ class ChapterCatalogImpl : ChapterCatalog {
     }
 
     private fun getChunksURL(languageCode: String, bookSlug: String): String {
-        return "https://api.unfoldingword.org/ts/txt/2/${bookSlug}/${languageCode}/ulb/chunks.json"
+        return "https://api.unfoldingword.org/ts/txt/2/$bookSlug/$languageCode/ulb/chunks.json"
     }
 
     private fun getLastChunk(chunkList: MutableList<Chunk>): Chunk {

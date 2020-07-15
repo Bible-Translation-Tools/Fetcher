@@ -1,7 +1,7 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
-import org.bibletranslationtools.fetcher.data.Chapter
 import java.io.File
+import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 
@@ -37,7 +37,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         val chapterPath = File(sourceContentRoot, fullPath)
         val chapterFiles = chapterPath.listFiles()
 
-        return if(chapterFiles.isNullOrEmpty() || chapterFiles.size > 1) Chapter(chapterNumber, null)
+        return if (chapterFiles.isNullOrEmpty() || chapterFiles.size > 1) Chapter(chapterNumber, null)
         else Chapter(chapterNumber, chapterFiles[0])
     }
 
