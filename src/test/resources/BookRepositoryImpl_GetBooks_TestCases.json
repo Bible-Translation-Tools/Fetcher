@@ -1,0 +1,58 @@
+[
+  {
+    "languageCode": "en",
+    "bookCodes": [
+      "gen",
+      "mat",
+      "gal"
+    ],
+    "bookCatalog": [
+      {
+        "index": 1,
+        "slug": "gen",
+        "anglicizedName": "Genesis"
+      },
+      {
+        "index": 2,
+        "slug": "exo",
+        "anglicizedName": "Exodus"
+      },
+      {
+        "index": 44,
+        "slug": "jhn",
+        "anglicizedName": "John"
+      },
+      {
+        "index": 49,
+        "slug": "gal",
+        "anglicizedName": "Galatians"
+      }
+    ],
+    "expectedResult": [
+      {
+        "index": 1,
+        "slug": "gen",
+        "anglicizedName": "Genesis",
+        "availability": true
+      },
+      {
+        "index": 2,
+        "slug": "exo",
+        "anglicizedName": "Exodus",
+        "availability": false
+      },
+      {
+        "index": 44,
+        "slug": "jhn",
+        "anglicizedName": "John",
+        "availability": false
+      },
+      {
+        "index": 49,
+        "slug": "gal",
+        "anglicizedName": "Galatians",
+        "availability": true
+      }
+    ]
+  }
+]
