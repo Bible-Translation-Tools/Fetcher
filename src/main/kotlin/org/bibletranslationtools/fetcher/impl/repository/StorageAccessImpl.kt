@@ -2,6 +2,7 @@ package org.bibletranslationtools.fetcher.impl.repository
 
 import java.io.File
 import org.bibletranslationtools.fetcher.data.Chapter
+import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 
@@ -20,39 +21,72 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         return if (dirs.isNullOrEmpty()) listOf() else dirs.map { it.name }
     }
 
-    override fun getChapter(
+    override fun getChapterWithAudioFile(
         languageCode: String,
         bookSlug: String,
-        chapterNumber: Int,
-        fileExtension: String,
-        mediaExtension: String,
-        mediaQuality: String
+        chapter: String,
+        fileType: String
     ): Chapter {
-        val isContainer = mediaExtension.isNotEmpty()
-        val isCompressed = mediaQuality.isNotEmpty()
+        val chapterDownloadFile = getChapterAudioFile(
+            languageCode,
+            bookSlug,
+            chapter,
+            fileType
+        )
 
-        val pathPrefix = getChapterPathPrefix(languageCode, bookSlug, chapterNumber, fileExtension)
-        val fullPath = when {
-            isContainer && isCompressed -> "$pathPrefix/$mediaExtension/$mediaQuality/chapter"
-            isContainer -> "$pathPrefix/$mediaExtension/chapter"
-            !isContainer && isCompressed -> "$pathPrefix/$mediaQuality/chapter"
-            else -> "$pathPrefix/chapter"
-        }
-
-        val sourceContentRoot = directoryProvider.getContentRoot()
-        val chapterPath = File(sourceContentRoot, fullPath)
-        val chapterFiles = chapterPath.listFiles()
-
-        return if (chapterFiles.isNullOrEmpty() || chapterFiles.size > 1) Chapter(chapterNumber, null)
-        else Chapter(chapterNumber, chapterFiles[0])
+        return Chapter(chapter.toInt(), chapterDownloadFile)
     }
 
-    private fun getChapterPathPrefix(
+    private fun getChapterAudioFile(
         languageCode: String,
         bookSlug: String,
-        chapterNumber: Int,
-        fileExtension: String
-    ): String {
-        return "$languageCode/ulb/$bookSlug/$chapterNumber/CONTENTS/$fileExtension"
+        chapter: String,
+        fileType: String
+    ): File? {
+        val pathPrefix = getPathPrefixDir(languageCode, bookSlug, chapter)
+
+        return if(ContainerExtensions.isSupported(fileType)) {
+            seekAudioFile(pathPrefix.resolve(fileType), "chapter")
+        } else {
+            seekAudioFile(pathPrefix, "chapter")
+        }
+    }
+
+    private fun getPathPrefixDir(
+        languageCode: String,
+        bookSlug: String,
+        chapter: String = ""
+    ): File {
+        val sourceContentRootDir = directoryProvider.getContentRoot()
+
+        return if(chapter.isBlank()) {
+            sourceContentRootDir.resolve(
+                "$languageCode/ulb/$bookSlug/CONTENTS"
+            )
+        } else {
+            sourceContentRootDir.resolve(
+                "$languageCode/ulb/$bookSlug/${chapter.toInt()}/CONTENTS"
+            )
+        }
+    }
+
+    private fun seekAudioFile(
+        pathPrefix: File,
+        grouping: String
+    ): File? {
+        val paths = listOf(
+            "mp3/hi",
+            "mp3/low",
+            "wav"
+        )
+
+        for(path in paths) {
+            val contentDir = pathPrefix.resolve("$path/$grouping")
+            val contentFiles = contentDir.listFiles()
+
+            if(contentFiles.isNullOrEmpty()) continue
+            return contentFiles.first()
+        }
+        return null
     }
 }
