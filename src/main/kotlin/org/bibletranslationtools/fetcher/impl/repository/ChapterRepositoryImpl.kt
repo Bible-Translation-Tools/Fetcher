@@ -13,20 +13,17 @@ class ChapterRepositoryImpl(
         languageCode: String,
         bookSlug: String,
         fileExtension: String,
-        mediaExtension: String,
-        mediaQuality: String
+        mediaExtension: String
     ): List<Chapter> {
         val totalChapters = chapterCatalog.getChapterCount(languageCode, bookSlug)
 
         val chapterList = mutableListOf<Chapter>()
         for (chapterNumber in 1..totalChapters) {
-            chapterList.add(storageAccess.getChapter(
+            chapterList.add(storageAccess.getChapterWithAudioFile(
                 languageCode,
                 bookSlug,
-                chapterNumber,
-                fileExtension,
-                mediaExtension,
-                mediaQuality
+                chapterNumber.toString(),
+                fileExtension
             ))
         }
 

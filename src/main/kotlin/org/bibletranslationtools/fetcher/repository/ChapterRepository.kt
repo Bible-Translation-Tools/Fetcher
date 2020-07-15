@@ -7,7 +7,6 @@ interface ChapterRepository {
         languageCode: String,
         bookSlug: String,
         fileExtension: String,
-        mediaExtension: String = "",
-        mediaQuality: String = ""
+        mediaExtension: String = ""
     ): List<Chapter>
 }
