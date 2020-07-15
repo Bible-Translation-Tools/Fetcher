@@ -5,5 +5,11 @@ import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.data.Language
 
 interface ChapterRepository {
-    fun getChapters(language: Language, book: Book): List<Chapter>
+    fun getChapters(
+        languageCode: String,
+        bookSlug: String,
+        fileExtension: String,
+        mediaExtension: String = "",
+        mediaQuality: String = ""
+    ): List<Chapter>
 }
