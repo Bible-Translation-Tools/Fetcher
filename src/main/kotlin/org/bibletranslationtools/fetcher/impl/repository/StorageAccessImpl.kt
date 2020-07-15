@@ -45,7 +45,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
     ): File? {
         val pathPrefix = getPathPrefixDir(languageCode, bookSlug, chapter)
 
-        return if(ContainerExtensions.isSupported(fileType)) {
+        return if (ContainerExtensions.isSupported(fileType)) {
             seekAudioFile(pathPrefix.resolve(fileType), "chapter")
         } else {
             seekAudioFile(pathPrefix, "chapter")
@@ -59,7 +59,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
     ): File {
         val sourceContentRootDir = directoryProvider.getContentRoot()
 
-        return if(chapter.isBlank()) {
+        return if (chapter.isBlank()) {
             sourceContentRootDir.resolve(
                 "$languageCode/ulb/$bookSlug/CONTENTS"
             )
@@ -80,11 +80,11 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
             "wav"
         )
 
-        for(path in paths) {
+        for (path in paths) {
             val contentDir = pathPrefix.resolve("$path/$grouping")
             val contentFiles = contentDir.listFiles()
 
-            if(contentFiles.isNullOrEmpty()) continue
+            if (contentFiles.isNullOrEmpty()) continue
             return contentFiles.first()
         }
         return null
