@@ -6,5 +6,5 @@ data class Chapter(
     val number: Int,
     val file: File?
 ) {
-    fun hasDownload(): Boolean = file != null
+    fun hasContent(): Boolean = file != null
 }
