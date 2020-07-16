@@ -4,8 +4,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
 import java.net.URL
-import org.bibletranslationtools.fetcher.data.Book
-import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.impl.repository.ChapterCatalogImpl
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -28,7 +26,7 @@ class ChapterCatalogImplTest {
         for (testCase in retrieveGetChapterCountTestCases()) {
             assertEquals(
                 testCase.expectedResult,
-                chapterCatalog.getChapterCount(testCase.languageCode, testCase.bookSlug)
+                chapterCatalog.getAll(testCase.languageCode, testCase.bookSlug)
             )
         }
     }
