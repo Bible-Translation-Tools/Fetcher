@@ -13,4 +13,8 @@ class DirectoryProviderImpl : DirectoryProvider {
     override fun getProjectsDir(languageCode: String): File {
         return getContentRoot().resolve("$languageCode/$dublinCoreId")
     }
+
+    override fun getChaptersDir(languageCode: String, bookSlug: String): File {
+        return getProjectsDir(languageCode).resolve(bookSlug)
+    }
 }
