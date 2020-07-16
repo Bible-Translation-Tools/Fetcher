@@ -29,7 +29,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
     ): List<Chapter> {
         val chapterList = mutableListOf<Chapter>()
 
-        for(chapter in 1..totalChapters) {
+        for (chapter in 1..totalChapters) {
             chapterList.add(getChapterWithAudio(languageCode, bookSlug, chapter.toString(), fileType))
         }
 
