@@ -1,11 +1,11 @@
 package org.bibletranslationtools.fetcher.repository
 
-import org.bibletranslationtools.fetcher.data.Chapter
+import org.bibletranslationtools.fetcher.data.ChapterContent
 
 interface ChapterRepository {
-    fun getChaptersWithAudio(
+    fun getChaptersContent(
         languageCode: String,
         bookSlug: String,
         fileType: String
-    ): List<Chapter>
+    ): List<ChapterContent>
 }
