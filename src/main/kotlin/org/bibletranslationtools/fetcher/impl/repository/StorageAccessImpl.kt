@@ -58,7 +58,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
 
         val chapterDirContents = chapterFileDir.listFiles()
 
-        if(chapterDirContents.isNullOrEmpty()) return null
+        if (chapterDirContents.isNullOrEmpty()) return null
         return chapterDirContents.first()
     }
 
