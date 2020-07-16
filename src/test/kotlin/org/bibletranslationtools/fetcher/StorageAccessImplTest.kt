@@ -59,7 +59,7 @@ class StorageAccessImplTest {
         for (testCase in testCases) {
             `when`(mockFile.listFiles(any(FileFilter::class.java)))
                 .thenReturn(testCase.mockDirs.toTypedArray())
-            `when`(mockDirectoryProvider.getProjectsDir(testCase.languageCode))
+            `when`(mockDirectoryProvider.getProjectsDir(testCase.languageCode, "ulb"))
                 .thenReturn(mockFile)
 
             val storageAccessImpl =
@@ -68,7 +68,7 @@ class StorageAccessImplTest {
                 )
             assertEquals(
                 testCase.expectedResult,
-                storageAccessImpl.getBookSlugs(testCase.languageCode).toSet()
+                storageAccessImpl.getBookSlugs(testCase.languageCode, "ulb").toSet()
             )
         }
     }
