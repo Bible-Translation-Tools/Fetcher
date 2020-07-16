@@ -1,11 +1,7 @@
 package org.bibletranslationtools.fetcher.repository
 
-import org.bibletranslationtools.fetcher.data.ChapterContent
+import org.bibletranslationtools.fetcher.data.Chapter
 
 interface ChapterRepository {
-    fun getChaptersContent(
-        languageCode: String,
-        bookSlug: String,
-        fileType: String
-    ): List<ChapterContent>
+    fun getChapters(languageCode: String, bookSlug: String): List<Chapter>
 }

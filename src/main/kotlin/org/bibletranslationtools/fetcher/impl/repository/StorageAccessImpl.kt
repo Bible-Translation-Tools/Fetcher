@@ -1,7 +1,7 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import java.io.File
-import org.bibletranslationtools.fetcher.data.ChapterContent
+import org.bibletranslationtools.fetcher.data.CompressedExtensions
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.StorageAccess
@@ -21,83 +21,63 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         return if (dirs.isNullOrEmpty()) listOf() else dirs.map { it.name }
     }
 
-    override fun getChaptersContent(
-        languageCode: String,
-        bookSlug: String,
-        totalChapters: Int,
-        fileType: String
-    ): List<ChapterContent> {
-        val chapterList = mutableListOf<ChapterContent>()
+    override fun getChapterNumbers(languageCode: String, bookSlug: String): List<String> {
+        val chaptersDir = directoryProvider.getChaptersDir(languageCode, bookSlug)
+        val dirs = chaptersDir.listFiles(File::isDirectory)
 
-        for (chapter in 1..totalChapters) {
-            chapterList.add(
-                getChapterContent(
-                    languageCode,
-                    bookSlug,
-                    chapter.toString(),
-                    fileType
-                )
-            )
-        }
-
-        return chapterList
+        return if (dirs.isNullOrEmpty()) listOf() else dirs.map { it.name }
     }
 
-    private fun getChapterContent(
+    override fun getChapterFile(
         languageCode: String,
         bookSlug: String,
-        chapter: String,
-        fileType: String
-    ): ChapterContent {
-        val pathPrefix = getPathPrefixDir(languageCode, bookSlug, chapter)
-        val chapterDownloadFile = if (ContainerExtensions.isSupported(fileType)) {
-            seekFile(pathPrefix.resolve(fileType), "chapter")
-        } else {
-            seekFile(pathPrefix, "chapter")
-        }
+        chapterNumber: Int,
+        fileExtension: String,
+        mediaExtension: String,
+        mediaQuality: String
+    ): File? {
+        val chapterRootDir = getPathPrefixDir(
+            languageCode,
+            bookSlug,
+            fileExtension,
+            chapterNumber
+        )
 
-        return ChapterContent(chapter.toInt(), chapterDownloadFile)
+        val isContainer = ContainerExtensions.isSupported(fileExtension)
+        val isContainerAndCompressed = isContainer && CompressedExtensions.isSupported(mediaExtension)
+        val isFileAndCompressed = !isContainer && CompressedExtensions.isSupported(fileExtension)
+
+        val chapterFileDir = chapterRootDir.resolve(
+            when {
+                isContainerAndCompressed -> "$mediaExtension/$mediaQuality/chapter"
+                isContainer -> "$mediaExtension/chapter"
+                isFileAndCompressed -> "$mediaQuality/chapter"
+                else -> "chapter"
+            }
+        )
+
+        val chapterDirContents = chapterFileDir.listFiles()
+
+        if(chapterDirContents.isNullOrEmpty()) return null
+        return chapterDirContents.first()
     }
 
     private fun getPathPrefixDir(
         languageCode: String,
         bookSlug: String,
-        chapter: String = ""
+        fileExtension: String,
+        chapter: Int? = null
     ): File {
         val sourceContentRootDir = directoryProvider.getContentRoot()
 
-        return if (chapter.isBlank()) {
+        return if (chapter == null) {
             sourceContentRootDir.resolve(
-                "$languageCode/ulb/$bookSlug/CONTENTS"
+                "$languageCode/ulb/$bookSlug/CONTENTS/$fileExtension"
             )
         } else {
             sourceContentRootDir.resolve(
-                "$languageCode/ulb/$bookSlug/${chapter.toInt()}/CONTENTS"
+                "$languageCode/ulb/$bookSlug/$chapter/CONTENTS/$fileExtension"
             )
         }
-    }
-
-    private fun seekFile(
-        pathPrefix: File,
-        grouping: String
-    ): File? {
-        val paths = getAudioPathPriority()
-
-        for (path in paths) {
-            val contentDir = pathPrefix.resolve("$path/$grouping")
-            val contentFiles = contentDir.listFiles()
-
-            if (contentFiles.isNullOrEmpty()) continue
-            return contentFiles.first()
-        }
-        return null
-    }
-
-    private fun getAudioPathPriority(): List<String> {
-        return listOf(
-            "mp3/hi",
-            "mp3/low",
-            "wav"
-        )
     }
 }

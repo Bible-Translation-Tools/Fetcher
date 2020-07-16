@@ -7,6 +7,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.features.ClientRequestException
 import io.ktor.client.request.get
 import kotlinx.coroutines.runBlocking
+import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 
 class ChapterCatalogImpl : ChapterCatalog {
@@ -19,7 +20,7 @@ class ChapterCatalogImpl : ChapterCatalog {
         fun getChapter(): Int = id.split("-")[0].toInt()
     }
 
-    override fun getChapterCount(languageCode: String, bookSlug: String): Int {
+    override fun getAll(languageCode: String, bookSlug: String): List<Chapter> {
         val client = HttpClient()
         val response: ByteArray? = runBlocking {
             try {
@@ -29,13 +30,18 @@ class ChapterCatalogImpl : ChapterCatalog {
             }
         }
 
-        if (response == null) return 0
+        if (response == null) return listOf()
 
         val mapper = ObjectMapper().registerModule(KotlinModule())
         val chunkList: MutableList<Chunk> = mapper.readValue(response)
-        val lastChunk = getLastChunk(chunkList)
+        val totalChapters = getLastChunk(chunkList).getChapter()
 
-        return lastChunk.getChapter()
+        val chapterList = mutableListOf<Chapter>()
+        for (chapterNum in 1..totalChapters) {
+            chapterList.add(Chapter(chapterNum))
+        }
+
+        return chapterList
     }
 
     private fun getChunksURL(languageCode: String, bookSlug: String): String {
