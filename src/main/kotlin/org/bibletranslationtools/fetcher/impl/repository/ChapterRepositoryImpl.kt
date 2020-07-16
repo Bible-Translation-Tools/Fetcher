@@ -20,6 +20,6 @@ class ChapterRepositoryImpl(
             bookSlug,
             totalChapters,
             fileType
-        ).toList()
+        )
     }
 }
