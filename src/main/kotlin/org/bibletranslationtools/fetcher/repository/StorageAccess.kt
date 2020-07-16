@@ -11,7 +11,7 @@ interface StorageAccess {
         bookSlug: String,
         chapterNumber: Int,
         fileExtension: String,
-        mediaExtension: String,
-        mediaQuality: String
+        mediaExtension: String = "",
+        mediaQuality: String = ""
     ): File?
 }
