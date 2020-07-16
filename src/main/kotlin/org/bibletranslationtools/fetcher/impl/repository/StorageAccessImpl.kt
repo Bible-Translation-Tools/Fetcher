@@ -21,13 +21,28 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         return if (dirs.isNullOrEmpty()) listOf() else dirs.map { it.name }
     }
 
-    override fun getChapterWithAudioFile(
+    override fun getChaptersWithAudio(
+        languageCode: String,
+        bookSlug: String,
+        totalChapters: Int,
+        fileType: String
+    ): List<Chapter> {
+        val chapterList = mutableListOf<Chapter>()
+
+        for(chapter in 1..totalChapters) {
+            chapterList.add(getChapterWithAudio(languageCode, bookSlug, chapter.toString(), fileType))
+        }
+
+        return chapterList
+    }
+
+    private fun getChapterWithAudio(
         languageCode: String,
         bookSlug: String,
         chapter: String,
         fileType: String
     ): Chapter {
-        val chapterDownloadFile = getChapterAudioFile(
+        val chapterDownloadFile = getChapterAudio(
             languageCode,
             bookSlug,
             chapter,
@@ -37,7 +52,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         return Chapter(chapter.toInt(), chapterDownloadFile)
     }
 
-    private fun getChapterAudioFile(
+    private fun getChapterAudio(
         languageCode: String,
         bookSlug: String,
         chapter: String,
