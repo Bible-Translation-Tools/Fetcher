@@ -26,7 +26,7 @@ class ChapterCatalogImplTest {
         for (testCase in retrieveGetChapterCountTestCases()) {
             assertEquals(
                 testCase.expectedResult,
-                chapterCatalog.getAll(testCase.languageCode, testCase.bookSlug)
+                chapterCatalog.getAll(testCase.languageCode, testCase.bookSlug).size
             )
         }
     }

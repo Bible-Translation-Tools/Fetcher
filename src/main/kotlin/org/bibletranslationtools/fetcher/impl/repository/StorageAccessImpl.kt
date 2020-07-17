@@ -36,48 +36,64 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         mediaExtension: String,
         mediaQuality: String
     ): File? {
-        val chapterRootDir = getPathPrefixDir(
+        val chapterPrefixDir = getPathPrefixDir(
             languageCode,
             bookSlug,
             fileExtension,
-            chapterNumber
+            chapterNumber.toString()
         )
 
-        val isContainer = ContainerExtensions.isSupported(fileExtension)
-        val isContainerAndCompressed = isContainer && CompressedExtensions.isSupported(mediaExtension)
-        val isFileAndCompressed = !isContainer && CompressedExtensions.isSupported(fileExtension)
-
-        val chapterFileDir = chapterRootDir.resolve(
-            when {
-                isContainerAndCompressed -> "$mediaExtension/$mediaQuality/chapter"
-                isContainer -> "$mediaExtension/chapter"
-                isFileAndCompressed -> "$mediaQuality/chapter"
-                else -> "chapter"
-            }
+        val grouping = "chapter"
+        val chapterContentDir = getContentDir(
+            chapterPrefixDir,
+            fileExtension,
+            mediaExtension,
+            mediaQuality,
+            grouping
         )
 
-        val chapterDirContents = chapterFileDir.listFiles()
-
-        if (chapterDirContents.isNullOrEmpty()) return null
-        return chapterDirContents.first()
+        return chapterContentDir.listFiles(File::isFile)?.firstOrNull() ?: null
     }
 
     private fun getPathPrefixDir(
         languageCode: String,
-        bookSlug: String,
         fileExtension: String,
-        chapter: Int? = null
+        bookSlug: String = "",
+        chapter: String = ""
     ): File {
         val sourceContentRootDir = directoryProvider.getContentRoot()
-
-        return if (chapter == null) {
-            sourceContentRootDir.resolve(
+        return when {
+            bookSlug.isNotEmpty() && chapter.isNotEmpty() ->
+                sourceContentRootDir.resolve(
+                    "$languageCode/ulb/$bookSlug/$chapter/CONTENTS/$fileExtension"
+                )
+            bookSlug.isNotEmpty() -> sourceContentRootDir.resolve(
                 "$languageCode/ulb/$bookSlug/CONTENTS/$fileExtension"
             )
-        } else {
-            sourceContentRootDir.resolve(
-                "$languageCode/ulb/$bookSlug/$chapter/CONTENTS/$fileExtension"
+            else -> sourceContentRootDir.resolve(
+                "$languageCode/ulb/CONTENTS/$fileExtension"
             )
         }
+    }
+
+    private fun getContentDir(
+        prefixDir: File,
+        fileExtension: String,
+        mediaExtension: String,
+        mediaQuality: String,
+        grouping: String
+    ): File {
+        val isContainer = ContainerExtensions.isSupported(fileExtension)
+        val isContainerAndCompressed = isContainer && CompressedExtensions.isSupported(mediaExtension)
+        val isFileAndCompressed = !isContainer && CompressedExtensions.isSupported(fileExtension)
+
+        return prefixDir.resolve(
+            when {
+                isContainerAndCompressed -> "$mediaExtension/$mediaQuality/$grouping"
+                isContainer -> "$mediaExtension/$grouping"
+                isFileAndCompressed -> "$mediaQuality/$grouping"
+                else -> grouping
+            }
+        )
     }
 }
