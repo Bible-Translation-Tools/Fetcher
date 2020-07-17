@@ -4,5 +4,5 @@ import java.io.File
 
 interface DirectoryProvider {
     fun getContentRoot(): File
-    fun getProjectsDir(languageCode: String, resourceContainer: String): File
+    fun getProjectsDir(languageCode: String, resourceId: String): File
 }

@@ -8,7 +8,7 @@ class DirectoryProviderImpl : DirectoryProvider {
         return File("/")
     }
 
-    override fun getProjectsDir(languageCode: String, resourceContainer: String): File {
-        return getContentRoot().resolve("$languageCode/$resourceContainer")
+    override fun getProjectsDir(languageCode: String, resourceId: String): File {
+        return getContentRoot().resolve("$languageCode/$resourceId")
     }
 }
