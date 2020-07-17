@@ -10,11 +10,14 @@ import io.ktor.features.CallLogging
 import io.ktor.features.DefaultHeaders
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
+import io.ktor.request.path
 import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
 import io.ktor.routing.routing
+import org.bibletranslationtools.fetcher.usecase.*
+import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 
 fun Application.appModule() {
@@ -49,12 +52,14 @@ fun Application.appModule() {
                 route("gl") {
                     get {
                         // languages page
-                        val languageModel = LanguageModel(serviceDI.languageRepository)
+                        val languageModel = FetchLanguageViewData(serviceDI.languageRepository)
+                        val path = call.request.path()
+
                         call.respond(
                             ThymeleafContent(
                                 template = "",
                                 model = mapOf(
-                                    "languageList" to languageModel.viewData
+                                    "languageList" to languageModel.getListViewData(path)
                                 )
                             )
                         )
@@ -62,19 +67,21 @@ fun Application.appModule() {
                     route("{languageCode}") {
                         get {
                             // products page
-                            val productModel = ProductModel(serviceDI.productCatalog)
+                            val productModel = FetchProductViewData(serviceDI.productCatalog)
+                            val path = call.request.path()
+
                             call.respond(
                                 ThymeleafContent(
                                     template = "",
                                     model = mapOf(
-                                        "productList" to productModel.viewData
+                                        "productList" to productModel.getListViewData(path)
                                     )
                                 )
                             )
                         }
                         route("{productSlug}") {
                             get {
-                                //books page
+                                // books page
                                 val languageCode = call.parameters["languageCode"]
                                 if (languageCode.isNullOrBlank()) {
                                     // invalid route parameter
@@ -85,19 +92,24 @@ fun Application.appModule() {
                                         )
                                     )
                                 }
-                                val bookModel = BookModel(serviceDI.bookRepository, languageCode!!)
+                                val bookModel = FetchBookViewData(
+                                    serviceDI.bookRepository,
+                                    languageCode!!
+                                )
+                                val path = call.request.path()
+
                                 call.respond(
                                     ThymeleafContent(
                                         template = "",
                                         model = mapOf(
-                                            "bookList" to bookModel.viewData
+                                            "bookList" to bookModel.getListViewData(path)
                                         )
                                     )
                                 )
                             }
                             route("{bookSlug}") {
                                 get {
-                                    //chapters page
+                                    // chapters page
                                     val languageCode = call.parameters["languageCode"]
                                     val bookSlug = call.parameters["bookSlug"]
                                     val productSlug = call.parameters["productSlug"]
