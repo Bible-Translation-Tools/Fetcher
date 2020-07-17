@@ -12,8 +12,8 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         return if (dirs.isNullOrEmpty()) listOf() else dirs.map { it.name }
     }
 
-    override fun getBookSlugs(languageCode: String, dublinCoreId: String): List<String> {
-        val projectsDir = directoryProvider.getProjectsDir(languageCode, dublinCoreId)
+    override fun getBookSlugs(languageCode: String, resourceContainer: String): List<String> {
+        val projectsDir = directoryProvider.getProjectsDir(languageCode, resourceContainer)
         val dirs = projectsDir.listFiles(File::isDirectory)
 
         return if (dirs.isNullOrEmpty()) listOf() else dirs.map { it.name }
