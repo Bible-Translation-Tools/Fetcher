@@ -21,13 +21,6 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         return if (dirs.isNullOrEmpty()) listOf() else dirs.map { it.name }
     }
 
-    override fun getChapterNumbers(languageCode: String, bookSlug: String): List<String> {
-        val chaptersDir = directoryProvider.getChaptersDir(languageCode, bookSlug)
-        val dirs = chaptersDir.listFiles(File::isDirectory)
-
-        return if (dirs.isNullOrEmpty()) listOf() else dirs.map { it.name }
-    }
-
     override fun getChapterFile(
         languageCode: String,
         bookSlug: String,
