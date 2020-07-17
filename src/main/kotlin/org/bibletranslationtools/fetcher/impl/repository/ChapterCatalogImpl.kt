@@ -13,7 +13,9 @@ import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.slf4j.LoggerFactory
 
 class ChapterCatalogImpl : ChapterCatalog {
+    private val catalogUrlTemplate = "https://api.unfoldingword.org/ts/txt/2/%s/%s/ulb/chunks.json"
     private val logger = LoggerFactory.getLogger(javaClass)
+
     private data class Chunk(
         val firstvs: String,
         val id: String,
@@ -49,7 +51,7 @@ class ChapterCatalogImpl : ChapterCatalog {
     }
 
     private fun getChunksURL(languageCode: String, bookSlug: String): String {
-        return "https://api.unfoldingword.org/ts/txt/2/$bookSlug/$languageCode/ulb/chunks.json"
+        return String.format(catalogUrlTemplate, languageCode, bookSlug)
     }
 
     private fun getLastChunk(chunkList: MutableList<Chunk>): Chunk {
