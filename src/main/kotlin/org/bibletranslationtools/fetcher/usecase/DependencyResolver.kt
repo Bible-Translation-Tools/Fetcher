@@ -1,4 +1,4 @@
-package org.bibletranslationtools.fetcher.web
+package org.bibletranslationtools.fetcher.usecase
 
 import org.bibletranslationtools.fetcher.impl.repository.*
 import org.bibletranslationtools.fetcher.repository.*
