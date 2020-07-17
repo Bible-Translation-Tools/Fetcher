@@ -113,7 +113,11 @@ fun Application.appModule() {
                                     val languageCode = call.parameters["languageCode"]
                                     val bookSlug = call.parameters["bookSlug"]
                                     val productSlug = call.parameters["productSlug"]
-                                    if (languageCode.isNullOrBlank() || bookSlug.isNullOrBlank() || productSlug.isNullOrBlank()) {
+                                    if (
+                                        languageCode.isNullOrBlank() ||
+                                        bookSlug.isNullOrBlank() ||
+                                        productSlug.isNullOrBlank()
+                                    ) {
                                         // invalid route parameters
                                     }
                                 }

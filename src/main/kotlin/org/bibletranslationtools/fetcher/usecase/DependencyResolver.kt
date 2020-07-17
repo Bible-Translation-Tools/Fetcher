@@ -7,12 +7,12 @@ object DependencyResolver {
     private val directoryProvider: DirectoryProvider = DirectoryProviderImpl()
 
     val languageRepository: LanguageRepository = LanguageRepositoryImpl(
-        storageAccess =  StorageAccessImpl(directoryProvider),
+        storageAccess = StorageAccessImpl(directoryProvider),
         languageCatalog = PortGatewayLanguageCatalog()
     )
     val productCatalog: ProductCatalog = ProductCatalogImpl()
     val bookRepository: BookRepository = BookRepositoryImpl(
-        storageAccess =  StorageAccessImpl(directoryProvider),
+        storageAccess = StorageAccessImpl(directoryProvider),
         bookCatalog = BookCatalogImpl()
     )
 }
