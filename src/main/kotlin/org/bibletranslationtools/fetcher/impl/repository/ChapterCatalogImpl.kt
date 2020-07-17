@@ -6,12 +6,14 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.HttpClient
 import io.ktor.client.features.ClientRequestException
 import io.ktor.client.request.get
+import io.ktor.util.error
 import kotlinx.coroutines.runBlocking
 import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
+import org.slf4j.LoggerFactory
 
 class ChapterCatalogImpl : ChapterCatalog {
-
+    private val logger = LoggerFactory.getLogger(javaClass)
     private data class Chunk(
         val firstvs: String,
         val id: String,
@@ -22,10 +24,12 @@ class ChapterCatalogImpl : ChapterCatalog {
 
     override fun getAll(languageCode: String, bookSlug: String): List<Chapter> {
         val client = HttpClient()
+        val url = getChunksURL(languageCode, bookSlug)
         val response: ByteArray? = runBlocking {
             try {
-                client.get<ByteArray>(getChunksURL(languageCode, bookSlug))
+                client.get<ByteArray>(url)
             } catch (ex: ClientRequestException) {
+                logger.error("An error occurred when requesting from $url", ex)
                 null
             }
         }
