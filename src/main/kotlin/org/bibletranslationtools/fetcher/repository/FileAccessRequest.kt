@@ -5,7 +5,7 @@ data class FileAccessRequest(
     val resourceId: String,
     val fileExtension: String,
     val bookSlug: String = "",
-    val chapterNumber: String = "",
+    val chapter: String = "",
     val mediaExtension: String = "",
     val mediaQuality: String = ""
 )

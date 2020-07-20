@@ -31,7 +31,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
             resourceId = model.resourceId,
             bookSlug = model.bookSlug,
             fileExtension = model.fileExtension,
-            chapter = model.chapterNumber
+            chapter = model.chapter
         )
 
         val grouping = "chapter"
