@@ -4,9 +4,13 @@ import java.io.File
 import org.bibletranslationtools.fetcher.data.CompressedExtensions
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
+import org.bibletranslationtools.fetcher.repository.FileAccessModel
 import org.bibletranslationtools.fetcher.repository.StorageAccess
+import org.slf4j.LoggerFactory
 
 class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : StorageAccess {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     override fun getLanguageCodes(): List<String> {
         val sourceFileRootDir = directoryProvider.getContentRoot()
         val dirs = sourceFileRootDir.listFiles(File::isDirectory)
@@ -21,35 +25,39 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         return if (dirs.isNullOrEmpty()) listOf() else dirs.map { it.name }
     }
 
-    override fun getChapterFile(
-        languageCode: String,
-        bookSlug: String,
-        chapterNumber: Int,
-        fileExtension: String,
-        mediaExtension: String,
-        mediaQuality: String
-    ): File? {
+    override fun getChapterFile(model: FileAccessModel): File? {
         val chapterPrefixDir = getPathPrefixDir(
-            languageCode,
-            bookSlug,
-            fileExtension,
-            chapterNumber.toString()
+            model.languageCode,
+            model.resourceId,
+            model.bookSlug,
+            model.fileExtension,
+            model.chapterNumber.toString()
         )
 
         val grouping = "chapter"
         val chapterContentDir = getContentDir(
             chapterPrefixDir,
-            fileExtension,
-            mediaExtension,
-            mediaQuality,
+            model.fileExtension,
+            model.mediaExtension,
+            model.mediaQuality,
             grouping
         )
 
-        return chapterContentDir.listFiles(File::isFile)?.firstOrNull() ?: null
+        return try {
+            chapterContentDir.listFiles(File::isFile)?.single()
+        } catch (e: NoSuchElementException) {
+            // no content
+            null
+        } catch (e: IllegalArgumentException) {
+            // there are more than 1 file under the dir
+            logger.error("There are too many files under the grouping directory (1 allowed)", e)
+            null
+        }
     }
 
     private fun getPathPrefixDir(
         languageCode: String,
+        resourceId: String,
         fileExtension: String,
         bookSlug: String = "",
         chapter: String = ""
@@ -58,13 +66,13 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         return when {
             bookSlug.isNotEmpty() && chapter.isNotEmpty() ->
                 sourceContentRootDir.resolve(
-                    "$languageCode/ulb/$bookSlug/$chapter/CONTENTS/$fileExtension"
+                    "$languageCode/$resourceId/$bookSlug/$chapter/CONTENTS/$fileExtension"
                 )
             bookSlug.isNotEmpty() -> sourceContentRootDir.resolve(
-                "$languageCode/ulb/$bookSlug/CONTENTS/$fileExtension"
+                "$languageCode/$resourceId/$bookSlug/CONTENTS/$fileExtension"
             )
             else -> sourceContentRootDir.resolve(
-                "$languageCode/ulb/CONTENTS/$fileExtension"
+                "$languageCode/$resourceId/CONTENTS/$fileExtension"
             )
         }
     }
