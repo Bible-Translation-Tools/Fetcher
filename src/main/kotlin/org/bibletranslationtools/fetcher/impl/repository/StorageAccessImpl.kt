@@ -31,7 +31,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
             resourceId = model.resourceId,
             bookSlug = model.bookSlug,
             fileExtension = model.fileExtension,
-            chapter = model.chapterNumber.toString()
+            chapter = model.chapterNumber
         )
 
         val grouping = "chapter"
@@ -62,11 +62,13 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         bookSlug: String = "",
         chapter: String = ""
     ): File {
+        val trimmedChapter = chapter.trimStart('0')
         val sourceContentRootDir = directoryProvider.getContentRoot()
+
         return when {
-            bookSlug.isNotEmpty() && chapter.isNotEmpty() ->
+            bookSlug.isNotEmpty() && trimmedChapter.isNotEmpty() ->
                 sourceContentRootDir.resolve(
-                    "$languageCode/$resourceId/$bookSlug/$chapter/CONTENTS/$fileExtension"
+                    "$languageCode/$resourceId/$bookSlug/$trimmedChapter/CONTENTS/$fileExtension"
                 )
             bookSlug.isNotEmpty() -> sourceContentRootDir.resolve(
                 "$languageCode/$resourceId/$bookSlug/CONTENTS/$fileExtension"
