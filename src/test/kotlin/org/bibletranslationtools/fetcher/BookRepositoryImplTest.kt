@@ -30,7 +30,7 @@ class BookRepositoryImplTest {
         val mockBookCatalog = mock(BookCatalog::class.java)
 
         for (testCase in testCases) {
-            `when`(mockStorageAccess.getBookSlugs(testCase.languageCode))
+            `when`(mockStorageAccess.getBookSlugs(testCase.languageCode, "ulb"))
                 .thenReturn(testCase.bookCodes)
             `when`(mockBookCatalog.getAll()).thenReturn(testCase.bookCatalog)
 
@@ -39,7 +39,7 @@ class BookRepositoryImplTest {
                 bookCatalog = mockBookCatalog
             )
 
-            assertEquals(testCase.expectedResult, bookRepo.getBooks(testCase.languageCode))
+            assertEquals(testCase.expectedResult, bookRepo.getBooks(testCase.languageCode, "ulb"))
         }
     }
 
