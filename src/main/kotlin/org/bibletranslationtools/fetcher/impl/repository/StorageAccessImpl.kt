@@ -27,20 +27,20 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
 
     override fun getChapterFile(model: FileAccessModel): File? {
         val chapterPrefixDir = getPathPrefixDir(
-            model.languageCode,
-            model.resourceId,
-            model.bookSlug,
-            model.fileExtension,
-            model.chapterNumber.toString()
+            languageCode = model.languageCode,
+            resourceId = model.resourceId,
+            bookSlug = model.bookSlug,
+            fileExtension = model.fileExtension,
+            chapter = model.chapterNumber.toString()
         )
 
         val grouping = "chapter"
         val chapterContentDir = getContentDir(
-            chapterPrefixDir,
-            model.fileExtension,
-            model.mediaExtension,
-            model.mediaQuality,
-            grouping
+            prefixDir = chapterPrefixDir,
+            fileExtension = model.fileExtension,
+            mediaExtension = model.mediaExtension,
+            mediaQuality = model.mediaQuality,
+            grouping = grouping
         )
 
         return try {
