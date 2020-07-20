@@ -51,7 +51,7 @@ class ChapterCatalogImpl : ChapterCatalog {
     }
 
     private fun getChunksURL(languageCode: String, bookSlug: String): String {
-        return String.format(catalogUrlTemplate, languageCode, bookSlug)
+        return String.format(catalogUrlTemplate, bookSlug, languageCode)
     }
 
     private fun getLastChunk(chunkList: MutableList<Chunk>): Chunk {
