@@ -8,7 +8,7 @@ class FetchBookViewData(
     private val bookRepo: BookRepository,
     private val languageCode: String
 ) {
-    private val books = bookRepo.getBooks(languageCode)
+    private val books = bookRepo.getBooks(languageCode = languageCode, resourceId = "ulb")
 
     fun getListViewData(currentPath: String): List<BookViewData> = books.map {
         BookViewData(

@@ -16,8 +16,10 @@ import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
 import io.ktor.routing.routing
-import org.bibletranslationtools.fetcher.usecase.*
+import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
+import org.bibletranslationtools.fetcher.usecase.FetchLanguageViewData
+import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 
 fun Application.appModule() {
