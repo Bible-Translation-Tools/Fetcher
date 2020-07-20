@@ -12,9 +12,9 @@ class BookRepositoryImpl(
 ) : BookRepository {
     private val englishLanguageCode = "en"
 
-    override fun getBooks(languageCode: String): List<Book> {
+    override fun getBooks(languageCode: String, resourceId: String): List<Book> {
         val books = bookCatalog.getAll()
-        val availableBookCodes = storageAccess.getBookSlugs(languageCode)
+        val availableBookCodes = storageAccess.getBookSlugs(languageCode, resourceId)
 
         books.forEach {
             if (it.slug in availableBookCodes) {
@@ -25,8 +25,8 @@ class BookRepositoryImpl(
         return books
     }
 
-    override fun getBooks(language: Language): List<Book> {
-        return getBooks(language.code)
+    override fun getBooks(language: Language, resourceId: String): List<Book> {
+        return getBooks(language.code, resourceId)
     }
 
     override fun getBook(slug: String, languageCode: String): Book? {
