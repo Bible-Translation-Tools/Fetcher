@@ -50,7 +50,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
             null
         } catch (e: IllegalArgumentException) {
             // there are more than 1 file under the dir
-            logger.error("Too many files found at $chapterContentDir", e)
+            logger.error("Max files allowed: 1. Too many files found at $chapterContentDir", e)
             null
         }
     }
