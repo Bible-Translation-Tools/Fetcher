@@ -1,6 +1,6 @@
 package org.bibletranslationtools.fetcher.repository
 
-data class FileAccessModel(
+data class FileAccessRequest(
     val languageCode: String,
     val resourceId: String,
     val fileExtension: String,

@@ -4,7 +4,7 @@ import java.io.File
 import org.bibletranslationtools.fetcher.data.CompressedExtensions
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
-import org.bibletranslationtools.fetcher.repository.FileAccessModel
+import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.slf4j.LoggerFactory
 
@@ -25,7 +25,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         return if (dirs.isNullOrEmpty()) listOf() else dirs.map { it.name }
     }
 
-    override fun getChapterFile(model: FileAccessModel): File? {
+    override fun getChapterFile(model: FileAccessRequest): File? {
         val chapterPrefixDir = getPathPrefixDir(
             languageCode = model.languageCode,
             resourceId = model.resourceId,
