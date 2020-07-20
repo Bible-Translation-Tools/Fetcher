@@ -50,7 +50,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
             null
         } catch (e: IllegalArgumentException) {
             // there are more than 1 file under the dir
-            logger.error("There are too many files under the grouping directory (1 allowed)", e)
+            logger.error("Too many files under grouping for the parameter: $model", e)
             null
         }
     }
