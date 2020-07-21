@@ -25,6 +25,33 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         return if (dirs.isNullOrEmpty()) listOf() else dirs.map { it.name }
     }
 
+    override fun getBookFile(model: FileAccessRequest): File? {
+        val bookPrefixDir = getPathPrefixDir(
+            languageCode = model.languageCode,
+            resourceId = model.resourceId,
+            bookSlug = model.bookSlug,
+            fileExtension = model.fileExtension
+        )
+        val grouping = "book"
+        val bookContentDir = getContentDir(
+            prefixDir = bookPrefixDir,
+            fileExtension = model.fileExtension,
+            mediaExtension = model.mediaExtension,
+            mediaQuality = model.mediaQuality,
+            grouping = grouping
+        )
+        return try {
+            bookContentDir.listFiles(File::isFile)?.single()
+        } catch (e: NoSuchElementException) {
+            // no content
+            null
+        } catch (e: IllegalArgumentException) {
+            // there are more than 1 file under the dir
+            logger.error("Max files allowed: 1. Too many files found at $bookContentDir", e)
+            null
+        }
+    }
+
     override fun getChapterFile(model: FileAccessRequest): File? {
         val chapterPrefixDir = getPathPrefixDir(
             languageCode = model.languageCode,
