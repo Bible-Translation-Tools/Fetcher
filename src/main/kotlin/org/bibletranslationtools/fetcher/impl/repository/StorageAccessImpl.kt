@@ -32,6 +32,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
             bookSlug = model.bookSlug,
             fileExtension = model.fileExtension
         )
+
         val grouping = "book"
         val bookContentDir = getContentDir(
             prefixDir = bookPrefixDir,
@@ -40,6 +41,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
             mediaQuality = model.mediaQuality,
             grouping = grouping
         )
+        
         return try {
             bookContentDir.listFiles(File::isFile)?.single()
         } catch (e: NoSuchElementException) {
