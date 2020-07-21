@@ -3,11 +3,11 @@ package org.bibletranslationtools.fetcher
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
-import junit.framework.Assert.assertEquals
 import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.impl.repository.BookRepositoryImpl
 import org.bibletranslationtools.fetcher.repository.BookCatalog
 import org.bibletranslationtools.fetcher.repository.StorageAccess
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
