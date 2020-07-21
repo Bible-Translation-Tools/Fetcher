@@ -24,6 +24,7 @@ class ChapterCatalogImpl : ChapterCatalog {
         fun getChapter(): Int = id.split("-")[0].toInt()
     }
 
+    @Throws(ClientRequestException::class)
     override fun getAll(languageCode: String, bookSlug: String): List<Chapter> {
         val client = HttpClient()
         val url = getChunksURL(languageCode, bookSlug)
@@ -32,7 +33,7 @@ class ChapterCatalogImpl : ChapterCatalog {
                 client.get<ByteArray>(url)
             } catch (ex: ClientRequestException) {
                 logger.error("An error occurred when requesting from $url", ex)
-                null
+                throw ex
             }
         }
 
