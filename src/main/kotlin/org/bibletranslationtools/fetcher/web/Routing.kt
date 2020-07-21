@@ -3,7 +3,6 @@ package org.bibletranslationtools.fetcher.web
 import dev.jbs.ktor.thymeleaf.ThymeleafContent
 import io.ktor.application.call
 import io.ktor.http.Parameters
-import io.ktor.request.ApplicationRequest
 import io.ktor.request.acceptLanguage
 import io.ktor.request.path
 import io.ktor.response.respond
@@ -156,7 +155,6 @@ private fun chaptersView(
         )
     }
     val book = FetchBookViewData(resolver.bookRepository, languageCode)
-
 
     return ThymeleafContent(
         template = "",
