@@ -28,16 +28,14 @@ class ChapterCatalogImpl : ChapterCatalog {
     override fun getAll(languageCode: String, bookSlug: String): List<Chapter> {
         val client = HttpClient()
         val url = getChunksURL(languageCode, bookSlug)
-        val response: ByteArray? = runBlocking {
+        val response: ByteArray = runBlocking {
             try {
-                client.get<ByteArray>(url)
+                client.get(url)
             } catch (ex: ClientRequestException) {
                 logger.error("An error occurred when requesting from $url", ex)
                 throw ex
             }
         }
-
-        if (response == null) return listOf()
 
         val mapper = ObjectMapper().registerModule(KotlinModule())
         val chunkList: MutableList<Chunk> = mapper.readValue(response)
