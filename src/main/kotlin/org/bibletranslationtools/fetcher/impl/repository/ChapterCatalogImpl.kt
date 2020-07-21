@@ -30,7 +30,7 @@ class ChapterCatalogImpl : ChapterCatalog {
         val url = getChunksURL(languageCode, bookSlug)
         val response: ByteArray = runBlocking {
             try {
-                client.get(url)
+                client.get<ByteArray>(url)
             } catch (ex: ClientRequestException) {
                 logger.error("An error occurred when requesting from $url", ex)
                 throw ex
