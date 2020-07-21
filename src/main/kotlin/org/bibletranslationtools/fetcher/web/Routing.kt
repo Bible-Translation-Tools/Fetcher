@@ -35,23 +35,27 @@ fun Routing.root(resolver: DependencyResolver) {
         route("gl") {
             get {
                 // languages page
-                call.respond(gatewayLanguagesView(call.request, resolver, contentLanguage))
+                val path = call.request.path()
+                call.respond(gatewayLanguagesView(path, resolver, contentLanguage))
             }
             route("{languageCode}") {
                 get {
                     // products page
-                    call.respond(productsView(call.request, resolver, contentLanguage))
+                    val path = call.request.path()
+                    call.respond(productsView(path, resolver, contentLanguage))
                 }
                 route("{productSlug}") {
                     get {
                         // books page
                         val languageCode = call.parameters["languageCode"]
-                        call.respond(booksView(languageCode, call.request, resolver, contentLanguage))
+                        val path = call.request.path()
+                        call.respond(booksView(languageCode, path, resolver, contentLanguage))
                     }
                     route("{bookSlug}") {
                         get {
                             // chapters page
-                            call.respond(chaptersView(call.parameters, call.request, resolver, contentLanguage))
+                            val path = call.request.path()
+                            call.respond(chaptersView(call.parameters, path, resolver, contentLanguage))
                         }
                     }
                 }
@@ -77,12 +81,11 @@ private fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templ
 }
 
 private fun gatewayLanguagesView(
-    request: ApplicationRequest,
+    path: String,
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
     val model = FetchLanguageViewData(resolver.languageRepository)
-    val path = request.path()
     return ThymeleafContent(
         template = "",
         model = mapOf(
@@ -93,12 +96,11 @@ private fun gatewayLanguagesView(
 }
 
 private fun productsView(
-    request: ApplicationRequest,
+    path: String,
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
     val model = FetchProductViewData(resolver.productCatalog)
-    val path = request.path()
 
     return ThymeleafContent(
         template = "",
@@ -111,7 +113,7 @@ private fun productsView(
 
 private fun booksView(
     languageCode: String?,
-    request: ApplicationRequest,
+    path: String,
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
@@ -122,9 +124,7 @@ private fun booksView(
             model = mapOf()
         )
     }
-
     val bookModel = FetchBookViewData(resolver.bookRepository, languageCode)
-    val path = request.path()
 
     return ThymeleafContent(
         template = "",
@@ -137,7 +137,7 @@ private fun booksView(
 
 private fun chaptersView(
     parameters: Parameters,
-    request: ApplicationRequest,
+    path: String,
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
@@ -155,6 +155,8 @@ private fun chaptersView(
             model = mapOf()
         )
     }
+    val book = FetchBookViewData(resolver.bookRepository, languageCode)
+
 
     return ThymeleafContent(
         template = "",
