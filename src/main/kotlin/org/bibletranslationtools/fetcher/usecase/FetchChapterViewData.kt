@@ -5,6 +5,7 @@ import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
+import java.io.File
 
 class FetchChapterViewData(
     private val chapterCatalog: ChapterCatalog,
@@ -28,6 +29,7 @@ class FetchChapterViewData(
 
     fun getListViewData(): Map<Int, ChapterViewData> {
         val chapterList = mutableMapOf<Int, ChapterViewData>()
+        var chapterFile: File? = null
 
         for (chapterNumber in 1..chapters.size) {
             var url: String? = null
@@ -39,15 +41,15 @@ class FetchChapterViewData(
                     getMp3FileAccessRequest(chapterNumber, priority)
                 }
 
-                val chapterFile = storage.getChapterFile(fileAccessRequest) ?: continue
-
-                url = chapterFile.path
-                break
+                chapterFile = storage.getChapterFile(fileAccessRequest)
+                if (chapterFile != null) {
+                    break
+                }
             }
 
             chapterList[chapterNumber] = ChapterViewData(
-                chapterNumber,
-                url
+                chapterNumber = chapterNumber,
+                url = chapterFile?.path ?: null
             )
         }
 
