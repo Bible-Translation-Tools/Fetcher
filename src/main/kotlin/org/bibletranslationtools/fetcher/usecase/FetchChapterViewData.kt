@@ -35,12 +35,10 @@ class FetchChapterViewData(
             var url: String? = null
 
             for (priority in priorityList) {
-                val fileAccessRequest = if (product == ProductFileExtension.BTTR) {
-                    getTrFileAccessRequest(chapterNumber, priority)
-                } else if (product == ProductFileExtension.MP3) {
-                    getMp3FileAccessRequest(chapterNumber, priority)
-                } else {
-                    null
+                val fileAccessRequest = when(product) {
+                    ProductFileExtension.BTTR -> getTrFileAccessRequest(chapterNumber, priority)
+                    ProductFileExtension.MP3 -> getMp3FileAccessRequest(chapterNumber, priority)
+                    else -> null
                 }
 
                 val chapterFile = storage.getChapterFile(fileAccessRequest)
