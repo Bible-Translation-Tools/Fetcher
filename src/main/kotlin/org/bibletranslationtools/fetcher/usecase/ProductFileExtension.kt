@@ -10,7 +10,7 @@ enum class ProductFileExtension(val fileType: String) {
         fun getType(productSlug: String): ProductFileExtension? {
             return try {
                 valueOf(productSlug.toUpperCase())
-            } catch (ex: IllegalArgumentException){
+            } catch (ex: IllegalArgumentException) {
                 null
             }
         }
