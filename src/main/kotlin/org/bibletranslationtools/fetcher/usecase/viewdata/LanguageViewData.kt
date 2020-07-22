@@ -4,6 +4,5 @@ data class LanguageViewData(
     val code: String,
     val anglicizedName: String,
     val localizedName: String,
-    val availability: Boolean,
-    val url: String
+    val url: String?
 )

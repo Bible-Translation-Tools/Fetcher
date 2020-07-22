@@ -12,8 +12,7 @@ class FetchLanguageViewData(languageRepo: LanguageRepository) {
             code = it.code,
             anglicizedName = it.anglicizedName,
             localizedName = it.localizedName,
-            availability = it.availability,
-            url = "$currentPath/${it.code}"
+            url = if (it.availability) "$currentPath/${it.code}" else null
         )
     }
 }

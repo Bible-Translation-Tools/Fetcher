@@ -16,8 +16,7 @@ class FetchBookViewData(
             slug = it.slug,
             anglicizedName = it.anglicizedName,
             localizedName = it.localizedName,
-            availability = it.availability,
-            url = "$currentPath/${it.slug}"
+            url = if(it.availability) "$currentPath/${it.slug}" else null
         )
     }
 
