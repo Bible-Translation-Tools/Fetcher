@@ -4,15 +4,15 @@
     <title>Chater Card</title>
 </head>
 <body>
-    <a th:fragment="chaptercard(text, available, url)" class="chaptercard"
-       th:classappend="${available == false}? 'unavailable'"
-       th:href="${availability == false}? '#' : ${'/'+url}">
+    <a th:fragment="chaptercard(index,text, url)" class="chaptercard"
+       th:classappend="${url == null}? 'unavailable'"
+       th:href="${url == null}? '#' : ${'/'+url}">
 
-        <div class="chaptercard__title" th:classappend="${available == false}? 'unavailable'">
-            <p th:text="${text}">Chapter 01</p>
+        <div class="chaptercard__title" th:classappend="${url == null}? 'unavailable'">
+            <p th:text="${text} + {index}">Chapter 01</p>
         </div>
 
-        <div class="chaptercard__download" th:classappend="${available == false}? 'unavailable'">
+        <div class="chaptercard__download" th:classappend="${url == null}? 'unavailable'">
             <em class="material-icons chaptercard__icon">get_app</em>
             <p class="chaptercard__download-text">Download</p>
         </div>

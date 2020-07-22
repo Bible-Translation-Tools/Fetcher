@@ -5,21 +5,21 @@
 </head>
 <body>
 <a th:fragment="productcard(iconUrl, productTitle, productDescription, url)"
-   class="product-card" th:classappend="${availability == false}? 'unavailable' "
-   th:href="${availability == false}? '#' : ${'/'+url}">
+   class="product-card" th:classappend="${url == false}? 'unavailable' "
+   th:href="${url == false}? '#' : ${'/'+url}">
     <div class="product-card__icon-container"
-         th:classappend="${availability == false}? 'unavailable' ">
+         th:classappend="${url == false}? 'unavailable' ">
         <img alt="product_image" class="product-card__product-icon" th:src="@{static/} + ${iconUrl}"/>
     </div>
     <div class="product-card__text"
-         th:classappend="${availability == false}? 'unavailable' ">
+         th:classappend="${url == false}? 'unavailable' ">
         <p th:text="${productTitle}"class="product-card__title"
-           th:classappend="${availability == false}? 'unavailable' ">አማርኛ</p>
+           th:classappend="${url == false}? 'unavailable' ">አማርኛ</p>
         <p th:text="${productDescription}" class="product-card__description"
-           th:classappend="${availability == false}? 'unavailable' "><span>Amharic</span></p>
+           th:classappend="${url == false}? 'unavailable' "><span>Amharic</span></p>
     </div>
     <span class="product-card__icon"
-          th:classappend="${availability == false}? 'unavailable' ">
+          th:classappend="${url == false}? 'unavailable' ">
         <em class="material-icons">arrow_forward</em></span>
 </a>
 </body>
