@@ -35,7 +35,7 @@ class FetchChapterViewData(
             var url: String? = null
 
             for (priority in priorityList) {
-                val fileAccessRequest = when(product) {
+                val fileAccessRequest = when (product) {
                     ProductFileExtension.BTTR -> getTrFileAccessRequest(chapterNumber, priority)
                     ProductFileExtension.MP3 -> getMp3FileAccessRequest(chapterNumber, priority)
                     else -> null
