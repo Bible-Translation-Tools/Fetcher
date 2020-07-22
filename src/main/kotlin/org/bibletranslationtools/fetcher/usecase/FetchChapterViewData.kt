@@ -1,14 +1,11 @@
 package org.bibletranslationtools.fetcher.usecase
+
 import org.bibletranslationtools.fetcher.data.Chapter
-import org.bibletranslationtools.fetcher.impl.repository.ChapterCatalogImpl
-import org.bibletranslationtools.fetcher.impl.repository.DirectoryProviderImpl
-import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 import java.io.File
-import kotlin.system.measureTimeMillis
 
 class FetchChapterMp3ViewData(
     private val chapterCatalog: ChapterCatalog,
@@ -21,28 +18,27 @@ class FetchChapterMp3ViewData(
         languageCode = languageCode,
         bookSlug = bookSlug
     )
-    private val priority = listOf(
-        Pair<String, String>("mp3", "hi"),
-        Pair<String, String>("mp3", "low"),
-        Pair<String, String>("wav", "")
-    )
-    private val priorityMap = listOf(
-        mapOf<String, String>("fileExtension" to "mp3", "mediaQuality" to "hi"),
-        mapOf<String, String>("fileExtension" to "mp3", "mediaQuality" to "low"),
-        mapOf<String, String>("fileExtension" to "wav", "mediaQuality" to "")
+
+    private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
+
+    private val priorityList = listOf(
+        PriorityItem("mp3", "hi"),
+        PriorityItem("mp3", "low"),
+        PriorityItem("wav", "")
     )
 
     fun getListViewData(): Map<Int, ChapterViewData> {
-        val chapterViewData = mutableMapOf<Int, ChapterViewData>()
+        val chapterList = mutableMapOf<Int, ChapterViewData>()
 
         for (chapterNumber in 1..chapters.size) {
             var url: String? = null
 
-            for(pri in priorityMap) {
+
+            for (priority in priorityList) {
                 val fileAccessRequest = if (product == "tr") {
-                    getTrFileAccessRequest(chapterNumber, pri)
+                    getTrFileAccessRequest(chapterNumber, priority)
                 } else {
-                    getMp3FileAccessRequest(chapterNumber, pri)
+                    getMp3FileAccessRequest(chapterNumber, priority)
                 }
 
                 val chapterFile = storage.getChapterFile(fileAccessRequest) ?: continue
@@ -57,30 +53,29 @@ class FetchChapterMp3ViewData(
             )
         }
 
-        return chapterViewData
+        return chapterList
     }
 
-    private fun getTrFileAccessRequest(chapterNumber: Int, priorityValue: Map<String, String>): FileAccessRequest {
+    private fun getTrFileAccessRequest(chapterNumber: Int, priorityItem: PriorityItem): FileAccessRequest {
         return FileAccessRequest(
-            languageCode,
-            "ulb",
-            "tr",
-            bookSlug,
-            chapterNumber.toString(),
-            priorityValue["fileExtension"]!!,
-            priorityValue["mediaQuality"]!!
+            languageCode = languageCode,
+            resourceId = "ulb",
+            fileExtension = "tr",
+            bookSlug = bookSlug,
+            chapter = chapterNumber.toString(),
+            mediaExtension = priorityItem.fileExtension,
+            mediaQuality = priorityItem.mediaQuality
         )
     }
 
-    private fun getMp3FileAccessRequest(chapterNumber: Int, priorityValue: Map<String, String>): FileAccessRequest {
+    private fun getMp3FileAccessRequest(chapterNumber: Int, priorityItem: PriorityItem): FileAccessRequest {
         return FileAccessRequest(
-            languageCode,
-            "ulb",
-            priorityValue["fileExtension"]!!,
-            bookSlug,
-            chapterNumber.toString(),
-            "",
-            priorityValue["mediaQuality"]!!
+            languageCode = languageCode,
+            resourceId = "ulb",
+            fileExtension = priorityItem.fileExtension,
+            bookSlug = bookSlug,
+            chapter = chapterNumber.toString(),
+            mediaQuality = priorityItem.mediaQuality
         )
     }
 }
