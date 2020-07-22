@@ -5,19 +5,19 @@ import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
-import java.io.File
 
 class FetchChapterViewData(
     private val chapterCatalog: ChapterCatalog,
     private val storage: StorageAccess,
     private val languageCode: String,
-    private val product: String, // tr / mp3
+    private val productSlug: String, // tr / mp3
     private val bookSlug: String
 ) {
+    private val fileType = ProductFileExtension.valueOf(productSlug)
     private val chapters: List<Chapter> = chapterCatalog.getAll(
         languageCode = languageCode,
         bookSlug = bookSlug
-    )
+    ).sortedBy { it.number }
 
     private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
 
@@ -27,30 +27,29 @@ class FetchChapterViewData(
         PriorityItem("wav", "")
     )
 
-    fun getListViewData(): Map<Int, ChapterViewData> {
-        val chapterList = mutableMapOf<Int, ChapterViewData>()
-        var chapterFile: File? = null
+    fun getListViewData(): List<ChapterViewData> {
+        val chapterList = mutableListOf<ChapterViewData>()
+        val product = ProductFileExtension.getType(productSlug)
 
         for (chapterNumber in 1..chapters.size) {
             var url: String? = null
 
             for (priority in priorityList) {
-                val fileAccessRequest = if (product == "tr") {
+                val fileAccessRequest = if (product == ProductFileExtension.BTTR) {
                     getTrFileAccessRequest(chapterNumber, priority)
-                } else {
+                } else if (product == ProductFileExtension.MP3) {
                     getMp3FileAccessRequest(chapterNumber, priority)
+                } else {
+                    break
                 }
 
-                chapterFile = storage.getChapterFile(fileAccessRequest)
+                val chapterFile = storage.getChapterFile(fileAccessRequest)
                 if (chapterFile != null) {
+                    url = chapterFile.path
                     break
                 }
             }
-
-            chapterList[chapterNumber] = ChapterViewData(
-                chapterNumber = chapterNumber,
-                url = chapterFile?.path ?: null
-            )
+            chapterList.add(ChapterViewData(chapterNumber, url))
         }
 
         return chapterList
