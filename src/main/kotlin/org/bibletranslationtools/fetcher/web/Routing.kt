@@ -56,7 +56,7 @@ fun Routing.root(resolver: DependencyResolver) {
                         get {
                             // chapters page
                             val path = call.request.path()
-                            call.respond(chaptersView(call.parameters, path, resolver, contentLanguage))
+                            call.respond(chaptersView(call.parameters, resolver, contentLanguage))
                         }
                     }
                 }
@@ -138,7 +138,6 @@ private fun booksView(
 
 private fun chaptersView(
     parameters: Parameters,
-    path: String,
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
@@ -177,7 +176,8 @@ private fun chaptersView(
         model = mapOf(
             "book" to book,
             "chapterList" to chaptersModel
-        )
+        ),
+        locale = getPreferredLocale(contentLanguage, "")
     )
 }
 
