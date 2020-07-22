@@ -13,15 +13,15 @@
 
 <div th:insert="fragments/header :: header"></div>
 
-<div th:insert="fragments/navbar :: navbar('languages', 'tools', 'book', 'object')"></div>
+<div th:insert="fragments/navbar :: navbar('TODO', 'TODO', 'TODO', 'object')"></div>
 
-<div th:insert="fragments/hero :: hero('Available Books', 'Some books may be unavailable.')"></div>
+<div th:insert="fragments/hero :: hero(#{page_title}, #{page_info})"></div>
 
 <div th:insert="fragments/searchbar :: searchbar"></div>
 
 <div class="l-list-container" >
     <div th:each="book: ${bookList}">
-        <div th:insert="fragments/card :: card(${book.localizedName}, ${book.anglicizedName}, ${book.code}, ${book.availability}, 'chapters')"></div>
+        <div th:insert="fragments/card :: card(${book.localizedName}, ${book.anglicizedName}, ${book.code}, ${book.availability}, 'TODO bookURL')"></div>
     </div>
 </div>
 

@@ -13,9 +13,9 @@
 
 <div th:insert="fragments/header :: header"></div>
 
-<div th:insert="fragments/navbar :: navbar('languages', 'tools', 'book', 'object')"></div>
+<div th:insert="fragments/navbar :: navbar('TODO', 'TODO', 'TODO', 'TODO')"></div>
 
-<div th:insert="fragments/hero :: hero('Choose a Language', 'This is the language that the audio will be played in')"></div>
+<div th:insert="fragments/hero :: hero(#{page_title}, #{page_info})"></div>
 
 <div th:insert="fragments/searchbar :: searchbar"></div>
 
