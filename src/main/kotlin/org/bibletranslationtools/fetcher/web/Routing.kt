@@ -52,9 +52,7 @@ fun Routing.root(resolver: DependencyResolver) {
                     }
                     route("{bookSlug}") {
                         get {
-                            // chapters page
-                            val path = call.request.path()
-                            call.respond(chaptersView(call.parameters, path, resolver, contentLanguage))
+                            call.respond(chaptersView(call.parameters, resolver, contentLanguage))
                         }
                     }
                 }
@@ -136,28 +134,26 @@ private fun booksView(
 
 private fun chaptersView(
     parameters: Parameters,
-    path: String,
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
     val languageCode = parameters["languageCode"]
     val bookSlug = parameters["bookSlug"]
     val productSlug = parameters["productSlug"]
+
     if (
         languageCode.isNullOrBlank() ||
         bookSlug.isNullOrBlank() ||
         productSlug.isNullOrBlank()
     ) {
         // invalid route parameters
-        return ThymeleafContent(
-            template = "error",
-            model = mapOf()
-        )
+        return ThymeleafContent(template = "error", model = mapOf())
     }
-    val book = FetchBookViewData(resolver.bookRepository, languageCode)
 
+    val book = FetchBookViewData(resolver.bookRepository, languageCode)
     return ThymeleafContent(
         template = "",
-        model = mapOf()
+        model = mapOf("book" to book),
+        locale = getPreferredLocale(contentLanguage, "")
     )
 }
