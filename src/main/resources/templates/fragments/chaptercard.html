@@ -1,5 +1,8 @@
-<html xmlns:th="http://www.thymeleaf.org" lang="en" >
-
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Chater Card</title>
+</head>
 <body>
     <a th:fragment="chaptercard(text, available, url)" class="chaptercard"
        th:classappend="${available == false}? 'unavailable'"
@@ -10,7 +13,7 @@
         </div>
 
         <div class="chaptercard__download" th:classappend="${available == false}? 'unavailable'">
-            <i class="material-icons chaptercard__icon">get_app</i>
+            <em class="material-icons chaptercard__icon">get_app</em>
             <p class="chaptercard__download-text">Download</p>
         </div>
 

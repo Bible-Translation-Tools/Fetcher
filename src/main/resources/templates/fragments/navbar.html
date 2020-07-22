@@ -1,21 +1,25 @@
-<html xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Navbar</title>
+</head>
 <body>
 <div th:fragment="navbar(languageUrl, toolsUrl, booksUrl, object)" class="navbar">
     <a class="navbar__item" href="language.html"
        th:href="@{${languageUrl}}">
-        <i class="material-icons">translate </i>
+        <em class="material-icons">translate </em>
         <span th:text="${object}">Language</span>
     </a>
 
     <a class="navbar__item" href="tools.html"
    th:href="@{${toolsUrl}}">
-    <i class="material-icons">apps </i>
+    <em class="material-icons">apps </em>
     <span th:text="${object}">Tools</span>
     </a>
 
     <a class="navbar__item" href="books.html"
     th:href="@{${booksUrl}}">
-        <i class="material-icons">book </i>
+        <em class="material-icons">book </em>
         <span th:text="${object}">Books</span>
     </a>
 </div>

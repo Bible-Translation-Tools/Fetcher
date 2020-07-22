@@ -1,11 +1,15 @@
-<html xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Product Card</title>
+</head>
 <body>
 <a th:fragment="productcard(iconUrl, productTitle, productDescription, url)"
    class="product-card" th:classappend="${availability == false}? 'unavailable' "
    th:href="${availability == false}? '#' : ${'/'+url}">
     <div class="product-card__icon-container"
          th:classappend="${availability == false}? 'unavailable' ">
-        <img class="product-card__product-icon" th:src="@{static/} + ${iconUrl}"/>
+        <img alt="product_image" class="product-card__product-icon" th:src="@{static/} + ${iconUrl}"/>
     </div>
     <div class="product-card__text"
          th:classappend="${availability == false}? 'unavailable' ">
@@ -16,7 +20,7 @@
     </div>
     <span class="product-card__icon"
           th:classappend="${availability == false}? 'unavailable' ">
-        <i class="material-icons">arrow_forward</i></span>
+        <em class="material-icons">arrow_forward</em></span>
 </a>
 </body>
 </html>

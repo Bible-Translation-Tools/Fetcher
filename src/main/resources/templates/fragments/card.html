@@ -1,4 +1,8 @@
-<html xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Default Card</title>
+</head>
 <body>
 <a th:fragment="card(localizedText, anglicizedText, code, availability, url)"
    class="def-card" th:classappend="${availability == false}? 'unavailable' "
@@ -16,7 +20,7 @@
     </div>
     <span class="def-card__icon"
           th:classappend="${availability == false}? 'unavailable' ">
-        <i class="material-icons">arrow_forward</i></span>
+        <em class="material-icons">arrow_forward</em></span>
 </a>
 </body>
 </html>

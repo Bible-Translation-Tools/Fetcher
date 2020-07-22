@@ -71,7 +71,6 @@ and (max-device-width: 1200px) {
         margin: 0 16px;
     }
     .chaptercard__download {
-        justify-content: flex-end;
         padding: 0 8px;
         margin: 0 16px;
         flex: 0.1;

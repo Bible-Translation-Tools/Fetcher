@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Chapters</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" >
-    <meta charset="UTF-8" >
     <link rel="stylesheet" href="static/common.css" th:href="@{static/common.css}">
     <link rel="stylesheet" href="static/chapters.css" th:href="@{static/chapters.css}">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -24,7 +23,7 @@
     th:text="${'replace with book name from book object'}">{Book Name}</h2>
     <a class="chapter-download-card__button"
         th:href="${'/'+ 'replace this with url from book object'}">
-        <i class="material-icons">get_app</i>
+        <em class="material-icons">get_app</em>
         <p >Download Book</p>
     </a>
 </div>
