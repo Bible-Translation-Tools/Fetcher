@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chapters</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" >
+    <meta charset="UTF-8" >
+    <link rel="stylesheet" href="static/common.css" th:href="@{static/common.css}">
+    <link rel="stylesheet" href="static/products.css" th:href="@{static/products.css}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+
+<div th:insert="fragments/header :: header"></div>
+
+<div th:insert="fragments/navbar :: navbar('languages', 'tools', 'book', 'object')"></div>
+
+<div th:insert="fragments/hero :: hero('Choose a File Type', 'Some files may not be compatible with certain applications or devices. This can be changed later.')"></div>
+
+<div class="l-list-container" >
+    <div th:each="product: ${productList}">
+        <div th:insert="fragments/productcard :: productcard(${product.iconUrl}, #{${product.titleKey}}, #{${product.descriptionKey}}, 'books')"></div>
+    </div>
+</div>
+</body>
+</html>

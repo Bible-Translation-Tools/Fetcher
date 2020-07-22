@@ -1,0 +1,30 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" >
+    <title>Languages</title>
+    <meta charset="UTF-8" >
+    <link rel="stylesheet" href="static/common.css" th:href="@{static/common.css}">
+    <link rel="stylesheet" href="static/language.css" th:href="@{static/language.css}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+
+<div th:insert="fragments/header :: header"></div>
+
+<div th:insert="fragments/navbar :: navbar('languages', 'tools', 'book', 'object')"></div>
+
+<div th:insert="fragments/hero :: hero('Available Books', 'Some books may be unavailable.')"></div>
+
+<div th:insert="fragments/searchbar :: searchbar"></div>
+
+<div class="l-list-container" >
+    <div th:each="book: ${bookList}">
+        <div th:insert="fragments/card :: card(${book.localizedName}, ${book.anglicizedName}, ${book.code}, ${book.availability}, 'chapters')"></div>
+    </div>
+</div>
+
+</body>
+
+</html>

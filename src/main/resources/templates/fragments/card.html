@@ -1,0 +1,22 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<a th:fragment="card(localizedText, anglicizedText, code, availability, url)"
+   class="def-card" th:classappend="${availability == false}? 'unavailable' "
+   th:href="${availability == false}? '#' : ${'/'+url}">
+    <div class="def-card__code"
+         th:classappend="${availability == false}? 'unavailable' ">
+        <span th:text="${code}">01 Gen</span>
+    </div>
+    <div class="def-card__main-text"
+         th:classappend="${availability == false}? 'unavailable' ">
+        <p th:text="${localizedText}"class="def-card__text"
+           th:classappend="${availability == false}? 'unavailable' ">አማርኛ</p>
+        <p th:text="${anglicizedText}" class="def-card__anglicized-text"
+           th:classappend="${availability == false}? 'unavailable' "><span>Amharic</span></p>
+    </div>
+    <span class="def-card__icon"
+          th:classappend="${availability == false}? 'unavailable' ">
+        <i class="material-icons">arrow_forward</i></span>
+</a>
+</body>
+</html>

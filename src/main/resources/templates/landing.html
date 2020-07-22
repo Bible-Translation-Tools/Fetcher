@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.tyhmeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8" >
+    <link rel="stylesheet" type="text/css" href="static/landing.css" th:href="@{static/landing.css}">
+    <link href = "https://fonts.googleapis.com/icon?family=Material+Icons" rel = "stylesheet">
+</head>
+
+<body>
+
+<div th:insert="fragments/header :: header"></div>
+
+<div class="mainSection">
+
+    <div class="infoSection">
+        <h1 class="infoSection__heading">Listen to the Bible Offline.</h1>
+        <p class="infoSection__text"> Download source audio so that you can listen to it whenever you want without an internet connection.</p>
+
+        <button class="infoSection__button">
+            <i class="material-icons">note_add </i>
+            <span>Get Started</span>
+        </button>
+    </div>
+
+</div>
+</body>
+</html>

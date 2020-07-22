@@ -1,0 +1,19 @@
+<html xmlns:th="http://www.thymeleaf.org" lang="en" >
+
+<body>
+    <a th:fragment="chaptercard(text, available, url)" class="chaptercard"
+       th:classappend="${available == false}? 'unavailable'"
+       th:href="${availability == false}? '#' : ${'/'+url}">
+
+        <div class="chaptercard__title" th:classappend="${available == false}? 'unavailable'">
+            <p th:text="${text}">Chapter 01</p>
+        </div>
+
+        <div class="chaptercard__download" th:classappend="${available == false}? 'unavailable'">
+            <i class="material-icons chaptercard__icon">get_app</i>
+            <p class="chaptercard__download-text">Download</p>
+        </div>
+
+    </a>
+</body>
+</html>
