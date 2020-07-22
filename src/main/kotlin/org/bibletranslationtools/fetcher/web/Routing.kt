@@ -2,6 +2,7 @@ package org.bibletranslationtools.fetcher.web
 
 import dev.jbs.ktor.thymeleaf.ThymeleafContent
 import io.ktor.application.call
+import io.ktor.client.features.ClientRequestException
 import io.ktor.http.Parameters
 import io.ktor.request.acceptLanguage
 import io.ktor.request.path
@@ -13,6 +14,7 @@ import java.util.Locale
 import java.util.ResourceBundle
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
+import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
 import org.bibletranslationtools.fetcher.usecase.FetchLanguageViewData
 import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
 
@@ -123,12 +125,12 @@ private fun booksView(
             model = mapOf()
         )
     }
-    val bookModel = FetchBookViewData(resolver.bookRepository, languageCode)
+    val booksModel = FetchBookViewData(resolver.bookRepository, languageCode)
 
     return ThymeleafContent(
         template = "",
         model = mapOf(
-            "bookList" to bookModel.getListViewData(path)
+            "bookList" to booksModel.getListViewData(path)
         ),
         locale = getPreferredLocale(contentLanguage, "")
     )
@@ -143,21 +145,45 @@ private fun chaptersView(
     val languageCode = parameters["languageCode"]
     val bookSlug = parameters["bookSlug"]
     val productSlug = parameters["productSlug"]
+
     if (
         languageCode.isNullOrBlank() ||
         bookSlug.isNullOrBlank() ||
         productSlug.isNullOrBlank()
     ) {
         // invalid route parameters
-        return ThymeleafContent(
-            template = "error",
-            model = mapOf()
-        )
+        return errorPage("Invalid URL")
     }
-    val book = FetchBookViewData(resolver.bookRepository, languageCode)
+
+    val book = FetchBookViewData(resolver.bookRepository, languageCode).getBookInfo(bookSlug)
+    if (book == null) {
+        return errorPage("Could not find the content with the specified url")
+    }
+
+    val chaptersModel = try {
+        FetchChapterViewData(
+            chapterCatalog = resolver.chapterCatalog,
+            storage = resolver.storageAccess,
+            languageCode = languageCode,
+            productSlug = productSlug,
+            bookSlug = bookSlug
+        ).getListViewData()
+    } catch (ex: ClientRequestException) {
+        return errorPage("There was a server error at the moment. Please check back again later.")
+    }
 
     return ThymeleafContent(
         template = "",
-        model = mapOf()
+        model = mapOf(
+            "book" to book,
+            "chapterList" to chaptersModel
+        )
+    )
+}
+
+private fun errorPage(message: String): ThymeleafContent {
+    return ThymeleafContent(
+        template = "error",
+        model = mapOf("errorMessage" to message)
     )
 }
