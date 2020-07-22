@@ -36,10 +36,7 @@ class FetchChapterMp3ViewData(
         val chapterViewData = mutableMapOf<Int, ChapterViewData>()
 
         for (chapterNumber in 1..chapters.size) {
-            chapterViewData[chapterNumber] = ChapterViewData(
-                chapterNumber,
-                null
-            )
+            var url: String? = null
 
             for(pri in priorityMap) {
                 val fileAccessRequest = if (product == "tr") {
@@ -50,9 +47,14 @@ class FetchChapterMp3ViewData(
 
                 val chapterFile = storage.getChapterFile(fileAccessRequest) ?: continue
 
-                chapterViewData[chapterNumber]!!.url = chapterFile.path
+                url = chapterFile.path
                 break
             }
+
+            chapterViewData[chapterNumber] = ChapterViewData(
+                chapterNumber,
+                url
+            )
         }
 
         return chapterViewData
