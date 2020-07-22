@@ -40,7 +40,7 @@ class FetchChapterViewData(
                 } else if (product == ProductFileExtension.MP3) {
                     getMp3FileAccessRequest(chapterNumber, priority)
                 } else {
-                    break
+                    null
                 }
 
                 val chapterFile = storage.getChapterFile(fileAccessRequest)

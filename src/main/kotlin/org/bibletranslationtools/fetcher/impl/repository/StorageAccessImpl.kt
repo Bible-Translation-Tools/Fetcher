@@ -25,7 +25,9 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         return if (dirs.isNullOrEmpty()) listOf() else dirs.map { it.name }
     }
 
-    override fun getChapterFile(model: FileAccessRequest): File? {
+    override fun getChapterFile(model: FileAccessRequest?): File? {
+        if (model == null) return null
+
         val chapterPrefixDir = getPathPrefixDir(
             languageCode = model.languageCode,
             resourceId = model.resourceId,
