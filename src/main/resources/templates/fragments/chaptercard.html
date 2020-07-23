@@ -9,7 +9,7 @@
        th:href="${url == null}? '#' : ${url}">
 
         <div class="chaptercard__title" th:classappend="${url == null}? 'unavailable'">
-            <p th:text="${text} + {index}">Chapter 01</p>
+            <p th:text="${text + index}">Chapter 01</p>
         </div>
 
         <div class="chaptercard__download" th:classappend="${url == null}? 'unavailable'">
