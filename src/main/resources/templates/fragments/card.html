@@ -6,7 +6,7 @@
 <body>
 <a th:fragment="card(localizedText, anglicizedText, code, url)"
    class="def-card" th:classappend="${url == null}? 'unavailable' "
-   th:href="${url == null}? '#' : ${'/'+url}">
+   th:href="${url == null}? '#' : ${url}">
     <div class="def-card__code"
          th:classappend="${url == null}? 'unavailable' ">
         <span th:text="${code}">01 Gen</span>

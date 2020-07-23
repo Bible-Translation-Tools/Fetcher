@@ -21,7 +21,7 @@
 
 <div class="l-list-container" >
     <div th:each="book: ${bookList}">
-        <div th:insert="fragments/card :: card(${book.localizedName}, ${book.anglicizedName}, ${book.slug}, ${book.url})"></div>
+        <div th:insert="fragments/card :: card(${book.localizedName}, ${book.anglicizedName}, ${book.index + ' '+ book.slug}, ${book.url})"></div>
     </div>
 </div>
 
