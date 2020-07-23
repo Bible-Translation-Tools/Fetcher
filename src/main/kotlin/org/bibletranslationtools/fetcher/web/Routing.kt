@@ -113,19 +113,15 @@ private fun chaptersView(
     parameters: Parameters,
     resolver: DependencyResolver
 ): ThymeleafContent {
-    val invalidParameters = parameters[ParamKeys.languageParamKey].isNullOrEmpty() ||
-            parameters[ParamKeys.productParamKey].isNullOrEmpty() ||
-            parameters[ParamKeys.bookParamKey].isNullOrEmpty()
     val bookViewData: BookViewData? = getBookViewData(parameters, resolver)
     val chapterViewDataList: List<ChapterViewData>? = try {
         getChapterViewDataList(parameters, resolver)
     } catch (ex: ClientRequestException) {
-        null
+        return errorPage("Server network error. Please check back again later.")
     }
 
     return when {
-        invalidParameters -> errorPage("Invalid Parameters")
-        chapterViewDataList == null -> errorPage("Server network error. Please check back again later.")
+        chapterViewDataList == null -> errorPage("Invalid Parameters")
         bookViewData == null -> errorPage("Could not find the content with the specified url")
         else -> ThymeleafContent(
             template = "",
