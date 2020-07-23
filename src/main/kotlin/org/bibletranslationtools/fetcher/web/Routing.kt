@@ -93,7 +93,7 @@ private fun booksView(
     resolver: DependencyResolver
 ): ThymeleafContent {
     val languageCode = parameters[languageParamKey]
-    if(languageCode.isNullOrEmpty()) return errorPage("Invalid Language Code")
+    if (languageCode.isNullOrEmpty()) return errorPage("Invalid Language Code")
 
     val booksModel = FetchBookViewData(resolver.bookRepository, languageCode)
 
@@ -113,7 +113,7 @@ private fun chaptersView(
     val productSlug = parameters[productParamKey]
     val bookSlug = parameters[bookParamKey]
 
-    if(languageCode.isNullOrEmpty() || productSlug.isNullOrEmpty() || bookSlug.isNullOrEmpty()) {
+    if (languageCode.isNullOrEmpty() || productSlug.isNullOrEmpty() || bookSlug.isNullOrEmpty()) {
         return errorPage("Error")
     }
 
