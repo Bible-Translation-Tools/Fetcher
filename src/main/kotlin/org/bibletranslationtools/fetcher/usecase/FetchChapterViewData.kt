@@ -42,7 +42,7 @@ class FetchChapterViewData(
 
                 val chapterFile = storage.getChapterFile(fileAccessRequest)
                 if (chapterFile != null) {
-                    url = chapterFile.path
+                    url = chapterFile.invariantSeparatorsPath
                     break
                 }
             }
