@@ -7,26 +7,27 @@ import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 
 class FetchChapterViewData(
-    private val chapterCatalog: ChapterCatalog,
+    chapterCatalog: ChapterCatalog,
     private val storage: StorageAccess,
     private val languageCode: String,
     private val productSlug: String, // tr / mp3
     private val bookSlug: String
 ) {
+    companion object {
+        val priorityList = listOf(
+            PriorityItem("mp3", "hi"),
+            PriorityItem("mp3", "low"),
+            PriorityItem("wav", "")
+        )
+        data class PriorityItem(val fileExtension: String, val mediaQuality: String)
+    }
+
     private val chapters: List<Chapter> = chapterCatalog.getAll(
         languageCode = languageCode,
         bookSlug = bookSlug
     ).sortedBy { it.number }
 
-    private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
-
-    private val priorityList = listOf(
-        PriorityItem("mp3", "hi"),
-        PriorityItem("mp3", "low"),
-        PriorityItem("wav", "")
-    )
-
-    fun getListViewData(): List<ChapterViewData> {
+    fun getViewDataList(): List<ChapterViewData> {
         val chapterList = mutableListOf<ChapterViewData>()
         val product = ProductFileExtension.getType(productSlug)
 
