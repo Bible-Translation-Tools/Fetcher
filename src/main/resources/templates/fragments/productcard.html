@@ -8,7 +8,7 @@
    class="product-card"
    th:href="${url}">
     <div class="product-card__icon-container">
-        <img alt="product_image" class="product-card__product-icon" th:src="@{static/} + ${iconUrl}"/>
+        <img alt="product_image" class="product-card__product-icon" th:src="${'/static/' + iconUrl}"/>
     </div>
     <div class="product-card__text">
         <p th:text="${productTitle}"class="product-card__title">አማርኛ</p>

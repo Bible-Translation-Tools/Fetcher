@@ -30,7 +30,7 @@
 
 <div class="l-list-container" >
     <div th:each="chapter: ${chapterList}">
-        <div th:insert="fragments/chaptercard :: chaptercard(${chapter.chapterNumber}, ${chapter.localizedName}, ${chapter.url})"></div>
+        <div th:insert="fragments/chaptercard :: chaptercard(${chapter.chapterNumber}, ${chapter.titleKey}, ${chapter.url})"></div>
     </div>
 </div>
 </body>
