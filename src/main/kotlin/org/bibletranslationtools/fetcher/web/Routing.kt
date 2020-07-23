@@ -27,9 +27,8 @@ fun Routing.root(resolver: DependencyResolver) {
             contentLanguage = Locale.LanguageRange.parse(call.request.acceptLanguage())
             call.respond(
                 ThymeleafContent(
-                    template = "index",
-                    model = mapOf(),
-                    locale = getPreferredLocale(contentLanguage, "index")
+                    template = "landing",
+                    model = mapOf()
                 )
             )
         }
@@ -88,11 +87,10 @@ private fun gatewayLanguagesView(
 ): ThymeleafContent {
     val model = FetchLanguageViewData(resolver.languageRepository)
     return ThymeleafContent(
-        template = "",
+        template = "languages",
         model = mapOf(
             "languageList" to model.getListViewData(path)
-        ),
-        locale = getPreferredLocale(contentLanguage, "")
+        )
     )
 }
 
@@ -104,11 +102,10 @@ private fun productsView(
     val model = FetchProductViewData(resolver.productCatalog)
 
     return ThymeleafContent(
-        template = "",
+        template = "products",
         model = mapOf(
             "productList" to model.getListViewData(path)
-        ),
-        locale = getPreferredLocale(contentLanguage, "")
+        )
     )
 }
 
@@ -120,15 +117,12 @@ private fun booksView(
 ): ThymeleafContent {
     if (languageCode.isNullOrBlank()) {
         // invalid route parameter
-        return ThymeleafContent(
-            template = "error",
-            model = mapOf()
-        )
+        return errorPage("Invalid route params")
     }
     val booksModel = FetchBookViewData(resolver.bookRepository, languageCode)
 
     return ThymeleafContent(
-        template = "",
+        template = "books",
         model = mapOf(
             "bookList" to booksModel.getListViewData(path)
         ),
@@ -172,7 +166,7 @@ private fun chaptersView(
     }
 
     return ThymeleafContent(
-        template = "",
+        template = "chapters",
         model = mapOf(
             "book" to book,
             "chapterList" to chaptersModel
@@ -183,7 +177,7 @@ private fun chaptersView(
 
 private fun errorPage(message: String): ThymeleafContent {
     return ThymeleafContent(
-        template = "error",
+        template = "",
         model = mapOf("errorMessage" to message)
     )
 }

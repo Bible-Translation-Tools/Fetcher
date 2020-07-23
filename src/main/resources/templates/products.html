@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>Products</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" >
-    <link rel="stylesheet" href="static/common.css" th:href="@{static/common.css}">
-    <link rel="stylesheet" href="static/products.css" th:href="@{static/products.css}">
+    <link rel="stylesheet" href="/static/common.css">
+    <link rel="stylesheet" href="/static/products.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
@@ -18,7 +18,7 @@
 
 <div class="l-list-container" >
     <div th:each="product: ${productList}">
-        <div th:insert="fragments/productcard :: productcard(${product.iconUrl}, #{${product.titleKey}}, #{${product.descriptionKey}}, ${product.url}')"></div>
+        <div th:insert="fragments/productcard :: productcard(${product.iconUrl}, #{${product.titleKey}}, #{${product.descriptionKey}}, ${product.url})"></div>
     </div>
 </div>
 </body>

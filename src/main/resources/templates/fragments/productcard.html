@@ -5,21 +5,16 @@
 </head>
 <body>
 <a th:fragment="productcard(iconUrl, productTitle, productDescription, url)"
-   class="product-card" th:classappend="${url == false}? 'unavailable' "
-   th:href="${url == false}? '#' : ${'/'+url}">
-    <div class="product-card__icon-container"
-         th:classappend="${url == false}? 'unavailable' ">
-        <img alt="product_image" class="product-card__product-icon" th:src="@{static/} + ${iconUrl}"/>
+   class="product-card"
+   th:href="${'/'+url}">
+    <div class="product-card__icon-container">
+        <img alt="product_image" class="product-card__product-icon" th:src="${'/static/' + iconUrl}"/>
     </div>
-    <div class="product-card__text"
-         th:classappend="${url == false}? 'unavailable' ">
-        <p th:text="${productTitle}"class="product-card__title"
-           th:classappend="${url == false}? 'unavailable' ">አማርኛ</p>
-        <p th:text="${productDescription}" class="product-card__description"
-           th:classappend="${url == false}? 'unavailable' "><span>Amharic</span></p>
+    <div class="product-card__text">
+        <p th:text="${productTitle}"class="product-card__title">አማርኛ</p>
+        <p th:text="${productDescription}" class="product-card__description"><span>Amharic</span></p>
     </div>
-    <span class="product-card__icon"
-          th:classappend="${url == false}? 'unavailable' ">
+    <span class="product-card__icon">
         <em class="material-icons">arrow_forward</em></span>
 </a>
 </body>
