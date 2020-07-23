@@ -7,7 +7,7 @@ import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 
 class FetchChapterViewData(
-    private val chapterCatalog: ChapterCatalog,
+    chapterCatalog: ChapterCatalog,
     private val storage: StorageAccess,
     private val languageCode: String,
     private val productSlug: String, // tr / mp3

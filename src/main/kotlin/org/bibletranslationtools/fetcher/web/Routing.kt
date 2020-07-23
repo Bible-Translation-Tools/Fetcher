@@ -14,10 +14,14 @@ import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
 import org.bibletranslationtools.fetcher.usecase.FetchLanguageViewData
 import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
+import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
+import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 
-private const val languageParamKey = "languageCode"
-private const val productParamKey = "productSlug"
-private const val bookParamKey = "bookSlug"
+private object ParamKeys {
+    const val languageParamKey = "languageCode"
+    const val productParamKey = "productSlug"
+    const val bookParamKey = "bookSlug"
+}
 
 fun Routing.root(resolver: DependencyResolver) {
     route("/") {
@@ -36,19 +40,19 @@ fun Routing.root(resolver: DependencyResolver) {
                 val path = call.request.path()
                 call.respond(gatewayLanguagesView(path, resolver))
             }
-            route("{$languageParamKey}") {
+            route("{${ParamKeys.languageParamKey}}") {
                 get {
                     // products page
                     val path = call.request.path()
                     call.respond(productsView(path, resolver))
                 }
-                route("{$productParamKey}") {
+                route("{${ParamKeys.productParamKey}}") {
                     get {
                         // books page
                         val path = call.request.path()
                         call.respond(booksView(call.parameters, path, resolver))
                     }
-                    route("{$bookParamKey}") {
+                    route("{${ParamKeys.bookParamKey}}") {
                         get {
                             // chapters page
                             call.respond(chaptersView(call.parameters, resolver))
@@ -92,15 +96,15 @@ private fun booksView(
     path: String,
     resolver: DependencyResolver
 ): ThymeleafContent {
-    val languageCode = parameters[languageParamKey]
+    val languageCode = parameters[ParamKeys.languageParamKey]
     if (languageCode.isNullOrEmpty()) return errorPage("Invalid Language Code")
 
-    val booksModel = FetchBookViewData(resolver.bookRepository, languageCode)
+    val bookViewData = FetchBookViewData(resolver.bookRepository, languageCode).getViewDataList(path)
 
     return ThymeleafContent(
         template = "",
         model = mapOf(
-            "bookList" to booksModel.getListViewData(path)
+            "bookList" to bookViewData
         )
     )
 }
@@ -109,20 +113,48 @@ private fun chaptersView(
     parameters: Parameters,
     resolver: DependencyResolver
 ): ThymeleafContent {
-    val languageCode = parameters[languageParamKey]
-    val productSlug = parameters[productParamKey]
-    val bookSlug = parameters[bookParamKey]
-
-    if (languageCode.isNullOrEmpty() || productSlug.isNullOrEmpty() || bookSlug.isNullOrEmpty()) {
-        return errorPage("Error")
+    val invalidParameters = parameters[ParamKeys.languageParamKey].isNullOrEmpty() ||
+            parameters[ParamKeys.productParamKey].isNullOrEmpty() ||
+            parameters[ParamKeys.bookParamKey].isNullOrEmpty()
+    val bookViewData: BookViewData? = getBookViewData(parameters, resolver)
+    val chapterViewDataList: List<ChapterViewData>? = try {
+        getChapterViewDataList(parameters, resolver)
+    } catch (ex: ClientRequestException) {
+        null
     }
 
-    val book = FetchBookViewData(resolver.bookRepository, languageCode).getBookInfo(bookSlug)
-    if (book == null) {
-        return errorPage("Could not find the content with the specified url")
+    return when {
+        invalidParameters -> errorPage("Inavlid Parameters")
+        chapterViewDataList == null -> errorPage("Server network error. Please check back again later.")
+        bookViewData == null -> errorPage("Could not find the content with the specified url")
+        else -> ThymeleafContent(
+            template = "",
+            model = mapOf(
+                "book" to bookViewData,
+                "chapterList" to chapterViewDataList
+            )
+        )
     }
+}
 
-    val chapterViewDataList = try {
+private fun getBookViewData(parameters: Parameters, resolver: DependencyResolver): BookViewData? {
+    val languageCode = parameters[ParamKeys.languageParamKey]
+    val bookSlug = parameters[ParamKeys.bookParamKey]
+
+    return if (!languageCode.isNullOrEmpty() && !bookSlug.isNullOrEmpty()) {
+        FetchBookViewData(resolver.bookRepository, languageCode).getViewData(bookSlug)
+    } else {
+        null
+    }
+}
+
+@Throws(ClientRequestException::class)
+private fun getChapterViewDataList(parameters: Parameters, resolver: DependencyResolver): List<ChapterViewData>? {
+    val languageCode = parameters[ParamKeys.languageParamKey]
+    val productSlug = parameters[ParamKeys.productParamKey]
+    val bookSlug = parameters[ParamKeys.bookParamKey]
+
+    return if (!languageCode.isNullOrEmpty() && !bookSlug.isNullOrEmpty() && !productSlug.isNullOrEmpty()) {
         FetchChapterViewData(
             chapterCatalog = resolver.chapterCatalog,
             storage = resolver.storageAccess,
@@ -130,17 +162,9 @@ private fun chaptersView(
             productSlug = productSlug,
             bookSlug = bookSlug
         ).getViewDataList()
-    } catch (ex: ClientRequestException) {
-        return errorPage("Server network error. Please check back again later.")
+    } else {
+        null
     }
-
-    return ThymeleafContent(
-        template = "",
-        model = mapOf(
-            "book" to book,
-            "chapterList" to chapterViewDataList
-        )
-    )
 }
 
 private fun errorPage(message: String): ThymeleafContent {

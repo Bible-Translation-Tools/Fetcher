@@ -9,7 +9,7 @@ class FetchBookViewData(
 ) {
     private val books = bookRepo.getBooks(languageCode = languageCode, resourceId = "ulb")
 
-    fun getListViewData(currentPath: String): List<BookViewData> = books.map {
+    fun getViewDataList(currentPath: String): List<BookViewData> = books.map {
         BookViewData(
             index = it.index,
             slug = it.slug,
@@ -19,7 +19,7 @@ class FetchBookViewData(
         )
     }
 
-    fun getBookInfo(bookSlug: String): BookViewData? {
+    fun getViewData(bookSlug: String): BookViewData? {
         val book = bookRepo.getBook(bookSlug, languageCode)
         return if (book != null) BookViewData(
             index = book.index,
