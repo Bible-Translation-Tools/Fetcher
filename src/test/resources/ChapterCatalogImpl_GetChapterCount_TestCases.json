@@ -1,0 +1,27 @@
+[
+  {
+    "languageCode": "en",
+    "bookSlug": "gen",
+    "expectedResult": 50
+  },
+  {
+    "languageCode": "en",
+    "bookSlug": "exo",
+    "expectedResult": 40
+  },
+  {
+    "languageCode": "en",
+    "bookSlug": "mat",
+    "expectedResult": 28
+  },
+  {
+    "languageCode": "en",
+    "bookSlug": "jhn",
+    "expectedResult": 21
+  },
+  {
+    "languageCode": "en",
+    "bookSlug": "rut",
+    "expectedResult": 4
+  }
+]
