@@ -12,11 +12,11 @@ body,html {
     font-size: 100%;
     @font-face {
         font-family: "Noto Sans";
-        src: url("../fonts/NotoSans-Regular.ttf") format('.ttf'),
-             url("../fonts/NotoSans-BoldItalic.ttf") format('.ttf'),
-             url("../fonts/NotoSans-Bold.ttf") format('.ttf'),
-             url("../fonts/NotoSans-Italic.ttf") format('.ttf');
-         src: local("../fonts/NotoSans-Regular.ttf") format('.ttf')
+        src: url("/static/fonts/NotoSans-Regular.ttf") format('.ttf'),
+             url("/static/fonts/NotoSans-BoldItalic.ttf") format('.ttf'),
+             url("/static/fonts/NotoSans-Bold.ttf") format('.ttf'),
+             url("/static/fonts/NotoSans-Italic.ttf") format('.ttf');
+         src: local("/static/fonts/NotoSans-Regular.ttf") format('.ttf')
     }
     overflow-y: scroll;
     overflow-x: hidden;
