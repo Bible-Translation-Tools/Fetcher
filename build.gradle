@@ -45,6 +45,7 @@ dependencies {
     implementation "org.slf4j:slf4j-api:$slf4j_api_ver"
     implementation "org.slf4j:slf4j-simple:$slf4j_simple_ver"
     implementation "org.mockito:mockito-core:$mockito_core_ver"
+    implementation "io.ktor:ktor-client-cio:$ktor_client_ver"
     implementation name: "thymeleaf-1.0-SNAPSHOT"
 
     detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_ver"
