@@ -6,7 +6,7 @@
 <body>
 <a th:fragment="productcard(iconUrl, productTitle, productDescription, url)"
    class="product-card"
-   th:href="${'/'+url}">
+   th:href="${url}">
     <div class="product-card__icon-container">
         <img alt="product_image" class="product-card__product-icon" th:src="@{static/} + ${iconUrl}"/>
     </div>
