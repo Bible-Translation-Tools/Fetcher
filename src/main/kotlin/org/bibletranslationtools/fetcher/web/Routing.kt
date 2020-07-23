@@ -125,8 +125,7 @@ private fun booksView(
         template = "books",
         model = mapOf(
             "bookList" to booksModel.getListViewData(path)
-        ),
-        locale = getPreferredLocale(contentLanguage, "")
+        )
     )
 }
 
@@ -170,8 +169,7 @@ private fun chaptersView(
         model = mapOf(
             "book" to book,
             "chapterList" to chaptersModel
-        ),
-        locale = getPreferredLocale(contentLanguage, "")
+        )
     )
 }
 
