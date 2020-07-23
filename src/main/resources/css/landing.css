@@ -1,46 +1,17 @@
 body,html {
-    height: 100%;
-    width: 100%;
-    padding: 0;
-    margin: 0;
-    background:linear-gradient(0deg, #111A31 0%, #111A31CC 36%, #111A3100 100%), url('static/img/landing_image@2x.png') rgba(1, 90, 217, 0.5);
+    background:linear-gradient(0deg, #111A31 0%, #111A31CC 36%, #111A3100 100%), url('/static/img/landing_image@2x.png') rgba(1, 90, 217, 0.5);
     background-size: cover;
     background-repeat: no-repeat;
     background-blend-mode: overlay;
     background-position: center;
     box-sizing: border-box;
-    font-size: 100%;
-
-    overflow: hidden;
 }
 .mainSection {
     height: 100%;
     width: 100%;
     display: flex;
-    align-items: flex-end;
-    justify-content: center;
-}
-.header {
-    display: flex;
     align-items: center;
-    height: 8.75%;
-    width: 100%;
-    background-color: #111A31;
-    padding-left: 5%;
-    position: fixed;
-    top: 0;
-}
-.header__text {
-    color: white;
-    font-weight: 300;
-    font-size: 16px;
-    margin-left: 16px;
-    line-height: 24px;
-    font-family: 'Noto Sans', Calibri, sans-serif;
-}
-.header__logo {
-    height:40px;
-    width: 40px;
+    justify-content: center;
 }
 .infoSection {
     display: flex;
@@ -50,7 +21,9 @@ body,html {
     align-items: center;
     justify-content: flex-end;
     flex-direction: column;
-    margin: 0px 8px 32px 8px;
+    margin: auto;
+    padding: 12px;
+    max-width: 642px;
 }
 .infoSection__heading {
     font-family: 'Noto Sans', Calibri, monospace;
@@ -74,8 +47,6 @@ body,html {
     background-color: #FFB100;
     min-height: 40px;
     width: 153px;
-    /* height: 6.25%; */
-    /* width: 50%; */
     border-radius: 4px;
     border: none;
     font-size: 16px;
