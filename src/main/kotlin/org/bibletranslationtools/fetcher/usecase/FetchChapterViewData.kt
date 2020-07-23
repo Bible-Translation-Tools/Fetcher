@@ -27,7 +27,7 @@ class FetchChapterViewData(
         PriorityItem("wav", "")
     )
 
-    fun getListViewData(): List<ChapterViewData> {
+    fun getViewDataList(): List<ChapterViewData> {
         val chapterList = mutableListOf<ChapterViewData>()
         val product = ProductFileExtension.getType(productSlug)
 

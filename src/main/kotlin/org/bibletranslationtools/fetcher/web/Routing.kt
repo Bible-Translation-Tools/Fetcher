@@ -4,13 +4,11 @@ import dev.jbs.ktor.thymeleaf.ThymeleafContent
 import io.ktor.application.call
 import io.ktor.client.features.ClientRequestException
 import io.ktor.http.Parameters
-import io.ktor.request.acceptLanguage
 import io.ktor.request.path
 import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
-import java.util.Locale
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
@@ -95,7 +93,7 @@ private fun booksView(
     resolver: DependencyResolver
 ): ThymeleafContent {
     val languageCode = parameters[languageParamKey]
-    if(languageCode.isNullOrEmpty()) return errorPage("Error")
+    if(languageCode.isNullOrEmpty()) return errorPage("Invalid Language Code")
 
     val booksModel = FetchBookViewData(resolver.bookRepository, languageCode)
 
@@ -124,23 +122,23 @@ private fun chaptersView(
         return errorPage("Could not find the content with the specified url")
     }
 
-    val chaptersModel = try {
+    val chapterViewDataList = try {
         FetchChapterViewData(
             chapterCatalog = resolver.chapterCatalog,
             storage = resolver.storageAccess,
             languageCode = languageCode,
             productSlug = productSlug,
             bookSlug = bookSlug
-        ).getListViewData()
+        ).getViewDataList()
     } catch (ex: ClientRequestException) {
-        return errorPage("There was a server error at the moment. Please check back again later.")
+        return errorPage("Server network error. Please check back again later.")
     }
 
     return ThymeleafContent(
         template = "",
         model = mapOf(
             "book" to book,
-            "chapterList" to chaptersModel
+            "chapterList" to chapterViewDataList
         )
     )
 }
