@@ -13,18 +13,19 @@ class FetchChapterViewData(
     private val productSlug: String, // tr / mp3
     private val bookSlug: String
 ) {
+    companion object {
+        val priorityList = listOf(
+            PriorityItem("mp3", "hi"),
+            PriorityItem("mp3", "low"),
+            PriorityItem("wav", "")
+        )
+        data class PriorityItem(val fileExtension: String, val mediaQuality: String)
+    }
+
     private val chapters: List<Chapter> = chapterCatalog.getAll(
         languageCode = languageCode,
         bookSlug = bookSlug
     ).sortedBy { it.number }
-
-    private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
-
-    private val priorityList = listOf(
-        PriorityItem("mp3", "hi"),
-        PriorityItem("mp3", "low"),
-        PriorityItem("wav", "")
-    )
 
     fun getViewDataList(): List<ChapterViewData> {
         val chapterList = mutableListOf<ChapterViewData>()

@@ -101,7 +101,11 @@ private fun booksView(
     val languageCode = parameters[ParamKeys.languageParamKey]
     if (languageCode.isNullOrEmpty()) return errorPage("Invalid Language Code")
 
-    val bookViewData = FetchBookViewData(resolver.bookRepository, languageCode).getViewDataList(path)
+    val bookViewData = FetchBookViewData(
+        resolver.bookRepository,
+        resolver.storageAccess,
+        languageCode
+    ).getViewDataList(path)
 
     return ThymeleafContent(
         template = "",
@@ -116,6 +120,7 @@ private fun chaptersView(
     resolver: DependencyResolver
 ): ThymeleafContent {
     val bookViewData: BookViewData? = getBookViewData(parameters, resolver)
+
     val chapterViewDataList: List<ChapterViewData>? = try {
         getChapterViewDataList(parameters, resolver)
     } catch (ex: ClientRequestException) {
@@ -138,9 +143,14 @@ private fun chaptersView(
 private fun getBookViewData(parameters: Parameters, resolver: DependencyResolver): BookViewData? {
     val languageCode = parameters[ParamKeys.languageParamKey]
     val bookSlug = parameters[ParamKeys.bookParamKey]
+    val productSlug = parameters[ParamKeys.productParamKey]
 
-    return if (!languageCode.isNullOrEmpty() && !bookSlug.isNullOrEmpty()) {
-        FetchBookViewData(resolver.bookRepository, languageCode).getViewData(bookSlug)
+    return if (!languageCode.isNullOrEmpty() && !bookSlug.isNullOrEmpty() && !productSlug.isNullOrEmpty()) {
+        FetchBookViewData(
+            resolver.bookRepository,
+            resolver.storageAccess,
+            languageCode
+        ).getViewData(bookSlug, productSlug)
     } else {
         null
     }
