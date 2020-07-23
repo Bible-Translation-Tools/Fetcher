@@ -37,19 +37,19 @@ fun Routing.root(resolver: DependencyResolver) {
         route("gl") {
             get {
                 // languages page
-                val path = call.request.path()
+                val path = normalizeUrl(call.request.path())
                 call.respond(gatewayLanguagesView(path, resolver))
             }
             route("{${ParamKeys.languageParamKey}}") {
                 get {
                     // products page
-                    val path = call.request.path()
+                    val path = normalizeUrl(call.request.path())
                     call.respond(productsView(path, resolver))
                 }
                 route("{${ParamKeys.productParamKey}}") {
                     get {
                         // books page
-                        val path = call.request.path()
+                        val path = normalizeUrl(call.request.path())
                         call.respond(booksView(call.parameters, path, resolver))
                     }
                     route("{${ParamKeys.bookParamKey}}") {
@@ -63,6 +63,8 @@ fun Routing.root(resolver: DependencyResolver) {
         }
     }
 }
+
+fun normalizeUrl(path: String): String = java.io.File(path).invariantSeparatorsPath
 
 private fun gatewayLanguagesView(
     path: String,

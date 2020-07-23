@@ -13,7 +13,6 @@ class FetchChapterViewData(
     private val productSlug: String, // tr / mp3
     private val bookSlug: String
 ) {
-    private val fileType = ProductFileExtension.valueOf(productSlug)
     private val chapters: List<Chapter> = chapterCatalog.getAll(
         languageCode = languageCode,
         bookSlug = bookSlug
@@ -43,7 +42,7 @@ class FetchChapterViewData(
 
                 val chapterFile = storage.getChapterFile(fileAccessRequest)
                 if (chapterFile != null) {
-                    url = chapterFile.path
+                    url = chapterFile.invariantSeparatorsPath
                     break
                 }
             }
