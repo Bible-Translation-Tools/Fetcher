@@ -124,7 +124,7 @@ private fun chaptersView(
     }
 
     return when {
-        invalidParameters -> errorPage("Inavlid Parameters")
+        invalidParameters -> errorPage("Invalid Parameters")
         chapterViewDataList == null -> errorPage("Server network error. Please check back again later.")
         bookViewData == null -> errorPage("Could not find the content with the specified url")
         else -> ThymeleafContent(
