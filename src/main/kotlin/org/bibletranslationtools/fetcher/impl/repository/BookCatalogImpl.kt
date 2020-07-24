@@ -51,7 +51,8 @@ class BookCatalogImpl : BookCatalog {
             Book(
                 index = it.index,
                 slug = it.slug,
-                anglicizedName = it.anglicizedName
+                anglicizedName = it.anglicizedName,
+                localizedName = it.anglicizedName // This is set as default to English regarding the catalog.
             )
         }
     }
