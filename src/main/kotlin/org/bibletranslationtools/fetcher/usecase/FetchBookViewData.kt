@@ -29,7 +29,7 @@ class FetchBookViewData(
 
         for (priority in FetchChapterViewData.priorityList) {
             val fileAccessRequest = when (product) {
-                ProductFileExtension.BTTR -> getTrFileAccessRequest(bookSlug, priority)
+                ProductFileExtension.BTTR -> getBTTRFileAccessRequest(bookSlug, product!!.fileType, priority)
                 ProductFileExtension.MP3 -> getMp3FileAccessRequest(bookSlug, priority)
                 else -> null
             }
@@ -52,14 +52,15 @@ class FetchBookViewData(
         }
     }
 
-    private fun getTrFileAccessRequest(
+    private fun getBTTRFileAccessRequest(
         bookSlug: String,
+        containerType: String,
         priorityItem: FetchChapterViewData.Companion.PriorityItem
     ): FileAccessRequest {
         return FileAccessRequest(
             languageCode = languageCode,
             resourceId = "ulb",
-            fileExtension = "tr",
+            fileExtension = containerType,
             bookSlug = bookSlug,
             mediaExtension = priorityItem.fileExtension,
             mediaQuality = priorityItem.mediaQuality
