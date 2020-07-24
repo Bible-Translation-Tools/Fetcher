@@ -15,14 +15,13 @@ class FetchChapterViewData(
 ) {
     private val product = ProductFileExtension.getType(productSlug)
 
-    companion object {
-        val priorityList = listOf(
-            PriorityItem("mp3", "hi"),
-            PriorityItem("mp3", "low"),
-            PriorityItem("wav", "")
-        )
-        data class PriorityItem(val fileExtension: String, val mediaQuality: String)
-    }
+    private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
+
+    private val priorityList = listOf(
+        PriorityItem("mp3", "hi"),
+        PriorityItem("mp3", "low"),
+        PriorityItem("wav", "")
+    )
 
     private val chapters: List<Chapter> = chapterCatalog.getAll(
         languageCode = languageCode,
@@ -58,7 +57,7 @@ class FetchChapterViewData(
         return FileAccessRequest(
             languageCode = languageCode,
             resourceId = "ulb",
-            fileExtension = product!!.fileType,
+            fileExtension = "tr",
             bookSlug = bookSlug,
             chapter = chapterNumber.toString(),
             mediaExtension = priorityItem.fileExtension,

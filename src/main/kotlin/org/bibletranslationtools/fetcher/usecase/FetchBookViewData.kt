@@ -12,6 +12,14 @@ class FetchBookViewData(
 ) {
     private val books = bookRepo.getBooks(languageCode = languageCode, resourceId = "ulb")
 
+    private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
+
+    private val priorityList = listOf(
+        PriorityItem("mp3", "hi"),
+        PriorityItem("mp3", "low"),
+        PriorityItem("wav", "")
+    )
+
     fun getViewDataList(currentPath: String): List<BookViewData> = books.map {
         BookViewData(
             index = it.index,
@@ -27,9 +35,9 @@ class FetchBookViewData(
         val product = ProductFileExtension.getType(productSlug)
         var url: String? = null
 
-        for (priority in FetchChapterViewData.priorityList) {
+        for (priority in priorityList) {
             val fileAccessRequest = when (product) {
-                ProductFileExtension.BTTR -> getBTTRFileAccessRequest(bookSlug, product!!.fileType, priority)
+                ProductFileExtension.BTTR -> getBTTRFileAccessRequest(bookSlug, priority)
                 ProductFileExtension.MP3 -> getMp3FileAccessRequest(bookSlug, priority)
                 else -> null
             }
@@ -54,13 +62,12 @@ class FetchBookViewData(
 
     private fun getBTTRFileAccessRequest(
         bookSlug: String,
-        containerType: String,
-        priorityItem: FetchChapterViewData.Companion.PriorityItem
+        priorityItem: PriorityItem
     ): FileAccessRequest {
         return FileAccessRequest(
             languageCode = languageCode,
             resourceId = "ulb",
-            fileExtension = containerType,
+            fileExtension = "tr",
             bookSlug = bookSlug,
             mediaExtension = priorityItem.fileExtension,
             mediaQuality = priorityItem.mediaQuality
@@ -69,7 +76,7 @@ class FetchBookViewData(
 
     private fun getMp3FileAccessRequest(
         bookSlug: String,
-        priorityItem: FetchChapterViewData.Companion.PriorityItem
+        priorityItem: PriorityItem
     ): FileAccessRequest {
         return FileAccessRequest(
             languageCode = languageCode,
