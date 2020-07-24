@@ -44,6 +44,11 @@ span {
     padding-left: 5%;
     top: 0;
 }
+.header__link {
+    display: flex;
+    align-items:center;
+    justify-content: center;
+}
 .header__text {
     color: white;
     font-weight: 300;
@@ -131,7 +136,7 @@ span {
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    margin: 16px auto;
+    margin: 16px auto 64px auto;
     max-width: 1400px;
 }
 .unavailable {
@@ -142,6 +147,7 @@ span {
 }
 .unavailable:hover {
     box-shadow: none !important;
+    cursor: no-drop;
 }
 .unavailable i {
     display: none !important;
@@ -158,9 +164,6 @@ span {
 @media only screen
 and (max-device-width: 767px)
 and (min-device-width: 320px) {
-    .l-list-container {
-        padding-bottom: 40px;
-    }
  .hero__page-title {
         min-width: 312px;
         width: 70%;
