@@ -70,18 +70,6 @@ and (max-device-width: 1200px) {
         text-align: left;
         margin: 0 16px;
     }
-    .chaptercard__download {
-        padding: 0 8px;
-        margin: 0 16px;
-        flex: 0.1;
-        border: 1px solid lightgray;
-        height: 40px;
-        width: 40px;
-        border-radius: 4px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
     .chapter-download-card {
         width: 608px;
         height: 152px;
@@ -108,4 +96,16 @@ and (min-device-width: 320px) {
         height: 152px;
         border-radius: 8px;
     }
+     .chaptercard__download {
+            padding: 0 8px;
+            margin: 0 16px;
+            flex: 0.1;
+            border: 1px solid lightgray;
+            height: 40px;
+            width: 40px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 }

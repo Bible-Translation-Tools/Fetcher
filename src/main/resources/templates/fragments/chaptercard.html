@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Chater Card</title>
+    <title>Chapter Card</title>
 </head>
 <body>
     <a th:fragment="chaptercard(index,text, url)" class="chaptercard"
        th:classappend="${url == null}? 'unavailable'"
-       th:href="${url == null}? '#' : ${'/' + url}" download>
+       th:download="${url == null}? '#' : ${'/' + url}">
 
         <div class="chaptercard__title" th:classappend="${url == null}? 'unavailable'">
             <p th:text="${text + index}">Chapter 01</p>
