@@ -54,9 +54,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         }
     }
 
-    override fun getChapterFile(request: FileAccessRequest?): File? {
-        if (request == null) return null
-
+    override fun getChapterFile(request: FileAccessRequest): File? {
         val chapterPrefixDir = getPathPrefixDir(
             languageCode = request.languageCode,
             resourceId = request.resourceId,

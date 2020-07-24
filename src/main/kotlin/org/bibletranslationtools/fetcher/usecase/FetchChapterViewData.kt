@@ -28,7 +28,9 @@ class FetchChapterViewData(
         bookSlug = bookSlug
     ).sortedBy { it.number }
 
-    fun getViewDataList(): List<ChapterViewData> {
+    fun getViewDataList(): List<ChapterViewData>? {
+        if(product == null) return null
+
         val chapterList = mutableListOf<ChapterViewData>()
 
         for (chapterNumber in 1..chapters.size) {
@@ -38,7 +40,6 @@ class FetchChapterViewData(
                 val fileAccessRequest = when (product) {
                     ProductFileExtension.BTTR -> getBTTRFileAccessRequest(chapterNumber, priority)
                     ProductFileExtension.MP3 -> getMp3FileAccessRequest(chapterNumber, priority)
-                    else -> null
                 }
 
                 val chapterFile = storage.getChapterFile(fileAccessRequest)
