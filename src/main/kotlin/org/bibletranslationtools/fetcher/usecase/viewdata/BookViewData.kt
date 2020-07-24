@@ -6,4 +6,6 @@ data class BookViewData(
     val anglicizedName: String,
     val localizedName: String,
     val url: String?
-)
+) {
+    val downloadFileName: String = if (url != null) java.io.File(url).name else ""
+}
