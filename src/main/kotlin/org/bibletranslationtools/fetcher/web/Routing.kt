@@ -64,7 +64,7 @@ fun Routing.root(resolver: DependencyResolver) {
     }
 }
 
-fun normalizeUrl(path: String): String = java.io.File(path).invariantSeparatorsPath
+private fun normalizeUrl(path: String): String = java.io.File(path).invariantSeparatorsPath
 
 private fun gatewayLanguagesView(
     path: String,
