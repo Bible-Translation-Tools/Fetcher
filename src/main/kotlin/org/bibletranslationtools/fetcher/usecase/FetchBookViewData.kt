@@ -32,19 +32,18 @@ class FetchBookViewData(
 
     fun getViewData(bookSlug: String, productSlug: String): BookViewData? {
         val book = bookRepo.getBook(bookSlug, languageCode)
-        val product = ProductFileExtension.getType(productSlug)
+        val product = ProductFileExtension.getType(productSlug) ?: return null
         var url: String? = null
 
         for (priority in priorityList) {
             val fileAccessRequest = when (product) {
                 ProductFileExtension.BTTR -> getBTTRFileAccessRequest(bookSlug, priority)
                 ProductFileExtension.MP3 -> getMp3FileAccessRequest(bookSlug, priority)
-                else -> null
             }
 
-            val chapterFile = storage.getChapterFile(fileAccessRequest)
-            if (chapterFile != null) {
-                url = chapterFile.invariantSeparatorsPath
+            val bookFile = storage.getBookFile(fileAccessRequest)
+            if (bookFile != null) {
+                url = bookFile.invariantSeparatorsPath
                 break
             }
         }

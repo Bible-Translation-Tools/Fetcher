@@ -29,7 +29,7 @@ class FetchChapterViewData(
     ).sortedBy { it.number }
 
     fun getViewDataList(): List<ChapterViewData>? {
-        if(product == null) return null
+        if (product == null) return null
 
         val chapterList = mutableListOf<ChapterViewData>()
 
