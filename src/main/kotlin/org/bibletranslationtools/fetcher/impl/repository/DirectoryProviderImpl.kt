@@ -5,7 +5,7 @@ import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 
 class DirectoryProviderImpl : DirectoryProvider {
     override fun getContentRoot(): File {
-        return File("D:/WA")
+        return File("/")
     }
 
     override fun getProjectsDir(languageCode: String, resourceId: String): File {
