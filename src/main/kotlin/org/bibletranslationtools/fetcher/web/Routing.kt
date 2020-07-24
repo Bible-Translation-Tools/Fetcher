@@ -131,7 +131,7 @@ private fun chaptersView(
         chapterViewDataList == null -> errorPage("Invalid Parameters")
         bookViewData == null -> errorPage("Could not find the content with the specified url")
         else -> ThymeleafContent(
-            template = "",
+            template = "chapters",
             model = mapOf(
                 "book" to bookViewData,
                 "chapterList" to chapterViewDataList
@@ -173,14 +173,6 @@ private fun getChapterViewDataList(parameters: Parameters, resolver: DependencyR
     } else {
         null
     }
-
-    return ThymeleafContent(
-        template = "chapters",
-        model = mapOf(
-            "book" to book,
-            "chapterList" to chaptersModel
-        )
-    )
 }
 
 private fun errorPage(message: String): ThymeleafContent {
