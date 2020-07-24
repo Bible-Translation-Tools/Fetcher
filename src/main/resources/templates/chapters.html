@@ -20,9 +20,9 @@
 
 <div class="chapter-download-card">
     <h2 class="chapter-download-card__book-name"
-    th:text="${'replace with book name from book object'}">{Book Name}</h2>
+        th:text="${book.anglicizedName}">{Book Name}</h2>
     <a class="chapter-download-card__button"
-        th:href="${'/'+ 'replace this with url from book object'}">
+       th:href="${'/'+ book.url}" download>
         <em class="material-icons">get_app</em>
         <p >Download Book</p>
     </a>
