@@ -18,7 +18,7 @@
 
 <div class="l-list-container" >
     <div th:each="product: ${productList}">
-        <div th:insert="fragments/productcard :: productcard(${product.iconUrl}, #{${product.titleKey}}, #{${product.descriptionKey}}, ${product.url}')"></div>
+        <div th:insert="fragments/productcard :: productcard(${product.iconUrl}, #{${product.titleKey}}, #{${product.descriptionKey}}, ${product.url})"></div>
     </div>
 </div>
 </body>
