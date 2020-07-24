@@ -31,8 +31,8 @@ class FetchBookViewData(
     }
 
     fun getViewData(bookSlug: String, productSlug: String): BookViewData? {
-        val book = bookRepo.getBook(bookSlug, languageCode)
         val product = ProductFileExtension.getType(productSlug) ?: return null
+        val book = bookRepo.getBook(bookSlug, languageCode)
         var url: String? = null
 
         for (priority in priorityList) {
