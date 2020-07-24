@@ -1,0 +1,111 @@
+.chaptercard {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width:98vw;
+    max-width: 949px;
+    max-height: 56px;
+    border-top: 1px solid #111A3133;
+}
+.chaptercard__title {
+    flex: 1;
+    text-align: center;
+    color: #111A31;
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+.chaptercard__download {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    color: #015AD9;
+    font-size: 1rem;
+}
+.chaptercard__download-text {
+    text-decoration: underline;
+    padding: 2px;
+    line-height: 24px;
+}
+.chaptercard__icon {
+    height: 24px;
+    width: 24px;
+}
+.chapter-download-card {
+    background: #0A3373;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 753px;
+    height: 152px;
+    margin: 16px auto 16px auto;
+}
+.chapter-download-card__book-name {
+    font-size: 26px;
+    color: white;
+}
+.chapter-download-card__button {
+    width: 184px;
+    height: 40px;
+    background: #FFB100;
+    color: black;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+}
+
+
+/* --layout for tablets  */
+@media only  screen
+and (max-device-width: 1200px) {
+    .chaptercard {
+        justify-content: space-between;
+        max-width: 608px;
+    }
+    .chaptercard__title {
+        text-align: left;
+        margin: 0 16px;
+    }
+    .chapter-download-card {
+        width: 608px;
+        height: 152px;
+    }
+}
+/* --mobile layout for phones  */
+@media only screen
+and (max-device-width: 767px)
+and (min-device-width: 320px) {
+    .hero__page-title {
+        margin-bottom: 20px;
+    }
+    .hero__page-info {
+        display: none;
+    }
+     .chaptercard__icon {
+         color: darkblue;
+     }
+    .chaptercard__download-text {
+        display: none;
+    }
+   .chapter-download-card {
+        width: 312.5px;
+        height: 152px;
+        border-radius: 8px;
+    }
+     .chaptercard__download {
+            padding: 0 8px;
+            margin: 0 16px;
+            flex: 0.1;
+            border: 1px solid lightgray;
+            height: 40px;
+            width: 40px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+}

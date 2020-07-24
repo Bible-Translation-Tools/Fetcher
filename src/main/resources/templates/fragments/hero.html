@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Hero</title>
+</head>
+<body>
+<div th:fragment="hero(pageTitle, pageInfo)" class="hero">
+    <h1 class="hero__page-title" th:text="${pageTitle}">
+        Choose a Gateway Language
+    </h1>
+
+    <p class="hero__page-info" th:text="${pageInfo}">
+        This is the language that the audio will be played in.
+    </p>
+</div>
+</body>
+
+</html>

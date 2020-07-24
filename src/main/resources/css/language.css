@@ -1,0 +1,134 @@
+.def-card{
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    align-items: center;
+    justify-content: flex-start;
+    width:296px;
+    height: 168px;
+    border-radius: 8px;
+    border: 1px #111A3129 solid;
+    overflow: hidden;
+    /* padding: 0 8px 0 8px; */
+    margin: 8px;
+}
+.def-card:hover {
+    box-shadow:  0px 8px 8px #111A313D;
+    cursor: pointer
+}
+.def-card__secondary-text {
+    order: 2;
+    flex: 1;
+    /* background: rgba(17, 26, 49, 0.1); */
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    color: #000000;
+}
+.def-card__icon {
+    flex: 0.5;
+    display: none;
+}
+.def-card__icon--hidden {
+    display: none;
+}
+.def-card__main-text {
+    order: 1;
+    height: 112px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+.def-card__code {
+    order: 2;
+    color: #000000;
+    font-size: 1rem;
+    text-transform: capitalize;
+}
+.def-card__text {
+    background: #111A310D;
+    max-height: 80px;
+    width: 100%;
+    flex: 1;
+    text-align: center;
+    font-size: 24px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #111A3199;
+    font-weight: bold;
+}
+.def-card__anglicized-text {
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    color: #111A31;
+    font-size: 20px;
+    margin: 2px;
+    height: 32px;
+}
+
+/* --mobile layout for phones  */
+@media only screen
+and (max-device-width: 767px)
+and (min-device-width: 320px)
+ {
+    .def-card {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-evenly;
+        width: 100vw;
+        height: 79px;
+        margin: 0;
+        border: solid 1px #111A3133;
+        border-radius:0;
+    }
+    .def-card__main-text {
+        order: 2;
+        flex: 3;
+        justify-content: center;
+        height: 80%;
+        margin: 0 0 0 4px;
+    }
+    .def-card__code {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        flex: 1;
+        text-align: center;
+        background: #111A310D;
+        font-size: 1rem;
+    }
+    .def-card__text {
+        flex: none;
+        display: block;
+        background-color: white;
+        color: #111A31;
+        font-size: 1.125rem;
+        text-align: left;
+        height: 50%;
+    }
+    .def-card__anglicized-text {
+        color: #111A31;
+        font-size: 1rem;
+        font-weight: 500;
+        text-align: left;
+        height: 50%;
+    }
+    .def-card__secondary-text {
+        order: 1;
+        background-color:#111A310D ;
+        color: #111A3199;
+        font-size: 1rem;
+    }
+    .def-card__icon {
+        display: block;
+        order: 3;
+    }
+}

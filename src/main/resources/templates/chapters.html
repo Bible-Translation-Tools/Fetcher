@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Chapters</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" >
+    <link rel="stylesheet" href="/static/common.css">
+    <link rel="stylesheet" href="/static/chapters.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+
+<div th:insert="fragments/header :: header"></div>
+
+<div th:insert="fragments/navbar :: navbar('TODO', 'TODO', 'TODO', 'TODO')"></div>
+
+<div th:insert="fragments/hero :: hero(#{page_title}, #{page_info})"></div>
+
+<div th:insert="fragments/searchbar :: searchbar"></div>
+
+<div class="chapter-download-card">
+    <h2 class="chapter-download-card__book-name"
+        th:text="${book.anglicizedName}">{Book Name}</h2>
+    <a class="chapter-download-card__button"
+       th:classappend="${book.url == null}? 'unavailable'"
+       th:href="${book.url == null}? '#' : ${'/' + book.url}" download>
+        <em class="material-icons">get_app</em>
+        <p >Download Book</p>
+    </a>
+</div>
+
+<div class="l-list-container" >
+    <div th:each="chapter: ${chapterList}">
+        <div th:insert="fragments/chaptercard :: chaptercard(${chapter.chapterNumber}, ${chapter.titleKey}, ${chapter.url})"></div>
+    </div>
+</div>
+</body>
+</html>

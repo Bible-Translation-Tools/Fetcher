@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Chapter Card</title>
+</head>
+<body>
+    <a th:fragment="chaptercard(index,text, url)" class="chaptercard"
+       th:classappend="${url == null}? 'unavailable'"
+       th:download="${url == null}? '#' : ${'/' + url}">
+
+        <div class="chaptercard__title" th:classappend="${url == null}? 'unavailable'">
+            <p th:text="${text + index}">Chapter 01</p>
+        </div>
+
+        <div class="chaptercard__download" th:classappend="${url == null}? 'unavailable'">
+            <em class="material-icons chaptercard__icon">get_app</em>
+            <p class="chaptercard__download-text">Download</p>
+        </div>
+
+    </a>
+</body>
+</html>
