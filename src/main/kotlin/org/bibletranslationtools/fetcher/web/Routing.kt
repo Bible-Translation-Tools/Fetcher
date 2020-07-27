@@ -66,10 +66,10 @@ fun Routing.root(resolver: DependencyResolver) {
                 }
             }
         }
-        route("/download/{filePath...}") {
-            get {
-                val pathToFile = call.parameters["filePath"] ?: ""
-                val file = resolver.storageAccess.getContentRoot().resolve(pathToFile)
+        route("/download") {
+            get("{paths...}") {
+                val pathFromRoute = call.parameters.getAll("paths")?.joinToString("/")?:""
+                val file = resolver.storageAccess.getContentRoot().resolve(pathFromRoute)
                 if (!file.isFile) {
                     call.respond(HttpStatusCode.NotFound, "File is no longer available.")
                 } else {
