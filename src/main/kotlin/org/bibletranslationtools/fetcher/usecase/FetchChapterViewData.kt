@@ -1,5 +1,6 @@
 package org.bibletranslationtools.fetcher.usecase
 
+import io.ktor.client.features.ClientRequestException
 import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
@@ -23,10 +24,14 @@ class FetchChapterViewData(
         PriorityItem("wav", "")
     )
 
-    private val chapters: List<Chapter> = chapterCatalog.getAll(
-        languageCode = languageCode,
-        bookSlug = bookSlug
-    ).sortedBy { it.number }
+    private val chapters: List<Chapter> = try {
+        chapterCatalog.getAll(
+            languageCode = languageCode,
+            bookSlug = bookSlug
+        ).sortedBy { it.number }
+    } catch(ex: ClientRequestException) {
+        throw ex
+    }
 
     fun getViewDataList(): List<ChapterViewData>? {
         if (product == null) return null
