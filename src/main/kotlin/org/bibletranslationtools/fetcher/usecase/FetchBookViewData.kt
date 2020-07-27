@@ -1,10 +1,10 @@
 package org.bibletranslationtools.fetcher.usecase
 
+import java.io.File
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
-import java.io.File
 
 class FetchBookViewData(
     private val bookRepo: BookRepository,

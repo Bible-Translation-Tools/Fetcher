@@ -5,5 +5,4 @@ data class ChapterViewData(
     val url: String?
 ) {
     val titleKey: String = "chapter" // localization key
-    val downloadFileName: String? = if (url != null) java.io.File(url).name else null
 }
