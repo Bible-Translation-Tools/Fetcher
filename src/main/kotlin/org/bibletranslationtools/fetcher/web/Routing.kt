@@ -3,12 +3,17 @@ package org.bibletranslationtools.fetcher.web
 import dev.jbs.ktor.thymeleaf.ThymeleafContent
 import io.ktor.application.call
 import io.ktor.client.features.ClientRequestException
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.Parameters
 import io.ktor.request.path
+import io.ktor.response.header
 import io.ktor.response.respond
+import io.ktor.response.respondFile
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
+import java.io.File
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
@@ -58,6 +63,18 @@ fun Routing.root(resolver: DependencyResolver) {
                             call.respond(chaptersView(call.parameters, resolver))
                         }
                     }
+                }
+            }
+        }
+        route("/download") {
+            get("{paths...}") {
+                val pathFromRoute = call.parameters.getAll("paths")?.joinToString("/") ?: ""
+                val file = resolver.storageAccess.getContentRoot().resolve(pathFromRoute)
+                if (!file.isFile) {
+                    call.respond(HttpStatusCode.NotFound, "File is no longer available.")
+                } else {
+                    call.response.header(HttpHeaders.ContentDisposition, "attachment; filename=\"${file.name}\"")
+                    call.respondFile(file)
                 }
             }
         }
@@ -177,7 +194,7 @@ private fun getChapterViewDataList(parameters: Parameters, resolver: DependencyR
 
 private fun errorPage(message: String): ThymeleafContent {
     return ThymeleafContent(
-        template = "error",
+        template = "",
         model = mapOf("errorMessage" to message)
     )
 }

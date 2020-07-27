@@ -1,5 +1,7 @@
 package org.bibletranslationtools.fetcher.usecase
 
+import io.ktor.client.features.ClientRequestException
+import java.io.File
 import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
@@ -10,7 +12,7 @@ class FetchChapterViewData(
     chapterCatalog: ChapterCatalog,
     private val storage: StorageAccess,
     private val languageCode: String,
-    productSlug: String, // tr / mp3
+    productSlug: String,
     private val bookSlug: String
 ) {
     private val product = ProductFileExtension.getType(productSlug)
@@ -23,10 +25,14 @@ class FetchChapterViewData(
         PriorityItem("wav", "")
     )
 
-    private val chapters: List<Chapter> = chapterCatalog.getAll(
-        languageCode = languageCode,
-        bookSlug = bookSlug
-    ).sortedBy { it.number }
+    private val chapters: List<Chapter> = try {
+        chapterCatalog.getAll(
+            languageCode = languageCode,
+            bookSlug = bookSlug
+        ).sortedBy { it.number }
+    } catch (ex: ClientRequestException) {
+        throw ex
+    }
 
     fun getViewDataList(): List<ChapterViewData>? {
         if (product == null) return null
@@ -44,7 +50,7 @@ class FetchChapterViewData(
 
                 val chapterFile = storage.getChapterFile(fileAccessRequest)
                 if (chapterFile != null) {
-                    url = chapterFile.invariantSeparatorsPath
+                    url = getChapterDownloadUrl(chapterFile)
                     break
                 }
             }
@@ -75,5 +81,9 @@ class FetchChapterViewData(
             chapter = chapterNumber.toString(),
             mediaQuality = priorityItem.mediaQuality
         )
+    }
+
+    private fun getChapterDownloadUrl(chapterFile: File): String {
+        return chapterFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
     }
 }

@@ -11,6 +11,10 @@ import org.slf4j.LoggerFactory
 class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : StorageAccess {
     private val logger = LoggerFactory.getLogger(javaClass)
 
+    override fun getContentRoot(): File {
+        return directoryProvider.getContentRoot()
+    }
+
     override fun getLanguageCodes(): List<String> {
         val sourceFileRootDir = directoryProvider.getContentRoot()
         val dirs = sourceFileRootDir.listFiles(File::isDirectory)
