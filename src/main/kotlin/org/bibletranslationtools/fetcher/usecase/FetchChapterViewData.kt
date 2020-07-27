@@ -11,7 +11,7 @@ class FetchChapterViewData(
     chapterCatalog: ChapterCatalog,
     private val storage: StorageAccess,
     private val languageCode: String,
-    productSlug: String, // tr / mp3
+    productSlug: String,
     private val bookSlug: String
 ) {
     private val product = ProductFileExtension.getType(productSlug)
