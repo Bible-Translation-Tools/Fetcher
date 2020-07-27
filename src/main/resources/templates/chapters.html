@@ -23,8 +23,7 @@
         th:text="${book.anglicizedName}">{Book Name}</h2>
     <a class="chapter-download-card__button"
        th:classappend="${book.url == null}? 'unavailable'"
-       th:href="${book.url == null}? '#' : ${'/download/' + book.url}"
-       download
+       th:href="${book.url == null}? '#' : ${'/download?filePath=' + book.url}"
        >
 
     <em class="material-icons">get_app</em>

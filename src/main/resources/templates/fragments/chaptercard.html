@@ -6,7 +6,7 @@
 <body>
     <a th:fragment="chaptercard(index, text, url, fileName)" class="chaptercard"
        th:classappend="${url == null}? 'unavailable'"
-       th:href="${url == null}? '#' : ${'/download/' + url}"
+       th:href="${url == null}? '#' : ${'/download?filePath=' + url}"
        download
        >
 
