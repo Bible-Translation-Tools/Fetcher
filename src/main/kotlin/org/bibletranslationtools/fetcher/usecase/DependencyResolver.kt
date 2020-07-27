@@ -16,7 +16,7 @@ import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 
 object DependencyResolver {
-    private val directoryProvider: DirectoryProvider = DirectoryProviderImpl()
+    val directoryProvider: DirectoryProvider = DirectoryProviderImpl()
 
     val storageAccess: StorageAccess = StorageAccessImpl(directoryProvider)
     val languageRepository: LanguageRepository = LanguageRepositoryImpl(

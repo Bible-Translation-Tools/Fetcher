@@ -9,11 +9,13 @@ import io.ktor.features.CallLogging
 import io.ktor.features.DefaultHeaders
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.files
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
 import io.ktor.response.header
 import io.ktor.response.respond
 import io.ktor.response.respondFile
+import io.ktor.http.content.staticRootFolder
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
@@ -45,6 +47,10 @@ fun Application.appModule() {
                 static("img") {
                     resources("img")
                 }
+            }
+            static("downloads") {
+                staticRootFolder = resolver.directoryProvider.getContentRoot()
+                files(".")
             }
             // Application Route
             root(resolver)
