@@ -29,7 +29,7 @@ fun Routing.root(resolver: DependencyResolver) {
             // landing page
             call.respond(
                 ThymeleafContent(
-                    template = "",
+                    template = "landing",
                     model = mapOf()
                 )
             )
@@ -72,7 +72,7 @@ private fun gatewayLanguagesView(
 ): ThymeleafContent {
     val model = FetchLanguageViewData(resolver.languageRepository)
     return ThymeleafContent(
-        template = "",
+        template = "languages",
         model = mapOf(
             "languageList" to model.getListViewData(path)
         )
@@ -86,7 +86,7 @@ private fun productsView(
     val model = FetchProductViewData(resolver.productCatalog)
 
     return ThymeleafContent(
-        template = "",
+        template = "products",
         model = mapOf(
             "productList" to model.getListViewData(path)
         )
@@ -108,7 +108,7 @@ private fun booksView(
     ).getViewDataList(path)
 
     return ThymeleafContent(
-        template = "",
+        template = "books",
         model = mapOf(
             "bookList" to bookViewData
         )
@@ -131,7 +131,7 @@ private fun chaptersView(
         chapterViewDataList == null -> errorPage("Invalid Parameters")
         bookViewData == null -> errorPage("Could not find the content with the specified url")
         else -> ThymeleafContent(
-            template = "",
+            template = "chapters",
             model = mapOf(
                 "book" to bookViewData,
                 "chapterList" to chapterViewDataList
