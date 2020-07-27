@@ -3,26 +3,18 @@ package org.bibletranslationtools.fetcher.web
 import dev.jbs.ktor.thymeleaf.Thymeleaf
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCallPipeline
-import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.CallLogging
 import io.ktor.features.DefaultHeaders
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.files
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
-import io.ktor.response.header
-import io.ktor.response.respond
-import io.ktor.response.respondFile
 import io.ktor.http.content.staticRootFolder
 import io.ktor.routing.Routing
 import io.ktor.routing.get
-import io.ktor.routing.route
 import io.ktor.routing.routing
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
-import java.io.File
 
 fun Application.appModule() {
     install(DefaultHeaders)
