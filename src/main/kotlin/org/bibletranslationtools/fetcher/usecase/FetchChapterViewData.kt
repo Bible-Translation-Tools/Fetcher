@@ -50,7 +50,7 @@ class FetchChapterViewData(
 
                 val chapterFile = storage.getChapterFile(fileAccessRequest)
                 if (chapterFile != null) {
-                    url = getChapterFileDownloadUrl(chapterFile)
+                    url = getChapterDownloadUrl(chapterFile)
                     break
                 }
             }
@@ -58,10 +58,6 @@ class FetchChapterViewData(
         }
 
         return chapterList
-    }
-
-    private fun getChapterFileDownloadUrl(chapterFile: File): String {
-        return chapterFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
     }
 
     private fun getBTTRFileAccessRequest(chapterNumber: Int, priorityItem: PriorityItem): FileAccessRequest {
@@ -85,5 +81,9 @@ class FetchChapterViewData(
             chapter = chapterNumber.toString(),
             mediaQuality = priorityItem.mediaQuality
         )
+    }
+
+    private fun getChapterDownloadUrl(chapterFile: File): String {
+        return chapterFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
     }
 }
