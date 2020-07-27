@@ -4,7 +4,7 @@
     <title>Chapter Card</title>
 </head>
 <body>
-    <a th:fragment="chaptercard(index, text, url, fileName)" class="chaptercard"
+    <a th:fragment="chaptercard(index, text, url)" class="chaptercard"
        th:classappend="${url == null}? 'unavailable'"
        th:href="${url == null}? '#' : ${'/download?filePath=' + url}"
        th:target="${url == null}? '' : '_blank'">
