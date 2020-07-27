@@ -48,7 +48,7 @@ fun Application.appModule() {
                     resources("img")
                 }
             }
-            static("downloads") {
+            static("download") {
                 staticRootFolder = resolver.directoryProvider.getContentRoot()
                 files(".")
             }
