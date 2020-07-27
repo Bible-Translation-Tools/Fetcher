@@ -6,6 +6,7 @@ import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
+import java.io.File
 
 class FetchChapterViewData(
     chapterCatalog: ChapterCatalog,
@@ -49,7 +50,7 @@ class FetchChapterViewData(
 
                 val chapterFile = storage.getChapterFile(fileAccessRequest)
                 if (chapterFile != null) {
-                    url = chapterFile.invariantSeparatorsPath
+                    url = getChapterFileDownloadUrl(chapterFile)
                     break
                 }
             }
@@ -57,6 +58,10 @@ class FetchChapterViewData(
         }
 
         return chapterList
+    }
+
+    private fun getChapterFileDownloadUrl(chapterFile: File): String {
+        return chapterFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
     }
 
     private fun getBTTRFileAccessRequest(chapterNumber: Int, priorityItem: PriorityItem): FileAccessRequest {
