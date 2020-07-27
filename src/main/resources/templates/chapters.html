@@ -24,7 +24,7 @@
     <a class="chapter-download-card__button"
        th:classappend="${book.url == null}? 'unavailable'"
        th:href="${book.url == null}? '#' : ${'/download?filePath=' + book.url}"
-       target="_blank">
+       th:target="${book.url == null}? '' : '_blank'">
 
     <em class="material-icons">get_app</em>
         <p >Download Book</p>
