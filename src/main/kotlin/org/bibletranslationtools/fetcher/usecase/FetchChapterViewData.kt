@@ -1,12 +1,12 @@
 package org.bibletranslationtools.fetcher.usecase
 
 import io.ktor.client.features.ClientRequestException
+import java.io.File
 import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
-import java.io.File
 
 class FetchChapterViewData(
     chapterCatalog: ChapterCatalog,
@@ -30,7 +30,7 @@ class FetchChapterViewData(
             languageCode = languageCode,
             bookSlug = bookSlug
         ).sortedBy { it.number }
-    } catch(ex: ClientRequestException) {
+    } catch (ex: ClientRequestException) {
         throw ex
     }
 
