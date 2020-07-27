@@ -3,9 +3,13 @@ package org.bibletranslationtools.fetcher.web
 import dev.jbs.ktor.thymeleaf.ThymeleafContent
 import io.ktor.application.call
 import io.ktor.client.features.ClientRequestException
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.Parameters
 import io.ktor.request.path
+import io.ktor.response.header
 import io.ktor.response.respond
+import io.ktor.response.respondFile
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
@@ -16,6 +20,7 @@ import org.bibletranslationtools.fetcher.usecase.FetchLanguageViewData
 import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
+import java.io.File
 
 private object ParamKeys {
     const val languageParamKey = "languageCode"
@@ -58,6 +63,19 @@ fun Routing.root(resolver: DependencyResolver) {
                             call.respond(chaptersView(call.parameters, resolver))
                         }
                     }
+                }
+            }
+        }
+
+        route("download/{filePath...}") {
+            get {
+                val pathToFile = call.parameters["filePath"]?:""
+                val file = File(pathToFile)
+                if (!file.isFile) {
+                    call.respond(HttpStatusCode.NotFound, "File is no longer available.")
+                } else {
+                    call.response.header(HttpHeaders.ContentDisposition, "attachment; filename=\"${file.name}\"")
+                    call.respondFile(File(pathToFile))
                 }
             }
         }
