@@ -1,7 +1,6 @@
 package org.bibletranslationtools.fetcher.web
 
 import dev.jbs.ktor.thymeleaf.ThymeleafContent
-import io.ktor.application.ApplicationCall
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.call
 import io.ktor.client.features.ClientRequestException
@@ -14,12 +13,9 @@ import io.ktor.request.uri
 import io.ktor.response.header
 import io.ktor.response.respond
 import io.ktor.response.respondFile
-import io.ktor.routing.Route
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
-import io.ktor.util.pipeline.PipelineInterceptor
-import io.ktor.util.pipeline.PipelinePhase
 import java.util.Locale
 import java.util.ResourceBundle
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
