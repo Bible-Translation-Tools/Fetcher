@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.tyhmeleaf.org" lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Landing</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,7 +19,7 @@
         <h1 class="infoSection__heading">Listen to the Bible Offline.</h1>
         <p class="infoSection__text"> Download source audio so that you can listen to it whenever you want without an internet connection.</p>
 
-        <a class="infoSection__button" href="/gl">
+        <a class="infoSection__button" href="/gl" th:href="${glRoute}">
             <em class="material-icons">note_add </em>
             <span>Get Started</span>
         </a>

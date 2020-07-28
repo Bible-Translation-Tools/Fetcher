@@ -22,10 +22,13 @@ import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 
+private const val gatewayLanguagesRoute = "gl"
+
 private object ParamKeys {
     const val languageParamKey = "languageCode"
     const val productParamKey = "productSlug"
     const val bookParamKey = "bookSlug"
+
 }
 
 fun Routing.root(resolver: DependencyResolver) {
@@ -35,11 +38,13 @@ fun Routing.root(resolver: DependencyResolver) {
             call.respond(
                 ThymeleafContent(
                     template = "landing",
-                    model = mapOf()
+                    model = mapOf(
+                        "glRoute" to "/$gatewayLanguagesRoute"
+                    )
                 )
             )
         }
-        route("gl") {
+        route(gatewayLanguagesRoute) {
             get {
                 // languages page
                 val path = normalizeUrl(call.request.path())
@@ -106,7 +111,7 @@ private fun productsView(
         template = "products",
         model = mapOf(
             "productList" to model.getListViewData(path),
-            "languagesNavUrl" to "/gl"
+            "languagesNavUrl" to "/$gatewayLanguagesRoute"
         )
     )
 }
@@ -129,8 +134,8 @@ private fun booksView(
         template = "books",
         model = mapOf(
             "bookList" to bookViewData,
-            "languagesNavUrl" to "/gl",
-            "toolsNavUrl" to "/gl/$languageCode"
+            "languagesNavUrl" to "/$gatewayLanguagesRoute",
+            "toolsNavUrl" to "/$gatewayLanguagesRoute/$languageCode"
         )
     )
 }
@@ -158,9 +163,9 @@ private fun chaptersView(
             model = mapOf(
                 "book" to bookViewData,
                 "chapterList" to chapterViewDataList,
-                "languagesNavUrl" to "/gl",
-                "toolsNavUrl" to "/gl/$languageCode",
-                "booksNavUrl" to "/gl/$languageCode/$productSlug"
+                "languagesNavUrl" to "/$gatewayLanguagesRoute",
+                "toolsNavUrl" to "/$gatewayLanguagesRoute/$languageCode",
+                "booksNavUrl" to "/$gatewayLanguagesRoute/$languageCode/$productSlug"
             )
         )
     }
