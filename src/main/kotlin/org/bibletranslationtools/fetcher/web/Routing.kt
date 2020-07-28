@@ -105,7 +105,8 @@ private fun productsView(
     return ThymeleafContent(
         template = "products",
         model = mapOf(
-            "productList" to model.getListViewData(path)
+            "productList" to model.getListViewData(path),
+            "languageUrl" to "/gl"
         )
     )
 }
@@ -127,7 +128,9 @@ private fun booksView(
     return ThymeleafContent(
         template = "books",
         model = mapOf(
-            "bookList" to bookViewData
+            "bookList" to bookViewData,
+            "languageUrl" to "/gl",
+            "toolsUrl" to "/gl/en"
         )
     )
 }
@@ -151,7 +154,10 @@ private fun chaptersView(
             template = "chapters",
             model = mapOf(
                 "book" to bookViewData,
-                "chapterList" to chapterViewDataList
+                "chapterList" to chapterViewDataList,
+                "languageUrl" to "/gl",
+                "toolsUrl" to "/gl/en",
+                "booksUrl" to "/gl/en/mp3"
             )
         )
     }
