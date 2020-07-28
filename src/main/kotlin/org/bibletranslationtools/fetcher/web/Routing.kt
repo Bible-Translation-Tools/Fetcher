@@ -106,7 +106,7 @@ private fun productsView(
         template = "products",
         model = mapOf(
             "productList" to model.getListViewData(path),
-            "languageUrl" to "/gl"
+            "languagesNavUrl" to "/gl"
         )
     )
 }
@@ -129,8 +129,8 @@ private fun booksView(
         template = "books",
         model = mapOf(
             "bookList" to bookViewData,
-            "languageUrl" to "/gl",
-            "toolsUrl" to "/gl/$languageCode"
+            "languagesNavUrl" to "/gl",
+            "toolsNavUrl" to "/gl/$languageCode"
         )
     )
 }
@@ -158,9 +158,9 @@ private fun chaptersView(
             model = mapOf(
                 "book" to bookViewData,
                 "chapterList" to chapterViewDataList,
-                "languageUrl" to "/gl",
-                "toolsUrl" to "/gl/$languageCode",
-                "booksUrl" to "/gl/$languageCode/$productSlug"
+                "languagesNavUrl" to "/gl",
+                "toolsNavUrl" to "/gl/$languageCode",
+                "booksNavUrl" to "/gl/$languageCode/$productSlug"
             )
         )
     }
