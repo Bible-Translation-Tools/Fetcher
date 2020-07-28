@@ -1,6 +1,8 @@
 package org.bibletranslationtools.fetcher.web
 
 import dev.jbs.ktor.thymeleaf.ThymeleafContent
+import io.ktor.application.ApplicationCall
+import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.call
 import io.ktor.client.features.ClientRequestException
 import io.ktor.http.HttpHeaders
@@ -8,12 +10,16 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.Parameters
 import io.ktor.request.acceptLanguage
 import io.ktor.request.path
+import io.ktor.request.uri
 import io.ktor.response.header
 import io.ktor.response.respond
 import io.ktor.response.respondFile
+import io.ktor.routing.Route
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
+import io.ktor.util.pipeline.PipelineInterceptor
+import io.ktor.util.pipeline.PipelinePhase
 import java.util.Locale
 import java.util.ResourceBundle
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
@@ -31,11 +37,16 @@ private object ParamKeys {
 }
 
 fun Routing.root(resolver: DependencyResolver) {
-
     route("/") {
+        var contentLanguage = listOf<Locale.LanguageRange>()
+        intercept(ApplicationCallPipeline.Call) {
+            if (!call.request.uri.startsWith("/static")) {
+                contentLanguage = Locale.LanguageRange.parse(call.request.acceptLanguage())
+            }
+        }
         get {
             // landing page
-            val contentLanguage = Locale.LanguageRange.parse(call.request.acceptLanguage())
+
             call.respond(
                 ThymeleafContent(
                     template = "landing",
@@ -48,27 +59,23 @@ fun Routing.root(resolver: DependencyResolver) {
             get {
                 // languages page
                 val path = normalizeUrl(call.request.path())
-                val contentLanguage = Locale.LanguageRange.parse(call.request.acceptLanguage())
                 call.respond(gatewayLanguagesView(path, resolver, contentLanguage))
             }
             route("{${ParamKeys.languageParamKey}}") {
                 get {
                     // products page
                     val path = normalizeUrl(call.request.path())
-                    val contentLanguage = Locale.LanguageRange.parse(call.request.acceptLanguage())
                     call.respond(productsView(path, resolver, contentLanguage))
                 }
                 route("{${ParamKeys.productParamKey}}") {
                     get {
                         // books page
                         val path = normalizeUrl(call.request.path())
-                        val contentLanguage = Locale.LanguageRange.parse(call.request.acceptLanguage())
                         call.respond(booksView(call.parameters, path, resolver, contentLanguage))
                     }
                     route("{${ParamKeys.bookParamKey}}") {
                         get {
                             // chapters page
-                            val contentLanguage = Locale.LanguageRange.parse(call.request.acceptLanguage())
                             call.respond(chaptersView(call.parameters, resolver, contentLanguage))
                         }
                     }
