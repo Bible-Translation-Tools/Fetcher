@@ -130,7 +130,7 @@ private fun booksView(
         model = mapOf(
             "bookList" to bookViewData,
             "languageUrl" to "/gl",
-            "toolsUrl" to "/gl/en"
+            "toolsUrl" to "/gl/$languageCode"
         )
     )
 }
@@ -147,6 +147,9 @@ private fun chaptersView(
         return errorPage("Server network error. Please check back again later.")
     }
 
+    val languageCode = parameters["languageCode"]
+    val productSlug = parameters["productSlug"]
+
     return when {
         chapterViewDataList == null -> errorPage("Invalid Parameters")
         bookViewData == null -> errorPage("Could not find the content with the specified url")
@@ -156,8 +159,8 @@ private fun chaptersView(
                 "book" to bookViewData,
                 "chapterList" to chapterViewDataList,
                 "languageUrl" to "/gl",
-                "toolsUrl" to "/gl/en",
-                "booksUrl" to "/gl/en/mp3"
+                "toolsUrl" to "/gl/$languageCode",
+                "booksUrl" to "/gl/$languageCode/$productSlug"
             )
         )
     }
