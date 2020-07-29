@@ -16,7 +16,9 @@ import io.ktor.response.respondFile
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
+import java.lang.IllegalArgumentException
 import java.util.Locale
+import java.util.MissingResourceException
 import java.util.ResourceBundle
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
@@ -25,6 +27,7 @@ import org.bibletranslationtools.fetcher.usecase.FetchLanguageViewData
 import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
+import org.slf4j.LoggerFactory
 
 private object ParamKeys {
     const val languageParamKey = "languageCode"
@@ -35,6 +38,7 @@ private object ParamKeys {
 fun Routing.root(resolver: DependencyResolver) {
     route("/") {
         var contentLanguage = listOf<Locale.LanguageRange>()
+        // execute before any sub-routes
         intercept(ApplicationCallPipeline.Call) {
             if (!call.request.uri.startsWith("/static")) {
                 contentLanguage = Locale.LanguageRange.parse(call.request.acceptLanguage())
@@ -214,13 +218,16 @@ private fun getChapterViewDataList(parameters: Parameters, resolver: DependencyR
 
 private fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templateName: String): Locale {
     val noFallbackController = ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_PROPERTIES)
+    val logger = LoggerFactory.getLogger("GetLocale")
 
     for (languageRange in languageRanges) {
         val locale = Locale.Builder().setLanguageTag(languageRange.range).build()
         try {
             ResourceBundle.getBundle("templates/$templateName", locale, noFallbackController)
             return locale
-        } catch (ex: Exception) {
+        } catch (ex: MissingResourceException) {
+            logger.warn("Locale for ${locale.language} not supported")
+        } catch (ex: IllegalArgumentException) {
             ex.printStackTrace()
         }
     }
