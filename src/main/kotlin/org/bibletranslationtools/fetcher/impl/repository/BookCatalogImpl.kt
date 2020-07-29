@@ -16,7 +16,6 @@ class BookCatalogImpl : BookCatalog {
         const val CATALOG_SLUG_ID = "slug"
         const val CATALOG_NUMBER_ID = "num"
         const val CATALOG_ANGLICIZED_NAME_ID = "name"
-        const val BOOK_CATALOG_FILE_NAME = "book_catalog.json"
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -27,6 +26,7 @@ class BookCatalogImpl : BookCatalog {
     )
 
     private val logger = LoggerFactory.getLogger(javaClass)
+    private val bookCatalogFileName = System.getenv("BOOK_CATALOG_FILE")
     private val books: List<Book> = parseCatalog()
 
     override fun getAll(): List<Book> = this.books
@@ -42,7 +42,7 @@ class BookCatalogImpl : BookCatalog {
             val catalogFile = getBookCatalogFile()
             catalogFile.readText()
         } catch (e: FileNotFoundException) {
-            logger.error("$BOOK_CATALOG_FILE_NAME file not found", e)
+            logger.error("Book Catalog file not found at $bookCatalogFileName", e)
             throw e // crash on fatal exception: critical resource not found
         }
 
@@ -59,9 +59,11 @@ class BookCatalogImpl : BookCatalog {
 
     @Throws(FileNotFoundException::class)
     private fun getBookCatalogFile(): File {
-        val catalogFileURL = javaClass.classLoader.getResource(BOOK_CATALOG_FILE_NAME)
-            ?: throw FileNotFoundException()
+        val catalogFile = File(bookCatalogFileName)
+        if(!catalogFile.exists()) {
+            throw FileNotFoundException()
+        }
 
-        return File(catalogFileURL.path)
+        return catalogFile
     }
 }

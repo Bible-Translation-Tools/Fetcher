@@ -27,7 +27,7 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
     )
 
     private val logger = LoggerFactory.getLogger(javaClass)
-    private val portLanguageFileName = "port_gateway_languages.csv"
+    private val portLanguageFileName = System.getenv("GATEWAY_LANG_FILE")
     private val languageList: List<Language> = parseCatalog()
 
     override fun getAll(): List<Language> = this.languageList
@@ -37,7 +37,7 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
         val languagesFile: File = try {
             getLanguagesFile()
         } catch (e: FileNotFoundException) {
-            logger.error("$portLanguageFileName file not found", e)
+            logger.error("Port Gateway Languages file not found at $portLanguageFileName", e)
             throw e // crash on fatal exception: critical resource not found
         }
 
@@ -59,11 +59,11 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
 
     @Throws(FileNotFoundException::class)
     private fun getLanguagesFile(): File {
-        val portLanguagesResource: URL? = javaClass.classLoader.getResource(portLanguageFileName)
-        if (portLanguagesResource == null) {
-            throw FileNotFoundException("$portLanguageFileName not found in resources.")
+        val portFile = File(portLanguageFileName)
+        if(!portFile.exists()) {
+            throw FileNotFoundException()
         }
 
-        return File(portLanguagesResource.file)
+        return portFile
     }
 }
