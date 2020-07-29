@@ -4,6 +4,8 @@ services:
     build: ./fileserver
     ports:
       - "8081:80"
+    env_file:
+      - vars.env
     volumes:
       - "${SRV_FILES_DIR}:/srv/files"
   fetcher-app:
@@ -12,11 +14,7 @@ services:
       - "8080:8080"
     env_file:
       - vars.env
-    environment:
-      - CDN_BASE_URL=http://localhost:8081
-      - GATEWAY_LANG_FILE=/srv/resources/languages.csv
     volumes:
-      - ./build/libs/bible-translation-tools_fetcher.jar:/app/fetcher.jar
+      - ../build/libs/bible-translation-tools_fetcher.jar:/app/fetcher.jar
       - ./resources:/srv/resources
-      - ./file.csv:/srv/file.csv
-      - "${SRV_FILES_DIR}:/where/ktor/expects/files"
+      - /home/dj/source_content:/content
