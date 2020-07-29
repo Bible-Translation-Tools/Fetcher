@@ -1,0 +1,14 @@
+[
+  {
+    "slug": "BTTr",
+    "titleKey": "tr_title",
+    "descriptionKey": "tr_description",
+    "iconUrl": "img/recorder_icon.png"
+  },
+  {
+    "slug": "mp3",
+    "titleKey": "mp3_title",
+    "descriptionKey": "mp3_description",
+    "iconUrl": "img/mp3_icon.png"
+  }
+]
