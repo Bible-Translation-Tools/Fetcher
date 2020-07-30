@@ -17,4 +17,3 @@ services:
     volumes:
       - ../build/libs/bible-translation-tools_fetcher.jar:/app/fetcher.jar
       - ./resources:/srv/resources
-      - /home/dj/source_content:/content
