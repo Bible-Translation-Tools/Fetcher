@@ -11,6 +11,7 @@ import java.io.FileNotFoundException
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.slf4j.LoggerFactory
+import java.io.InputStream
 
 const val PORT_LANGUAGE_CODE_ID = "IETF Tag"
 const val PORT_ANGLICIZED_NAME_ID = "Name"
@@ -26,17 +27,17 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
     )
 
     private val logger = LoggerFactory.getLogger(javaClass)
-    private val portLanguageFileName = System.getenv("GATEWAY_LANG_FILE")
+    private val portLanguageFileName = "/port_gateway_languages.csv"
     private val languageList: List<Language> = parseCatalog()
 
     override fun getAll(): List<Language> = this.languageList
 
     @Throws(FileNotFoundException::class)
     private fun parseCatalog(): List<Language> {
-        val languagesFile: File = try {
+        val languagesStream: InputStream = try {
             getLanguagesFile()
         } catch (e: FileNotFoundException) {
-            logger.error("Port Gateway Languages file not found at $portLanguageFileName", e)
+            logger.error("$portLanguageFileName not found in resources", e)
             throw e // crash on fatal exception: critical resource not found
         }
 
@@ -46,7 +47,7 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
             PortGatewayLanguage::class.java
         )
             .with(schema)
-            .readValues(languagesFile)
+            .readValues(languagesStream)
 
         val languageList = mutableListOf<Language>()
         languagesIterator.forEach {
@@ -57,12 +58,12 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
     }
 
     @Throws(FileNotFoundException::class)
-    private fun getLanguagesFile(): File {
-        val portFile = File(portLanguageFileName)
-        if (!portFile.exists()) {
+    private fun getLanguagesFile(): InputStream {
+        val portFileStream = javaClass.getResourceAsStream(portLanguageFileName)
+        if(portFileStream == null) {
             throw FileNotFoundException()
         }
 
-        return portFile
+        return portFileStream
     }
 }
