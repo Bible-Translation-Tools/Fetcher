@@ -139,7 +139,8 @@ private fun chaptersView(
             template = "chapters",
             model = mapOf(
                 "book" to bookViewData,
-                "chapterList" to chapterViewDataList
+                "chapterList" to chapterViewDataList,
+                "baseUrl" to System.getenv("CDN_BASE_URL")
             )
         )
     }
