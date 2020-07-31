@@ -29,6 +29,8 @@ import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 import org.slf4j.LoggerFactory
 
+private const val GL_ROUTE = "gl"
+
 private object ParamKeys {
     const val languageParamKey = "languageCode"
     const val productParamKey = "productSlug"
@@ -50,12 +52,14 @@ fun Routing.root(resolver: DependencyResolver) {
             call.respond(
                 ThymeleafContent(
                     template = "landing",
-                    model = mapOf(),
+                    model = mapOf(
+                        "glRoute" to "/$GL_ROUTE"
+                    ),
                     locale = getPreferredLocale(contentLanguage, "landing")
                 )
             )
         }
-        route("gl") {
+        route(GL_ROUTE) {
             get {
                 // languages page
                 val path = normalizeUrl(call.request.path())
@@ -108,7 +112,8 @@ private fun gatewayLanguagesView(
     return ThymeleafContent(
         template = "languages",
         model = mapOf(
-            "languageList" to model.getListViewData(path)
+            "languageList" to model.getListViewData(path),
+            "languagesNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "languages")
     )
@@ -124,7 +129,9 @@ private fun productsView(
     return ThymeleafContent(
         template = "products",
         model = mapOf(
-            "productList" to model.getListViewData(path)
+            "productList" to model.getListViewData(path),
+            "languagesNavUrl" to "/$GL_ROUTE",
+            "toolsNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "products")
     )
@@ -148,7 +155,10 @@ private fun booksView(
     return ThymeleafContent(
         template = "books",
         model = mapOf(
-            "bookList" to bookViewData
+            "bookList" to bookViewData,
+            "languagesNavUrl" to "/$GL_ROUTE",
+            "toolsNavUrl" to "/$GL_ROUTE/$languageCode",
+            "booksNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "books")
     )
@@ -167,6 +177,9 @@ private fun chaptersView(
         return errorPage("Server network error. Please check back again later.")
     }
 
+    val languageCode = parameters["languageCode"]
+    val productSlug = parameters["productSlug"]
+
     return when {
         chapterViewDataList == null -> errorPage("Invalid Parameters")
         bookViewData == null -> errorPage("Could not find the content with the specified url")
@@ -174,7 +187,10 @@ private fun chaptersView(
             template = "chapters",
             model = mapOf(
                 "book" to bookViewData,
-                "chapterList" to chapterViewDataList
+                "chapterList" to chapterViewDataList,
+                "languagesNavUrl" to "/$GL_ROUTE",
+                "toolsNavUrl" to "/$GL_ROUTE/$languageCode",
+                "booksNavUrl" to "/$GL_ROUTE/$languageCode/$productSlug"
             ),
             locale = getPreferredLocale(contentLanguage, "chapters")
         )
