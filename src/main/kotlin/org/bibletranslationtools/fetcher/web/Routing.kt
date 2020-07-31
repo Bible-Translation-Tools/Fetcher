@@ -29,13 +29,12 @@ import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 import org.slf4j.LoggerFactory
 
-private const val gatewayLanguagesRoute = "gl"
+private const val GL_ROUTE = "gl"
 
 private object ParamKeys {
     const val languageParamKey = "languageCode"
     const val productParamKey = "productSlug"
     const val bookParamKey = "bookSlug"
-
 }
 
 fun Routing.root(resolver: DependencyResolver) {
@@ -54,13 +53,13 @@ fun Routing.root(resolver: DependencyResolver) {
                 ThymeleafContent(
                     template = "landing",
                     model = mapOf(
-                        "glRoute" to "/$gatewayLanguagesRoute"
+                        "glRoute" to "/$GL_ROUTE"
                     ),
                     locale = getPreferredLocale(contentLanguage, "landing")
                 )
             )
         }
-        route(gatewayLanguagesRoute) {
+        route(GL_ROUTE) {
             get {
                 // languages page
                 val path = normalizeUrl(call.request.path())
@@ -131,7 +130,7 @@ private fun productsView(
         template = "products",
         model = mapOf(
             "productList" to model.getListViewData(path),
-            "languagesNavUrl" to "/$gatewayLanguagesRoute",
+            "languagesNavUrl" to "/$GL_ROUTE",
             "toolsNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "products")
@@ -157,8 +156,8 @@ private fun booksView(
         template = "books",
         model = mapOf(
             "bookList" to bookViewData,
-            "languagesNavUrl" to "/$gatewayLanguagesRoute",
-            "toolsNavUrl" to "/$gatewayLanguagesRoute/$languageCode",
+            "languagesNavUrl" to "/$GL_ROUTE",
+            "toolsNavUrl" to "/$GL_ROUTE/$languageCode",
             "booksNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "books")
@@ -189,9 +188,9 @@ private fun chaptersView(
             model = mapOf(
                 "book" to bookViewData,
                 "chapterList" to chapterViewDataList,
-                "languagesNavUrl" to "/$gatewayLanguagesRoute",
-                "toolsNavUrl" to "/$gatewayLanguagesRoute/$languageCode",
-                "booksNavUrl" to "/$gatewayLanguagesRoute/$languageCode/$productSlug"
+                "languagesNavUrl" to "/$GL_ROUTE",
+                "toolsNavUrl" to "/$GL_ROUTE/$languageCode",
+                "booksNavUrl" to "/$GL_ROUTE/$languageCode/$productSlug"
             ),
             locale = getPreferredLocale(contentLanguage, "chapters")
         )
