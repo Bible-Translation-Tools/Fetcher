@@ -12,7 +12,7 @@
 
 <div th:insert="fragments/header :: header"></div>
 
-<div th:insert="fragments/navbar :: navbar('TODO', 'TODO', 'TODO', 'TODO')"></div>
+<div th:insert="fragments/navbar :: navbar('TODO', 'TODO', 'TODO')"></div>
 
 <div th:insert="fragments/hero :: hero(#{page_title}, #{page_info})"></div>
 
@@ -27,13 +27,13 @@
        th:target="${book.url == null}? '' : '_blank'">
 
     <em class="material-icons">get_app</em>
-        <p >Download Book</p>
+        <p th:text="#{download_book}">Download Book</p>
     </a>
 </div>
 
 <div class="l-list-container" >
     <div th:each="chapter: ${chapterList}">
-        <div th:insert="fragments/chaptercard :: chaptercard(${chapter.chapterNumber}, ${chapter.titleKey}, ${chapter.url})"></div>
+        <div th:insert="fragments/chaptercard :: chaptercard(${chapter.chapterNumber}, #{${chapter.titleKey}(${chapter.chapterNumber})}, ${chapter.url})"></div>
     </div>
 </div>
 </body>
