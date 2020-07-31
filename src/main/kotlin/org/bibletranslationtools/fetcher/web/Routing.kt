@@ -113,7 +113,8 @@ private fun gatewayLanguagesView(
     return ThymeleafContent(
         template = "languages",
         model = mapOf(
-            "languageList" to model.getListViewData(path)
+            "languageList" to model.getListViewData(path),
+            "languagesNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "languages")
     )
@@ -130,7 +131,8 @@ private fun productsView(
         template = "products",
         model = mapOf(
             "productList" to model.getListViewData(path),
-            "languagesNavUrl" to "/$gatewayLanguagesRoute"
+            "languagesNavUrl" to "/$gatewayLanguagesRoute",
+            "toolsNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "products")
     )
@@ -156,7 +158,8 @@ private fun booksView(
         model = mapOf(
             "bookList" to bookViewData,
             "languagesNavUrl" to "/$gatewayLanguagesRoute",
-            "toolsNavUrl" to "/$gatewayLanguagesRoute/$languageCode"
+            "toolsNavUrl" to "/$gatewayLanguagesRoute/$languageCode",
+            "booksNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "books")
     )
