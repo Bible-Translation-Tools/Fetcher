@@ -4,7 +4,7 @@
     <title>Navbar</title>
 </head>
 <body>
-<div th:fragment="navbar(languageUrl, toolsUrl, booksUrl, object)" class="navbar">
+<div th:fragment="navbar(languageUrl, toolsUrl, booksUrl)" class="navbar">
     <a class="navbar__item" href="language.html"
        th:href="@{${languageUrl}}">
         <em class="material-icons">translate </em>
