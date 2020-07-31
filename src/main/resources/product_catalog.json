@@ -1,8 +1,8 @@
 [
   {
-    "slug": "BTTr",
-    "titleKey": "tr_title",
-    "descriptionKey": "tr_description",
+    "slug": "bttr",
+    "titleKey": "bttr_title",
+    "descriptionKey": "bttr_description",
     "iconUrl": "img/recorder_icon.png"
   },
   {
