@@ -4,8 +4,6 @@ services:
     build: ./fileserver
     ports:
       - "8081:80"
-    env_file:
-      - vars.env
     volumes:
       - ${HOST_CONTENT_ROOT}:/srv/files/download
   fetcher-app:
