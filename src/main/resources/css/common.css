@@ -31,6 +31,10 @@ span {
      font-size: 100%;
      line-height: 24px;
  }
+}
+.navbar__item span {
+    margin-left: 8px;
+}
  a {
     color: black;
      text-decoration: none;
@@ -73,8 +77,8 @@ span {
 }
 .navbar__item {
     text-decoration: none;
-    display: flex;
-    flex-direction: column;
+    display: inline-flex;
+    flex-direction: row;
     flex: 1;
     width: 100%;
     height: 100%;
@@ -147,7 +151,6 @@ span {
 }
 .unavailable {
     background: white !important;
-    border: none !important;
     color: #111A3133 !important;
     box-shadow: none !important;
 }
@@ -165,6 +168,10 @@ span {
         bottom: 0;
         left: 0;
     }
+    .navbar__item {
+        display: flex;
+        flex-direction: column;
+    }
     .navbar__item--active {
         border-top: 2px solid rgb(1, 90, 217) !important;
         border-bottom: none;
@@ -174,6 +181,10 @@ span {
 @media only screen
 and (max-device-width: 767px)
 and (min-device-width: 320px) {
+    .navbar__item {
+        display: flex;
+        flex-direction: column;
+    }
     .navbar__item--active {
         border-top: 2px solid rgb(1, 90, 217) !important;
         border-bottom: none;
@@ -191,7 +202,7 @@ and (min-device-width: 320px) {
         width: 70%;
     }
     .searchbar {
-        min-width: 312px;
+        min-width: 290px;
         width: 70%;
     }
 }
