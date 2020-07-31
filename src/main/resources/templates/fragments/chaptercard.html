@@ -6,7 +6,7 @@
 <body>
     <a th:fragment="chaptercard(index, text, url)" class="chaptercard"
        th:classappend="${url == null}? 'unavailable'"
-       th:href="${url == null}? '#' : ${'//' + baseUrl + '/' + url}"
+       th:href="${url == null}? '#' : ${url}"
        th:target="${url == null}? '' : '_blank'">
 
         <div class="chaptercard__title" th:classappend="${url == null}? 'unavailable'">
