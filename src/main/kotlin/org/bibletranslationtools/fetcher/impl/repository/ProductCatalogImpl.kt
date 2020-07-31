@@ -2,12 +2,11 @@ package org.bibletranslationtools.fetcher.impl.repository
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import java.io.File
 import java.io.FileNotFoundException
+import java.io.InputStream
 import org.bibletranslationtools.fetcher.data.Product
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.slf4j.LoggerFactory
-import java.io.InputStream
 
 class ProductCatalogImpl : ProductCatalog {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -31,7 +30,7 @@ class ProductCatalogImpl : ProductCatalog {
     @Throws(FileNotFoundException::class)
     private fun getProductCatalogFile(): InputStream {
         val catalogFileStream = javaClass.getResourceAsStream(productCatalogFileName)
-        if(catalogFileStream == null) {
+        if (catalogFileStream == null) {
             throw FileNotFoundException()
         }
 

@@ -6,12 +6,11 @@ import com.fasterxml.jackson.databind.MappingIterator
 import com.fasterxml.jackson.dataformat.csv.CsvMapper
 import com.fasterxml.jackson.dataformat.csv.CsvSchema
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import java.io.File
 import java.io.FileNotFoundException
+import java.io.InputStream
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.slf4j.LoggerFactory
-import java.io.InputStream
 
 const val PORT_LANGUAGE_CODE_ID = "IETF Tag"
 const val PORT_ANGLICIZED_NAME_ID = "Name"
@@ -60,7 +59,7 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
     @Throws(FileNotFoundException::class)
     private fun getLanguagesFile(): InputStream {
         val portFileStream = javaClass.getResourceAsStream(portLanguageFileName)
-        if(portFileStream == null) {
+        if (portFileStream == null) {
             throw FileNotFoundException()
         }
 

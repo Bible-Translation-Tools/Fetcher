@@ -4,12 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import java.io.File
 import java.io.FileNotFoundException
+import java.io.InputStream
 import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.repository.BookCatalog
 import org.slf4j.LoggerFactory
-import java.io.InputStream
 
 class BookCatalogImpl : BookCatalog {
 
@@ -60,7 +59,7 @@ class BookCatalogImpl : BookCatalog {
     @Throws(FileNotFoundException::class)
     private fun getBookCatalogFile(): InputStream {
         val catalogFileStream = javaClass.getResourceAsStream(bookCatalogFileName)
-        if(catalogFileStream == null) {
+        if (catalogFileStream == null) {
             throw FileNotFoundException()
         }
 
