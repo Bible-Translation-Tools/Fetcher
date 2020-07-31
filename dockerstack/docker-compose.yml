@@ -5,7 +5,7 @@ services:
     ports:
       - "8081:80"
     volumes:
-      - ${HOST_CONTENT_ROOT}:/srv/files/download
+      - ${HOST_CONTENT_ROOT}:/srv/files/
   fetcher-app:
     image: bibletranslationtools/fetcher
     ports:
