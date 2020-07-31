@@ -4,15 +4,11 @@ import dev.jbs.ktor.thymeleaf.ThymeleafContent
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.call
 import io.ktor.client.features.ClientRequestException
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.Parameters
 import io.ktor.request.acceptLanguage
 import io.ktor.request.path
 import io.ktor.request.uri
-import io.ktor.response.header
 import io.ktor.response.respond
-import io.ktor.response.respondFile
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route

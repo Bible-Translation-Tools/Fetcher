@@ -60,7 +60,7 @@ class BookCatalogImpl : BookCatalog {
     @Throws(FileNotFoundException::class)
     private fun getBookCatalogFile(): File {
         val catalogFile = File(bookCatalogFileName)
-        if(!catalogFile.exists()) {
+        if (!catalogFile.exists()) {
             throw FileNotFoundException()
         }
 

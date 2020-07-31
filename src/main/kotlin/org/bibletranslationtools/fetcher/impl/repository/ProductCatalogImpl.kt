@@ -31,7 +31,7 @@ class ProductCatalogImpl : ProductCatalog {
     @Throws(FileNotFoundException::class)
     private fun getProductCatalogFile(): File {
         val catalogFile = File(productCatalogFileName)
-        if(!catalogFile.exists()) {
+        if (!catalogFile.exists()) {
             throw FileNotFoundException("Product Catalog file not found at $productCatalogFileName")
         }
 

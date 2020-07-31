@@ -8,7 +8,6 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import java.io.File
 import java.io.FileNotFoundException
-import java.net.URL
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.slf4j.LoggerFactory
@@ -60,7 +59,7 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
     @Throws(FileNotFoundException::class)
     private fun getLanguagesFile(): File {
         val portFile = File(portLanguageFileName)
-        if(!portFile.exists()) {
+        if (!portFile.exists()) {
             throw FileNotFoundException()
         }
 
