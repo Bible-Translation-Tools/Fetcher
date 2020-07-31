@@ -4,23 +4,23 @@
     <title>Navbar</title>
 </head>
 <body>
-<div th:fragment="navbar(languagesNavUrl, toolsNavUrl, booksNavUrl, object)" class="navbar">
+<div th:fragment="navbar(languagesNavUrl, toolsNavUrl, booksNavUrl)" class="navbar">
     <a class="navbar__item" href="language.html"
        th:href="${languagesNavUrl}">
         <em class="material-icons">translate </em>
-        <span th:text="${object}">Language</span>
+        <span th:text="#{languages}">Language</span>
     </a>
 
     <a class="navbar__item" href="tools.html"
    th:href="${toolsNavUrl}">
     <em class="material-icons">apps </em>
-    <span th:text="${object}">Tools</span>
+    <span th:text="#{tools}">Tools</span>
     </a>
 
     <a class="navbar__item" href="books.html"
     th:href="${booksNavUrl}">
         <em class="material-icons">book </em>
-        <span th:text="${object}">Books</span>
+        <span th:text="#{books}">Books</span>
     </a>
 </div>
 </body>

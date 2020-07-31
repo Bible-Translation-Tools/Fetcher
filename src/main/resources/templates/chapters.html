@@ -27,13 +27,13 @@
        th:target="${book.url == null}? '' : '_blank'">
 
     <em class="material-icons">get_app</em>
-        <p >Download Book</p>
+        <p th:text="#{download_book}">Download Book</p>
     </a>
 </div>
 
 <div class="l-list-container" >
     <div th:each="chapter: ${chapterList}">
-        <div th:insert="fragments/chaptercard :: chaptercard(${chapter.chapterNumber}, ${chapter.titleKey}, ${chapter.url})"></div>
+        <div th:insert="fragments/chaptercard :: chaptercard(${chapter.chapterNumber}, #{${chapter.titleKey}(${chapter.chapterNumber})}, ${chapter.url})"></div>
     </div>
 </div>
 </body>
