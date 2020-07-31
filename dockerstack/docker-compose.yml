@@ -7,7 +7,7 @@ services:
     env_file:
       - vars.env
     volumes:
-      - "${SRV_FILES_DIR}:/srv/files"
+      - ${HOST_CONTENT_ROOT}:/srv/files/download
   fetcher-app:
     image: bibletranslationtools/fetcher
     ports:
