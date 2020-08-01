@@ -128,6 +128,10 @@ span {
 }
 .searchbar__input {
     border: none;
+    font-size: 100%;
+    outline: none;
+    width: 100%;
+    height: 32px;
 }
 .l-list-container {
     /* height: 340px; */
