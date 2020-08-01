@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="/static/common.css">
     <link rel="stylesheet" href="/static/language.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style id="cssFilter">
+
+    </style>
 </head>
 
 <body>
@@ -24,7 +27,21 @@
         <div th:insert="fragments/card :: card(${book.localizedName}, ${book.anglicizedName}, ${book.index + ' '+ book.slug}, ${book.url})"></div>
     </div>
 </div>
-
+<script>
+    window.filter.addEventListener("input", e => {
+    console.log(e.target.value);
+        let filter = e.target.value;
+        let css = filter? `
+         .def-card {
+            display: none !important;
+         }
+         .l-list-container a[data-text*="${filter}" i] {
+            display: flex !important;
+         }
+        `: ``;
+        document.getElementById('cssFilter').innerHTML = css ;
+    });
+</script>
 </body>
 
 </html>
