@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Default Card</title>
+</head>
+<body>
+<script th:fragment="filter">
+        window.filter.addEventListener("input", e => {
+        console.log(e.target.value);
+            let filter = e.target.value;
+            let css = filter? `
+             .l-list-container a {
+                display: none !important;
+             }
+             .l-list-container a[data-text*="${filter}" i] {
+                display: flex !important;
+             }
+            `: ``;
+            document.getElementById('cssFilter').innerHTML = css ;
+        });
+</script>
+</body>
+</html>
