@@ -6,7 +6,6 @@
 <body>
 <script th:fragment="filter">
         window.filter.addEventListener("input", e => {
-        console.log(e.target.value);
             let filter = e.target.value;
             let css = filter? `
              .l-list-container a {
