@@ -61,14 +61,26 @@ span {
     height:40px;
     width: 40px;
 }
+.c-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px #111A3133 solid;
+    width: 100%;
+    height:56px;
+}
+.c-navbar > div {
+    width: 100%;
+    height: 100%;
+}
 .navbar {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
     width: 100%;
-    height: 56px;
+    max-width: 900px;
+    height: 100%;
     background-color: white;
-    border: 1px #111A3133 solid;
     margin: auto;
 }
 .navbar__item {
