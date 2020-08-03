@@ -122,4 +122,7 @@ and (min-device-width: 320px) {
     .chaptercard__download.unavailable {
         border: none;
     }
+    .chaptercard__download.unavailable .chaptercard__icon {
+        color: #cfd1d6;
+    }
 }
