@@ -151,6 +151,7 @@ span {
 }
 .unavailable {
     background: white !important;
+    border: none !important;
     color: #111A3133 !important;
     box-shadow: none !important;
 }
@@ -181,14 +182,6 @@ span {
 @media only screen
 and (max-device-width: 767px)
 and (min-device-width: 320px) {
-    .navbar__item {
-        display: flex;
-        flex-direction: column;
-    }
-    .navbar__item--active {
-        border-top: 2px solid rgb(1, 90, 217) !important;
-        border-bottom: none;
-    }
     .hero__page-title {
         min-width: 312px;
         width: 70%;
