@@ -194,8 +194,8 @@ and (min-device-width: 320px) {
         width: 70%;
     }
     .searchbar {
-        min-width: 290px;
-        width: 70%;
+        max-width: 312px;
+        width: 80%;
     }
 }
 
