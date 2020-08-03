@@ -14,7 +14,9 @@
 
 <div th:insert="fragments/header :: header"></div>
 
-<div th:insert="fragments/navbar :: navbar(${languagesNavUrl}, null, null)"></div>
+<div class="c-navbar">
+    <div th:insert="fragments/navbar :: navbar(${languagesNavUrl}, null, null)"></div>
+</div>
 
 <div th:insert="fragments/hero :: hero(#{page_title}, #{page_info})"></div>
 
