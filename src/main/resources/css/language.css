@@ -99,10 +99,12 @@ and (min-device-width: 320px)
         flex: 3;
         justify-content: center;
         height: 80%;
-        margin: 0 0 0 4px;
+        margin: 0 0 0 10px;
+        padding-top: 8px;
     }
     .def-card__code {
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         height: 100%;
