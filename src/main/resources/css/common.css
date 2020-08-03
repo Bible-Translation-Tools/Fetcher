@@ -71,7 +71,6 @@ span {
 }
 .c-navbar > div {
     width: 100%;
-    height: 100%;
 }
 .navbar {
     display: flex;
@@ -79,7 +78,7 @@ span {
     justify-content: space-evenly;
     width: 100%;
     max-width: 900px;
-    height: 100%;
+    height: 56px;
     background-color: white;
     margin: auto;
 }
@@ -176,7 +175,7 @@ span {
 }
 /* --tablet layout -- */
 @media only screen and (max-device-width: 1200px) {
-    .navbar {
+    .c-navbar {
     position: absolute;
         bottom: 0;
         left: 0;
