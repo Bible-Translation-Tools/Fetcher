@@ -151,7 +151,6 @@ span {
 }
 .unavailable {
     background: white !important;
-    border: none !important;
     color: #111A3133 !important;
     box-shadow: none !important;
 }

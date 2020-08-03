@@ -72,7 +72,9 @@
     margin: 2px;
     height: 32px;
 }
-
+.def-card.unavailable {
+    border: none;
+}
 /* --mobile layout for phones  */
 @media only screen
 and (max-device-width: 767px)
@@ -85,8 +87,12 @@ and (min-device-width: 320px)
         width: 100vw;
         height: 79px;
         margin: 0;
-        border: solid 1px #111A3133;
+        border: none;
+        border-top: 1px solid #111A3133 !important;
         border-radius:0;
+    }
+    .l-list-container > div:last-child a.def-card {
+        border-bottom: 1px solid #111A3133;
     }
     .def-card__main-text {
         order: 2;
