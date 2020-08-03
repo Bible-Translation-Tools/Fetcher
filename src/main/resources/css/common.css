@@ -82,12 +82,18 @@ span {
     justify-content: center;
     margin: 0;
     padding: 0;
-    color: rgba(0,0,0, 0.3);
+    color: #111a31ba;
 }
-
+.navbar__item:hover {
+    background: #56565626;
+}
 .navbar__item--active {
-    border-top: 2px solid #015AD9;
-    color: #015AD9;
+    cursor: default;
+    border-bottom: 2px solid rgb(1, 90, 217);
+    color: rgb(1, 90, 217);
+}
+.navbar__item--active:hover {
+    background: white !important;
 }
 .hero {
     display: flex;
@@ -163,12 +169,20 @@ span {
         bottom: 0;
         left: 0;
     }
+    .navbar__item--active {
+        border-top: 2px solid rgb(1, 90, 217) !important;
+        border-bottom: none;
+    }
 }
 /* --mobile layout for phones  */
 @media only screen
 and (max-device-width: 767px)
 and (min-device-width: 320px) {
- .hero__page-title {
+    .navbar__item--active {
+        border-top: 2px solid rgb(1, 90, 217) !important;
+        border-bottom: none;
+    }
+    .hero__page-title {
         min-width: 312px;
         width: 70%;
     }

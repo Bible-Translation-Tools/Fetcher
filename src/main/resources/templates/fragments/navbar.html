@@ -4,23 +4,26 @@
     <title>Navbar</title>
 </head>
 <body>
-<div th:fragment="navbar(languageUrl, toolsUrl, booksUrl, object)" class="navbar">
-    <a class="navbar__item" href="language.html"
-       th:href="@{${languageUrl}}">
+<div th:fragment="navbar(languagesNavUrl, toolsNavUrl, booksNavUrl)" class="navbar">
+    <a class="navbar__item" href="#"
+       th:classappend="${languagesNavUrl == null}? 'unavailable' : (${languagesNavUrl == #strings.toString('#')}? 'navbar\_\_item--active' : 'navbar\_\_item--available')"
+       th:href="${languagesNavUrl != null}? ${languagesNavUrl} : '#'">
         <em class="material-icons">translate </em>
-        <span th:text="${object}">Language</span>
+        <span th:text="#{languages}">Language</span>
     </a>
 
-    <a class="navbar__item" href="tools.html"
-   th:href="@{${toolsUrl}}">
-    <em class="material-icons">apps </em>
-    <span th:text="${object}">Tools</span>
+    <a class="navbar__item" href="#"
+       th:classappend="${toolsNavUrl == null}? 'unavailable' : (${toolsNavUrl == #strings.toString('#')}? 'navbar\_\_item--active' : 'navbar\_\_item--available')"
+       th:href="${toolsNavUrl != null}? ${toolsNavUrl} : '#'">
+        <em class="material-icons">apps </em>
+        <span th:text="#{tools}">Tools</span>
     </a>
 
-    <a class="navbar__item" href="books.html"
-    th:href="@{${booksUrl}}">
+    <a class="navbar__item"
+       th:classappend="${booksNavUrl == null}? 'unavailable' : (${booksNavUrl == #strings.toString('#')}? 'navbar\_\_item--active' : 'navbar\_\_item--available')"
+       th:href="${booksNavUrl != null}? ${booksNavUrl} : '#'">
         <em class="material-icons">book </em>
-        <span th:text="${object}">Books</span>
+        <span th:text="#{books}">Books</span>
     </a>
 </div>
 </body>
