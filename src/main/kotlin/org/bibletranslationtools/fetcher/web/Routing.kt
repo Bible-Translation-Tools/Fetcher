@@ -113,7 +113,6 @@ private fun gatewayLanguagesView(
         template = "languages",
         model = mapOf(
             "languageList" to model.getListViewData(path),
-            "languageNavTitle" to "",
             "languagesNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "languages")
@@ -136,7 +135,7 @@ private fun productsView(
         template = "products",
         model = mapOf(
             "productList" to model.getListViewData(path),
-            "languageNavTitle" to languageName,
+            "languagesNavTitle" to languageName,
             "languagesNavUrl" to "/$GL_ROUTE",
             "toolsNavUrl" to "#"
         ),
@@ -151,7 +150,10 @@ private fun booksView(
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
     val languageCode = parameters[ParamKeys.languageParamKey]
-    if (languageCode.isNullOrEmpty()) return errorPage("Invalid Language Code")
+    val productSlug = parameters[ParamKeys.productParamKey]
+    if (languageCode.isNullOrEmpty() || productSlug.isNullOrEmpty()){
+        return errorPage("Invalid request parameters")
+    }
 
     val languageName = resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
     val bookViewData = FetchBookViewData(
@@ -164,8 +166,9 @@ private fun booksView(
         template = "books",
         model = mapOf(
             "bookList" to bookViewData,
-            "languageNavTitle" to languageName,
+            "languagesNavTitle" to languageName,
             "languagesNavUrl" to "/$GL_ROUTE",
+            "toolsNavTitle" to productSlug.toUpperCase(),
             "toolsNavUrl" to "/$GL_ROUTE/$languageCode",
             "booksNavUrl" to "#"
         ),
@@ -199,9 +202,11 @@ private fun chaptersView(
             model = mapOf(
                 "book" to bookViewData,
                 "chapterList" to chapterViewDataList,
-                "languageNavTitle" to languageName,
+                "languagesNavTitle" to languageName,
                 "languagesNavUrl" to "/$GL_ROUTE",
+                "toolsNavTitle" to productSlug!!.toUpperCase(),
                 "toolsNavUrl" to "/$GL_ROUTE/$languageCode",
+                "booksNavTitle" to bookViewData.localizedName,
                 "booksNavUrl" to "/$GL_ROUTE/$languageCode/$productSlug"
             ),
             locale = getPreferredLocale(contentLanguage, "chapters")
