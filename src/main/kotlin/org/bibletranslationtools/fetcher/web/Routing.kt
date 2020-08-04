@@ -30,7 +30,6 @@ import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 import org.slf4j.LoggerFactory
 
 private const val GL_ROUTE = "gl"
-private val validator = RoutingValidator()
 
 private object ParamKeys {
     const val languageParamKey = "languageCode"
@@ -126,6 +125,7 @@ private fun productsView(
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
+    val validator = RoutingValidator(resolver)
     if(!validator.isLanguageCodeValid(parameters[ParamKeys.languageParamKey])) {
         return errorPage("Language Code ${parameters["languageCode"]} is invalid.")
     }
@@ -149,7 +149,9 @@ private fun booksView(
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
+    val validator = RoutingValidator(resolver)
     val languageCode = parameters[ParamKeys.languageParamKey]
+
     if (!validator.isLanguageCodeValid(languageCode)) return errorPage("Invalid Language Code")
     if(!validator.isProductSlugValid(parameters[ParamKeys.productParamKey])) return errorPage("Invalid Product Slug")
 
@@ -205,6 +207,7 @@ private fun chaptersView(
 }
 
 private fun getBookViewData(parameters: Parameters, resolver: DependencyResolver): BookViewData? {
+    val validator = RoutingValidator(resolver)
     val languageCode = parameters[ParamKeys.languageParamKey]
     val bookSlug = parameters[ParamKeys.bookParamKey]
     val productSlug = parameters[ParamKeys.productParamKey]
@@ -226,6 +229,7 @@ private fun getBookViewData(parameters: Parameters, resolver: DependencyResolver
 
 @Throws(ClientRequestException::class)
 private fun getChapterViewDataList(parameters: Parameters, resolver: DependencyResolver): List<ChapterViewData>? {
+    val validator = RoutingValidator(resolver)
     val languageCode = parameters[ParamKeys.languageParamKey]
     val productSlug = parameters[ParamKeys.productParamKey]
     val bookSlug = parameters[ParamKeys.bookParamKey]

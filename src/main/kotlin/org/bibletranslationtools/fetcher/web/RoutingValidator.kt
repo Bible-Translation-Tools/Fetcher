@@ -1,6 +1,8 @@
 package org.bibletranslationtools.fetcher.web
 
-class RoutingValidator {
+import org.bibletranslationtools.fetcher.usecase.DependencyResolver
+
+class RoutingValidator(val resolver: DependencyResolver) {
 
     fun isLanguageCodeValid(languageCode: String?): Boolean {
         var isValid = true
