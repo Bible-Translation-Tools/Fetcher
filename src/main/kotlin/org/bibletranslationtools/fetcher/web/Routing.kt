@@ -30,6 +30,7 @@ import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 import org.slf4j.LoggerFactory
 
 private const val GL_ROUTE = "gl"
+private val validator = RoutingValidator()
 
 private object ParamKeys {
     const val languageParamKey = "languageCode"
@@ -125,7 +126,7 @@ private fun productsView(
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
-    if(!isLanguageCodeValid(parameters[ParamKeys.languageParamKey])) {
+    if(!validator.isLanguageCodeValid(parameters[ParamKeys.languageParamKey])) {
         return errorPage("Language Code ${parameters["languageCode"]} is invalid.")
     }
 
@@ -149,8 +150,8 @@ private fun booksView(
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
     val languageCode = parameters[ParamKeys.languageParamKey]
-    if (!isLanguageCodeValid(languageCode)) return errorPage("Invalid Language Code")
-    if(!isProductSlugValid(parameters[ParamKeys.productParamKey])) return errorPage("Invalid Product Slug")
+    if (!validator.isLanguageCodeValid(languageCode)) return errorPage("Invalid Language Code")
+    if(!validator.isProductSlugValid(parameters[ParamKeys.productParamKey])) return errorPage("Invalid Product Slug")
 
     val bookViewData = FetchBookViewData(
         resolver.bookRepository,
@@ -209,9 +210,9 @@ private fun getBookViewData(parameters: Parameters, resolver: DependencyResolver
     val productSlug = parameters[ParamKeys.productParamKey]
 
     return if (
-        isLanguageCodeValid(languageCode) &&
-        isBookSlugValid(bookSlug) &&
-        isProductSlugValid(productSlug)
+        validator.isLanguageCodeValid(languageCode) &&
+        validator.isBookSlugValid(bookSlug) &&
+        validator.isProductSlugValid(productSlug)
     ) {
         FetchBookViewData(
             resolver.bookRepository,
@@ -230,9 +231,9 @@ private fun getChapterViewDataList(parameters: Parameters, resolver: DependencyR
     val bookSlug = parameters[ParamKeys.bookParamKey]
 
     return if (
-        isLanguageCodeValid(languageCode) &&
-        isBookSlugValid(bookSlug) &&
-        isProductSlugValid(productSlug)
+        validator.isLanguageCodeValid(languageCode) &&
+        validator.isBookSlugValid(bookSlug) &&
+        validator.isProductSlugValid(productSlug)
     ) {
         FetchChapterViewData(
             chapterCatalog = resolver.chapterCatalog,
@@ -263,30 +264,6 @@ private fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templ
     }
 
     return Locale.getDefault()
-}
-
-private fun isLanguageCodeValid(languageCode: String?): Boolean {
-    var isValid = true
-
-    if(languageCode.isNullOrEmpty()) isValid = false
-
-    return isValid
-}
-
-private fun isProductSlugValid(productSlug: String?): Boolean {
-    var isValid = true
-
-    if(productSlug.isNullOrEmpty()) isValid = false
-
-    return isValid
-}
-
-private fun isBookSlugValid(bookSlug: String?): Boolean {
-    var isValid = true
-
-    if(bookSlug.isNullOrEmpty()) isValid = false
-
-    return isValid
 }
 
 private fun errorPage(message: String): ThymeleafContent {
