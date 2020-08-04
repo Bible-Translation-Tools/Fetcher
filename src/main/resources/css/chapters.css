@@ -47,7 +47,7 @@ background: rgba(1, 90, 217, 0.2);
     height: 24px;
     width: 24px;
 }
-.chaptercard__icon.unavailable {
+.chaptercard__download-target.unavailable {
     display: none;
 }
 .chapter-download-card {
