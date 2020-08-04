@@ -214,7 +214,7 @@ private fun getBookViewData(parameters: Parameters, resolver: DependencyResolver
 
     return if (
         validator.isLanguageCodeValid(languageCode) &&
-        validator.isBookSlugValid(bookSlug) &&
+        validator.isBookSlugValid(languageCode, bookSlug) &&
         validator.isProductSlugValid(productSlug)
     ) {
         FetchBookViewData(
@@ -236,7 +236,7 @@ private fun getChapterViewDataList(parameters: Parameters, resolver: DependencyR
 
     return if (
         validator.isLanguageCodeValid(languageCode) &&
-        validator.isBookSlugValid(bookSlug) &&
+        validator.isBookSlugValid(languageCode, bookSlug) &&
         validator.isProductSlugValid(productSlug)
     ) {
         FetchChapterViewData(

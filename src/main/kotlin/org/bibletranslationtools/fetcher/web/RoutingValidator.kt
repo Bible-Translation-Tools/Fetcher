@@ -26,10 +26,14 @@ class RoutingValidator(val resolver: DependencyResolver) {
         return isValid
     }
 
-    fun isBookSlugValid(bookSlug: String?): Boolean {
+    fun isBookSlugValid(languageCode: String?, bookSlug: String?): Boolean {
         var isValid = true
 
-        if(bookSlug.isNullOrEmpty()) isValid = false
+        when {
+            bookSlug.isNullOrEmpty() -> isValid = false
+            languageCode.isNullOrEmpty() -> isValid = false
+            resolver.bookRepository.getBook(bookSlug, languageCode) == null -> isValid = false
+        }
 
         return isValid
     }
