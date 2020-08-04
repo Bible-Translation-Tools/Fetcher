@@ -208,12 +208,16 @@ private fun getBookViewData(parameters: Parameters, resolver: DependencyResolver
     val bookSlug = parameters[ParamKeys.bookParamKey]
     val productSlug = parameters[ParamKeys.productParamKey]
 
-    return if (!languageCode.isNullOrEmpty() && !bookSlug.isNullOrEmpty() && !productSlug.isNullOrEmpty()) {
+    return if (
+        isLanguageCodeValid(languageCode) &&
+        isBookSlugValid(bookSlug) &&
+        isProductSlugValid(productSlug)
+    ) {
         FetchBookViewData(
             resolver.bookRepository,
             resolver.storageAccess,
-            languageCode
-        ).getViewData(bookSlug, productSlug)
+            languageCode!!
+        ).getViewData(bookSlug!!, productSlug!!)
     } else {
         null
     }
@@ -225,13 +229,17 @@ private fun getChapterViewDataList(parameters: Parameters, resolver: DependencyR
     val productSlug = parameters[ParamKeys.productParamKey]
     val bookSlug = parameters[ParamKeys.bookParamKey]
 
-    return if (!languageCode.isNullOrEmpty() && !bookSlug.isNullOrEmpty() && !productSlug.isNullOrEmpty()) {
+    return if (
+        isLanguageCodeValid(languageCode) &&
+        isBookSlugValid(bookSlug) &&
+        isProductSlugValid(productSlug)
+    ) {
         FetchChapterViewData(
             chapterCatalog = resolver.chapterCatalog,
             storage = resolver.storageAccess,
-            languageCode = languageCode,
-            productSlug = productSlug,
-            bookSlug = bookSlug
+            languageCode = languageCode!!,
+            productSlug = productSlug!!,
+            bookSlug = bookSlug!!
         ).getViewDataList()
     } else {
         null
@@ -269,6 +277,14 @@ private fun isProductSlugValid(productSlug: String?): Boolean {
     var isValid = true
 
     if(productSlug.isNullOrEmpty()) isValid = false
+
+    return isValid
+}
+
+private fun isBookSlugValid(bookSlug: String?): Boolean {
+    var isValid = true
+
+    if(bookSlug.isNullOrEmpty()) isValid = false
 
     return isValid
 }
