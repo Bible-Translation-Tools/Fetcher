@@ -145,11 +145,11 @@ private fun booksView(
     if (!validator.isLanguageCodeValid(languageCode)) return errorPage("Invalid Language Code")
     if(!validator.isProductSlugValid(parameters[ParamKeys.productParamKey])) return errorPage("Invalid Product Slug")
 
-    val languageName = resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
+    val languageName = resolver.languageCatalog.getLanguage(languageCode!!)?.localizedName ?: ""
     val bookViewData = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,
-        languageCode!!
+        languageCode
     ).getViewDataList(path)
 
     return ThymeleafContent(
