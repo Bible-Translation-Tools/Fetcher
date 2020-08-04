@@ -2,26 +2,25 @@ package org.bibletranslationtools.fetcher.impl.repository
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import java.io.File
 import java.io.FileNotFoundException
+import java.io.InputStream
 import org.bibletranslationtools.fetcher.data.Product
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.slf4j.LoggerFactory
 
 class ProductCatalogImpl : ProductCatalog {
     private val logger = LoggerFactory.getLogger(javaClass)
-    private val productCatalogFileName = "product_catalog.json"
+    private val productCatalogFileName = "/product_catalog.json"
     private val products: List<Product> = parseCatalog()
 
     override fun getAll(): List<Product> = this.products
 
     @Throws(FileNotFoundException::class)
     private fun parseCatalog(): List<Product> {
-        val jsonProducts: String = try {
-            val productsFile = getProductCatalogFile()
-            productsFile.readText()
+        val jsonProducts: InputStream = try {
+            getProductCatalogFile()
         } catch (e: FileNotFoundException) {
-            logger.error("$productCatalogFileName file not found", e)
+            logger.error("$productCatalogFileName not found in resources.", e)
             throw e // crash on fatal exception: critical resource not found
         }
 
@@ -29,10 +28,12 @@ class ProductCatalogImpl : ProductCatalog {
     }
 
     @Throws(FileNotFoundException::class)
-    private fun getProductCatalogFile(): File {
-        val resourceFileURL = javaClass.classLoader.getResource(productCatalogFileName)
-            ?: throw FileNotFoundException()
+    private fun getProductCatalogFile(): InputStream {
+        val catalogFileStream = javaClass.getResourceAsStream(productCatalogFileName)
+        if (catalogFileStream == null) {
+            throw FileNotFoundException()
+        }
 
-        return File(resourceFileURL.path)
+        return catalogFileStream
     }
 }

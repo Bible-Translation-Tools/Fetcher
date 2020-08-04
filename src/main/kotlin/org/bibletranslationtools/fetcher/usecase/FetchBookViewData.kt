@@ -87,7 +87,8 @@ class FetchBookViewData(
         )
     }
 
-    private fun getBookDownloadUrl(chapterFile: File): String {
-        return chapterFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
+    private fun getBookDownloadUrl(bookFile: File): String {
+        val relativeBookPath = bookFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
+        return "//${System.getenv("CDN_BASE_URL")}/$relativeBookPath"
     }
 }
