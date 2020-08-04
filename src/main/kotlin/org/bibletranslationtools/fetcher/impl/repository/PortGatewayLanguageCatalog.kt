@@ -32,6 +32,8 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
 
     override fun getAll(): List<Language> = this.languageList
 
+    override fun getLanguage(code: String): Language? = this.languageList.firstOrNull { it.code == code }
+
     @Throws(FileNotFoundException::class)
     private fun parseCatalog(): List<Language> {
         val languagesFile: File = try {
