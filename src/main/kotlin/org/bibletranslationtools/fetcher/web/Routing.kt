@@ -69,7 +69,7 @@ fun Routing.root(resolver: DependencyResolver) {
                 get {
                     // products page
                     val path = normalizeUrl(call.request.path())
-                    call.respond(productsView(path, resolver, contentLanguage))
+                    call.respond(productsView(call.parameters, path, resolver, contentLanguage))
                 }
                 route("{${ParamKeys.productParamKey}}") {
                     get {
@@ -120,10 +120,15 @@ private fun gatewayLanguagesView(
 }
 
 private fun productsView(
+    parameters: Parameters,
     path: String,
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
+    if(!isLanguageCodeValid(parameters[ParamKeys.languageParamKey])) {
+        return errorPage("Language Code ${parameters["languageCode"]} is invalid.")
+    }
+
     val model = FetchProductViewData(resolver.productCatalog)
 
     return ThymeleafContent(
@@ -144,12 +149,13 @@ private fun booksView(
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
     val languageCode = parameters[ParamKeys.languageParamKey]
-    if (languageCode.isNullOrEmpty()) return errorPage("Invalid Language Code")
+    if (!isLanguageCodeValid(languageCode)) return errorPage("Invalid Language Code")
+    if(!isProductSlugValid(parameters[ParamKeys.productParamKey])) return errorPage("Invalid Product Slug")
 
     val bookViewData = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,
-        languageCode
+        languageCode!!
     ).getViewDataList(path)
 
     return ThymeleafContent(
@@ -249,6 +255,22 @@ private fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templ
     }
 
     return Locale.getDefault()
+}
+
+private fun isLanguageCodeValid(languageCode: String?): Boolean {
+    var isValid = true
+
+    if(languageCode.isNullOrEmpty()) isValid = false
+
+    return isValid
+}
+
+private fun isProductSlugValid(productSlug: String?): Boolean {
+    var isValid = true
+
+    if(productSlug.isNullOrEmpty()) isValid = false
+
+    return isValid
 }
 
 private fun errorPage(message: String): ThymeleafContent {
