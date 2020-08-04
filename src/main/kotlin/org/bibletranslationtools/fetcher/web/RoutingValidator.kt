@@ -8,6 +8,9 @@ class RoutingValidator(val resolver: DependencyResolver) {
         var isValid = true
 
         if(languageCode.isNullOrEmpty()) isValid = false
+        if(
+            !resolver.languageRepository.getLanguages().map { it.code == languageCode }.contains(true)
+        ) isValid = false
 
         return isValid
     }
@@ -16,6 +19,9 @@ class RoutingValidator(val resolver: DependencyResolver) {
         var isValid = true
 
         if(productSlug.isNullOrEmpty()) isValid = false
+        if(
+            !resolver.productCatalog.getAll().map { it.slug == productSlug }.contains(true)
+        ) isValid = false
 
         return isValid
     }
