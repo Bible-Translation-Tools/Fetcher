@@ -9,7 +9,8 @@
        th:classappend="${languagesNavUrl == null}? 'unavailable' : (${languagesNavUrl == #strings.toString('#')}? 'navbar\_\_item--active' : 'navbar\_\_item--available')"
        th:href="${languagesNavUrl != null}? ${languagesNavUrl} : '#'">
         <em class="material-icons">translate </em>
-        <span th:text="#{languages}">Language</span>
+        <span th:if="${languageNavTitle == ''}" th:text="#{languages}">Language</span>
+        <span th:unless="${languageNavTitle == ''}" th:text="${languageNavTitle}">Selected Language</span>
     </a>
 
     <a class="navbar__item" href="#"
