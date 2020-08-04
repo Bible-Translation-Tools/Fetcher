@@ -15,8 +15,10 @@
         </div>
 
         <div class="chaptercard__download" th:classappend="${url == null}? 'unavailable'">
-            <em class="material-icons chaptercard__icon">get_app</em>
-            <p class="chaptercard__download-text" th:text="#{download}">Download</p>
+            <div class="chaptercard__download-target" th:classappend="${url == null}? 'unavailable'">
+                <em class="material-icons chaptercard__icon" th:classappend="${url == null}? 'unavailable'">get_app</em>
+                <p class="chaptercard__download-text" th:text="#{download}">Download</p>
+            </div>
         </div>
 
     </a>

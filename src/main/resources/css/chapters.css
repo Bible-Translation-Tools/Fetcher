@@ -26,8 +26,17 @@
     color: #015AD9;
     font-size: 1rem;
 }
-.chaptercard__download:hover {
-    background: #015AD9 0% 0% no-repeat padding-box;
+.chaptercard__download-target {
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    width: auto;
+    padding:0 4px 0 4px;
+}
+.chaptercard__download-target:hover {
+background: rgba(1, 90, 217, 0.2);
 }
 .chaptercard__download-text {
     text-decoration: underline;
@@ -38,13 +47,17 @@
     height: 24px;
     width: 24px;
 }
+.chaptercard__icon.unavailable {
+    display: none;
+}
 .chapter-download-card {
     background: #0A3373;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 753px;
+    width: 80%;
+    max-width: 753px;
     height: 152px;
     margin: 16px auto 16px auto;
 }
