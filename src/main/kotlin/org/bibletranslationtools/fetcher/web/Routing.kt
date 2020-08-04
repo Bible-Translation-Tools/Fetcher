@@ -69,7 +69,7 @@ fun Routing.root(resolver: DependencyResolver) {
                 get {
                     // products page
                     val path = normalizeUrl(call.request.path())
-                    call.respond(productsView(path, resolver, contentLanguage))
+                    call.respond(productsView(call.parameters, path, resolver, contentLanguage))
                 }
                 route("{${ParamKeys.productParamKey}}") {
                     get {
@@ -113,6 +113,7 @@ private fun gatewayLanguagesView(
         template = "languages",
         model = mapOf(
             "languageList" to model.getListViewData(path),
+            "languageNavTitle" to "",
             "languagesNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "languages")
@@ -120,16 +121,22 @@ private fun gatewayLanguagesView(
 }
 
 private fun productsView(
+    parameters: Parameters,
     path: String,
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
     val model = FetchProductViewData(resolver.productCatalog)
+    val languageCode = parameters[ParamKeys.languageParamKey] ?: ""
+    if (languageCode.isNullOrEmpty()) return errorPage("Invalid Language Code")
+
+    val languageName = resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
 
     return ThymeleafContent(
         template = "products",
         model = mapOf(
             "productList" to model.getListViewData(path),
+            "languageNavTitle" to languageName,
             "languagesNavUrl" to "/$GL_ROUTE",
             "toolsNavUrl" to "#"
         ),
@@ -146,6 +153,7 @@ private fun booksView(
     val languageCode = parameters[ParamKeys.languageParamKey]
     if (languageCode.isNullOrEmpty()) return errorPage("Invalid Language Code")
 
+    val languageName = resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
     val bookViewData = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,
@@ -156,6 +164,7 @@ private fun booksView(
         template = "books",
         model = mapOf(
             "bookList" to bookViewData,
+            "languageNavTitle" to languageName,
             "languagesNavUrl" to "/$GL_ROUTE",
             "toolsNavUrl" to "/$GL_ROUTE/$languageCode",
             "booksNavUrl" to "#"
@@ -179,6 +188,8 @@ private fun chaptersView(
 
     val languageCode = parameters["languageCode"]
     val productSlug = parameters["productSlug"]
+    val language = resolver.languageCatalog.getLanguage(languageCode ?: "")
+    val languageName = language?.localizedName ?: ""
 
     return when {
         chapterViewDataList == null -> errorPage("Invalid Parameters")
@@ -188,6 +199,7 @@ private fun chaptersView(
             model = mapOf(
                 "book" to bookViewData,
                 "chapterList" to chapterViewDataList,
+                "languageNavTitle" to languageName,
                 "languagesNavUrl" to "/$GL_ROUTE",
                 "toolsNavUrl" to "/$GL_ROUTE/$languageCode",
                 "booksNavUrl" to "/$GL_ROUTE/$languageCode/$productSlug"
