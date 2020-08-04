@@ -4,15 +4,11 @@ import dev.jbs.ktor.thymeleaf.ThymeleafContent
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.call
 import io.ktor.client.features.ClientRequestException
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.Parameters
 import io.ktor.request.acceptLanguage
 import io.ktor.request.path
 import io.ktor.request.uri
-import io.ktor.response.header
 import io.ktor.response.respond
-import io.ktor.response.respondFile
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
@@ -86,18 +82,6 @@ fun Routing.root(resolver: DependencyResolver) {
                 }
             }
         }
-        route("/download") {
-            get("{paths...}") {
-                val pathFromRoute = call.parameters.getAll("paths")?.joinToString("/") ?: ""
-                val file = resolver.storageAccess.getContentRoot().resolve(pathFromRoute)
-                if (!file.isFile) {
-                    call.respond(HttpStatusCode.NotFound, "File is no longer available.")
-                } else {
-                    call.response.header(HttpHeaders.ContentDisposition, "attachment; filename=\"${file.name}\"")
-                    call.respondFile(file)
-                }
-            }
-        }
     }
 }
 
@@ -113,6 +97,7 @@ private fun gatewayLanguagesView(
         template = "languages",
         model = mapOf(
             "languageList" to model.getListViewData(path),
+            "languageNavTitle" to "",
             "languagesNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "languages")
@@ -131,11 +116,16 @@ private fun productsView(
     }
 
     val model = FetchProductViewData(resolver.productCatalog)
+    val languageCode = parameters[ParamKeys.languageParamKey] ?: ""
+    if (languageCode.isNullOrEmpty()) return errorPage("Invalid Language Code")
+
+    val languageName = resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
 
     return ThymeleafContent(
         template = "products",
         model = mapOf(
             "productList" to model.getListViewData(path),
+            "languageNavTitle" to languageName,
             "languagesNavUrl" to "/$GL_ROUTE",
             "toolsNavUrl" to "#"
         ),
@@ -155,6 +145,7 @@ private fun booksView(
     if (!validator.isLanguageCodeValid(languageCode)) return errorPage("Invalid Language Code")
     if(!validator.isProductSlugValid(parameters[ParamKeys.productParamKey])) return errorPage("Invalid Product Slug")
 
+    val languageName = resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
     val bookViewData = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,
@@ -165,6 +156,7 @@ private fun booksView(
         template = "books",
         model = mapOf(
             "bookList" to bookViewData,
+            "languageNavTitle" to languageName,
             "languagesNavUrl" to "/$GL_ROUTE",
             "toolsNavUrl" to "/$GL_ROUTE/$languageCode",
             "booksNavUrl" to "#"
@@ -188,6 +180,8 @@ private fun chaptersView(
 
     val languageCode = parameters["languageCode"]
     val productSlug = parameters["productSlug"]
+    val language = resolver.languageCatalog.getLanguage(languageCode ?: "")
+    val languageName = language?.localizedName ?: ""
 
     return when {
         chapterViewDataList == null -> errorPage("Invalid Parameters")
@@ -197,6 +191,7 @@ private fun chaptersView(
             model = mapOf(
                 "book" to bookViewData,
                 "chapterList" to chapterViewDataList,
+                "languageNavTitle" to languageName,
                 "languagesNavUrl" to "/$GL_ROUTE",
                 "toolsNavUrl" to "/$GL_ROUTE/$languageCode",
                 "booksNavUrl" to "/$GL_ROUTE/$languageCode/$productSlug"
