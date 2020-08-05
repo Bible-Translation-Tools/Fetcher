@@ -6,9 +6,8 @@ import com.fasterxml.jackson.databind.MappingIterator
 import com.fasterxml.jackson.dataformat.csv.CsvMapper
 import com.fasterxml.jackson.dataformat.csv.CsvSchema
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import java.io.File
 import java.io.FileNotFoundException
-import java.net.URL
+import java.io.InputStream
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.slf4j.LoggerFactory
@@ -27,7 +26,7 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
     )
 
     private val logger = LoggerFactory.getLogger(javaClass)
-    private val portLanguageFileName = "port_gateway_languages.csv"
+    private val portLanguageFileName = "/port_gateway_languages.csv"
     private val languageList: List<Language> = parseCatalog()
 
     override fun getAll(): List<Language> = this.languageList
@@ -36,10 +35,10 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
 
     @Throws(FileNotFoundException::class)
     private fun parseCatalog(): List<Language> {
-        val languagesFile: File = try {
+        val languagesStream: InputStream = try {
             getLanguagesFile()
         } catch (e: FileNotFoundException) {
-            logger.error("$portLanguageFileName file not found", e)
+            logger.error("$portLanguageFileName not found in resources", e)
             throw e // crash on fatal exception: critical resource not found
         }
 
@@ -49,7 +48,7 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
             PortGatewayLanguage::class.java
         )
             .with(schema)
-            .readValues(languagesFile)
+            .readValues(languagesStream)
 
         val languageList = mutableListOf<Language>()
         languagesIterator.forEach {
@@ -60,12 +59,12 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
     }
 
     @Throws(FileNotFoundException::class)
-    private fun getLanguagesFile(): File {
-        val portLanguagesResource: URL? = javaClass.classLoader.getResource(portLanguageFileName)
-        if (portLanguagesResource == null) {
-            throw FileNotFoundException("$portLanguageFileName not found in resources.")
+    private fun getLanguagesFile(): InputStream {
+        val portFileStream = javaClass.getResourceAsStream(portLanguageFileName)
+        if (portFileStream == null) {
+            throw FileNotFoundException()
         }
 
-        return File(portLanguagesResource.file)
+        return portFileStream
     }
 }
