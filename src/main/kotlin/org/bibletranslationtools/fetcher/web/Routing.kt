@@ -111,13 +111,15 @@ private fun productsView(
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
     val validator = RoutingValidator(resolver)
-    if (!validator.isLanguageCodeValid(parameters[ParamKeys.languageParamKey])) {
-        return errorPage("Language Code ${parameters["languageCode"]} is invalid.")
+
+    val languageCode = parameters[ParamKeys.languageParamKey]
+    if (!validator.isLanguageCodeValid(languageCode)) {
+        return errorPage("Invalid route parameters")
+    } else {
+        languageCode!!
     }
 
     val model = FetchProductViewData(resolver.productCatalog)
-    val languageCode = parameters[ParamKeys.languageParamKey] ?: ""
-    if (languageCode.isNullOrEmpty()) return errorPage("Invalid Language Code")
 
     val languageName = resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
 
@@ -147,9 +149,11 @@ private fun booksView(
         !validator.isProductSlugValid(parameters[ParamKeys.productParamKey])
     ) {
         return errorPage("Invalid route parameters")
+    } else {
+        languageCode!!
     }
 
-    val languageName = resolver.languageCatalog.getLanguage(languageCode!!)?.localizedName ?: ""
+    val languageName = resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
     val bookViewData = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,
@@ -180,7 +184,7 @@ private fun chaptersView(
     val productSlug = parameters[ParamKeys.productParamKey]
     val bookSlug = parameters[ParamKeys.bookParamKey]
 
-    if(
+    if (
         !validator.isLanguageCodeValid(languageCode) ||
         !validator.isProductSlugValid(productSlug) ||
         !validator.isBookSlugValid(languageCode, bookSlug)
@@ -197,14 +201,14 @@ private fun chaptersView(
     val chapterViewDataList: List<ChapterViewData>? = try {
         getChapterViewDataList(languageCode, bookSlug, productSlug, resolver)
     } catch (ex: ClientRequestException) {
-        return errorPage("Server network error. Please check back again later.")
+        null
     }
 
     val language = resolver.languageCatalog.getLanguage(languageCode)
     val languageName = language?.localizedName ?: ""
 
     return when {
-        chapterViewDataList == null -> errorPage("Invalid Parameters")
+        chapterViewDataList == null -> errorPage("Error loading chapter data")
         bookViewData == null -> errorPage("Could not find the content with the specified url")
         else -> ThymeleafContent(
             template = "chapters",
