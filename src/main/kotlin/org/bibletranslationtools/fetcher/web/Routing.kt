@@ -113,7 +113,10 @@ private fun productsView(
     val model = FetchProductViewData(resolver.productCatalog)
     val languageCode = parameters[ParamKeys.languageParamKey] ?: ""
     if (languageCode.isNullOrEmpty()) {
-        return errorPage("Invalid Language Code", "Language code $languageCode is not valid.")
+        return errorPage(
+            "Invalid Parameters",
+            "Language code $languageCode is not valid."
+        )
     }
 
     val languageName = resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
@@ -139,7 +142,7 @@ private fun booksView(
     val languageCode = parameters[ParamKeys.languageParamKey]
     if (languageCode.isNullOrEmpty()) {
         return errorPage(
-            "Invalid Language Code",
+            "Invalid Parameters",
             "Language code $languageCode is not valid."
         )
     }
@@ -187,10 +190,10 @@ private fun chaptersView(
 
     return when {
         chapterViewDataList == null -> {
-            errorPage("Invalid Parameters", "Could not retrieve chapter data.")
+            errorPage("Content Not Available", "Could not retrieve chapter data.")
         }
         bookViewData == null -> {
-            errorPage("Invalid Parameters", "Could not retrieve book data.")
+            errorPage("Content Not Available", "Could not retrieve book data.")
         }
         else -> ThymeleafContent(
             template = "chapters",
