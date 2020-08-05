@@ -36,9 +36,6 @@
 .chaptercard:hover {
     background: #b0b0b029 !important
 }
-.chaptercard.unavailable {
-    overflow: hidden;
-}
 .chapter-download-card {
     background: #0A3373;
     display: flex;
