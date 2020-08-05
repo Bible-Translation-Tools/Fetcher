@@ -66,9 +66,8 @@
     justify-content: center;
     border: none;
 }
-.chapter-download-card__button:hover {
-    background: #c58b07;
-}
+
+
 /* --layout for tablets  */
 @media only  screen
 and (max-device-width: 1200px) {
