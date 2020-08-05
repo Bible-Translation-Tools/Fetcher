@@ -55,7 +55,7 @@ and (min-device-width: 320px) {
         padding: 0;
         flex-direction: row;
         border: none;
-        border-top: 1px solid #111A3133 !important;
+        border-top: 1px solid #111A3133;
         border-radius:0;
         margin: 0;
     }

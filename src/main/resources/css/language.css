@@ -72,9 +72,6 @@
     margin: 2px;
     line-height: 32px;
 }
-.def-card.unavailable {
-    border: none;
-}
 /* --mobile layout for phones  */
 @media only screen
 and (max-device-width: 767px)
@@ -88,7 +85,7 @@ and (min-device-width: 320px)
         height: 79px;
         margin: 0;
         border: none;
-        border-top: 1px solid #111A3133 !important;
+        border-top: 1px solid #111A3133;
         border-radius:0;
     }
     .def-card__main-text {

@@ -5,7 +5,7 @@
     width:98vw;
     max-width: 949px;
     max-height: 56px;
-    border-top: 1px solid #111A3133;
+    border-top: 1px solid #111A3133 !important;
     overflow: hidden;
 }
 .chaptercard__title {
@@ -113,9 +113,6 @@ and (min-device-width: 320px) {
             align-items: center;
             justify-content: center;
         }
-    .chaptercard__download.unavailable {
-        border: none;
-    }
     .chaptercard__download.unavailable .chaptercard__icon {
         color: #cfd1d6;
     }

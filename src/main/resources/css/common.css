@@ -77,7 +77,7 @@ span {
 }
 .navbar__item {
     text-decoration: none;
-    display: inline-flex;
+    display: flex;
     flex-direction: row;
     flex: 1;
     width: 100%;
@@ -153,6 +153,7 @@ span {
     background: white !important;
     color: #111A3133 !important;
     box-shadow: none !important;
+    border: none !important;
 }
 .unavailable:hover {
     box-shadow: none !important;
@@ -200,6 +201,9 @@ and (min-device-width: 320px) {
     .l-list-container > div:last-child a
     {
         border-bottom: 1px solid #111A3133;
+    }
+    .l-list-container a.unavailable {
+        border-top: 1px solid #111A3133 !important;
     }
 }
 
