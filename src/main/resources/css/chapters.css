@@ -32,15 +32,6 @@
     height: 24px;
     width: 24px;
 }
-.chaptercard:hover {
-    background: #b0b0b029 !important
-}
-.chaptercard.unavailable {
-    overflow: hidden;
-}
-.l-list-container > div:last-child a.chaptercard {
-    border-bottom: 1px solid #111A3133;
-}
 .chapter-download-card {
     background: #0A3373;
     display: flex;
