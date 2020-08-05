@@ -249,7 +249,7 @@ private fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templ
 
 private fun errorPage(message: String): ThymeleafContent {
     return ThymeleafContent(
-        template = "",
+        template = "error",
         model = mapOf("errorMessage" to message)
     )
 }
