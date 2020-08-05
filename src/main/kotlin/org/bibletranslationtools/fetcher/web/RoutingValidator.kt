@@ -2,40 +2,31 @@ package org.bibletranslationtools.fetcher.web
 
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 
-class RoutingValidator(val resolver: DependencyResolver) {
+class RoutingValidator(private val resolver: DependencyResolver) {
 
     fun isLanguageCodeValid(languageCode: String?): Boolean {
-        var isValid = true
-
-        if(languageCode.isNullOrEmpty()) isValid = false
-        if(
-            !resolver.languageRepository.getLanguages().map { it.code == languageCode }.contains(true)
-        ) isValid = false
-
-        return isValid
+        return when {
+            languageCode.isNullOrEmpty() -> false
+            resolver.languageCatalog.getLanguage(languageCode) == null -> false
+            else -> true
+        }
     }
 
     fun isProductSlugValid(productSlug: String?): Boolean {
-        var isValid = true
-
-        if(productSlug.isNullOrEmpty()) isValid = false
-        if(
-            !resolver.productCatalog.getAll().map { it.slug == productSlug }.contains(true)
-        ) isValid = false
-
-        return isValid
+        return when {
+            productSlug.isNullOrEmpty() -> false
+            resolver.productCatalog.getProduct(productSlug) == null -> false
+            else -> true
+        }
     }
 
     fun isBookSlugValid(languageCode: String?, bookSlug: String?): Boolean {
-        var isValid = true
-
-        when {
-            bookSlug.isNullOrEmpty() -> isValid = false
-            languageCode.isNullOrEmpty() -> isValid = false
-            resolver.bookRepository.getBook(bookSlug, languageCode) == null -> isValid = false
+        return when {
+            bookSlug.isNullOrEmpty() -> false
+            languageCode.isNullOrEmpty() -> false
+            resolver.bookRepository.getBook(bookSlug, languageCode) == null -> false
+            else -> true
         }
-
-        return isValid
     }
 
 }
