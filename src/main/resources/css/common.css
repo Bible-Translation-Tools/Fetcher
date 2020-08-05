@@ -149,6 +149,10 @@ span {
     margin: 16px auto 64px auto;
     max-width: 1400px;
 }
+.l-list-container > div:last-child a
+{
+    border-bottom: 1px solid #111A3133;
+}
 .unavailable {
     background: white !important;
     color: #111A3133 !important;

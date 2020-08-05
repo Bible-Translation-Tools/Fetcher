@@ -91,9 +91,6 @@ and (min-device-width: 320px)
         border-top: 1px solid #111A3133 !important;
         border-radius:0;
     }
-    .l-list-container > div:last-child a.def-card {
-        border-bottom: 1px solid #111A3133;
-    }
     .def-card__main-text {
         order: 2;
         flex: 3;
