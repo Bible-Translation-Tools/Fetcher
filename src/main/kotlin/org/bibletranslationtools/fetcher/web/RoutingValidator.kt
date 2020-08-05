@@ -28,5 +28,4 @@ class RoutingValidator(private val resolver: DependencyResolver) {
             else -> true
         }
     }
-
 }

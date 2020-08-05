@@ -111,7 +111,7 @@ private fun productsView(
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
     val validator = RoutingValidator(resolver)
-    if(!validator.isLanguageCodeValid(parameters[ParamKeys.languageParamKey])) {
+    if (!validator.isLanguageCodeValid(parameters[ParamKeys.languageParamKey])) {
         return errorPage("Language Code ${parameters["languageCode"]} is invalid.")
     }
 
@@ -142,8 +142,12 @@ private fun booksView(
     val validator = RoutingValidator(resolver)
     val languageCode = parameters[ParamKeys.languageParamKey]
 
-    if (!validator.isLanguageCodeValid(languageCode)) return errorPage("Invalid Language Code")
-    if(!validator.isProductSlugValid(parameters[ParamKeys.productParamKey])) return errorPage("Invalid Product Slug")
+    if (
+        !validator.isLanguageCodeValid(languageCode) ||
+        !validator.isProductSlugValid(parameters[ParamKeys.productParamKey])
+    ) {
+        return errorPage("Invalid route parameters")
+    }
 
     val languageName = resolver.languageCatalog.getLanguage(languageCode!!)?.localizedName ?: ""
     val bookViewData = FetchBookViewData(
@@ -170,17 +174,33 @@ private fun chaptersView(
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
-    val bookViewData: BookViewData? = getBookViewData(parameters, resolver)
+    val validator = RoutingValidator(resolver)
+
+    val languageCode = parameters[ParamKeys.languageParamKey]
+    val productSlug = parameters[ParamKeys.productParamKey]
+    val bookSlug = parameters[ParamKeys.bookParamKey]
+
+    if(
+        !validator.isLanguageCodeValid(languageCode) ||
+        !validator.isProductSlugValid(productSlug) ||
+        !validator.isBookSlugValid(languageCode, bookSlug)
+    ) {
+        return errorPage("Invalid route parameters")
+    } else {
+        languageCode!!
+        bookSlug!!
+        productSlug!!
+    }
+
+    val bookViewData: BookViewData? = getBookViewData(languageCode, bookSlug, productSlug, resolver)
 
     val chapterViewDataList: List<ChapterViewData>? = try {
-        getChapterViewDataList(parameters, resolver)
+        getChapterViewDataList(languageCode, bookSlug, productSlug, resolver)
     } catch (ex: ClientRequestException) {
         return errorPage("Server network error. Please check back again later.")
     }
 
-    val languageCode = parameters["languageCode"]
-    val productSlug = parameters["productSlug"]
-    val language = resolver.languageCatalog.getLanguage(languageCode ?: "")
+    val language = resolver.languageCatalog.getLanguage(languageCode)
     val languageName = language?.localizedName ?: ""
 
     return when {
@@ -201,49 +221,33 @@ private fun chaptersView(
     }
 }
 
-private fun getBookViewData(parameters: Parameters, resolver: DependencyResolver): BookViewData? {
-    val validator = RoutingValidator(resolver)
-    val languageCode = parameters[ParamKeys.languageParamKey]
-    val bookSlug = parameters[ParamKeys.bookParamKey]
-    val productSlug = parameters[ParamKeys.productParamKey]
-
-    return if (
-        validator.isLanguageCodeValid(languageCode) &&
-        validator.isBookSlugValid(languageCode, bookSlug) &&
-        validator.isProductSlugValid(productSlug)
-    ) {
-        FetchBookViewData(
+private fun getBookViewData(
+    languageCode: String,
+    bookSlug: String,
+    productSlug: String,
+    resolver: DependencyResolver
+): BookViewData? {
+    return FetchBookViewData(
             resolver.bookRepository,
             resolver.storageAccess,
-            languageCode!!
-        ).getViewData(bookSlug!!, productSlug!!)
-    } else {
-        null
-    }
+            languageCode
+        ).getViewData(bookSlug, productSlug)
 }
 
 @Throws(ClientRequestException::class)
-private fun getChapterViewDataList(parameters: Parameters, resolver: DependencyResolver): List<ChapterViewData>? {
-    val validator = RoutingValidator(resolver)
-    val languageCode = parameters[ParamKeys.languageParamKey]
-    val productSlug = parameters[ParamKeys.productParamKey]
-    val bookSlug = parameters[ParamKeys.bookParamKey]
-
-    return if (
-        validator.isLanguageCodeValid(languageCode) &&
-        validator.isBookSlugValid(languageCode, bookSlug) &&
-        validator.isProductSlugValid(productSlug)
-    ) {
-        FetchChapterViewData(
+private fun getChapterViewDataList(
+    languageCode: String,
+    bookSlug: String,
+    productSlug: String,
+    resolver: DependencyResolver
+): List<ChapterViewData>? {
+    return FetchChapterViewData(
             chapterCatalog = resolver.chapterCatalog,
             storage = resolver.storageAccess,
-            languageCode = languageCode!!,
-            productSlug = productSlug!!,
-            bookSlug = bookSlug!!
+            languageCode = languageCode,
+            productSlug = productSlug,
+            bookSlug = bookSlug
         ).getViewDataList()
-    } else {
-        null
-    }
 }
 
 private fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templateName: String): Locale {
