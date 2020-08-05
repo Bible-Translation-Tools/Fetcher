@@ -151,11 +151,12 @@ private fun booksView(
 ): ThymeleafContent {
     val languageCode = parameters[ParamKeys.languageParamKey]
     val productSlug = parameters[ParamKeys.productParamKey]
-    if (languageCode.isNullOrEmpty() || productSlug.isNullOrEmpty()){
+    if (languageCode.isNullOrEmpty() || productSlug.isNullOrEmpty()) {
         return errorPage("Invalid request parameters")
     }
 
     val languageName = resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
+    val productName = resolver.productCatalog.getProduct(productSlug)?.titleKey ?: ""
     val bookViewData = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,
@@ -168,7 +169,7 @@ private fun booksView(
             "bookList" to bookViewData,
             "languagesNavTitle" to languageName,
             "languagesNavUrl" to "/$GL_ROUTE",
-            "toolsNavTitle" to productSlug.toUpperCase(),
+            "toolsNavTitle" to productName,
             "toolsNavUrl" to "/$GL_ROUTE/$languageCode",
             "booksNavUrl" to "#"
         ),
@@ -193,6 +194,8 @@ private fun chaptersView(
     val productSlug = parameters["productSlug"]
     val language = resolver.languageCatalog.getLanguage(languageCode ?: "")
     val languageName = language?.localizedName ?: ""
+    val product = resolver.productCatalog.getProduct(productSlug ?: "")
+    val productName = product?.titleKey ?: ""
 
     return when {
         chapterViewDataList == null -> errorPage("Invalid Parameters")
@@ -204,7 +207,7 @@ private fun chaptersView(
                 "chapterList" to chapterViewDataList,
                 "languagesNavTitle" to languageName,
                 "languagesNavUrl" to "/$GL_ROUTE",
-                "toolsNavTitle" to productSlug!!.toUpperCase(),
+                "toolsNavTitle" to productName,
                 "toolsNavUrl" to "/$GL_ROUTE/$languageCode",
                 "booksNavTitle" to bookViewData.localizedName,
                 "booksNavUrl" to "/$GL_ROUTE/$languageCode/$productSlug"

@@ -18,7 +18,7 @@
        th:href="${toolsNavUrl != null}? ${toolsNavUrl} : '#'">
         <em class="material-icons">apps </em>
         <span th:if="${toolsNavTitle == null}" th:text="#{tools}">Tools</span>
-        <span th:unless="${toolsNavTitle == null}" th:text="${toolsNavTitle}">Selected Tool</span>
+        <span th:unless="${toolsNavTitle == null}" th:text="#{${toolsNavTitle}}">Selected Tool</span>
     </a>
 
     <a class="navbar__item"

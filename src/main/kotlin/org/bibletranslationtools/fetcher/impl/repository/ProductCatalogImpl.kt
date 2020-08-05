@@ -15,6 +15,8 @@ class ProductCatalogImpl : ProductCatalog {
 
     override fun getAll(): List<Product> = this.products
 
+    override fun getProduct(slug: String): Product? = this.products.firstOrNull { it.slug == slug }
+
     @Throws(FileNotFoundException::class)
     private fun parseCatalog(): List<Product> {
         val jsonProducts: String = try {
