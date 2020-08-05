@@ -5,7 +5,7 @@
 </head>
 <body>
     <a th:fragment="chaptercard(index, text, url)" class="chaptercard"
-       th:attrappend="data-text=${index +' ' + text}"
+       th:attrappend="data-slug=${code}, data-angname=${anglicizedText}, data-localname=${localizedText}"
        th:classappend="${url == null}? 'unavailable'"
        th:href="${url == null}? '#' : ${url}"
        th:target="${url == null}? '' : '_blank'">
