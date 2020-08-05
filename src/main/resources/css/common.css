@@ -77,7 +77,7 @@ span {
     display: flex;
     flex-direction: row;
     flex: 1;
-    width: 100%;
+    width: 33%;
     height: 100%;
     align-items: center;
     justify-content: center;
@@ -95,6 +95,13 @@ span {
 }
 .navbar__item--active:hover {
     background: white !important;
+}
+.navbar__item span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80%;
+    white-space: nowrap;
+    padding-left: 8px;
 }
 .hero {
     display: flex;
@@ -174,6 +181,10 @@ span {
         border-top: 2px solid rgb(1, 90, 217) !important;
         border-bottom: none;
     }
+    .navbar__item span {
+        padding: 0;
+    }
+
 }
 /* --mobile layout for phones  */
 @media only screen
