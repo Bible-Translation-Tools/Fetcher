@@ -111,7 +111,7 @@ private fun productsView(
 ): ThymeleafContent {
     val model = FetchProductViewData(resolver.productCatalog)
     val languageCode = parameters[ParamKeys.languageParamKey] ?: ""
-    if (languageCode.isNullOrEmpty()) return errorPage("Invalid Language Code")
+    if (languageCode.isEmpty()) return errorPage("Invalid Language Code")
 
     val languageName = resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
 
@@ -174,8 +174,8 @@ private fun chaptersView(
         return errorPage("Server network error. Please check back again later.")
     }
 
-    val languageCode = parameters["languageCode"]
-    val productSlug = parameters["productSlug"]
+    val languageCode = parameters[ParamKeys.languageParamKey]
+    val productSlug = parameters[ParamKeys.productParamKey]
     val language = resolver.languageCatalog.getLanguage(languageCode ?: "")
     val languageName = language?.localizedName ?: ""
     val product = resolver.productCatalog.getProduct(productSlug ?: "")
