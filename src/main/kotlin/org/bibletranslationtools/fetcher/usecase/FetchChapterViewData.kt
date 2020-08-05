@@ -84,6 +84,7 @@ class FetchChapterViewData(
     }
 
     private fun getChapterDownloadUrl(chapterFile: File): String {
-        return chapterFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
+        val relativeChapterPath = chapterFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
+        return "//${System.getenv("CDN_BASE_URL")}/$relativeChapterPath"
     }
 }

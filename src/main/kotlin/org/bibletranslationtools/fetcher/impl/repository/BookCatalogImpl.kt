@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import java.io.File
 import java.io.FileNotFoundException
+import java.io.InputStream
 import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.repository.BookCatalog
 import org.slf4j.LoggerFactory
@@ -16,7 +16,6 @@ class BookCatalogImpl : BookCatalog {
         const val CATALOG_SLUG_ID = "slug"
         const val CATALOG_NUMBER_ID = "num"
         const val CATALOG_ANGLICIZED_NAME_ID = "name"
-        const val BOOK_CATALOG_FILE_NAME = "book_catalog.json"
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -27,6 +26,7 @@ class BookCatalogImpl : BookCatalog {
     )
 
     private val logger = LoggerFactory.getLogger(javaClass)
+    private val bookCatalogFileName = "/book_catalog.json"
     private val books: List<Book> = parseCatalog()
 
     override fun getAll(): List<Book> = this.books
@@ -38,11 +38,10 @@ class BookCatalogImpl : BookCatalog {
     }
 
     private fun parseCatalog(): List<Book> {
-        val jsonBookCatalog: String = try {
-            val catalogFile = getBookCatalogFile()
-            catalogFile.readText()
+        val jsonBookCatalog: InputStream = try {
+            getBookCatalogFile()
         } catch (e: FileNotFoundException) {
-            logger.error("$BOOK_CATALOG_FILE_NAME file not found", e)
+            logger.error("$bookCatalogFileName not found in resources", e)
             throw e // crash on fatal exception: critical resource not found
         }
 
@@ -58,10 +57,12 @@ class BookCatalogImpl : BookCatalog {
     }
 
     @Throws(FileNotFoundException::class)
-    private fun getBookCatalogFile(): File {
-        val catalogFileURL = javaClass.classLoader.getResource(BOOK_CATALOG_FILE_NAME)
-            ?: throw FileNotFoundException()
+    private fun getBookCatalogFile(): InputStream {
+        val catalogFileStream = javaClass.getResourceAsStream(bookCatalogFileName)
+        if (catalogFileStream == null) {
+            throw FileNotFoundException()
+        }
 
-        return File(catalogFileURL.path)
+        return catalogFileStream
     }
 }
