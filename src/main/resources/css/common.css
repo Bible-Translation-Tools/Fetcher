@@ -31,10 +31,7 @@ span {
      font-size: 100%;
      line-height: 24px;
  }
-}
-.navbar__item span {
-    margin-left: 8px;
-}
+
  a {
     color: black;
      text-decoration: none;
