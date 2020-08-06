@@ -8,6 +8,7 @@
     border-top: 1px solid #111A3133 !important;
     overflow: hidden;
     padding: 0 8px 0 8px;
+    box-sizing: border-box;
 }
 .chaptercard:hover {
     background: #111A310D;
@@ -100,6 +101,9 @@ and (max-device-width: 1200px) {
 @media only screen
 and (max-device-width: 767px)
 and (min-device-width: 320px) {
+    .chaptercard {
+        border-box: content-box;
+    }
     .hero__page-title {
         margin-bottom: 20px;
     }
