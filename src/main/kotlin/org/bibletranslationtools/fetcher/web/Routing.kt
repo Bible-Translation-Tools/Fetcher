@@ -132,6 +132,7 @@ private fun productsView(
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
     val validator = RoutingValidator(resolver)
+
     if (!validator.isLanguageCodeValid(params.languageCode)) {
         return errorPage("Invalid route parameters")
     }
@@ -158,10 +159,9 @@ private fun booksView(
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
     val validator = RoutingValidator(resolver)
-    val languageCode = params.languageCode
 
     if (
-        !validator.isLanguageCodeValid(languageCode) ||
+        !validator.isLanguageCodeValid(params.languageCode) ||
         !validator.isProductSlugValid(params.productSlug)
     ) {
         return errorPage("Invalid route parameters")
@@ -171,7 +171,7 @@ private fun booksView(
     val bookViewData = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,
-        languageCode
+        params.languageCode
     ).getViewDataList(path)
 
     return ThymeleafContent(
@@ -180,7 +180,7 @@ private fun booksView(
             "bookList" to bookViewData,
             "languageNavTitle" to languageName,
             "languagesNavUrl" to "/$GL_ROUTE",
-            "toolsNavUrl" to "/$GL_ROUTE/$languageCode",
+            "toolsNavUrl" to "/$GL_ROUTE/${params.languageCode}",
             "booksNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "books")
@@ -194,14 +194,10 @@ private fun chaptersView(
 ): ThymeleafContent {
     val validator = RoutingValidator(resolver)
 
-    val languageCode = params.languageCode
-    val productSlug = params.productSlug
-    val bookSlug = params.bookSlug
-
     if (
-        !validator.isLanguageCodeValid(languageCode) ||
-        !validator.isProductSlugValid(productSlug) ||
-        !validator.isBookSlugValid(languageCode, bookSlug)
+        !validator.isLanguageCodeValid(params.languageCode) ||
+        !validator.isProductSlugValid(params.productSlug) ||
+        !validator.isBookSlugValid(params.languageCode, params.bookSlug)
     ) {
         return errorPage("Invalid route parameters")
     }
@@ -209,15 +205,15 @@ private fun chaptersView(
     val bookViewData: BookViewData? = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,
-        languageCode
-    ).getViewData(bookSlug, productSlug)
+        params.languageCode
+    ).getViewData(params.bookSlug, params.productSlug)
     val chapterViewDataList: List<ChapterViewData>? = try {
         FetchChapterViewData(
             chapterCatalog = resolver.chapterCatalog,
             storage = resolver.storageAccess,
-            languageCode = languageCode,
-            productSlug = productSlug,
-            bookSlug = bookSlug
+            languageCode = params.languageCode,
+            productSlug = params.productSlug,
+            bookSlug = params.bookSlug
         ).getViewDataList()
     } catch (ex: ClientRequestException) {
         null
@@ -234,8 +230,8 @@ private fun chaptersView(
                 "chapterList" to chapterViewDataList,
                 "languageNavTitle" to languageName,
                 "languagesNavUrl" to "/$GL_ROUTE",
-                "toolsNavUrl" to "/$GL_ROUTE/$languageCode",
-                "booksNavUrl" to "/$GL_ROUTE/$languageCode/$productSlug"
+                "toolsNavUrl" to "/$GL_ROUTE/${params.languageCode}",
+                "booksNavUrl" to "/$GL_ROUTE/${params.languageCode}/${params.productSlug}"
             ),
             locale = getPreferredLocale(contentLanguage, "chapters")
         )
