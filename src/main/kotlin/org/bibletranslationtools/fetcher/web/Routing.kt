@@ -112,7 +112,12 @@ private fun productsView(
 ): ThymeleafContent {
     val model = FetchProductViewData(resolver.productCatalog)
     val languageCode = parameters[ParamKeys.languageParamKey] ?: ""
-    if (languageCode.isNullOrEmpty()) return errorPage("Invalid Language Code")
+    if (languageCode.isNullOrEmpty()) {
+        return errorPage(
+            "Invalid Parameters",
+            "Language code $languageCode is not valid."
+        )
+    }
 
     val languageName = resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
 
@@ -135,7 +140,12 @@ private fun booksView(
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
     val languageCode = parameters[ParamKeys.languageParamKey]
-    if (languageCode.isNullOrEmpty()) return errorPage("Invalid Language Code")
+    if (languageCode.isNullOrEmpty()) {
+        return errorPage(
+            "Invalid Parameters",
+            "Language code $languageCode is not valid."
+        )
+    }
 
     val languageName = resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
     val bookViewData = FetchBookViewData(
@@ -167,7 +177,10 @@ private fun chaptersView(
     val chapterViewDataList: List<ChapterViewData>? = try {
         getChapterViewDataList(parameters, resolver)
     } catch (ex: ClientRequestException) {
-        return errorPage("Server network error. Please check back again later.")
+        return errorPage(
+            "Server Network Error",
+            "There was an error in requesting chapter data."
+        )
     }
 
     val languageCode = parameters["languageCode"]
@@ -176,8 +189,12 @@ private fun chaptersView(
     val languageName = language?.localizedName ?: ""
 
     return when {
-        chapterViewDataList == null -> errorPage("Invalid Parameters")
-        bookViewData == null -> errorPage("Could not find the content with the specified url")
+        chapterViewDataList == null -> {
+            errorPage("Content Not Available", "Could not retrieve chapter data.")
+        }
+        bookViewData == null -> {
+            errorPage("Content Not Available", "Could not retrieve book data.")
+        }
         else -> ThymeleafContent(
             template = "chapters",
             model = mapOf(
@@ -247,9 +264,12 @@ private fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templ
     return Locale.getDefault()
 }
 
-private fun errorPage(message: String): ThymeleafContent {
+private fun errorPage(title: String, message: String): ThymeleafContent {
     return ThymeleafContent(
-        template = "",
-        model = mapOf("errorMessage" to message)
+        template = "error",
+        model = mapOf(
+            "errorTitle" to title,
+            "errorMessage" to message
+        )
     )
 }
