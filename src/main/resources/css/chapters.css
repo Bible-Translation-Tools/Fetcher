@@ -1,19 +1,19 @@
 .chaptercard {
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: space-between;
     width:98vw;
-    max-width: 949px;
+    max-width: 753px;
     max-height: 56px;
     border-top: 1px solid #111A3133 !important;
     overflow: hidden;
+    padding: 0 8px 0 8px;
 }
 .chaptercard:hover {
     background: #111A310D;
 }
 .chaptercard__title {
     flex: 1;
-    text-align: center;
     color: #111A31;
     font-size: 1.15rem;
     font-weight: 600;
@@ -23,7 +23,7 @@
     display: flex;
     align-items: center;
     text-align: center;
-    justify-content: center;
+    justify-content: flex-end;
     color: #015AD9;
     font-size: 1rem;
 }
@@ -58,7 +58,7 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    max-width: 949px;
+    max-width: 753px;
     height: 152px;
     margin: 16px auto 16px auto;
 }

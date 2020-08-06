@@ -122,22 +122,22 @@ span {
     text-align: center;
 }
 .hero__page-title {
-    font-size: 26px;
+    font-size: 2rem;
     line-height: 39px;
     margin: 0;
     font-family: 'Noto Sans', Calibri, sans-serif;
     font-weight: 300;
     text-align: center;
-    width: 608px;
+    width: 753px;
     margin-top: 20px;
 }
 
 .hero__page-info {
     font-family: 'Noto Sans', Calibri, sans-serif;
-    font-size: 1rem;
+    font-size: 1.25rem;
     line-height: 1.5rem;
     font-weight: 300;
-    width: 608px;
+    width: 753px;
 }
 .searchbar {
     display: flex;
@@ -198,6 +198,14 @@ span {
     }
     .navbar__item span {
         padding: 0;
+    }
+    .hero__page-title {
+        width: 608px;
+        font-size: 1.625rem;
+    }
+    .hero__page-info {
+        width: 608px;
+        font-size: 1rem;
     }
 
 }
