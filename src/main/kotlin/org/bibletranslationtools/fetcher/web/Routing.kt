@@ -4,7 +4,6 @@ import dev.jbs.ktor.thymeleaf.ThymeleafContent
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.call
 import io.ktor.client.features.ClientRequestException
-import io.ktor.http.Parameters
 import io.ktor.request.acceptLanguage
 import io.ktor.request.path
 import io.ktor.request.uri
@@ -31,6 +30,16 @@ private object ParamKeys {
     const val languageParamKey = "languageCode"
     const val productParamKey = "productSlug"
     const val bookParamKey = "bookSlug"
+}
+
+private data class Params(
+    private val lc: String? = null, // language code
+    private val ps: String? = null, // product slug
+    private val bs: String? = null // book slug
+) {
+    val languageCode = lc ?: ""
+    val productSlug = ps ?: ""
+    val bookSlug = bs ?: ""
 }
 
 fun Routing.root(resolver: DependencyResolver) {
@@ -65,18 +74,30 @@ fun Routing.root(resolver: DependencyResolver) {
                 get {
                     // products page
                     val path = normalizeUrl(call.request.path())
-                    call.respond(productsView(call.parameters, path, resolver, contentLanguage))
+                    val params = Params(
+                        lc = call.parameters[ParamKeys.languageParamKey]
+                    )
+                    call.respond(productsView(params, path, resolver, contentLanguage))
                 }
                 route("{${ParamKeys.productParamKey}}") {
                     get {
                         // books page
                         val path = normalizeUrl(call.request.path())
-                        call.respond(booksView(call.parameters, path, resolver, contentLanguage))
+                        val params = Params(
+                            lc = call.parameters[ParamKeys.languageParamKey],
+                            ps = call.parameters[ParamKeys.productParamKey]
+                        )
+                        call.respond(booksView(params, path, resolver, contentLanguage))
                     }
                     route("{${ParamKeys.bookParamKey}}") {
                         get {
                             // chapters page
-                            call.respond(chaptersView(call.parameters, resolver, contentLanguage))
+                            val params = Params(
+                                lc = call.parameters[ParamKeys.languageParamKey],
+                                ps = call.parameters[ParamKeys.productParamKey],
+                                bs = call.parameters[ParamKeys.bookParamKey]
+                            )
+                            call.respond(chaptersView(params, resolver, contentLanguage))
                         }
                     }
                 }
@@ -97,6 +118,7 @@ private fun gatewayLanguagesView(
         template = "languages",
         model = mapOf(
             "languageList" to model.getListViewData(path),
+            "languageNavTitle" to "",
             "languagesNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "languages")
@@ -104,22 +126,25 @@ private fun gatewayLanguagesView(
 }
 
 private fun productsView(
-    parameters: Parameters,
+    params: Params,
     path: String,
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
-    val model = FetchProductViewData(resolver.productCatalog)
-    val languageCode = parameters[ParamKeys.languageParamKey] ?: ""
-    if (languageCode.isEmpty()) return errorPage("Invalid Language Code")
+    val validator = RoutingValidator(resolver)
 
-    val languageName = resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
+    if (!validator.isLanguageCodeValid(params.languageCode)) {
+        return errorPage("Invalid route parameters")
+    }
+
+    val model = FetchProductViewData(resolver.productCatalog)
+    val languageName = getLanguageName(params.languageCode, resolver)
 
     return ThymeleafContent(
         template = "products",
         model = mapOf(
             "productList" to model.getListViewData(path),
-            "languagesNavTitle" to languageName,
+            "languageNavTitle" to languageName,
             "languagesNavUrl" to "/$GL_ROUTE",
             "toolsNavUrl" to "#"
         ),
@@ -128,33 +153,34 @@ private fun productsView(
 }
 
 private fun booksView(
-    parameters: Parameters,
+    params: Params,
     path: String,
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
-    val languageCode = parameters[ParamKeys.languageParamKey]
-    val productSlug = parameters[ParamKeys.productParamKey]
-    if (languageCode.isNullOrEmpty() || productSlug.isNullOrEmpty()) {
-        return errorPage("Invalid request parameters")
+    val validator = RoutingValidator(resolver)
+
+    if (
+        !validator.isLanguageCodeValid(params.languageCode) ||
+        !validator.isProductSlugValid(params.productSlug)
+    ) {
+        return errorPage("Invalid route parameters")
     }
 
-    val languageName = resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
-    val productName = resolver.productCatalog.getProduct(productSlug)?.titleKey ?: ""
+    val languageName = getLanguageName(params.languageCode, resolver)
     val bookViewData = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,
-        languageCode
+        params.languageCode
     ).getViewDataList(path)
 
     return ThymeleafContent(
         template = "books",
         model = mapOf(
             "bookList" to bookViewData,
-            "languagesNavTitle" to languageName,
+            "languageNavTitle" to languageName,
             "languagesNavUrl" to "/$GL_ROUTE",
-            "toolsNavTitle" to productName,
-            "toolsNavUrl" to "/$GL_ROUTE/$languageCode",
+            "toolsNavUrl" to "/$GL_ROUTE/${params.languageCode}",
             "booksNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "books")
@@ -162,78 +188,58 @@ private fun booksView(
 }
 
 private fun chaptersView(
-    parameters: Parameters,
+    params: Params,
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
-    val bookViewData: BookViewData? = getBookViewData(parameters, resolver)
+    val validator = RoutingValidator(resolver)
 
-    val chapterViewDataList: List<ChapterViewData>? = try {
-        getChapterViewDataList(parameters, resolver)
-    } catch (ex: ClientRequestException) {
-        return errorPage("Server network error. Please check back again later.")
+    if (
+        !validator.isLanguageCodeValid(params.languageCode) ||
+        !validator.isProductSlugValid(params.productSlug) ||
+        !validator.isBookSlugValid(params.languageCode, params.bookSlug)
+    ) {
+        return errorPage("Invalid route parameters")
     }
 
-    val languageCode = parameters[ParamKeys.languageParamKey]
-    val productSlug = parameters[ParamKeys.productParamKey]
-    val language = resolver.languageCatalog.getLanguage(languageCode ?: "")
-    val languageName = language?.localizedName ?: ""
-    val product = resolver.productCatalog.getProduct(productSlug ?: "")
-    val productName = product?.titleKey ?: ""
+    val languageName = getLanguageName(params.languageCode, resolver)
+    val bookViewData: BookViewData? = FetchBookViewData(
+        resolver.bookRepository,
+        resolver.storageAccess,
+        params.languageCode
+    ).getViewData(params.bookSlug, params.productSlug)
+    val chapterViewDataList: List<ChapterViewData>? = try {
+        FetchChapterViewData(
+            chapterCatalog = resolver.chapterCatalog,
+            storage = resolver.storageAccess,
+            languageCode = params.languageCode,
+            productSlug = params.productSlug,
+            bookSlug = params.bookSlug
+        ).getViewDataList()
+    } catch (ex: ClientRequestException) {
+        null
+    }
 
     return when {
-        chapterViewDataList == null -> errorPage("Invalid Parameters")
+        chapterViewDataList == null -> errorPage("Error loading chapter data")
         bookViewData == null -> errorPage("Could not find the content with the specified url")
         else -> ThymeleafContent(
             template = "chapters",
             model = mapOf(
                 "book" to bookViewData,
                 "chapterList" to chapterViewDataList,
-                "languagesNavTitle" to languageName,
+                "languageNavTitle" to languageName,
                 "languagesNavUrl" to "/$GL_ROUTE",
-                "toolsNavTitle" to productName,
-                "toolsNavUrl" to "/$GL_ROUTE/$languageCode",
-                "booksNavTitle" to bookViewData.localizedName,
-                "booksNavUrl" to "/$GL_ROUTE/$languageCode/$productSlug"
+                "toolsNavUrl" to "/$GL_ROUTE/${params.languageCode}",
+                "booksNavUrl" to "/$GL_ROUTE/${params.languageCode}/${params.productSlug}"
             ),
             locale = getPreferredLocale(contentLanguage, "chapters")
         )
     }
 }
 
-private fun getBookViewData(parameters: Parameters, resolver: DependencyResolver): BookViewData? {
-    val languageCode = parameters[ParamKeys.languageParamKey]
-    val bookSlug = parameters[ParamKeys.bookParamKey]
-    val productSlug = parameters[ParamKeys.productParamKey]
-
-    return if (!languageCode.isNullOrEmpty() && !bookSlug.isNullOrEmpty() && !productSlug.isNullOrEmpty()) {
-        FetchBookViewData(
-            resolver.bookRepository,
-            resolver.storageAccess,
-            languageCode
-        ).getViewData(bookSlug, productSlug)
-    } else {
-        null
-    }
-}
-
-@Throws(ClientRequestException::class)
-private fun getChapterViewDataList(parameters: Parameters, resolver: DependencyResolver): List<ChapterViewData>? {
-    val languageCode = parameters[ParamKeys.languageParamKey]
-    val productSlug = parameters[ParamKeys.productParamKey]
-    val bookSlug = parameters[ParamKeys.bookParamKey]
-
-    return if (!languageCode.isNullOrEmpty() && !bookSlug.isNullOrEmpty() && !productSlug.isNullOrEmpty()) {
-        FetchChapterViewData(
-            chapterCatalog = resolver.chapterCatalog,
-            storage = resolver.storageAccess,
-            languageCode = languageCode,
-            productSlug = productSlug,
-            bookSlug = bookSlug
-        ).getViewDataList()
-    } else {
-        null
-    }
+private fun getLanguageName(languageCode: String, resolver: DependencyResolver): String {
+    return resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
 }
 
 private fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templateName: String): Locale {
