@@ -102,7 +102,7 @@ and (max-device-width: 1200px) {
 and (max-device-width: 767px)
 and (min-device-width: 320px) {
     .chaptercard {
-        border-box: content-box;
+        box-sizing: content-box;
     }
     .hero__page-title {
         margin-bottom: 20px;
