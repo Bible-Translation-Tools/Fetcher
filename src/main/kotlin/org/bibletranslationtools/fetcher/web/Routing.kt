@@ -118,7 +118,6 @@ private fun gatewayLanguagesView(
         template = "languages",
         model = mapOf(
             "languageList" to model.getListViewData(path),
-            "languageNavTitle" to "",
             "languagesNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "languages")
@@ -144,7 +143,7 @@ private fun productsView(
         template = "products",
         model = mapOf(
             "productList" to model.getListViewData(path),
-            "languageNavTitle" to languageName,
+            "languagesNavTitle" to languageName,
             "languagesNavUrl" to "/$GL_ROUTE",
             "toolsNavUrl" to "#"
         ),
@@ -168,6 +167,7 @@ private fun booksView(
     }
 
     val languageName = getLanguageName(params.languageCode, resolver)
+    val productTitle = getProductTitleKey(params.productSlug, resolver)
     val bookViewData = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,
@@ -178,8 +178,9 @@ private fun booksView(
         template = "books",
         model = mapOf(
             "bookList" to bookViewData,
-            "languageNavTitle" to languageName,
+            "languagesNavTitle" to languageName,
             "languagesNavUrl" to "/$GL_ROUTE",
+            "toolsNavTitle" to productTitle,
             "toolsNavUrl" to "/$GL_ROUTE/${params.languageCode}",
             "booksNavUrl" to "#"
         ),
@@ -203,6 +204,7 @@ private fun chaptersView(
     }
 
     val languageName = getLanguageName(params.languageCode, resolver)
+    val productTitle = getProductTitleKey(params.productSlug, resolver)
     val bookViewData: BookViewData? = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,
@@ -228,9 +230,11 @@ private fun chaptersView(
             model = mapOf(
                 "book" to bookViewData,
                 "chapterList" to chapterViewDataList,
-                "languageNavTitle" to languageName,
+                "languagesNavTitle" to languageName,
                 "languagesNavUrl" to "/$GL_ROUTE",
+                "toolsNavTitle" to productTitle,
                 "toolsNavUrl" to "/$GL_ROUTE/${params.languageCode}",
+                "booksNavTitle" to bookViewData.localizedName,
                 "booksNavUrl" to "/$GL_ROUTE/${params.languageCode}/${params.productSlug}"
             ),
             locale = getPreferredLocale(contentLanguage, "chapters")
@@ -240,6 +244,10 @@ private fun chaptersView(
 
 private fun getLanguageName(languageCode: String, resolver: DependencyResolver): String {
     return resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
+}
+
+private fun getProductTitleKey(productSlug: String, resolver: DependencyResolver): String {
+    return resolver.productCatalog.getProduct(productSlug)?.titleKey ?: ""
 }
 
 private fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templateName: String): Locale {
