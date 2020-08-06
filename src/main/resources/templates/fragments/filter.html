@@ -5,9 +5,9 @@
 </head>
 <body>
 <script th:fragment="filter">
-        window.filter.addEventListener("input", e => {
-            let filter = e.target.value;
-            let css = filter? `
+    window.filter.addEventListener("input", e => {
+        let filter = e.target.value;
+        let css = filter ? `
              .l-list-container a {
                 display: none !important;
              }
@@ -16,9 +16,9 @@
               .l-list-container a[data-slug*="${filter}" i] {
                 display: flex !important;
              }
-            `: ``;
-            document.getElementById('cssFilter').innerHTML = css ;
-        });
+            ` : ``;
+        document.getElementById('cssFilter').innerHTML = css;
+    });
 </script>
 </body>
 </html>

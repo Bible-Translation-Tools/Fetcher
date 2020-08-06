@@ -36,7 +36,7 @@
     padding:0 4px 0 4px;
 }
 .chaptercard__download-target:hover {
-background: rgba(1, 90, 217, 0.2);
+    background: rgba(1, 90, 217, 0.2);
 }
 .chaptercard__download-text {
     text-decoration: underline;
