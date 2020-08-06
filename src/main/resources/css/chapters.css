@@ -51,9 +51,6 @@
 .chaptercard__download-target.unavailable {
     display: none;
 }
-.chaptercard:hover {
-    background: #b0b0b029 !important
-}
 .chapter-download-card {
     background: #0A3373;
     display: flex;
