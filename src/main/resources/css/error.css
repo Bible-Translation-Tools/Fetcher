@@ -1,0 +1,27 @@
+.l-error-container {
+   height: 100vw;
+   width: 100vw;
+   align-items: column;
+   margin: auto;
+   max-height: 600px;
+}
+
+.error-title {
+    padding-left: 5%;
+}
+
+.c-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.error-message {
+    padding-left: 5%;
+}
+.error-image {
+    width: 100%;
+    height: auto;
+    max-height: 500px;
+    max-width: 500px;
+}

@@ -4,6 +4,7 @@ import dev.jbs.ktor.thymeleaf.ThymeleafContent
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.call
 import io.ktor.client.features.ClientRequestException
+import io.ktor.http.HttpStatusCode
 import io.ktor.request.acceptLanguage
 import io.ktor.request.path
 import io.ktor.request.uri
@@ -134,7 +135,11 @@ private fun productsView(
     val validator = RoutingValidator(resolver)
 
     if (!validator.isLanguageCodeValid(params.languageCode)) {
-        return errorPage("Invalid route parameters")
+        return errorPage(
+            "Invalid route parameters",
+            "Invalid Language.",
+            HttpStatusCode.NotFound
+        )
     }
 
     val model = FetchProductViewData(resolver.productCatalog)
@@ -164,7 +169,11 @@ private fun booksView(
         !validator.isLanguageCodeValid(params.languageCode) ||
         !validator.isProductSlugValid(params.productSlug)
     ) {
-        return errorPage("Invalid route parameters")
+        return errorPage(
+            "Invalid route parameters",
+            "Invalid Language and/or Product.",
+            HttpStatusCode.NotFound
+        )
     }
 
     val languageName = getLanguageName(params.languageCode, resolver)
@@ -199,7 +208,11 @@ private fun chaptersView(
         !validator.isProductSlugValid(params.productSlug) ||
         !validator.isBookSlugValid(params.languageCode, params.bookSlug)
     ) {
-        return errorPage("Invalid route parameters")
+        return errorPage(
+            "Invalid route parameters",
+            "Invalid Language, Product, and/or Book.",
+            HttpStatusCode.NotFound
+        )
     }
 
     val languageName = getLanguageName(params.languageCode, resolver)
@@ -217,12 +230,28 @@ private fun chaptersView(
             bookSlug = params.bookSlug
         ).getViewDataList()
     } catch (ex: ClientRequestException) {
-        null
+        return errorPage(
+            "Internal Server Error",
+            "An error occurred on the network. Please refresh and try again.",
+            HttpStatusCode.InternalServerError
+        )
     }
 
     return when {
-        chapterViewDataList == null -> errorPage("Error loading chapter data")
-        bookViewData == null -> errorPage("Could not find the content with the specified url")
+        chapterViewDataList == null -> {
+            errorPage(
+                "Chapter Data Not Found",
+                "Error loading data about the chapters.",
+                HttpStatusCode.NotFound
+            )
+        }
+        bookViewData == null -> {
+            errorPage(
+                "Book Data Not Found",
+                "Error loading data about the book.",
+                HttpStatusCode.NotFound
+            )
+        }
         else -> ThymeleafContent(
             template = "chapters",
             model = mapOf(
@@ -261,9 +290,13 @@ private fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templ
     return Locale.getDefault()
 }
 
-private fun errorPage(message: String): ThymeleafContent {
+private fun errorPage(title: String, message: String, errorCode: HttpStatusCode): ThymeleafContent {
     return ThymeleafContent(
-        template = "",
-        model = mapOf("errorMessage" to message)
+        template = "error",
+        model = mapOf(
+            "errorTitle" to title,
+            "errorMessage" to message,
+            "errorCode" to errorCode.value
+        )
     )
 }
