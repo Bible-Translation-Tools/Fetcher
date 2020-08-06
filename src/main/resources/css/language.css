@@ -70,9 +70,8 @@
     color: #111A31;
     font-size: 20px;
     margin: 2px;
-    height: 32px;
+    line-height: 32px;
 }
-
 /* --mobile layout for phones  */
 @media only screen
 and (max-device-width: 767px)
@@ -85,7 +84,8 @@ and (min-device-width: 320px)
         width: 100vw;
         height: 79px;
         margin: 0;
-        border: solid 1px #111A3133;
+        border: none;
+        border-top: 1px solid #111A3133;
         border-radius:0;
     }
     .def-card__main-text {
@@ -93,10 +93,12 @@ and (min-device-width: 320px)
         flex: 3;
         justify-content: center;
         height: 80%;
-        margin: 0 0 0 4px;
+        margin: 0 0 0 10px;
+        padding-top: 8px;
     }
     .def-card__code {
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         height: 100%;
@@ -112,7 +114,7 @@ and (min-device-width: 320px)
         color: #111A31;
         font-size: 1.125rem;
         text-align: left;
-        height: 50%;
+        height: 45%;
     }
     .def-card__anglicized-text {
         color: #111A31;
