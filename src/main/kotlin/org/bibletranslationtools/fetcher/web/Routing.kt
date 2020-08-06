@@ -238,7 +238,7 @@ private fun chaptersView(
     }
 }
 
-private fun getLanguageName(langaugeCode: String, resolver: DependencyResolver): String {
+private fun getLanguageName(languageCode: String, resolver: DependencyResolver): String {
     return resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
 }
 
