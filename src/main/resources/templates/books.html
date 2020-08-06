@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" dir="ltr" th:dir="#{dir}">
 <head>
     <meta charset="UTF-8">
     <title>Books</title>
@@ -21,7 +21,7 @@
 
 <div class="l-list-container" >
     <div th:each="book: ${bookList}">
-        <div th:insert="fragments/card :: card(${book.localizedName}, ${book.anglicizedName}, ${book.index + ' '+ book.slug}, ${book.url})"></div>
+        <div th:insert="fragments/card :: card(${book.localizedName}, ${book.anglicizedName}, ${book.index}, ${book.slug}, ${book.url})"></div>
     </div>
 </div>
 
