@@ -62,14 +62,25 @@ span {
     height:40px;
     width: 40px;
 }
+.c-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px #111A3133 solid;
+    width: 100%;
+    height:56px;
+}
+.c-navbar > div {
+    width: 100%;
+}
 .navbar {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
     width: 100%;
+    max-width: 900px;
     height: 56px;
     background-color: white;
-    border: 1px #111A3133 solid;
     margin: auto;
 }
 .navbar__item {
@@ -111,22 +122,22 @@ span {
     text-align: center;
 }
 .hero__page-title {
-    font-size: 26px;
+    font-size: 2rem;
     line-height: 39px;
     margin: 0;
     font-family: 'Noto Sans', Calibri, sans-serif;
     font-weight: 300;
     text-align: center;
-    width: 608px;
+    width: 753px;
     margin-top: 20px;
 }
 
 .hero__page-info {
     font-family: 'Noto Sans', Calibri, sans-serif;
-    font-size: 1rem;
+    font-size: 1.25rem;
     line-height: 1.5rem;
     font-weight: 300;
-    width: 608px;
+    width: 753px;
 }
 .searchbar {
     display: flex;
@@ -142,6 +153,10 @@ span {
 }
 .searchbar__input {
     border: none;
+    font-size: 100%;
+    outline: none;
+    width: 100%;
+    height: 32px;
 }
 .l-list-container {
     /* height: 340px; */
@@ -168,7 +183,7 @@ span {
 }
 /* --tablet layout -- */
 @media only screen and (max-device-width: 1200px) {
-    .navbar {
+    .c-navbar {
     position: absolute;
         bottom: 0;
         left: 0;
@@ -183,6 +198,14 @@ span {
     }
     .navbar__item span {
         padding: 0;
+    }
+    .hero__page-title {
+        width: 608px;
+        font-size: 1.625rem;
+    }
+    .hero__page-info {
+        width: 608px;
+        font-size: 1rem;
     }
 
 }
