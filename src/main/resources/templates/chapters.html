@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" dir="ltr" th:dir="#{dir}">
 <head>
     <meta charset="UTF-8">
     <title>Chapters</title>
@@ -7,12 +7,15 @@
     <link rel="stylesheet" href="/static/common.css">
     <link rel="stylesheet" href="/static/chapters.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style id="cssFilter">/*css filter placeholder*/</style>
 </head>
 <body>
 
 <div th:insert="fragments/header :: header"></div>
 
-<div th:insert="fragments/navbar :: navbar(${languagesNavUrl}, ${toolsNavUrl}, ${booksNavUrl})"></div>
+<div class="c-navbar">
+    <div th:insert="fragments/navbar :: navbar(${languagesNavUrl}, ${toolsNavUrl}, ${booksNavUrl})"></div>
+</div>
 
 <div th:insert="fragments/hero :: hero(#{page_title}, #{page_info})"></div>
 
@@ -36,5 +39,8 @@
         <div th:insert="fragments/chaptercard :: chaptercard(${chapter.chapterNumber}, #{${chapter.titleKey}(${chapter.chapterNumber})}, ${chapter.url})"></div>
     </div>
 </div>
+
+<div th:insert="fragments/filter :: filter"></div>
+
 </body>
 </html>
