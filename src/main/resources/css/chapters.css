@@ -5,7 +5,8 @@
     width:98vw;
     max-width: 949px;
     max-height: 56px;
-    border-top: 1px solid #111A3133;
+    border-top: 1px solid #111A3133 !important;
+    overflow: hidden;
 }
 .chaptercard:hover {
     background: #111A310D;
@@ -50,6 +51,9 @@
 .chaptercard__download-target.unavailable {
     display: none;
 }
+.chaptercard:hover {
+    background: #b0b0b029 !important
+}
 .chapter-download-card {
     background: #0A3373;
     display: flex;
@@ -76,8 +80,9 @@
     justify-content: center;
     border: none;
 }
-
-
+.chapter-download-card__button:hover {
+    background: #c58b07;
+}
 /* --layout for tablets  */
 @media only  screen
 and (max-device-width: 1200px) {
@@ -127,4 +132,7 @@ and (min-device-width: 320px) {
             align-items: center;
             justify-content: center;
         }
+    .chaptercard__download.unavailable .chaptercard__icon {
+        color: #cfd1d6;
+    }
 }
