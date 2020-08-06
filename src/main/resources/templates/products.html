@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" dir="ltr" th:dir="#{dir}">
 <head>
     <meta charset="UTF-8">
     <title>Products</title>
@@ -12,7 +12,9 @@
 
 <div th:insert="fragments/header :: header"></div>
 
-<div th:insert="fragments/navbar :: navbar(${languagesNavUrl}, ${toolsNavUrl}, null)"></div>
+<div class="c-navbar">
+    <div th:insert="fragments/navbar :: navbar(${languagesNavUrl}, ${toolsNavUrl}, null)"></div>
+</div>
 
 <div th:insert="fragments/hero :: hero(#{page_title}, #{page_info})"></div>
 

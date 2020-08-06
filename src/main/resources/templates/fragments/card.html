@@ -4,12 +4,14 @@
     <title>Default Card</title>
 </head>
 <body>
-<a th:fragment="card(localizedText, anglicizedText, code, url)"
+<a th:fragment="card(localizedText, anglicizedText, index, code, url)"
+   th:attrappend="data-slug=${code}, data-angname=${anglicizedText}, data-localname=${localizedText}"
    class="def-card" th:classappend="${url == null}? 'unavailable' "
    th:href="${url == null}? '#' : ${url}">
     <div class="def-card__code"
          th:classappend="${url == null}? 'unavailable' ">
-        <span th:text="${code}">01 Gen</span>
+        <span th:if="${index != ''}" th:text="${index + ' '}">01 </span>
+        <span th:text="${code}">Gen</span>
     </div>
     <div class="def-card__main-text"
          th:classappend="${url == null}? 'unavailable' ">
