@@ -4,7 +4,6 @@ import dev.jbs.ktor.thymeleaf.ThymeleafContent
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.call
 import io.ktor.client.features.ClientRequestException
-import io.ktor.http.Parameters
 import io.ktor.request.acceptLanguage
 import io.ktor.request.path
 import io.ktor.request.uri
@@ -36,7 +35,7 @@ private object ParamKeys {
 private data class Params(
     private val lc: String? = null, // language code
     private val ps: String? = null, // product slug
-    private val bs: String? = null  // book slug
+    private val bs: String? = null // book slug
 ) {
     val languageCode = lc ?: ""
     val productSlug = ps ?: ""
