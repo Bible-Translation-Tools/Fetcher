@@ -31,6 +31,7 @@ span {
      font-size: 100%;
      line-height: 24px;
  }
+
  a {
     color: black;
      text-decoration: none;
@@ -74,9 +75,9 @@ span {
 .navbar__item {
     text-decoration: none;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     flex: 1;
-    width: 100%;
+    width: 33%;
     height: 100%;
     align-items: center;
     justify-content: center;
@@ -94,6 +95,13 @@ span {
 }
 .navbar__item--active:hover {
     background: white !important;
+}
+.navbar__item span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80%;
+    white-space: nowrap;
+    padding-left: 8px;
 }
 .hero {
     display: flex;
@@ -147,9 +155,9 @@ span {
 }
 .unavailable {
     background: white !important;
-    border: none !important;
     color: #111A3133 !important;
     box-shadow: none !important;
+    border: none !important;
 }
 .unavailable:hover {
     box-shadow: none !important;
@@ -165,19 +173,23 @@ span {
         bottom: 0;
         left: 0;
     }
+    .navbar__item {
+        display: flex;
+        flex-direction: column;
+    }
     .navbar__item--active {
         border-top: 2px solid rgb(1, 90, 217) !important;
         border-bottom: none;
     }
+    .navbar__item span {
+        padding: 0;
+    }
+
 }
 /* --mobile layout for phones  */
 @media only screen
 and (max-device-width: 767px)
 and (min-device-width: 320px) {
-    .navbar__item--active {
-        border-top: 2px solid rgb(1, 90, 217) !important;
-        border-bottom: none;
-    }
     .hero__page-title {
         min-width: 312px;
         width: 70%;
@@ -191,8 +203,15 @@ and (min-device-width: 320px) {
         width: 70%;
     }
     .searchbar {
-        min-width: 312px;
-        width: 70%;
+        max-width: 312px;
+        width: 80%;
+    }
+    .l-list-container > div:last-child a
+    {
+        border-bottom: 1px solid #111A3133;
+    }
+    .l-list-container a.unavailable {
+        border-top: 1px solid #111A3133 !important;
     }
 }
 
