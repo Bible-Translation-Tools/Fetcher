@@ -39,11 +39,7 @@ private data class Params(
 ) {
     val languageCode = lc ?: ""
     val productSlug = ps ?: ""
-    val bookSlug = ps ?: ""
-
-    fun getLanguageName(resolver: DependencyResolver): String {
-        return resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
-    }
+    val bookSlug = bs ?: ""
 }
 
 fun Routing.root(resolver: DependencyResolver) {
@@ -141,7 +137,7 @@ private fun productsView(
     }
 
     val model = FetchProductViewData(resolver.productCatalog)
-    val languageName = params.getLanguageName(resolver)
+    val languageName = getLanguageName(params, resolver)
 
     return ThymeleafContent(
         template = "products",
@@ -171,7 +167,7 @@ private fun booksView(
         return errorPage("Invalid route parameters")
     }
 
-    val languageName = params.getLanguageName(resolver)
+    val languageName = getLanguageName(params, resolver)
     val bookViewData = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,
@@ -226,7 +222,7 @@ private fun chaptersView(
     } catch (ex: ClientRequestException) {
         null
     }
-    val languageName = params.getLanguageName(resolver)
+    val languageName = getLanguageName(params, resolver)
 
     return when {
         chapterViewDataList == null -> errorPage("Error loading chapter data")
@@ -244,6 +240,10 @@ private fun chaptersView(
             locale = getPreferredLocale(contentLanguage, "chapters")
         )
     }
+}
+
+private fun getLanguageName(params: Params, resolver: DependencyResolver): String {
+    return resolver.languageCatalog.getLanguage(params.languageCode)?.localizedName ?: ""
 }
 
 private fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templateName: String): Locale {
