@@ -210,9 +210,19 @@ private fun chaptersView(
         return errorPage("Invalid route parameters")
     }
 
-    val bookViewData: BookViewData? = getBookViewData(languageCode, bookSlug, productSlug, resolver)
+    val bookViewData: BookViewData? = FetchBookViewData(
+        resolver.bookRepository,
+        resolver.storageAccess,
+        languageCode
+    ).getViewData(bookSlug, productSlug)
     val chapterViewDataList: List<ChapterViewData>? = try {
-        getChapterViewDataList(languageCode, bookSlug, productSlug, resolver)
+        FetchChapterViewData(
+            chapterCatalog = resolver.chapterCatalog,
+            storage = resolver.storageAccess,
+            languageCode = languageCode,
+            productSlug = productSlug,
+            bookSlug = bookSlug
+        ).getViewDataList()
     } catch (ex: ClientRequestException) {
         null
     }
@@ -234,35 +244,6 @@ private fun chaptersView(
             locale = getPreferredLocale(contentLanguage, "chapters")
         )
     }
-}
-
-private fun getBookViewData(
-    languageCode: String,
-    bookSlug: String,
-    productSlug: String,
-    resolver: DependencyResolver
-): BookViewData? {
-    return FetchBookViewData(
-            resolver.bookRepository,
-            resolver.storageAccess,
-            languageCode
-        ).getViewData(bookSlug, productSlug)
-}
-
-@Throws(ClientRequestException::class)
-private fun getChapterViewDataList(
-    languageCode: String,
-    bookSlug: String,
-    productSlug: String,
-    resolver: DependencyResolver
-): List<ChapterViewData>? {
-    return FetchChapterViewData(
-            chapterCatalog = resolver.chapterCatalog,
-            storage = resolver.storageAccess,
-            languageCode = languageCode,
-            productSlug = productSlug,
-            bookSlug = bookSlug
-        ).getViewDataList()
 }
 
 private fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templateName: String): Locale {
