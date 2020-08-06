@@ -4,6 +4,7 @@ import dev.jbs.ktor.thymeleaf.ThymeleafContent
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.call
 import io.ktor.client.features.ClientRequestException
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.Parameters
 import io.ktor.request.acceptLanguage
 import io.ktor.request.path
@@ -115,7 +116,8 @@ private fun productsView(
     if (languageCode.isNullOrEmpty()) {
         return errorPage(
             "Invalid Parameters",
-            "Language code $languageCode is not valid."
+            "Language code $languageCode is not valid.",
+            HttpStatusCode.NotFound
         )
     }
 
@@ -143,7 +145,8 @@ private fun booksView(
     if (languageCode.isNullOrEmpty()) {
         return errorPage(
             "Invalid Parameters",
-            "Language code $languageCode is not valid."
+            "Language code $languageCode is not valid.",
+            HttpStatusCode.NotFound
         )
     }
 
@@ -179,7 +182,8 @@ private fun chaptersView(
     } catch (ex: ClientRequestException) {
         return errorPage(
             "Server Network Error",
-            "There was an error in requesting chapter data."
+            "There was an error in requesting chapter data.",
+            HttpStatusCode.InternalServerError
         )
     }
 
@@ -190,10 +194,18 @@ private fun chaptersView(
 
     return when {
         chapterViewDataList == null -> {
-            errorPage("Content Not Available", "Could not retrieve chapter data.")
+            errorPage(
+                "Content Not Available",
+                "Could not retrieve chapter data.",
+                HttpStatusCode.NotFound
+            )
         }
         bookViewData == null -> {
-            errorPage("Content Not Available", "Could not retrieve book data.")
+            errorPage(
+                "Content Not Available",
+                "Could not retrieve book data.",
+                HttpStatusCode.NotFound
+            )
         }
         else -> ThymeleafContent(
             template = "chapters",
@@ -264,12 +276,13 @@ private fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templ
     return Locale.getDefault()
 }
 
-private fun errorPage(title: String, message: String): ThymeleafContent {
+private fun errorPage(title: String, message: String, errorCode: HttpStatusCode): ThymeleafContent {
     return ThymeleafContent(
         template = "error",
         model = mapOf(
             "errorTitle" to title,
-            "errorMessage" to message
+            "errorMessage" to message,
+            "errorCode" to errorCode.value
         )
     )
 }
