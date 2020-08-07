@@ -1,3 +1,10 @@
+@font-face {
+    font-family: "Noto Sans";
+    src: url("/static/fonts/NotoSans-Regular.ttf") format('truetype'),
+         url("/static/fonts/NotoSans-BoldItalic.ttf") format('truetype'),
+         url("/static/fonts/NotoSans-Bold.ttf") format('truetype'),
+         url("/static/fonts/NotoSans-Italic.ttf") format('truetype');
+}
 body,html {
     height: 100%;
     width: 100%;
@@ -10,24 +17,16 @@ body,html {
     background-position: center;
     box-sizing: border-box;
     font-size: 100%;
-    @font-face {
-        font-family: "Noto Sans";
-        src: url("/static/fonts/NotoSans-Regular.ttf") format('.ttf'),
-             url("/static/fonts/NotoSans-BoldItalic.ttf") format('.ttf'),
-             url("/static/fonts/NotoSans-Bold.ttf") format('.ttf'),
-             url("/static/fonts/NotoSans-Italic.ttf") format('.ttf');
-         src: local("/static/fonts/NotoSans-Regular.ttf") format('.ttf')
-    }
     overflow-y: scroll;
     overflow-x: hidden;
 }
 p {
-    font-family: "Noto Sans", Courier, sans-serif;
+    font-family: "Noto Sans", Arial, sans-serif;
     overflow: hidden;
     text-overflow: ellipse;
 }
 span {
-     font-family: "Noto Sans", Courier, sans-serif;
+     font-family: "Noto Sans", Arial, sans-serif;
      font-size: 100%;
      line-height: 24px;
  }
@@ -56,7 +55,7 @@ span {
     font-size: 16px;
     margin-left: 16px;
     line-height: 24px;
-    font-family: 'Noto Sans', Calibri, sans-serif;
+    font-family: 'Noto Sans', Arial, sans-serif;
 }
 .header__logo {
     height:40px;
@@ -125,7 +124,7 @@ span {
     font-size: 2rem;
     line-height: 39px;
     margin: 0;
-    font-family: 'Noto Sans', Calibri, sans-serif;
+    font-family: 'Noto Sans', Arial, sans-serif;
     font-weight: 300;
     text-align: center;
     width: 753px;
@@ -133,7 +132,7 @@ span {
 }
 
 .hero__page-info {
-    font-family: 'Noto Sans', Calibri, sans-serif;
+    font-family: 'Noto Sans', Arial, sans-serif;
     font-size: 1.25rem;
     line-height: 1.5rem;
     font-weight: 300;
@@ -218,7 +217,7 @@ and (min-device-width: 320px) {
         width: 70%;
     }
     .hero__page-info {
-        font-family: 'Noto Sans', Calibri, sans-serif;
+        font-family: 'Noto Sans', Arial, sans-serif;
         font-size: 1rem;
         line-height: 1.5rem;
         font-weight: 300;

@@ -33,6 +33,9 @@ fun Application.appModule() {
             static("static") {
                 resources("css")
                 resources("js")
+                static("fonts") {
+                    resources("fonts")
+                }
                 static("img") {
                     resources("img")
                 }
