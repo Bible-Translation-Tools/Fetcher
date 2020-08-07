@@ -6,6 +6,7 @@ import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.install
 import io.ktor.features.CallLogging
 import io.ktor.features.DefaultHeaders
+import io.ktor.http.content.resource
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
 import io.ktor.routing.Routing
@@ -33,6 +34,9 @@ fun Application.appModule() {
             static("static") {
                 resources("css")
                 resources("js")
+                static("fonts") {
+                    resources("fonts")
+                }
                 static("img") {
                     resources("img")
                 }

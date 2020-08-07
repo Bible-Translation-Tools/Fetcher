@@ -1,3 +1,10 @@
+@font-face {
+    font-family: "Noto Sans";
+    src: url("/static/fonts/NotoSans-Regular.ttf") format('truetype'),
+         url("/static/fonts/NotoSans-BoldItalic.ttf") format('truetype'),
+         url("/static/fonts/NotoSans-Bold.ttf") format('truetype'),
+         url("/static/fonts/NotoSans-Italic.ttf") format('truetype');
+}
 body,html {
     height: 100%;
     width: 100%;
@@ -10,14 +17,6 @@ body,html {
     background-position: center;
     box-sizing: border-box;
     font-size: 100%;
-    @font-face {
-        font-family: "Noto Sans";
-        src: url("/static/fonts/NotoSans-Regular.ttf") format('.ttf'),
-             url("/static/fonts/NotoSans-BoldItalic.ttf") format('.ttf'),
-             url("/static/fonts/NotoSans-Bold.ttf") format('.ttf'),
-             url("/static/fonts/NotoSans-Italic.ttf") format('.ttf');
-         src: local("/static/fonts/NotoSans-Regular.ttf") format('.ttf')
-    }
     overflow-y: scroll;
     overflow-x: hidden;
 }
