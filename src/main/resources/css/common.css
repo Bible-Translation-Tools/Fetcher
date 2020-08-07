@@ -21,12 +21,12 @@ body,html {
     overflow-x: hidden;
 }
 p {
-    font-family: "Noto Sans", Courier, sans-serif;
+    font-family: "Noto Sans", Arial, sans-serif;
     overflow: hidden;
     text-overflow: ellipse;
 }
 span {
-     font-family: "Noto Sans", Courier, sans-serif;
+     font-family: "Noto Sans", Arial, sans-serif;
      font-size: 100%;
      line-height: 24px;
  }
@@ -55,7 +55,7 @@ span {
     font-size: 16px;
     margin-left: 16px;
     line-height: 24px;
-    font-family: 'Noto Sans', Calibri, sans-serif;
+    font-family: 'Noto Sans', Arial, sans-serif;
 }
 .header__logo {
     height:40px;
@@ -124,7 +124,7 @@ span {
     font-size: 2rem;
     line-height: 39px;
     margin: 0;
-    font-family: 'Noto Sans', Calibri, sans-serif;
+    font-family: 'Noto Sans', Arial, sans-serif;
     font-weight: 300;
     text-align: center;
     width: 753px;
@@ -132,7 +132,7 @@ span {
 }
 
 .hero__page-info {
-    font-family: 'Noto Sans', Calibri, sans-serif;
+    font-family: 'Noto Sans', Arial, sans-serif;
     font-size: 1.25rem;
     line-height: 1.5rem;
     font-weight: 300;
@@ -217,7 +217,7 @@ and (min-device-width: 320px) {
         width: 70%;
     }
     .hero__page-info {
-        font-family: 'Noto Sans', Calibri, sans-serif;
+        font-family: 'Noto Sans', Arial, sans-serif;
         font-size: 1rem;
         line-height: 1.5rem;
         font-weight: 300;
