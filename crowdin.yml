@@ -1,0 +1,3 @@
+files:
+  - source: /src/main/resources/templates/products_en.properties
+    translation: /src/main/resources/templates/products_%two_letters_code%.properties
