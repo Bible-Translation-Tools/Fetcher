@@ -5,5 +5,27 @@
     "fileExtension": "mp3",
     "expectedResult": "en/ulb/gen/CONTENTS/mp3",
     "bookSlug": "gen"
+  },
+  {
+    "languageCode": "en",
+    "resourceId": "ulb",
+    "fileExtension": "wav",
+    "expectedResult": "en/ulb/CONTENTS/wav"
+  },
+  {
+    "languageCode": "en",
+    "resourceId": "ulb",
+    "fileExtension": "pdf",
+    "expectedResult": "en/ulb/exo/1/CONTENTS/pdf",
+    "bookSlug": "exo",
+    "chapter": "01"
+  },
+  {
+    "languageCode": "en",
+    "resourceId": "tq",
+    "fileExtension": "mp3",
+    "expectedResult": "en/tq/mat/1/CONTENTS/mp3",
+    "bookSlug": "mat",
+    "chapter": "1"
   }
 ]
