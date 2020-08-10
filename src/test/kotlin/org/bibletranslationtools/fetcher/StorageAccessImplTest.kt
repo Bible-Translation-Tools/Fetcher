@@ -127,14 +127,15 @@ class StorageAccessImplTest {
 
         for (testCase in testCases) {
             assertEquals(
+                File("/mock/${testCase.expectedResult}").path,
                 StorageAccessImpl.getPathPrefixDir(
                     testCase.languageCode,
                     testCase.resourceId,
                     testCase.fileExtension,
                     mockDirectoryProvider,
-                    testCase.bookSlug
-                ).path,
-                File("/mock/${testCase.expectedResult}").path
+                    testCase.bookSlug,
+                    testCase.chapter
+                ).path
             )
         }
     }
@@ -158,14 +159,14 @@ class StorageAccessImplTest {
 
         for (testCase in testCases) {
             assertEquals(
+                File(testCase.expectedResult).path,
                 StorageAccessImpl.getContentDir(
                     testCase.prefixDir,
                     testCase.fileExtension,
                     testCase.mediaExtension,
                     testCase.mediaQuality,
                     testCase.grouping
-                ).path,
-                File(testCase.expectedResult).path
+                ).path
             )
         }
     }
