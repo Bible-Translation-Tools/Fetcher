@@ -125,7 +125,7 @@ class StorageAccessImplTest {
         `when`(mockDirectoryProvider.getContentRoot())
             .thenReturn(File("/mock"))
 
-        for(testCase in testCases) {
+        for (testCase in testCases) {
             assertEquals(
                 StorageAccessImpl.getPathPrefixDir(
                     testCase.languageCode,
@@ -156,7 +156,7 @@ class StorageAccessImplTest {
     fun testGetContentDir() {
         val testCases = retrieveGetContentDirTestCases()
 
-        for(testCase in testCases) {
+        for (testCase in testCases) {
             assertEquals(
                 StorageAccessImpl.getContentDir(
                     testCase.prefixDir,
