@@ -1,0 +1,10 @@
+[
+  {
+    "prefixDir": "/mock",
+    "fileExtension": "wav",
+    "mediaExtension": "",
+    "mediaQuality": "",
+    "grouping": "chapter",
+    "expectedResult": "/mock/chapter"
+  }
+]

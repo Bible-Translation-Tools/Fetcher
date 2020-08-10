@@ -1,0 +1,9 @@
+[
+  {
+    "languageCode": "en",
+    "resourceId": "ulb",
+    "fileExtension": "mp3",
+    "expectedResult": "en/ulb/gen/CONTENTS/mp3",
+    "bookSlug": "gen"
+  }
+]
