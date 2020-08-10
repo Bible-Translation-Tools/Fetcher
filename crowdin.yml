@@ -1,13 +1,14 @@
 files:
--   source: /src/main/resources/templates/books_en.properties
+  - source: /src/main/resources/templates/books_en.properties
     translation: /src/main/resources/templates/books_%two_letters_code%.properties
--   source: /src/main/resources/templates/chapters_en.properties
+  - source: /src/main/resources/templates/chapters_en.properties
     translation: /src/main/resources/templates/chapters_%two_letters_code%.properties
--   source: /src/main/resources/templates/landing_en.properties
+  - source: /src/main/resources/templates/landing_en.properties
     translation: /src/main/resources/templates/landing_%two_letters_code%.properties
--   source: /src/main/resources/templates/languages_en.properties
+  - source: /src/main/resources/templates/languages_en.properties
     translation: /src/main/resources/templates/languages_%two_letters_code%.properties
--   source: /src/main/resources/templates/products_en.properties
+  - source: /src/main/resources/templates/products_en.properties
     translation: /src/main/resources/templates/products_%two_letters_code%.properties
--   source: /src/main/resources/templates/fragments/navbar_en.properties
-    translation: /src/main/resources/templates/fragments/navbar_%two_letters_code%.properties
+  - source: /src/main/resources/templates/fragments/navbar_en.properties
+    translation: >-
+      /src/main/resources/templates/fragments/navbar_%two_letters_code%.properties
