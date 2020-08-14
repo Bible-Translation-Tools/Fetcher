@@ -135,9 +135,10 @@ private fun productsView(
 
     if (!validator.isLanguageCodeValid(params.languageCode)) {
         return errorPage(
-            "Invalid route parameters",
-            "Invalid Language.",
-            HttpStatusCode.NotFound
+            "invalid_route_parameter",
+            "invalid_route_parameter_message",
+            HttpStatusCode.NotFound,
+            contentLanguage
         )
     }
 
@@ -169,9 +170,10 @@ private fun booksView(
         !validator.isProductSlugValid(params.productSlug)
     ) {
         return errorPage(
-            "Invalid route parameters",
-            "Invalid Language and/or Product.",
-            HttpStatusCode.NotFound
+            "invalid_route_parameter",
+            "invalid_route_parameter_message",
+            HttpStatusCode.NotFound,
+            contentLanguage
         )
     }
 
@@ -210,9 +212,10 @@ private fun chaptersView(
         !validator.isBookSlugValid(params.languageCode, params.bookSlug)
     ) {
         return errorPage(
-            "Invalid route parameters",
-            "Invalid Language, Product, and/or Book.",
-            HttpStatusCode.NotFound
+            "invalid_route_parameter",
+            "invalid_route_parameter_message",
+            HttpStatusCode.NotFound,
+            contentLanguage
         )
     }
 
@@ -233,28 +236,22 @@ private fun chaptersView(
         ).getViewDataList()
     } catch (ex: ClientRequestException) {
         return errorPage(
-            "Internal Server Error",
-            "An error occurred on the network. Please refresh and try again.",
-            HttpStatusCode.InternalServerError
+            "internal_error",
+            "internal_error_message",
+            HttpStatusCode.InternalServerError,
+            contentLanguage
         )
     }
 
-    return when {
-        chapterViewDataList == null -> {
-            errorPage(
-                "Chapter Data Not Found",
-                "Error loading data about the chapters.",
-                HttpStatusCode.NotFound
-            )
-        }
-        bookViewData == null -> {
-            errorPage(
-                "Book Data Not Found",
-                "Error loading data about the book.",
-                HttpStatusCode.NotFound
-            )
-        }
-        else -> ThymeleafContent(
+    return if (chapterViewDataList == null || bookViewData == null) {
+        errorPage(
+            "not_found",
+            "not_found_message",
+            HttpStatusCode.NotFound,
+            contentLanguage
+        )
+    } else {
+        ThymeleafContent(
             template = "chapters",
             model = mapOf(
                 "book" to bookViewData,
@@ -298,13 +295,19 @@ private fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templ
     return Locale.getDefault()
 }
 
-private fun errorPage(title: String, message: String, errorCode: HttpStatusCode): ThymeleafContent {
+private fun errorPage(
+    titleKey: String,
+    messageKey: String,
+    errorCode: HttpStatusCode,
+    contentLanguage: List<Locale.LanguageRange>
+): ThymeleafContent {
     return ThymeleafContent(
         template = "error",
         model = mapOf(
-            "errorTitle" to title,
-            "errorMessage" to message,
+            "errorTitleKey" to titleKey,
+            "errorMessageKey" to messageKey,
             "errorCode" to errorCode.value
-        )
+        ),
+        locale = getPreferredLocale(contentLanguage, "chapters")
     )
 }

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" dir="ltr" th:dir="#{dir}">
 <head>
     <meta charset="UTF-8">
-    <title>Error</title>
+    <title th:text="#{error}">Error</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" >
     <link rel="icon" href="/static/img/fetcher_logo.png">
     <link rel="stylesheet" href="/static/common.css">
@@ -15,8 +15,8 @@
 
 
 <div class="l-error-container">
-    <h2 th:text="${errorTitle}" class="error-title">Could not find page</h2>
-    <p th:text="${errorMessage}" class="error-message"> This page does not exist</p>
+    <h2 th:text="#{${errorTitleKey}}" class="error-title">Page Error</h2>
+    <p th:text="#{${errorMessageKey}}" class="error-message"> An error has occurred.</p>
     <div class="c-center">
         <img alt="error_gif" class="error-image"
              th:src="${errorCode == 404}? '/static/img/error_404.gif' : '/static/img/error_500.gif' "
