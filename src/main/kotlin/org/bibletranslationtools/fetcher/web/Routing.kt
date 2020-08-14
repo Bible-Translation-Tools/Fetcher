@@ -150,7 +150,7 @@ private fun productsView(
             "productList" to model.getListViewData(path),
             "languagesNavTitle" to languageName,
             "languagesNavUrl" to "/$GL_ROUTE",
-            "toolsNavUrl" to "#"
+            "fileTypesNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "products")
     )
@@ -189,8 +189,8 @@ private fun booksView(
             "bookList" to bookViewData,
             "languagesNavTitle" to languageName,
             "languagesNavUrl" to "/$GL_ROUTE",
-            "toolsNavTitle" to productTitle,
-            "toolsNavUrl" to "/$GL_ROUTE/${params.languageCode}",
+            "fileTypesNavTitle" to productTitle,
+            "fileTypesNavUrl" to "/$GL_ROUTE/${params.languageCode}",
             "booksNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "books")
@@ -261,8 +261,8 @@ private fun chaptersView(
                 "chapterList" to chapterViewDataList,
                 "languagesNavTitle" to languageName,
                 "languagesNavUrl" to "/$GL_ROUTE",
-                "toolsNavTitle" to productTitle,
-                "toolsNavUrl" to "/$GL_ROUTE/${params.languageCode}",
+                "fileTypesNavTitle" to productTitle,
+                "fileTypesNavUrl" to "/$GL_ROUTE/${params.languageCode}",
                 "booksNavTitle" to bookViewData.localizedName,
                 "booksNavUrl" to "/$GL_ROUTE/${params.languageCode}/${params.productSlug}"
             ),
