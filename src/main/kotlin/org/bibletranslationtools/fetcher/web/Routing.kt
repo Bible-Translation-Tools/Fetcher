@@ -243,24 +243,15 @@ private fun chaptersView(
         )
     }
 
-    return when {
-        chapterViewDataList == null -> {
-            errorPage(
-                "not_found",
-                "not_found_message",
-                HttpStatusCode.NotFound,
-                contentLanguage
-            )
-        }
-        bookViewData == null -> {
-            errorPage(
-                "not_found",
-                "not_found_message",
-                HttpStatusCode.NotFound,
-                contentLanguage
-            )
-        }
-        else -> ThymeleafContent(
+    return if (chapterViewDataList == null || bookViewData == null) {
+        errorPage(
+            "not_found",
+            "not_found_message",
+            HttpStatusCode.NotFound,
+            contentLanguage
+        )
+    } else {
+        ThymeleafContent(
             template = "chapters",
             model = mapOf(
                 "book" to bookViewData,
