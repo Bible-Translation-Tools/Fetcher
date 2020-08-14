@@ -2,8 +2,9 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" dir="ltr" th:dir="#{dir}">
 <head>
     <meta charset="UTF-8">
-    <title>Chapters</title>
+    <title th:text="#{chapters}">Chapters</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" >
+    <link rel="icon" href="/static/img/fetcher_logo.png">
     <link rel="stylesheet" href="/static/common.css">
     <link rel="stylesheet" href="/static/chapters.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -14,7 +15,7 @@
 <div th:insert="fragments/header :: header"></div>
 
 <div class="c-navbar">
-    <div th:insert="fragments/navbar :: navbar(${languagesNavUrl}, ${toolsNavUrl}, ${booksNavUrl})"></div>
+    <div th:insert="fragments/navbar :: navbar(${languagesNavUrl}, ${fileTypesNavUrl}, ${booksNavUrl})"></div>
 </div>
 
 <div th:insert="fragments/hero :: hero(#{page_title}, #{page_info})"></div>
