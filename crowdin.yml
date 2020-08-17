@@ -15,3 +15,5 @@ files:
   - source: /src/main/resources/templates/fragments/searchbar_en.properties
     translation: >-
       /src/main/resources/templates/fragments/searchbar_%two_letters_code%.properties
+  - source: src/main/resources/templates/error_en.properties
+    translation: src/main/resources/templates/error_%two_letters_code%.properties
