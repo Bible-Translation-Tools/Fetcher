@@ -96,40 +96,8 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         fileExtensionList: List<String>
     ): Boolean {
         // look for book files
-        for (ext in fileExtensionList) {
-            val bookPrefixDir = getPathPrefixDir(
-                languageCode = languageCode,
-                resourceId = resourceId,
-                bookSlug = bookSlug,
-                fileExtension = ext
-            )
-            val walkBookDir = bookPrefixDir.walk()
-            val hasBook = walkBookDir.any() {
-                it.parentFile.name == "book" && it.extension == ext
-            }
-            if (hasBook) return true
-        }
-
-        // look into chapters content
-        val sourceContentRootDir = directoryProvider.getContentRoot()
-        val bookDir = sourceContentRootDir.resolve("$languageCode/$resourceId/$bookSlug")
-        val chapterDirList = bookDir.listFiles(
-            FileFilter {
-                it.name.matches(Regex("[0-9]{1,3}")) && it.isDirectory
-            }
-        )
-        if (chapterDirList != null) {
-            for (chapterDir in chapterDirList) {
-                fileExtensionList.forEach { ext ->
-                    val walkChapterDir = bookDir.resolve("$chapterDir/CONTENTS/$ext").walk()
-                    val hasContent = walkChapterDir.any {
-                        it.parentFile.name == "chapter" && it.extension == ext
-                    }
-                    if (hasContent) return true
-                }
-            }
-        }
-        return false
+        return hasBookFile(languageCode, resourceId, bookSlug, fileExtensionList) ||
+                hasChapterFile(languageCode, resourceId, bookSlug, fileExtensionList)
     }
 
     private fun getPathPrefixDir(
@@ -175,5 +143,54 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
                 else -> grouping
             }
         )
+    }
+
+    private fun hasBookFile(
+        languageCode: String,
+        resourceId: String,
+        bookSlug: String,
+        fileExtensionList: List<String>
+    ): Boolean {
+        for (ext in fileExtensionList) {
+            val bookPrefixDir = getPathPrefixDir(
+                languageCode = languageCode,
+                resourceId = resourceId,
+                bookSlug = bookSlug,
+                fileExtension = ext
+            )
+            val walkBookDir = bookPrefixDir.walk()
+            val hasBook = walkBookDir.any() {
+                it.parentFile.name == "book" && it.extension == ext
+            }
+            if (hasBook) return true
+        }
+        return false
+    }
+
+    private fun hasChapterFile(
+        languageCode: String,
+        resourceId: String,
+        bookSlug: String,
+        fileExtensionList: List<String>
+    ): Boolean {
+        val sourceContentRootDir = directoryProvider.getContentRoot()
+        val bookDir = sourceContentRootDir.resolve("$languageCode/$resourceId/$bookSlug")
+        val chapterDirList = bookDir.listFiles(
+            FileFilter {
+                it.name.matches(Regex("[0-9]{1,3}")) && it.isDirectory
+            }
+        )
+        if (chapterDirList != null) {
+            for (chapterDir in chapterDirList) {
+                fileExtensionList.forEach { ext ->
+                    val walkChapterDir = bookDir.resolve("$chapterDir/CONTENTS/$ext").walk()
+                    val hasContent = walkChapterDir.any {
+                        it.parentFile.name == "chapter" && it.extension == ext
+                    }
+                    if (hasContent) return true
+                }
+            }
+        }
+        return false
     }
 }
