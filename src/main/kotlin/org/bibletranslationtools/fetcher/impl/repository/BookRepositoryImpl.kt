@@ -12,7 +12,7 @@ class BookRepositoryImpl(
 ) : BookRepository {
     private val englishLanguageCode = "en"
 
-    override fun getBooks(languageCode: String, resourceId: String): List<Book> {
+    override fun getBooks(resourceId: String, languageCode: String): List<Book> {
         val books = bookCatalog.getAll()
         // set localized name here
 
@@ -20,7 +20,7 @@ class BookRepositoryImpl(
     }
 
     override fun getBooks(language: Language, resourceId: String): List<Book> {
-        return getBooks(language.code, resourceId)
+        return getBooks(resourceId, language.code)
     }
 
     override fun getBook(slug: String, languageCode: String): Book? {
