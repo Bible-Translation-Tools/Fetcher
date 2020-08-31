@@ -1,13 +1,13 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import java.io.File
+import java.io.FileFilter
 import org.bibletranslationtools.fetcher.data.CompressedExtensions
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.slf4j.LoggerFactory
-import java.io.FileFilter
 
 class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : StorageAccess {
     private val logger = LoggerFactory.getLogger(javaClass)
