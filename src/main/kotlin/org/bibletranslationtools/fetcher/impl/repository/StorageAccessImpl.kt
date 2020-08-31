@@ -191,7 +191,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
             for (chapterDir in chapterDirList) {
                 fileExtensionList.forEach { ext ->
                     val walkChapterDir = bookDir.resolve("$chapterDir/CONTENTS/$ext").walk()
-                    val hasContent =  if (ContainerExtensions.isSupported(ext)) { // for container files like "tr"
+                    val hasContent = if (ContainerExtensions.isSupported(ext)) { // for container files like "tr"
                         walkChapterDir.any {
                             it.parentFile.name == "verse" && it.extension == ext
                         }
