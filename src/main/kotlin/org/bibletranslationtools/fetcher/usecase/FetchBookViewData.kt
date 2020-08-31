@@ -15,7 +15,7 @@ class FetchBookViewData(
     private val productSlug: String
 ) {
     private val resourceId = "ulb"
-    private val books: List<Book> = bookRepo.getBooks(languageCode = languageCode, resourceId = resourceId)
+    private val books: List<Book> = bookRepo.getBooks(resourceId = resourceId, languageCode = languageCode)
 
     private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
 
@@ -37,7 +37,8 @@ class FetchBookViewData(
 
         books.forEach { book ->
             book.availability = storage.hasBookContent(
-                languageCode, resourceId = resourceId,
+                languageCode,
+                resourceId = resourceId,
                 bookSlug = book.slug,
                 fileExtensionList = fileExtensionList
             )
@@ -56,7 +57,7 @@ class FetchBookViewData(
 
     fun getViewData(bookSlug: String): BookViewData? {
         val product = ProductFileExtension.getType(productSlug) ?: return null
-        val book = bookRepo.getBook(bookSlug, languageCode)
+        val book = bookRepo.getBook(bookSlug)
         var url: String? = null
 
         for (priority in priorityList) {
