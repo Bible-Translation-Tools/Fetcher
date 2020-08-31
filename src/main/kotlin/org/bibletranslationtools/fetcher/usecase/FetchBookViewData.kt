@@ -1,5 +1,6 @@
 package org.bibletranslationtools.fetcher.usecase
 
+import org.bibletranslationtools.fetcher.data.Book
 import java.io.File
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
@@ -11,7 +12,18 @@ class FetchBookViewData(
     private val storage: StorageAccess,
     private val languageCode: String
 ) {
-    private val books = bookRepo.getBooks(languageCode = languageCode, resourceId = "ulb")
+    private val resourceId = "ulb"
+    private val books: List<Book>
+
+    init {
+        books = bookRepo.getBooks(languageCode = languageCode, resourceId = resourceId)
+        books.forEach { book ->
+            book.availability = storage.hasBookContent(languageCode, resourceId = resourceId,
+                bookSlug = book.slug,
+                mediaExtensionList = listOf("mp3", "wav")
+            )
+        }
+    }
 
     private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
 
@@ -66,7 +78,7 @@ class FetchBookViewData(
     ): FileAccessRequest {
         return FileAccessRequest(
             languageCode = languageCode,
-            resourceId = "ulb",
+            resourceId = resourceId,
             fileExtension = "tr",
             bookSlug = bookSlug,
             mediaExtension = priorityItem.fileExtension,
@@ -80,7 +92,7 @@ class FetchBookViewData(
     ): FileAccessRequest {
         return FileAccessRequest(
             languageCode = languageCode,
-            resourceId = "ulb",
+            resourceId = resourceId,
             fileExtension = priorityItem.fileExtension,
             bookSlug = bookSlug,
             mediaQuality = priorityItem.mediaQuality

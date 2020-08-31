@@ -4,6 +4,7 @@ import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.BookCatalog
 import org.bibletranslationtools.fetcher.repository.BookRepository
+import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 
 class BookRepositoryImpl(
@@ -14,12 +15,7 @@ class BookRepositoryImpl(
 
     override fun getBooks(languageCode: String, resourceId: String): List<Book> {
         val books = bookCatalog.getAll()
-        val availableBookCodes = storageAccess.getBookSlugs(languageCode, resourceId)
-
-        books.forEach {
-            it.availability = it.slug in availableBookCodes
-            // set localized name here
-        }
+        // set localized name here
 
         return books
     }

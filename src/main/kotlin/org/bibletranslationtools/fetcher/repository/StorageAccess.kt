@@ -8,4 +8,10 @@ interface StorageAccess {
     fun getBookSlugs(languageCode: String, resourceId: String): List<String>
     fun getBookFile(request: FileAccessRequest): File?
     fun getChapterFile(request: FileAccessRequest): File?
+    fun hasBookContent(
+        languageCode: String,
+        resourceId: String,
+        bookSlug: String,
+        mediaExtensionList: List<String>
+    ): Boolean
 }
