@@ -31,7 +31,11 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
             fileExtension = request.fileExtension
         )
 
-        val grouping = "book"
+        val grouping = if (ContainerExtensions.isSupported(request.fileExtension)) {
+            "verse"
+        } else {
+            "book"
+        }
         val bookContentDir = getContentDir(
             prefixDir = bookPrefixDir,
             fileExtension = request.fileExtension,
@@ -61,7 +65,11 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
             chapter = request.chapter
         )
 
-        val grouping = "chapter"
+        val grouping = if (ContainerExtensions.isSupported(request.fileExtension)) {
+            "verse"
+        } else {
+            "chapter"
+        }
         val chapterContentDir = getContentDir(
             prefixDir = chapterPrefixDir,
             fileExtension = request.fileExtension,
@@ -152,8 +160,14 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
                 fileExtension = ext
             )
             val walkBookDir = bookPrefixDir.walk()
-            val hasBook = walkBookDir.any() {
-                it.parentFile.name == "book" && it.extension == ext
+            val hasBook = if (ContainerExtensions.isSupported(ext)) { // for container files like "tr"
+                walkBookDir.any() {
+                    it.parentFile.name == "verse" && it.extension == ext
+                }
+            } else {
+                walkBookDir.any() {
+                    it.parentFile.name == "book" && it.extension == ext
+                }
             }
             if (hasBook) return true
         }
@@ -177,8 +191,14 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
             for (chapterDir in chapterDirList) {
                 fileExtensionList.forEach { ext ->
                     val walkChapterDir = bookDir.resolve("$chapterDir/CONTENTS/$ext").walk()
-                    val hasContent = walkChapterDir.any {
-                        it.parentFile.name == "chapter" && it.extension == ext
+                    val hasContent =  if (ContainerExtensions.isSupported(ext)) { // for container files like "tr"
+                        walkChapterDir.any {
+                            it.parentFile.name == "verse" && it.extension == ext
+                        }
+                    } else {
+                        walkChapterDir.any {
+                            it.parentFile.name == "chapter" && it.extension == ext
+                        }
                     }
                     if (hasContent) return true
                 }
