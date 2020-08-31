@@ -88,6 +88,20 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         }
     }
 
+    override fun hasBookContent(
+        languageCode: String,
+        resourceId: String,
+        bookSlug: String,
+        mediaExtensionList: List<String>
+    ): Boolean {
+        val bookDirectoryName = "$languageCode/$resourceId/$bookSlug"
+        val walkBookDirectory = File(bookDirectoryName).walk()
+        return walkBookDirectory.any() {
+            (it.parentFile.name == "book" || it.parentFile.name == "chapter")
+                    && it.extension in mediaExtensionList
+        }
+    }
+
     private fun getPathPrefixDir(
         languageCode: String,
         resourceId: String,
