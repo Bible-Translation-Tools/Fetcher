@@ -24,7 +24,7 @@ class RoutingValidator(private val resolver: DependencyResolver) {
         return when {
             bookSlug.isNullOrEmpty() -> false
             languageCode.isNullOrEmpty() -> false
-            resolver.bookRepository.getBook(bookSlug, languageCode) == null -> false
+            resolver.bookRepository.getBook(bookSlug) == null -> false
             else -> true
         }
     }

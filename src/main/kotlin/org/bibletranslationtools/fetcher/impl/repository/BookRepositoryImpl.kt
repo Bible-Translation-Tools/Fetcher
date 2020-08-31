@@ -14,12 +14,7 @@ class BookRepositoryImpl(
 
     override fun getBooks(languageCode: String, resourceId: String): List<Book> {
         val books = bookCatalog.getAll()
-        val availableBookCodes = storageAccess.getBookSlugs(languageCode, resourceId)
-
-        books.forEach {
-            it.availability = it.slug in availableBookCodes
-            // set localized name here
-        }
+        // set localized name here
 
         return books
     }

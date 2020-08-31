@@ -1,5 +1,5 @@
 body,html {
-    background:linear-gradient(0deg, #111A31 0%, #111A31CC 36%, #111A3100 100%), url('/static/img/landing_image@2x.png') rgba(1, 90, 217, 0.5);
+    background:linear-gradient(0deg, #111A31 0%, #111A31CC 36%, #111A3100 100%), url('/static/img/landing_image.jpg') rgba(1, 90, 217, 0.5);
     background-size: cover;
     background-repeat: no-repeat;
     background-blend-mode: overlay;
