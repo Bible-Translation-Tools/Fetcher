@@ -7,6 +7,7 @@ import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.slf4j.LoggerFactory
+import java.io.FileFilter
 
 class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : StorageAccess {
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -92,14 +93,43 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         languageCode: String,
         resourceId: String,
         bookSlug: String,
-        mediaExtensionList: List<String>
+        fileExtensionList: List<String>
     ): Boolean {
-        val bookDirectoryName = "$languageCode/$resourceId/$bookSlug"
-        val walkBookDirectory = File(bookDirectoryName).walk()
-        return walkBookDirectory.any() {
-            (it.parentFile.name == "book" || it.parentFile.name == "chapter")
-                    && it.extension in mediaExtensionList
+        // look for book files
+        for (ext in fileExtensionList) {
+            val bookPrefixDir = getPathPrefixDir(
+                languageCode = languageCode,
+                resourceId = resourceId,
+                bookSlug = bookSlug,
+                fileExtension = ext
+            )
+            val walkBookDir = bookPrefixDir.walk()
+            val hasBook = walkBookDir.any() {
+                it.parentFile.name == "book" && it.extension == ext
+            }
+            if (hasBook) return true
         }
+
+        // look into chapters content
+        val sourceContentRootDir = directoryProvider.getContentRoot()
+        val bookDir = sourceContentRootDir.resolve("$languageCode/$resourceId/$bookSlug")
+        val chapterDirList = bookDir.listFiles(
+            FileFilter {
+                it.name.matches(Regex("[0-9]{1,3}")) && it.isDirectory
+            }
+        )
+        if (chapterDirList != null) {
+            for (chapterDir in chapterDirList) {
+                fileExtensionList.forEach { ext ->
+                    val walkChapterDir = bookDir.resolve("$chapterDir/CONTENTS/$ext").walk()
+                    val hasContent = walkChapterDir.any {
+                        it.parentFile.name == "chapter" && it.extension == ext
+                    }
+                    if (hasContent) return true
+                }
+            }
+        }
+        return false
     }
 
     private fun getPathPrefixDir(
