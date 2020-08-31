@@ -29,7 +29,7 @@ class FetchBookViewData(
         val fileExtensionFromProduct = ProductFileExtension.getType(productSlug)!!.fileType
 
         // expected file extensions to seek for
-        val mediaExtensionList = if (ContainerExtensions.isSupported(fileExtensionFromProduct)) {
+        val fileExtensionList = if (ContainerExtensions.isSupported(fileExtensionFromProduct)) {
             listOf("tr")
         } else {
             listOf("wav", "mp3")
@@ -39,7 +39,7 @@ class FetchBookViewData(
             book.availability = storage.hasBookContent(
                 languageCode, resourceId = resourceId,
                 bookSlug = book.slug,
-                mediaExtensionList = mediaExtensionList
+                fileExtensionList = fileExtensionList
             )
         }
 
