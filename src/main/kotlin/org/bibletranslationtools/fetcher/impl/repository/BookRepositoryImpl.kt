@@ -19,7 +19,7 @@ class BookRepositoryImpl(
         return books
     }
 
-    override fun getBooks(language: Language, resourceId: String): List<Book> {
+    override fun getBooks(resourceId: String, language: Language): List<Book> {
         return getBooks(resourceId, language.code)
     }
 
