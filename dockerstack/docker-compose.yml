@@ -12,6 +12,8 @@ services:
       - "8080:8080"
     env_file:
       - vars.env
+    environment:
+     - CDN_BASE_URL=${CDN_BASE_URL}
     volumes:
       - fetcher-content:/content
   ftp:
