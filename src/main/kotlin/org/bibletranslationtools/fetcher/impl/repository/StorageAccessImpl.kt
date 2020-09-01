@@ -4,6 +4,7 @@ import java.io.File
 import java.io.FileFilter
 import org.bibletranslationtools.fetcher.data.CompressedExtensions
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
+import org.bibletranslationtools.fetcher.data.Division
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
@@ -31,7 +32,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
             fileExtension = request.fileExtension
         )
 
-        val grouping = "book"
+        val grouping = getGrouping(request.fileExtension, Division.BOOK)
         val bookContentDir = getContentDir(
             prefixDir = bookPrefixDir,
             fileExtension = request.fileExtension,
@@ -61,7 +62,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
             chapter = request.chapter
         )
 
-        val grouping = "chapter"
+        val grouping = getGrouping(request.fileExtension, Division.CHAPTER)
         val chapterContentDir = getContentDir(
             prefixDir = chapterPrefixDir,
             fileExtension = request.fileExtension,
@@ -88,7 +89,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         bookSlug: String,
         fileExtensionList: List<String>
     ): Boolean {
-        // look for book files
+        // look for book files first, then chapters
         return hasBookFile(languageCode, resourceId, bookSlug, fileExtensionList) ||
                 hasChapterFile(languageCode, resourceId, bookSlug, fileExtensionList)
     }
@@ -152,10 +153,12 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
                 fileExtension = ext
             )
             val walkBookDir = bookPrefixDir.walk()
-            val hasBook = walkBookDir.any() {
-                it.parentFile.name == "book" && it.extension == ext
+            val grouping = getGrouping(ext, Division.BOOK)
+
+            val hasContent = walkBookDir.any() {
+                it.parentFile.name == grouping && it.extension == ext
             }
-            if (hasBook) return true
+            if (hasContent) return true
         }
         return false
     }
@@ -173,17 +176,27 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
                 it.name.matches(Regex("[0-9]{1,3}")) && it.isDirectory
             }
         )
-        if (chapterDirList != null) {
+
+        if (chapterDirList != null && chapterDirList.any()) {
             for (chapterDir in chapterDirList) {
                 fileExtensionList.forEach { ext ->
-                    val walkChapterDir = bookDir.resolve("$chapterDir/CONTENTS/$ext").walk()
+                    val walkChapterDir = bookDir.resolve("${chapterDir.name}/CONTENTS/$ext").walk()
+                    val grouping = getGrouping(ext, Division.CHAPTER)
+
                     val hasContent = walkChapterDir.any {
-                        it.parentFile.name == "chapter" && it.extension == ext
+                        it.parentFile.name == grouping && it.extension == ext
                     }
                     if (hasContent) return true
                 }
             }
         }
         return false
+    }
+
+    private fun getGrouping(ext: String, division: Division): String {
+        return when {
+            ext == "tr" -> "verse"
+            else -> division.name.toLowerCase()
+        }
     }
 }

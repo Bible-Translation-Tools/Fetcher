@@ -210,7 +210,7 @@ private fun chaptersView(
     if (
         !validator.isLanguageCodeValid(params.languageCode) ||
         !validator.isProductSlugValid(params.productSlug) ||
-        !validator.isBookSlugValid(params.languageCode, params.bookSlug)
+        !validator.isBookSlugValid(params.bookSlug)
     ) {
         return errorPage(
             "invalid_route_parameter",
