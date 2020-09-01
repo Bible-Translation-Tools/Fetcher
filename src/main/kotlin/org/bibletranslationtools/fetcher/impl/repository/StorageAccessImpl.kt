@@ -31,11 +31,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
             fileExtension = request.fileExtension
         )
 
-        val grouping = if (ContainerExtensions.isSupported(request.fileExtension)) {
-            "verse"
-        } else {
-            "book"
-        }
+        val grouping = getGrouping(request.fileExtension, isBook = true)
         val bookContentDir = getContentDir(
             prefixDir = bookPrefixDir,
             fileExtension = request.fileExtension,
@@ -65,11 +61,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
             chapter = request.chapter
         )
 
-        val grouping = if (ContainerExtensions.isSupported(request.fileExtension)) {
-            "verse"
-        } else {
-            "chapter"
-        }
+        val grouping = getGrouping(request.fileExtension, isChapter = true)
         val chapterContentDir = getContentDir(
             prefixDir = chapterPrefixDir,
             fileExtension = request.fileExtension,
@@ -96,7 +88,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         bookSlug: String,
         fileExtensionList: List<String>
     ): Boolean {
-        // look for book files
+        // look for book files first, then chapters
         return hasBookFile(languageCode, resourceId, bookSlug, fileExtensionList) ||
                 hasChapterFile(languageCode, resourceId, bookSlug, fileExtensionList)
     }
@@ -160,16 +152,12 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
                 fileExtension = ext
             )
             val walkBookDir = bookPrefixDir.walk()
-            val hasBook = if (ContainerExtensions.isSupported(ext)) { // for container files like "tr"
-                walkBookDir.any() {
-                    it.parentFile.name == "verse" && it.extension == ext
-                }
-            } else {
-                walkBookDir.any() {
-                    it.parentFile.name == "book" && it.extension == ext
-                }
+            val grouping = getGrouping(ext, isBook = true)
+
+            val hasContent = walkBookDir.any() {
+                it.parentFile.name == grouping && it.extension == ext
             }
-            if (hasBook) return true
+            if (hasContent) return true
         }
         return false
     }
@@ -187,23 +175,29 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
                 it.name.matches(Regex("[0-9]{1,3}")) && it.isDirectory
             }
         )
-        if (chapterDirList != null) {
+
+        if (chapterDirList != null && chapterDirList.any()) {
             for (chapterDir in chapterDirList) {
                 fileExtensionList.forEach { ext ->
-                    val walkChapterDir = bookDir.resolve("$chapterDir/CONTENTS/$ext").walk()
-                    val hasContent = if (ContainerExtensions.isSupported(ext)) { // for container files like "tr"
-                        walkChapterDir.any {
-                            it.parentFile.name == "verse" && it.extension == ext
-                        }
-                    } else {
-                        walkChapterDir.any {
-                            it.parentFile.name == "chapter" && it.extension == ext
-                        }
+                    val walkChapterDir = bookDir.resolve("${chapterDir.name}/CONTENTS/$ext").walk()
+                    val grouping = getGrouping(ext, isChapter = true)
+
+                    val hasContent = walkChapterDir.any {
+                        it.parentFile.name == grouping && it.extension == ext
                     }
                     if (hasContent) return true
                 }
             }
         }
         return false
+    }
+
+    private fun getGrouping(ext: String, isChapter: Boolean = false, isBook: Boolean = false): String {
+        return when {
+            ext == "tr" -> "verse"
+            isChapter -> "chapter"
+            isBook -> "book"
+            else -> ""
+        }
     }
 }
