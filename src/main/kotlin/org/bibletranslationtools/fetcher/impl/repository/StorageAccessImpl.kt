@@ -156,7 +156,8 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
                 languageCode = languageCode,
                 resourceId = resourceId,
                 bookSlug = bookSlug,
-                fileExtension = ext
+                fileExtension = ext,
+                directoryProvider = directoryProvider
             )
             val walkBookDir = bookPrefixDir.walk()
             val grouping = getGrouping(ext, Division.BOOK)
