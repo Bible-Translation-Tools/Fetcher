@@ -83,41 +83,6 @@ class StorageAccessImplTest {
     }
 
     @Test
-    fun testGetBookCodes() {
-        val mockDirectoryProvider = mock(DirectoryProvider::class.java)
-        val mockFile = mock(File::class.java)
-        val testCases = retrieveGetBookCodesTestCases()
-        for (testCase in testCases) {
-            `when`(mockFile.listFiles(any(FileFilter::class.java)))
-                .thenReturn(testCase.mockDirs.toTypedArray())
-            `when`(mockDirectoryProvider.getProjectsDir(testCase.languageCode, "ulb"))
-                .thenReturn(mockFile)
-
-            val storageAccessImpl =
-                StorageAccessImpl(
-                    mockDirectoryProvider
-                )
-            assertEquals(
-                testCase.expectedResult,
-                storageAccessImpl.getBookSlugs(testCase.languageCode, "ulb").toSet()
-            )
-        }
-    }
-
-    private fun retrieveGetBookCodesTestCases(): List<GetBookCodesTestCase> {
-        val testCasesResource: URL? = javaClass.classLoader.getResource(
-            "StorageAccessImpl_GetBookCodes_TestCases.json"
-        )
-        if (testCasesResource == null) {
-            logger.error("Storage Access Implementation JSON test file not found.")
-            return listOf()
-        }
-
-        val testCasesFile = File(testCasesResource.file)
-        return jacksonObjectMapper().readValue(testCasesFile.readText())
-    }
-
-    @Test
     fun testGetPathPrefixDir() {
         val mockDirectoryProvider = mock(DirectoryProvider::class.java)
         val testCases = retrieveGetPathPrefixDirTestCases()

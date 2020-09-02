@@ -182,7 +182,8 @@ private fun booksView(
     val bookViewData = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,
-        params.languageCode
+        params.languageCode,
+        params.productSlug
     ).getViewDataList(path)
 
     return ThymeleafContent(
@@ -209,7 +210,7 @@ private fun chaptersView(
     if (
         !validator.isLanguageCodeValid(params.languageCode) ||
         !validator.isProductSlugValid(params.productSlug) ||
-        !validator.isBookSlugValid(params.languageCode, params.bookSlug)
+        !validator.isBookSlugValid(params.bookSlug)
     ) {
         return errorPage(
             "invalid_route_parameter",
@@ -224,8 +225,9 @@ private fun chaptersView(
     val bookViewData: BookViewData? = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,
-        params.languageCode
-    ).getViewData(params.bookSlug, params.productSlug)
+        params.languageCode,
+        params.productSlug
+    ).getViewData(params.bookSlug)
     val chapterViewDataList: List<ChapterViewData>? = try {
         FetchChapterViewData(
             chapterCatalog = resolver.chapterCatalog,
