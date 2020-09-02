@@ -71,7 +71,7 @@ class StorageAccessImplTest {
 
     private fun retrieveGetLanguageCodeTestCases(): List<GetLanguageCodesTestCase> {
         val testCasesResource: URL? = javaClass.classLoader.getResource(
-            "StorageAccessImpl_GetBookCodes_TestCases.json"
+            "StorageAccessImpl_GetLanguageCodes_TestCases.json"
         )
         if (testCasesResource == null) {
             logger.error("Storage Access Implementation JSON test file not found.")
