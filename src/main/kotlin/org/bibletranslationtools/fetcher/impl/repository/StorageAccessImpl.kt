@@ -145,51 +145,6 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
                 hasChapterFile(languageCode, resourceId, bookSlug, fileExtensionList)
     }
 
-    private fun getPathPrefixDir(
-        languageCode: String,
-        resourceId: String,
-        fileExtension: String,
-        bookSlug: String = "",
-        chapter: String = ""
-    ): File {
-        val trimmedChapter = chapter.trimStart('0')
-        val sourceContentRootDir = directoryProvider.getContentRoot()
-
-        return when {
-            bookSlug.isNotEmpty() && trimmedChapter.isNotEmpty() ->
-                sourceContentRootDir.resolve(
-                    "$languageCode/$resourceId/$bookSlug/$trimmedChapter/CONTENTS/$fileExtension"
-                )
-            bookSlug.isNotEmpty() -> sourceContentRootDir.resolve(
-                "$languageCode/$resourceId/$bookSlug/CONTENTS/$fileExtension"
-            )
-            else -> sourceContentRootDir.resolve(
-                "$languageCode/$resourceId/CONTENTS/$fileExtension"
-            )
-        }
-    }
-
-    private fun getContentDir(
-        prefixDir: File,
-        fileExtension: String,
-        mediaExtension: String,
-        mediaQuality: String,
-        grouping: String
-    ): File {
-        val isContainer = ContainerExtensions.isSupported(fileExtension)
-        val isContainerAndCompressed = isContainer && CompressedExtensions.isSupported(mediaExtension)
-        val isFileAndCompressed = !isContainer && CompressedExtensions.isSupported(fileExtension)
-
-        return prefixDir.resolve(
-            when {
-                isContainerAndCompressed -> "$mediaExtension/$mediaQuality/$grouping"
-                isContainer -> "$mediaExtension/$grouping"
-                isFileAndCompressed -> "$mediaQuality/$grouping"
-                else -> grouping
-            }
-        )
-    }
-
     private fun hasBookFile(
         languageCode: String,
         resourceId: String,
