@@ -21,12 +21,6 @@ class StorageAccessImplTest {
         val expectedResult: Set<String>
     )
 
-    data class GetBookCodesTestCase(
-        val languageCode: String,
-        val mockDirs: List<File>,
-        val expectedResult: Set<String>
-    )
-
     data class GetPathPrefixDirTestCase(
         val languageCode: String,
         val resourceId: String,
