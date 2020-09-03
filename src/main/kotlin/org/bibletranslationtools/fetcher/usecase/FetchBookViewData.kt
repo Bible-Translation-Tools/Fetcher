@@ -1,6 +1,8 @@
 package org.bibletranslationtools.fetcher.usecase
 
 import java.io.File
+import org.bibletranslationtools.fetcher.data.Book
+import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
@@ -9,9 +11,11 @@ import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 class FetchBookViewData(
     private val bookRepo: BookRepository,
     private val storage: StorageAccess,
-    private val languageCode: String
+    private val languageCode: String,
+    private val productSlug: String
 ) {
-    private val books = bookRepo.getBooks(languageCode = languageCode, resourceId = "ulb")
+    private val resourceId = "ulb"
+    private val books: List<Book> = bookRepo.getBooks(resourceId = resourceId, languageCode = languageCode)
 
     private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
 
@@ -21,19 +25,39 @@ class FetchBookViewData(
         PriorityItem("wav", "")
     )
 
-    fun getViewDataList(currentPath: String): List<BookViewData> = books.map {
-        BookViewData(
-            index = it.index,
-            slug = it.slug,
-            anglicizedName = it.anglicizedName,
-            localizedName = it.localizedName,
-            url = if (it.availability) "$currentPath/${it.slug}" else null
-        )
+    fun getViewDataList(currentPath: String): List<BookViewData> {
+        val fileExtensionFromProduct = ProductFileExtension.getType(productSlug)!!.fileType
+
+        // expected file extensions to seek for
+        val fileExtensionList = if (ContainerExtensions.isSupported(fileExtensionFromProduct)) {
+            listOf("tr")
+        } else {
+            listOf("wav", "mp3")
+        }
+
+        books.forEach { book ->
+            book.availability = storage.hasBookContent(
+                languageCode,
+                resourceId = resourceId,
+                bookSlug = book.slug,
+                fileExtensionList = fileExtensionList
+            )
+        }
+
+        return books.map {
+            BookViewData(
+                index = it.index,
+                slug = it.slug,
+                anglicizedName = it.anglicizedName,
+                localizedName = it.localizedName,
+                url = if (it.availability) "$currentPath/${it.slug}" else null
+            )
+        }
     }
 
-    fun getViewData(bookSlug: String, productSlug: String): BookViewData? {
+    fun getViewData(bookSlug: String): BookViewData? {
         val product = ProductFileExtension.getType(productSlug) ?: return null
-        val book = bookRepo.getBook(bookSlug, languageCode)
+        val book = bookRepo.getBook(bookSlug)
         var url: String? = null
 
         for (priority in priorityList) {
@@ -66,7 +90,7 @@ class FetchBookViewData(
     ): FileAccessRequest {
         return FileAccessRequest(
             languageCode = languageCode,
-            resourceId = "ulb",
+            resourceId = resourceId,
             fileExtension = "tr",
             bookSlug = bookSlug,
             mediaExtension = priorityItem.fileExtension,
@@ -80,7 +104,7 @@ class FetchBookViewData(
     ): FileAccessRequest {
         return FileAccessRequest(
             languageCode = languageCode,
-            resourceId = "ulb",
+            resourceId = resourceId,
             fileExtension = priorityItem.fileExtension,
             bookSlug = bookSlug,
             mediaQuality = priorityItem.mediaQuality

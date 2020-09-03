@@ -12,6 +12,8 @@ services:
       - "8080:8080"
     env_file:
       - vars.env
+    environment:
+     - CDN_BASE_URL=${CDN_BASE_URL}
     volumes:
       - fetcher-content:/content
   ftp:
@@ -25,7 +27,7 @@ services:
     environment:
       FTP_USER: ${fetcher_ftp_user}
       FTP_PASS: ${fetcher_ftp_pass}
-      PASV_ADDRESS: '127.0.0.1'
+      PASV_ADDRESS: ${fetcher_ftp_ip}
 
 volumes:
   fetcher-content:

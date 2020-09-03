@@ -51,28 +51,6 @@ class StorageAccessImplTest {
         }
     }
 
-    @Test
-    fun testGetBookCodes() {
-        val mockDirectoryProvider = mock(DirectoryProvider::class.java)
-        val mockFile = mock(File::class.java)
-        val testCases = retrieveGetBookCodesTestCases()
-        for (testCase in testCases) {
-            `when`(mockFile.listFiles(any(FileFilter::class.java)))
-                .thenReturn(testCase.mockDirs.toTypedArray())
-            `when`(mockDirectoryProvider.getProjectsDir(testCase.languageCode, "ulb"))
-                .thenReturn(mockFile)
-
-            val storageAccessImpl =
-                StorageAccessImpl(
-                    mockDirectoryProvider
-                )
-            assertEquals(
-                testCase.expectedResult,
-                storageAccessImpl.getBookSlugs(testCase.languageCode, "ulb").toSet()
-            )
-        }
-    }
-
     private fun retrieveGetLanguageCodeTestCases(): List<GetLanguageCodesTestCase> {
         val testCasesResource: URL? = javaClass.classLoader.getResource(
             "StorageAccessImpl_GetLanguageCodes_TestCases.json"
