@@ -1,0 +1,34 @@
+[
+  {
+    "prefixDir": "/mock",
+    "fileExtension": "wav",
+    "mediaExtension": "",
+    "mediaQuality": "",
+    "grouping": "chapter",
+    "expectedResult": "/mock/chapter"
+  },
+  {
+    "prefixDir": "/mock",
+    "fileExtension": "mp3",
+    "mediaExtension": "",
+    "mediaQuality": "hi",
+    "grouping": "book",
+    "expectedResult": "/mock/hi/book"
+  },
+  {
+    "prefixDir": "/mock",
+    "fileExtension": "tr",
+    "mediaExtension": "mp3",
+    "mediaQuality": "low",
+    "grouping": "verse",
+    "expectedResult": "/mock/mp3/low/verse"
+  },
+  {
+    "prefixDir": "/mock",
+    "fileExtension": "tr",
+    "mediaExtension": "wav",
+    "mediaQuality": "",
+    "grouping": "chunk",
+    "expectedResult": "/mock/wav/chunk"
+  }
+]
