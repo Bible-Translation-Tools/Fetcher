@@ -155,6 +155,7 @@ span {
     outline: none;
     width: 100%;
     height: 32px;
+    margin: auto 5px;
 }
 .l-list-container {
     /* height: 340px; */
