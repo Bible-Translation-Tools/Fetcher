@@ -5,7 +5,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-const val TOTAL_LANGUAGES = 44
+const val TOTAL_LANGUAGES = 38
 
 class PortGatewayLanguageCatalogTest {
 

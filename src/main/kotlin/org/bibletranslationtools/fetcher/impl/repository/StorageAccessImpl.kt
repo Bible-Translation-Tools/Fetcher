@@ -11,6 +11,55 @@ import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.slf4j.LoggerFactory
 
 class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : StorageAccess {
+
+    companion object {
+        fun getPathPrefixDir(
+            languageCode: String,
+            resourceId: String,
+            fileExtension: String,
+            directoryProvider: DirectoryProvider,
+            bookSlug: String = "",
+            chapter: String = ""
+        ): File {
+            val trimmedChapter = chapter.trimStart('0')
+            val sourceContentRootDir = directoryProvider.getContentRoot()
+
+            return when {
+                bookSlug.isNotEmpty() && trimmedChapter.isNotEmpty() ->
+                    sourceContentRootDir.resolve(
+                        "$languageCode/$resourceId/$bookSlug/$trimmedChapter/CONTENTS/$fileExtension"
+                    )
+                bookSlug.isNotEmpty() -> sourceContentRootDir.resolve(
+                    "$languageCode/$resourceId/$bookSlug/CONTENTS/$fileExtension"
+                )
+                else -> sourceContentRootDir.resolve(
+                    "$languageCode/$resourceId/CONTENTS/$fileExtension"
+                )
+            }
+        }
+
+        fun getContentDir(
+            prefixDir: File,
+            fileExtension: String,
+            mediaExtension: String,
+            mediaQuality: String,
+            grouping: String
+        ): File {
+            val isContainer = ContainerExtensions.isSupported(fileExtension)
+            val isContainerAndCompressed = isContainer && CompressedExtensions.isSupported(mediaExtension)
+            val isFileAndCompressed = !isContainer && CompressedExtensions.isSupported(fileExtension)
+
+            return prefixDir.resolve(
+                when {
+                    isContainerAndCompressed -> "$mediaExtension/$mediaQuality/$grouping"
+                    isContainer -> "$mediaExtension/$grouping"
+                    isFileAndCompressed -> "$mediaQuality/$grouping"
+                    else -> grouping
+                }
+            )
+        }
+    }
+
     private val logger = LoggerFactory.getLogger(javaClass)
 
     override fun getContentRoot(): File {
@@ -29,7 +78,8 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
             languageCode = request.languageCode,
             resourceId = request.resourceId,
             bookSlug = request.bookSlug,
-            fileExtension = request.fileExtension
+            fileExtension = request.fileExtension,
+            directoryProvider = directoryProvider
         )
 
         val grouping = getGrouping(request.fileExtension, Division.BOOK)
@@ -59,7 +109,8 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
             resourceId = request.resourceId,
             bookSlug = request.bookSlug,
             fileExtension = request.fileExtension,
-            chapter = request.chapter
+            chapter = request.chapter,
+            directoryProvider = directoryProvider
         )
 
         val grouping = getGrouping(request.fileExtension, Division.CHAPTER)
@@ -94,51 +145,6 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
                 hasChapterFile(languageCode, resourceId, bookSlug, fileExtensionList)
     }
 
-    private fun getPathPrefixDir(
-        languageCode: String,
-        resourceId: String,
-        fileExtension: String,
-        bookSlug: String = "",
-        chapter: String = ""
-    ): File {
-        val trimmedChapter = chapter.trimStart('0')
-        val sourceContentRootDir = directoryProvider.getContentRoot()
-
-        return when {
-            bookSlug.isNotEmpty() && trimmedChapter.isNotEmpty() ->
-                sourceContentRootDir.resolve(
-                    "$languageCode/$resourceId/$bookSlug/$trimmedChapter/CONTENTS/$fileExtension"
-                )
-            bookSlug.isNotEmpty() -> sourceContentRootDir.resolve(
-                "$languageCode/$resourceId/$bookSlug/CONTENTS/$fileExtension"
-            )
-            else -> sourceContentRootDir.resolve(
-                "$languageCode/$resourceId/CONTENTS/$fileExtension"
-            )
-        }
-    }
-
-    private fun getContentDir(
-        prefixDir: File,
-        fileExtension: String,
-        mediaExtension: String,
-        mediaQuality: String,
-        grouping: String
-    ): File {
-        val isContainer = ContainerExtensions.isSupported(fileExtension)
-        val isContainerAndCompressed = isContainer && CompressedExtensions.isSupported(mediaExtension)
-        val isFileAndCompressed = !isContainer && CompressedExtensions.isSupported(fileExtension)
-
-        return prefixDir.resolve(
-            when {
-                isContainerAndCompressed -> "$mediaExtension/$mediaQuality/$grouping"
-                isContainer -> "$mediaExtension/$grouping"
-                isFileAndCompressed -> "$mediaQuality/$grouping"
-                else -> grouping
-            }
-        )
-    }
-
     private fun hasBookFile(
         languageCode: String,
         resourceId: String,
@@ -150,7 +156,8 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
                 languageCode = languageCode,
                 resourceId = resourceId,
                 bookSlug = bookSlug,
-                fileExtension = ext
+                fileExtension = ext,
+                directoryProvider = directoryProvider
             )
             val walkBookDir = bookPrefixDir.walk()
             val grouping = getGrouping(ext, Division.BOOK)
