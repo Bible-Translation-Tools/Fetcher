@@ -1,0 +1,47 @@
+[
+  {
+    "languageCode": "en",
+    "resourceId": "ulb",
+    "bookSlug": "gen",
+    "fileExtensionList": ["mp3","wav"],
+    "tempFileDir": "en/ulb/gen/CONTENTS/wav/book/",
+    "tempFileName": "en_ulb_gen_mock.wav",
+    "expectedResult": true
+  },
+  {
+    "languageCode": "vi",
+    "resourceId": "ulb",
+    "bookSlug": "exo",
+    "fileExtensionList": ["tr"],
+    "tempFileDir": "vi/ulb/exo/CONTENTS/tr/wav/verse/",
+    "tempFileName": "vi_ulb_exo_mock.tr",
+    "expectedResult": true
+  },
+  {
+    "languageCode": "en",
+    "resourceId": "ulb",
+    "bookSlug": "exo",
+    "fileExtensionList": ["mp3"],
+    "tempFileDir": "en/ulb/exo/1/CONTENTS/mp3/hi/chapter/",
+    "tempFileName": "en_ulb_exo_c01_mock.mp3",
+    "expectedResult": true
+  },
+  {
+    "languageCode": "en",
+    "resourceId": "ulb",
+    "bookSlug": "exo",
+    "fileExtensionList": ["mp3"],
+    "tempFileDir": "en/ulb/exo/CONTENTS/mp3/hi/verse/",
+    "tempFileName": "en_ulb_exo_mock.mp3",
+    "expectedResult": false
+  },
+  {
+    "languageCode": "en",
+    "resourceId": "ulb",
+    "bookSlug": "exo",
+    "fileExtensionList": ["mp3"],
+    "tempFileDir": "en/ulb/exo/3/CONTENTS/mp3/hi/chapter/",
+    "tempFileName": "",
+    "expectedResult": false
+  }
+]

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" dir="ltr" th:dir="#{dir}">
+<head>
+    <title th:text="#{landing}">Landing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8" >
+    <link rel="icon" href="/static/img/fetcher_logo.png">
+    <link rel="stylesheet" type="text/css" href="/static/common.css">
+    <link rel="stylesheet" type="text/css" href="/static/landing.css">
+    <link href = "https://fonts.googleapis.com/icon?family=Material+Icons" rel = "stylesheet">
+</head>
+
+<body>
+
+<div th:insert="fragments/header :: header"></div>
+
+<div class="mainSection">
+
+    <div class="infoSection">
+        <h1 class="infoSection__heading" th:text="#{headline}">Listen to the Bible Offline.</h1>
+        <p class="infoSection__text" th:text="#{info}"> Download source audio so that you can listen to it whenever you want without an internet connection.</p>
+
+        <a class="infoSection__button" href="/gl" th:href="${glRoute}">
+            <em class="material-icons">note_add </em>
+            <span th:text="#{get_started}">Get Started</span>
+        </a>
+    </div>
+
+</div>
+</body>
+</html>

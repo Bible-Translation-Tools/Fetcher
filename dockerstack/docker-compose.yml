@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+  fileserver:
+    build: ./fileserver
+    ports:
+      - "8081:80"
+    volumes:
+      - fetcher-content:/srv/files
+  fetcher-app:
+  # for local development, tag your image with "local" e.g. `docker build -t bibletranslationtools/fetcher:local .`
+    image: bibletranslationtools/fetcher:${FETCHER_IMAGE_TAG}
+    ports:
+      - "8080:8080"
+    env_file:
+      - vars.env
+    environment:
+     - CDN_BASE_URL=${CDN_BASE_URL}
+    volumes:
+      - fetcher-content:/content
+  ftp:
+    image: bogem/ftp
+    volumes:
+      - fetcher-content:/home/vsftpd
+    ports:
+      - "20:20"
+      - "21:21"
+      - "47400-47470:47400-47470"
+    environment:
+      FTP_USER: ${fetcher_ftp_user}
+      FTP_PASS: ${fetcher_ftp_pass}
+      PASV_ADDRESS: ${fetcher_ftp_ip}
+
+volumes:
+  fetcher-content:

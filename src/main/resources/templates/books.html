@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" dir="ltr" th:dir="#{dir}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{books}">Books</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" >
+    <link rel="icon" href="/static/img/fetcher_logo.png">
+    <link rel="stylesheet" href="/static/common.css">
+    <link rel="stylesheet" href="/static/language.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style id="cssFilter">/*css filter placeholder*/</style>
+</head>
+
+<body>
+
+<div th:insert="fragments/header :: header"></div>
+
+<div class="c-navbar">
+    <div th:insert="fragments/navbar :: navbar(${languagesNavUrl}, ${fileTypesNavUrl}, ${booksNavUrl})"></div>
+</div>
+
+<div th:insert="fragments/hero :: hero(#{page_title}, #{page_info})"></div>
+
+<div th:insert="fragments/searchbar :: searchbar"></div>
+
+<div class="l-list-container" >
+    <div th:each="book: ${bookList}">
+        <div th:insert="fragments/card :: card(${book.localizedName}, ${book.anglicizedName}, ${book.index}, ${book.slug}, ${book.url})"></div>
+    </div>
+</div>
+
+<div th:insert="fragments/filter :: filter"></div>
+
+</body>
+
+</html>
