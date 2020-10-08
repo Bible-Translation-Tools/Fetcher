@@ -7,7 +7,7 @@ services:
     volumes:
       - fetcher-content:/srv/files
   fetcher-app:
-    image: bibletranslationtools/fetcher
+    image: bibletranslationtools/fetcher:${FETCHER_IMAGE_TAG}
     ports:
       - "8080:8080"
     env_file:
