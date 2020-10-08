@@ -7,7 +7,8 @@ services:
     volumes:
       - fetcher-content:/srv/files
   fetcher-app:
-    image: bibletranslationtools/fetcher
+  # for local development, tag your image with "local" e.g. `docker build -t bibletranslationtools/fetcher:local .`
+    image: bibletranslationtools/fetcher:${FETCHER_IMAGE_TAG}
     ports:
       - "8080:8080"
     env_file:
