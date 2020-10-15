@@ -11,6 +11,7 @@ import io.ktor.http.content.static
 import io.ktor.routing.Routing
 import io.ktor.routing.routing
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
+import org.bibletranslationtools.fetcher.web.controllers.*
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 
 fun Application.appModule() {
@@ -40,8 +41,12 @@ fun Application.appModule() {
                     resources("img")
                 }
             }
-            // Application Route
-            root(resolver)
+            // Application Routes - Controllers
+            homeController(resolver)
+            languageController(resolver)
+            productController(resolver)
+            bookController(resolver)
+            chapterController(resolver)
         }
     }
 }
