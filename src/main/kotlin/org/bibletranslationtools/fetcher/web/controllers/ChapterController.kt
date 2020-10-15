@@ -1,39 +1,39 @@
 package org.bibletranslationtools.fetcher.web.controllers
 
 import dev.jbs.ktor.thymeleaf.ThymeleafContent
-import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.call
 import io.ktor.client.features.ClientRequestException
 import io.ktor.http.HttpStatusCode
-import io.ktor.request.acceptLanguage
-import io.ktor.request.uri
 import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
+import java.util.Locale
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
-import org.bibletranslationtools.fetcher.web.controllers.utils.*
-import java.util.Locale
+import org.bibletranslationtools.fetcher.web.controllers.utils.BOOK_PARAM_KEY
+import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
+import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
+import org.bibletranslationtools.fetcher.web.controllers.utils.PRODUCT_PARAM_KEY
+import org.bibletranslationtools.fetcher.web.controllers.utils.RoutingValidator
+import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
+import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
+import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
+import org.bibletranslationtools.fetcher.web.controllers.utils.getLanguageName
+import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
+import org.bibletranslationtools.fetcher.web.controllers.utils.getProductTitleKey
 
 fun Routing.chapterController(resolver: DependencyResolver) {
-    route("/$GL_ROUTE/{${ParamKeys.languageParamKey}}/{${ParamKeys.productParamKey}}/{${ParamKeys.bookParamKey}}") {
-        var contentLanguage = listOf<Locale.LanguageRange>()
-        // execute before any sub-routes
-        intercept(ApplicationCallPipeline.Call) {
-            if (!call.request.uri.startsWith("/static")) {
-                contentLanguage = Locale.LanguageRange.parse(call.request.acceptLanguage())
-            }
-        }
+    route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}/{$BOOK_PARAM_KEY}") {
         get {
             // chapters page
-            val params = Params(
-                lc = call.parameters[ParamKeys.languageParamKey],
-                ps = call.parameters[ParamKeys.productParamKey],
-                bs = call.parameters[ParamKeys.bookParamKey]
+            val params = UrlParameters(
+                lc = call.parameters[LANGUAGE_PARAM_KEY],
+                ps = call.parameters[PRODUCT_PARAM_KEY],
+                bs = call.parameters[BOOK_PARAM_KEY]
             )
             call.respond(
                 chaptersView(
@@ -47,7 +47,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
 }
 
 private fun chaptersView(
-    params: Params,
+    params: UrlParameters,
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
@@ -112,7 +112,7 @@ private fun chaptersView(
                 "booksNavTitle" to bookViewData.localizedName,
                 "booksNavUrl" to "/$GL_ROUTE/${params.languageCode}/${params.productSlug}"
             ),
-            locale = getPreferredLocale(contentLanguage,"chapters")
+            locale = getPreferredLocale(contentLanguage, "chapters")
         )
     }
 }
