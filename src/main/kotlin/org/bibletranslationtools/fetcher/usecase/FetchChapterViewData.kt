@@ -15,7 +15,7 @@ class FetchChapterViewData(
     productSlug: String,
     private val bookSlug: String
 ) {
-    private val product = ProductFileExtension.getType(productSlug)
+    private val product = ProductFileExtension.getType(productSlug)!!
 
     private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
 
@@ -35,8 +35,13 @@ class FetchChapterViewData(
     }
 
     fun getViewDataList(): List<ChapterViewData>? {
-        if (product == null) return null
+        return when (product) {
+            ProductFileExtension.BTTR, ProductFileExtension.MP3 -> chaptersFromDirectory()
+            else -> chaptersFromCatalog()
+        }
+    }
 
+    private fun chaptersFromDirectory(): List<ChapterViewData> {
         val chapterList = mutableListOf<ChapterViewData>()
 
         for (chapterNumber in 1..chapters.size) {
@@ -58,6 +63,13 @@ class FetchChapterViewData(
         }
 
         return chapterList
+    }
+
+    private fun chaptersFromCatalog(): List<ChapterViewData> {
+        val url = "languagecode/filetype/bookslug?chapter=%d"
+        return chapters.map {
+            ChapterViewData(it.number, url = String.format(url, it.number))
+        }
     }
 
     private fun getBTTRFileAccessRequest(chapterNumber: Int, priorityItem: PriorityItem): FileAccessRequest {
