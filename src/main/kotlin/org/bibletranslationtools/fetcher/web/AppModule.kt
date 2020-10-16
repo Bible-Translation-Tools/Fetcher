@@ -3,14 +3,25 @@ package org.bibletranslationtools.fetcher.web
 import dev.jbs.ktor.thymeleaf.Thymeleaf
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCallPipeline
+import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.CallLogging
 import io.ktor.features.DefaultHeaders
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
+import io.ktor.request.acceptLanguage
+import io.ktor.request.uri
 import io.ktor.routing.Routing
 import io.ktor.routing.routing
+import io.ktor.util.AttributeKey
+import java.util.Locale
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
+import org.bibletranslationtools.fetcher.web.controllers.bookController
+import org.bibletranslationtools.fetcher.web.controllers.chapterController
+import org.bibletranslationtools.fetcher.web.controllers.homeController
+import org.bibletranslationtools.fetcher.web.controllers.languageController
+import org.bibletranslationtools.fetcher.web.controllers.productController
+import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 
 fun Application.appModule() {
@@ -24,7 +35,11 @@ fun Application.appModule() {
     }
     install(CallLogging)
     intercept(ApplicationCallPipeline.Setup) {
-        // display error page here and terminate the pipeline if fatal exception occurs
+        if (!call.request.uri.startsWith("/static")) {
+            val contentLanguage = Locale.LanguageRange.parse(call.request.acceptLanguage())
+            val key = AttributeKey<List<Locale.LanguageRange>>("contentLanguage")
+            call.attributes.put(key, contentLanguage)
+        }
     }
     install(Routing) {
         val resolver = DependencyResolver
@@ -40,8 +55,17 @@ fun Application.appModule() {
                     resources("img")
                 }
             }
-            // Application Route
-            root(resolver)
+            intercept(ApplicationCallPipeline.Setup) {
+                if (!call.request.uri.startsWith("/static")) {
+                    contentLanguage = Locale.LanguageRange.parse(call.request.acceptLanguage())
+                }
+            }
+            // Application Routes - Controllers
+            homeController()
+            languageController(resolver)
+            productController(resolver)
+            bookController(resolver)
+            chapterController(resolver)
         }
     }
 }
