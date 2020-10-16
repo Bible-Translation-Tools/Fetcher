@@ -34,13 +34,6 @@ fun Application.appModule() {
         })
     }
     install(CallLogging)
-    intercept(ApplicationCallPipeline.Setup) {
-        if (!call.request.uri.startsWith("/static")) {
-            val contentLanguage = Locale.LanguageRange.parse(call.request.acceptLanguage())
-            val key = AttributeKey<List<Locale.LanguageRange>>("contentLanguage")
-            call.attributes.put(key, contentLanguage)
-        }
-    }
     install(Routing) {
         val resolver = DependencyResolver
         routing {
