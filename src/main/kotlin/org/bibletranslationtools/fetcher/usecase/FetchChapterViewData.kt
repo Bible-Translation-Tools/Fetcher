@@ -46,6 +46,7 @@ class FetchChapterViewData(
                 val fileAccessRequest = when (product) {
                     ProductFileExtension.BTTR -> getBTTRFileAccessRequest(chapterNumber, priority)
                     ProductFileExtension.MP3 -> getMp3FileAccessRequest(chapterNumber, priority)
+                    ProductFileExtension.ORATURE -> getOratureFileAccessRequest(chapterNumber, priority)
                 }
 
                 val chapterFile = storage.getChapterFile(fileAccessRequest)
@@ -60,7 +61,10 @@ class FetchChapterViewData(
         return chapterList
     }
 
-    private fun getBTTRFileAccessRequest(chapterNumber: Int, priorityItem: PriorityItem): FileAccessRequest {
+    private fun getBTTRFileAccessRequest(
+        chapterNumber: Int,
+        priorityItem: PriorityItem
+    ): FileAccessRequest {
         return FileAccessRequest(
             languageCode = languageCode,
             resourceId = "ulb",
@@ -72,7 +76,25 @@ class FetchChapterViewData(
         )
     }
 
-    private fun getMp3FileAccessRequest(chapterNumber: Int, priorityItem: PriorityItem): FileAccessRequest {
+    private fun getMp3FileAccessRequest(
+        chapterNumber: Int,
+        priorityItem: PriorityItem
+    ): FileAccessRequest {
+        return FileAccessRequest(
+            languageCode = languageCode,
+            resourceId = "ulb",
+            fileExtension = priorityItem.fileExtension,
+            bookSlug = bookSlug,
+            chapter = chapterNumber.toString(),
+            mediaQuality = priorityItem.mediaQuality
+        )
+    }
+
+    // TODO: this is just a copy of the above method for now
+    private fun getOratureFileAccessRequest(
+        chapterNumber: Int,
+        priorityItem: PriorityItem
+    ): FileAccessRequest {
         return FileAccessRequest(
             languageCode = languageCode,
             resourceId = "ulb",
