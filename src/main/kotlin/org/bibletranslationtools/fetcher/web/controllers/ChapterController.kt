@@ -35,13 +35,24 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                 ps = call.parameters[PRODUCT_PARAM_KEY],
                 bs = call.parameters[BOOK_PARAM_KEY]
             )
-            call.respond(
-                chaptersView(
-                    params,
-                    resolver,
-                    contentLanguage
+
+            val validator = RoutingValidator(resolver)
+            if (
+                !validator.isLanguageCodeValid(params.languageCode) ||
+                !validator.isProductSlugValid(params.productSlug) ||
+                !validator.isBookSlugValid(params.bookSlug)
+            ) {
+                call.respond(
+                    errorPage(
+                        "invalid_route_parameter",
+                        "invalid_route_parameter_message",
+                        HttpStatusCode.NotFound,
+                        contentLanguage
+                    )
                 )
-            )
+                return@get
+            }
+            call.respond(chaptersView(params, resolver, contentLanguage))
         }
     }
 }
@@ -51,20 +62,6 @@ private fun chaptersView(
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
-    val validator = RoutingValidator(resolver)
-
-    if (
-        !validator.isLanguageCodeValid(params.languageCode) ||
-        !validator.isProductSlugValid(params.productSlug) ||
-        !validator.isBookSlugValid(params.bookSlug)
-    ) {
-        return errorPage(
-            "invalid_route_parameter",
-            "invalid_route_parameter_message",
-            HttpStatusCode.NotFound,
-            contentLanguage
-        )
-    }
 
     val bookViewData: BookViewData? = FetchBookViewData(
         resolver.bookRepository,
