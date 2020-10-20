@@ -1,6 +1,8 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import org.bibletranslationtools.fetcher.data.Chapter
+import org.bibletranslationtools.fetcher.io.DownloadClient
+import org.bibletranslationtools.fetcher.io.IDownloadClient
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.ChapterRepository
 import java.io.File
@@ -14,7 +16,7 @@ class ChapterRepositoryImpl(
         return chapterCatalog.getAll(languageCode, bookSlug)
     }
 
-    override fun requestChapterRC(
+    override fun getChapterRC(
         rcFile: File,
         resourceId: String,
         languageCode: String,
@@ -22,15 +24,22 @@ class ChapterRepositoryImpl(
         chapterNumber: Int
     ): File {
         // get the rc from git repo
+        val rcFile = getTemplateResourceContainer(languageCode, resourceId, DownloadClient())
 
         // pass into the download library
-//        return RCMediaDownloader.download(rcFile, )
+
         return File("")
     }
 
-    private fun getTemplateResourceContainer(languageCode: String, resourceId: String): File {
+    private fun getTemplateResourceContainer(
+        languageCode: String,
+        resourceId: String,
+        downloadClient: IDownloadClient
+    ): File? {
         val url = String.format(rcRepoUrlTemplate, languageCode, resourceId)
         // download rc from repo
-        return File("")
+        val downloadLocation = File("E:/miscs/rc") // path/on/file/system
+
+        return downloadClient.downloadFile(url, downloadLocation)
     }
 }

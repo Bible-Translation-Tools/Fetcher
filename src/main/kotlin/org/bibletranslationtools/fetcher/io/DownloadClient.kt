@@ -13,8 +13,10 @@ import retrofit2.http.Url
 class DownloadClient : IDownloadClient {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    override fun downloadFromUrl(url: String, destFile: File): File? {
+    override fun downloadFile(url: String, outputDir: File): File? {
         val fileFromUrl = File(url)
+        val destFile = outputDir.resolve(fileFromUrl.name)
+
         val retrofitService = Retrofit.Builder()
             .baseUrl(fileFromUrl.parentFile.invariantSeparatorsPath + "/")
             .build()
@@ -22,7 +24,7 @@ class DownloadClient : IDownloadClient {
             RetrofitDownloadClient::class.java
         )
 
-        val call = client.downloadFile(fileFromUrl.name)
+        val call = client.downloadFromUrl(fileFromUrl.name)
         val response = call.execute()
 
         if (response.isSuccessful) {
@@ -51,5 +53,5 @@ class DownloadClient : IDownloadClient {
 
 private interface RetrofitDownloadClient { // implemented by retrofit service
     @GET
-    fun downloadFile(@Url url: String): Call<ResponseBody>
+    fun downloadFromUrl(@Url url: String): Call<ResponseBody>
 }
