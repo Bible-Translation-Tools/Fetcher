@@ -1,7 +1,7 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import org.bibletranslationtools.fetcher.data.Chapter
-import org.bibletranslationtools.fetcher.io.DownloadClient
+import org.bibletranslationtools.fetcher.io.RetrofitDownloadClient
 import org.bibletranslationtools.fetcher.io.IDownloadClient
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.ChapterRepository
@@ -17,18 +17,21 @@ class ChapterRepositoryImpl(
     }
 
     override fun getChapterRC(
-        rcFile: File,
-        resourceId: String,
         languageCode: String,
         bookSlug: String,
-        chapterNumber: Int
+        chapterNumber: Int,
+        resourceId: String
     ): File {
         // get the rc from git repo
-        val rcFile = getTemplateResourceContainer(languageCode, resourceId, DownloadClient())
+        val rcFile = getTemplateResourceContainer(
+            languageCode,
+            resourceId,
+            RetrofitDownloadClient()
+        )
 
         // pass into the download library
 
-        return File("")
+        return rcFile ?: File("")
     }
 
     private fun getTemplateResourceContainer(
