@@ -14,17 +14,8 @@ import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
-import org.bibletranslationtools.fetcher.web.controllers.utils.BOOK_PARAM_KEY
-import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
-import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
-import org.bibletranslationtools.fetcher.web.controllers.utils.PRODUCT_PARAM_KEY
-import org.bibletranslationtools.fetcher.web.controllers.utils.RoutingValidator
-import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
-import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
-import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
-import org.bibletranslationtools.fetcher.web.controllers.utils.getLanguageName
-import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
-import org.bibletranslationtools.fetcher.web.controllers.utils.getProductTitleKey
+import org.bibletranslationtools.fetcher.web.controllers.utils.*
+import java.lang.NumberFormatException
 
 fun Routing.chapterController(resolver: DependencyResolver) {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}/{$BOOK_PARAM_KEY}") {
@@ -53,6 +44,34 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                 return@get
             }
             call.respond(chaptersView(params, resolver, contentLanguage))
+        }
+        route("{$CHAPTER_PARAM_KEY}") {
+            get {
+                val params = UrlParameters(
+                    lc = call.parameters[LANGUAGE_PARAM_KEY],
+                    ps = call.parameters[PRODUCT_PARAM_KEY],
+                    bs = call.parameters[BOOK_PARAM_KEY],
+                    ch = call.parameters[CHAPTER_PARAM_KEY]
+                )
+                val validator = RoutingValidator(resolver)
+                if (
+                    !validator.isLanguageCodeValid(params.languageCode) ||
+//                    !validator.isProductSlugValid(params.productSlug) ||
+                    params.productSlug != "orature" ||
+                    !validator.isBookSlugValid(params.bookSlug)
+                ) {
+                    call.respond(
+                        errorPage(
+                            "invalid_route_parameter",
+                            "invalid_route_parameter_message",
+                            HttpStatusCode.NotFound,
+                            contentLanguage
+                        )
+                    )
+                    return@get
+                }
+                call.respond(requestRCLink(params, resolver))
+            }
         }
     }
 }
@@ -111,5 +130,27 @@ private fun chaptersView(
             ),
             locale = getPreferredLocale(contentLanguage, "chapters")
         )
+    }
+}
+
+private fun requestRCLink(
+    params: UrlParameters,
+    resolver: DependencyResolver
+): String {
+    if (params.chapter == "all") {
+        // all available chapter
+        return ""
+    } else {
+        return try {
+            val chapterNumber = params.chapter.toInt()
+            val downloadFileUrl = resolver.chapterRepository.getChapterRC(
+                languageCode = params.languageCode,
+                bookSlug = params.bookSlug,
+                chapterNumber = chapterNumber
+            )
+            downloadFileUrl.path
+        } catch (ex: NumberFormatException) {
+            ""
+        }
     }
 }
