@@ -8,6 +8,7 @@ import java.io.File
 class ChapterRepositoryImpl(
     private val chapterCatalog: ChapterCatalog
 ) : ChapterRepository {
+    private val rcRepoUrlTemplate = "https://content.bibletranslationtools.org/WA-Catalog/%s_%s/archive/master.zip"
 
     override fun getAll(languageCode: String, bookSlug: String): List<Chapter> {
         return chapterCatalog.getAll(languageCode, bookSlug)
@@ -22,8 +23,14 @@ class ChapterRepositoryImpl(
     ): File {
         // get the rc from git repo
 
-        // pass into the lib
+        // pass into the download library
 //        return RCMediaDownloader.download(rcFile, )
-        return File("");
+        return File("")
+    }
+
+    private fun getTemplateResourceContainer(languageCode: String, resourceId: String): File {
+        val url = String.format(rcRepoUrlTemplate, languageCode, resourceId)
+        // download rc from repo
+        return File("")
     }
 }

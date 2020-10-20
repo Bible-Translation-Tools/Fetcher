@@ -72,7 +72,7 @@ private fun chaptersView(
 
     val chapterViewDataList: List<ChapterViewData>? = try {
         FetchChapterViewData(
-            chapterCatalog = resolver.chapterCatalog,
+            chapterRepository = resolver.chapterRepository,
             storage = resolver.storageAccess,
             languageCode = params.languageCode,
             productSlug = params.productSlug,
