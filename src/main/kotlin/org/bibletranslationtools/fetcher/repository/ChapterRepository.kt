@@ -10,5 +10,5 @@ interface ChapterRepository {
         bookSlug: String,
         chapterNumber: Int,
         resourceId: String = "ulb"
-    ): File
+    ): File?
 }

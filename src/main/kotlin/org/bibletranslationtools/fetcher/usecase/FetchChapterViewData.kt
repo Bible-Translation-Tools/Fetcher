@@ -67,9 +67,8 @@ class FetchChapterViewData(
     }
 
     private fun chaptersFromCatalog(): List<ChapterViewData> {
-        val requestUrl = "languagecode/filetype/bookslug/%d"
+        val requestUrl = "./$bookSlug/%d"
         return chapters.map {
-            ChapterViewData(it.number, url = String.format(url, it.number))
             ChapterViewData(it.number, url = String.format(requestUrl, it.number))
         }
     }
