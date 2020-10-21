@@ -1,11 +1,15 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import org.bibletranslationtools.fetcher.data.Chapter
-import org.bibletranslationtools.fetcher.io.RetrofitDownloadClient
-import org.bibletranslationtools.fetcher.io.IDownloadClient
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.ChapterRepository
 import java.io.File
+import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
+import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
+import org.wycliffeassociates.rcmediadownloader.data.MediaType
+import org.wycliffeassociates.rcmediadownloader.data.MediaUrlParameter
+import org.wycliffeassociates.rcmediadownloader.io.DownloadClient
+import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
 class ChapterRepositoryImpl(
     private val chapterCatalog: ChapterCatalog
@@ -23,14 +27,26 @@ class ChapterRepositoryImpl(
         resourceId: String
     ): File {
         // get the rc from git repo
+        val downloadClient: IDownloadClient = DownloadClient()
         val rcFile = getTemplateResourceContainer(
             languageCode,
             resourceId,
-            RetrofitDownloadClient()
-        )
+            downloadClient
+        )!!
 
         // pass into the download library
-
+        val downloadParameters = MediaUrlParameter(
+            projectId = bookSlug,
+            mediaDivision = MediaDivision.CHAPTER,
+            mediaTypes = listOf(MediaType.WAV),
+            chapter = chapterNumber
+        )
+        val rc = RCMediaDownloader.download(
+            rcFile,
+            downloadParameters,
+            downloadClient
+        )
+        // verify the chapter is existing
         return rcFile ?: File("")
     }
 

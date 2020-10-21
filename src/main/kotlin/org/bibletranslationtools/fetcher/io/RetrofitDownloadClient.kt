@@ -10,7 +10,7 @@ import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Url
 
-class RetrofitDownloadClient : IDownloadClient {
+class RetrofitDownloadClient : DownloadClientInterface {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     override fun downloadFile(url: String, outputDir: File): File? {
