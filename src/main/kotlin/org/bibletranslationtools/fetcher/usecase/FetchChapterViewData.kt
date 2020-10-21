@@ -3,7 +3,6 @@ package org.bibletranslationtools.fetcher.usecase
 import io.ktor.client.features.ClientRequestException
 import java.io.File
 import org.bibletranslationtools.fetcher.data.Chapter
-import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.ChapterRepository
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
@@ -37,8 +36,8 @@ class FetchChapterViewData(
 
     fun getViewDataList(): List<ChapterViewData>? {
         return when (product) {
-            ProductFileExtension.BTTR, ProductFileExtension.MP3 -> chaptersFromDirectory()
-            else -> chaptersFromCatalog()
+            ProductFileExtension.MP3 -> chaptersFromDirectory()
+            ProductFileExtension.BTTR -> chaptersFromCatalog()
         }
     }
 

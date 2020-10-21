@@ -58,7 +58,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                 if (
                     !validator.isLanguageCodeValid(params.languageCode) ||
 //                    !validator.isProductSlugValid(params.productSlug) ||
-                    params.productSlug != "orature" ||
+                    params.productSlug != "bttr" ||
                     !validator.isBookSlugValid(params.bookSlug)
                 ) {
                     call.respond(
@@ -71,7 +71,12 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                     )
                     return@get
                 }
-                call.respondText(requestRCDownloadLink(params, resolver))
+                val downloadLink = requestRCDownloadLink(params, resolver) ?: "haha"
+                if (downloadLink == null) {
+                    call.respond(HttpStatusCode.NotFound)
+                } else {
+                    call.respond(downloadLink)
+                }
             }
         }
     }
@@ -117,6 +122,7 @@ private fun chaptersView(
     } else {
         val languageName = getLanguageName(params.languageCode, resolver)
         val productTitle = getProductTitleKey(params.productSlug, resolver)
+        val isRequestLink = params.productSlug == "bttr"
         ThymeleafContent(
             template = "chapters",
             model = mapOf(
@@ -127,7 +133,8 @@ private fun chaptersView(
                 "fileTypesNavTitle" to productTitle,
                 "fileTypesNavUrl" to "/$GL_ROUTE/${params.languageCode}",
                 "booksNavTitle" to bookViewData.localizedName,
-                "booksNavUrl" to "/$GL_ROUTE/${params.languageCode}/${params.productSlug}"
+                "booksNavUrl" to "/$GL_ROUTE/${params.languageCode}/${params.productSlug}",
+                "isRequestLink" to isRequestLink
             ),
             locale = getPreferredLocale(contentLanguage, "chapters")
         )
@@ -137,7 +144,7 @@ private fun chaptersView(
 private fun requestRCDownloadLink(
     params: UrlParameters,
     resolver: DependencyResolver
-): String {
+): String? {
     if (params.chapter == "all") {
         // all available chapter
         return ""
@@ -149,9 +156,9 @@ private fun requestRCDownloadLink(
                 bookSlug = params.bookSlug,
                 chapterNumber = chapterNumber
             )
-            downloadFileUrl.path
+            downloadFileUrl?.path
         } catch (ex: NumberFormatException) {
-            ""
+            null
         }
     }
 }
