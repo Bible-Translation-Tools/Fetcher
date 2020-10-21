@@ -13,7 +13,6 @@ import io.ktor.request.acceptLanguage
 import io.ktor.request.uri
 import io.ktor.routing.Routing
 import io.ktor.routing.routing
-import io.ktor.util.AttributeKey
 import java.util.Locale
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.web.controllers.bookController
