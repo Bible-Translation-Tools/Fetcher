@@ -1,9 +1,10 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
+import java.io.File
+import java.util.zip.ZipFile
 import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.ChapterRepository
-import java.io.File
 import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
 import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
@@ -11,7 +12,6 @@ import org.wycliffeassociates.rcmediadownloader.data.MediaUrlParameter
 import org.wycliffeassociates.rcmediadownloader.io.DownloadClient
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
-import java.util.zip.ZipFile
 
 class ChapterRepositoryImpl(
     private val chapterCatalog: ChapterCatalog
@@ -53,7 +53,6 @@ class ChapterRepositoryImpl(
         return if (verifyChapterExisting(rcWithMedia, bookSlug, MediaType.WAV, chapterNumber)) {
             rcFile
         } else null
-
     }
 
     private fun getTemplateResourceContainer(

@@ -5,18 +5,28 @@ import io.ktor.application.call
 import io.ktor.client.features.ClientRequestException
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
-import io.ktor.response.respondText
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
+import java.lang.NumberFormatException
 import java.util.Locale
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
-import org.bibletranslationtools.fetcher.web.controllers.utils.*
-import java.lang.NumberFormatException
+import org.bibletranslationtools.fetcher.web.controllers.utils.BOOK_PARAM_KEY
+import org.bibletranslationtools.fetcher.web.controllers.utils.CHAPTER_PARAM_KEY
+import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
+import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
+import org.bibletranslationtools.fetcher.web.controllers.utils.PRODUCT_PARAM_KEY
+import org.bibletranslationtools.fetcher.web.controllers.utils.RoutingValidator
+import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
+import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
+import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
+import org.bibletranslationtools.fetcher.web.controllers.utils.getLanguageName
+import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
+import org.bibletranslationtools.fetcher.web.controllers.utils.getProductTitleKey
 
 fun Routing.chapterController(resolver: DependencyResolver) {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}/{$BOOK_PARAM_KEY}") {
