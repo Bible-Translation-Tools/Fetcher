@@ -1,7 +1,3 @@
-.hidden {
-    display: none !important;
-}
-
 .chaptercard {
     display: flex;
     align-items: center;
@@ -86,6 +82,23 @@
 .chapter-download-card__button:hover {
     background: #c58b07;
 }
+.hidden {
+    display: none !important;
+}
+.requesting {
+    background-color: rgba(10, 51, 115, 0.1);
+    color: rgba(10, 51, 115, 0.6);
+}
+.download-ready {
+    color: white;
+    background-color: #015ad9;
+}
+.download-ready:hover {
+    background: rgb(56 66 140);
+}
+.download-ready p{
+    text-decoration: none;
+}
 /* --layout for tablets  */
 @media only  screen
 and (max-device-width: 1200px) {
@@ -100,6 +113,10 @@ and (max-device-width: 1200px) {
     .chapter-download-card {
         width: 608px;
         height: 152px;
+    }
+    .download-ready {
+        background-color: unset;
+        color: unset;
     }
 }
 /* --mobile layout for phones  */
