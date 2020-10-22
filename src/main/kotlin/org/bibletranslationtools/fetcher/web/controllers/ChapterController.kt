@@ -71,7 +71,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                     )
                     return@get
                 }
-                val downloadLink = requestRCDownloadLink(params, resolver) ?: "haha"
+                val downloadLink = requestRCDownloadLink(params, resolver)
                 if (downloadLink == null) {
                     call.respond(HttpStatusCode.NotFound)
                 } else {

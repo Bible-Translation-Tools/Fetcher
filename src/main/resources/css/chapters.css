@@ -89,6 +89,9 @@
     background-color: rgba(10, 51, 115, 0.1);
     color: rgba(10, 51, 115, 0.6);
 }
+.requesting p {
+    text-decoration: none;
+}
 .download-ready {
     color: white;
     background-color: #015ad9;
@@ -113,10 +116,6 @@ and (max-device-width: 1200px) {
     .chapter-download-card {
         width: 608px;
         height: 152px;
-    }
-    .download-ready {
-        background-color: unset;
-        color: unset;
     }
 }
 /* --mobile layout for phones  */
@@ -157,5 +156,9 @@ and (min-device-width: 320px) {
         }
     .chaptercard__download.unavailable .chaptercard__icon {
         color: #cfd1d6;
+    }
+    .download-ready {
+        background-color: unset !important;
+        color: unset !important;
     }
 }
