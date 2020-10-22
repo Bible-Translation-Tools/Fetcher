@@ -35,7 +35,7 @@ class FetchBookViewData(
             listOf("wav", "mp3")
         }
 
-        when(productType) {
+        when (productType) {
             ProductFileExtension.ORATURE -> books.forEach { it.availability = true }
             else -> {
                 books.forEach { book ->
