@@ -1,4 +1,4 @@
-package org.bibletranslationtools.fetcher.web
+package org.bibletranslationtools.fetcher.web.controllers.utils
 
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 
