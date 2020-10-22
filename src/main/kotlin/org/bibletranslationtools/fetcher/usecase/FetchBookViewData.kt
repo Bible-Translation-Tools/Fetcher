@@ -69,7 +69,7 @@ class FetchBookViewData(
             val fileAccessRequest = when (product) {
                 ProductFileExtension.BTTR -> getBTTRFileAccessRequest(bookSlug, priority)
                 ProductFileExtension.MP3 -> getMp3FileAccessRequest(bookSlug, priority)
-                ProductFileExtension.ORATURE -> getOratureFileAccessRequest(bookSlug, priority)
+                ProductFileExtension.ORATURE -> TODO("add orature backend support")
             }
 
             val bookFile = storage.getBookFile(fileAccessRequest)
@@ -105,20 +105,6 @@ class FetchBookViewData(
     }
 
     private fun getMp3FileAccessRequest(
-        bookSlug: String,
-        priorityItem: PriorityItem
-    ): FileAccessRequest {
-        return FileAccessRequest(
-            languageCode = languageCode,
-            resourceId = resourceId,
-            fileExtension = priorityItem.fileExtension,
-            bookSlug = bookSlug,
-            mediaQuality = priorityItem.mediaQuality
-        )
-    }
-
-    // TODO: this is just a copy of the above method for now
-    private fun getOratureFileAccessRequest(
         bookSlug: String,
         priorityItem: PriorityItem
     ): FileAccessRequest {

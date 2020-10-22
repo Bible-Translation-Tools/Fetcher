@@ -5,7 +5,7 @@ import java.lang.IllegalArgumentException
 enum class ProductFileExtension(val fileType: String) {
     MP3("mp3"),
     BTTR("tr"),
-    ORATURE("zip"); // TODO: I don't think this filetype is accurate...
+    ORATURE("zip");
 
     companion object {
         fun getType(productSlug: String): ProductFileExtension? {
