@@ -40,17 +40,17 @@ class ChapterRepositoryImpl(
         val downloadParameters = MediaUrlParameter(
             projectId = bookSlug,
             mediaDivision = MediaDivision.CHAPTER,
-            mediaTypes = listOf(MediaType.WAV),
+            mediaTypes = listOf(MediaType.WAV, MediaType.MP3),
             chapter = chapterNumber
         )
-        val downloadedRC = RCMediaDownloader.download(
+        val rcWithMedia = RCMediaDownloader.download(
             rcFile,
             downloadParameters,
             downloadClient,
             overwrite = true
         )
         // verify the chapter is existing
-        return if (verifyChapterExisting(downloadedRC, bookSlug, MediaType.WAV, chapterNumber)) {
+        return if (verifyChapterExisting(rcWithMedia, bookSlug, MediaType.WAV, chapterNumber)) {
             rcFile
         } else null
 
