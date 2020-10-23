@@ -13,7 +13,6 @@ import io.ktor.request.acceptLanguage
 import io.ktor.request.uri
 import io.ktor.routing.Routing
 import io.ktor.routing.routing
-import io.ktor.util.AttributeKey
 import java.util.Locale
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.web.controllers.bookController
@@ -34,13 +33,6 @@ fun Application.appModule() {
         })
     }
     install(CallLogging)
-    intercept(ApplicationCallPipeline.Setup) {
-        if (!call.request.uri.startsWith("/static")) {
-            val contentLanguage = Locale.LanguageRange.parse(call.request.acceptLanguage())
-            val key = AttributeKey<List<Locale.LanguageRange>>("contentLanguage")
-            call.attributes.put(key, contentLanguage)
-        }
-    }
     install(Routing) {
         val resolver = DependencyResolver
         routing {
