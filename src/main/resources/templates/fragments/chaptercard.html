@@ -7,6 +7,7 @@
     <a th:fragment="chaptercard(index, text, url)" class="chaptercard"
        th:attrappend="data-slug=${code}, data-angname=${anglicizedText}, data-localname=${localizedText}"
        th:classappend="${url == null}? 'unavailable'"
+       th:href="${url == null}? '#' : ${url}"
        th:target="${url == null || isRequestLink}? '' : '_blank'">
 
         <div class="chaptercard__title" th:classappend="${url == null}? 'unavailable'">
@@ -14,40 +15,17 @@
         </div>
 
         <div class="chaptercard__download" th:classappend="${url == null}? 'unavailable'">
-
             <div class="chaptercard__download-target" th:if="${isRequestLink}" th:classappend="${url == null}? 'unavailable'">
                 <em class="material-icons chaptercard__icon" th:classappend="${url == null}? 'unavailable'">get_app</em>
                 <img class="chaptercard__spinner hidden" height="24" width="24" src="/static/img/spinner_icon.gif" />
-                <section class="chaptercard__download-container">
-                    <p
-                            class="chaptercard__download-text"
-                            name="request-text"
-                            th:text="#{request}"
-                            th:data-request-url="${url}"
-                            th:onclick="requestContent(event, this)">
-                        Request
-                    </p>
-                    <p
-                            class="chaptercard__download-text hidden"
-                            name="requesting-text"
-                            th:text="#{requesting}"
-                            onclick="e => e.stopPropagation()">
-                        Requesting
-                    </p>
-                    <p
-                            class="chaptercard__download-text hidden"
-                            name="download-text"
-                            th:text="#{download}">
-                        Download
-                    </p>
-                </section>
+                <p class="chaptercard__download-text" name="request-text" th:text="#{request}">Request</p>
+                <p class="chaptercard__download-text hidden" name="requesting-text" th:text="#{requesting}">Requesting</p>
+                <p class="chaptercard__download-text hidden" name="download-text" th:text="#{download}">Download</p>
             </div>
-
             <div class="chaptercard__download-target" th:unless="${isRequestLink}" th:classappend="${url == null}? 'unavailable'">
                 <em class="material-icons chaptercard__icon" th:classappend="${url == null}? 'unavailable'">get_app</em>
                 <p class="chaptercard__download-text" th:text="#{download}">Download</p>
             </div>
-
         </div>
 
     </a>
