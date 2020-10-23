@@ -25,7 +25,7 @@ function requestLinkHandler(event) {
     card.href = "javascript:void(0)" // prevent multi click
     fetch(url).then(response => {
         if (!response.ok) {
-            throw new Error('Request returned error');
+            throw new Error('Requested content is not available');
         }
         return response.text()
     }).then(data => {

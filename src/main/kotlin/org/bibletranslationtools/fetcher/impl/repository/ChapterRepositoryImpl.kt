@@ -30,17 +30,24 @@ class ChapterRepositoryImpl(
     ): File? {
         // get the rc from git repo
         val downloadClient: IDownloadClient = DownloadClient()
-        val rcFile = getTemplateResourceContainer(
+        val templateRC = getTemplateResourceContainer(
             languageCode,
             resourceId,
             downloadClient
-        )!!
+        ) ?: return null
+
+        // make new copy of the original
+        val newFilePath = templateRC.parentFile.resolve(
+            "RC_chapter_$chapterNumber.${templateRC.extension}"
+        )
+        val rcFile = templateRC.copyTo(newFilePath, true)
 
         // pass into the download library
+        val mediaTypes = listOf(MediaType.WAV, MediaType.MP3)
         val downloadParameters = MediaUrlParameter(
             projectId = bookSlug,
             mediaDivision = MediaDivision.CHAPTER,
-            mediaTypes = listOf(MediaType.WAV, MediaType.MP3),
+            mediaTypes = mediaTypes,
             chapter = chapterNumber
         )
         val rcWithMedia = RCMediaDownloader.download(
@@ -50,8 +57,10 @@ class ChapterRepositoryImpl(
             overwrite = true
         )
         // verify the chapter is existing
-        return if (verifyChapterExisting(rcWithMedia, bookSlug, MediaType.WAV, chapterNumber)) {
-            rcFile
+        return if (
+            verifyChapterExisting(rcWithMedia, bookSlug, mediaTypes, chapterNumber)
+        ) {
+            rcWithMedia
         } else null
     }
 
@@ -70,27 +79,29 @@ class ChapterRepositoryImpl(
     private fun verifyChapterExisting(
         rcFile: File,
         bookSlug: String,
-        mediaType: MediaType,
+        mediaTypes: List<MediaType>,
         chapterNumber: Int
     ): Boolean {
-        var pathInRC: String? = null
+        var isExisting = false
         ResourceContainer.load(rcFile).use { rc ->
             val mediaProject = rc.media?.projects?.firstOrNull {
                 it.identifier == bookSlug
             }
-            val media = mediaProject?.media?.firstOrNull {
-                it.identifier == mediaType.name.toLowerCase()
-            }
-            pathInRC = media?.chapterUrl
-        }
-        if (pathInRC == null) return false
 
-        var isExisting = false
-        val pathInMediaManifest = pathInRC!!.replace("{chapter}", chapterNumber.toString())
-        ZipFile(rcFile).use { rcZip ->
-            val listEntries = rcZip.entries().toList()
-            isExisting = listEntries.any { entry ->
-                entry.name.contains(pathInMediaManifest)
+            for (mediaType in mediaTypes) {
+                val media = mediaProject?.media?.firstOrNull {
+                    it.identifier == mediaType.name.toLowerCase()
+                }
+                val pathInRC = media?.chapterUrl ?: continue
+                val pathInMediaManifest = pathInRC.replace("{chapter}", chapterNumber.toString())
+
+                ZipFile(rcFile).use { rcZip ->
+                    val listEntries = rcZip.entries().toList()
+                    isExisting = listEntries.any { entry ->
+                        entry.name.contains(pathInMediaManifest)
+                    }
+                }
+                if (isExisting) break
             }
         }
         return isExisting
