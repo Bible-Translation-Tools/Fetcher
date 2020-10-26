@@ -4,7 +4,6 @@ import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.BookCatalog
 import org.bibletranslationtools.fetcher.repository.BookRepository
-import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
 import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
@@ -105,7 +104,7 @@ class BookRepositoryImpl(
                 ZipFile(rcFile).use { rcZip ->
                     val listEntries = rcZip.entries().toList()
                     isExisting = listEntries.any { entry ->
-                        entry.name.matches(Regex(".*/$chapterPathRegex"))
+                        entry.name.matches(Regex(".*/$chapterPathRegex\$"))
                     }
                 }
                 if (isExisting) return true
