@@ -3,19 +3,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
         element.textContent = "send"
     })
 
-    let requestUrl = element.dataset.requestUrl;
-    let downloadStatesContainer = element.closest('.chaptercard__download-target');
-
-    downloadStatesContainer.querySelectorAll(
-        ".chaptercard__download-target p, .chaptercard__icon"
-    ).forEach(item => {
-        item.classList.add("hidden");
-    });
-    downloadStatesContainer.querySelectorAll(
-        ".chaptercard__spinner, p[name='requesting-text']"
-    ).forEach(item => {
-        item.classList.remove("hidden");
-    });
+    document.querySelectorAll(".chaptercard").forEach(card => {
+            card.addEventListener('click', requestLinkHandler)
+    })
+})
 
 function requestLinkHandler(event) {
     let card = this
