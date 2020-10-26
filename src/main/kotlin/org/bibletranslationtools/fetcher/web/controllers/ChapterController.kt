@@ -150,15 +150,20 @@ private fun requestRCDownloadLink(
     resolver: DependencyResolver
 ): String? {
     if (params.chapter == ALL_CHAPTERS_PARAM) {
-        // all available chapter
-        return ""
+        // all available chapters
+        return resolver.bookRepository.getBookRC(
+            slug = params.bookSlug,
+            languageCode = params.languageCode,
+            resourceId = "ulb"
+        )?.path
     } else {
         return try {
             val chapterNumber = params.chapter.toInt()
             val downloadFileUrl = resolver.chapterRepository.getChapterRC(
                 languageCode = params.languageCode,
                 bookSlug = params.bookSlug,
-                chapterNumber = chapterNumber
+                chapterNumber = chapterNumber,
+                resourceId = "ulb"
             )
             downloadFileUrl?.path
         } catch (ex: NumberFormatException) {

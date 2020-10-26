@@ -115,4 +115,15 @@ class FetchBookViewData(
         val relativeBookPath = bookFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
         return "//${System.getenv("CDN_BASE_URL")}/$relativeBookPath"
     }
+
+    private fun bookRequestLink(bookSlug: String): BookViewData {
+        val book = bookRepo.getBook(bookSlug)!!
+        return BookViewData(
+            book.index,
+            book.slug,
+            book.anglicizedName,
+            book.localizedName,
+            "./$bookSlug/all"
+        )
+    }
 }
