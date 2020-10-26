@@ -101,7 +101,7 @@ class ChapterRepositoryImpl(
                         entry.name.contains(pathInMediaManifest)
                     }
                 }
-                if (isExisting) break
+                if (isExisting) return true
             }
         }
         return isExisting
