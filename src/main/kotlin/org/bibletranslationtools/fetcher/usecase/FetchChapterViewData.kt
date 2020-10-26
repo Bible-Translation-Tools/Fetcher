@@ -37,7 +37,7 @@ class FetchChapterViewData(
     fun getViewDataList(): List<ChapterViewData>? {
         return when (product) {
             ProductFileExtension.BTTR, ProductFileExtension.MP3 -> chaptersFromDirectory()
-            else -> chaptersFromCatalog() // orature
+            else -> chaptersFromCatalog() // all chapters are available
         }
     }
 
@@ -51,7 +51,7 @@ class FetchChapterViewData(
                 val fileAccessRequest = when (product) {
                     ProductFileExtension.BTTR -> getBTTRFileAccessRequest(chapterNumber, priority)
                     ProductFileExtension.MP3 -> getMp3FileAccessRequest(chapterNumber, priority)
-                    ProductFileExtension.ORATURE -> TODO("add orature backend support")
+                    else -> return listOf()
                 }
 
                 val chapterFile = storage.getChapterFile(fileAccessRequest)

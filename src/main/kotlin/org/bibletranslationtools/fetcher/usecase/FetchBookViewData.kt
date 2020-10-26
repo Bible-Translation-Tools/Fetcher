@@ -1,12 +1,12 @@
 package org.bibletranslationtools.fetcher.usecase
 
-import java.io.File
 import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
+import org.bibletranslationtools.fetcher.web.controllers.utils.ALL_CHAPTERS_PARAM
 
 class FetchBookViewData(
     private val bookRepo: BookRepository,
@@ -63,21 +63,7 @@ class FetchBookViewData(
     fun getViewData(bookSlug: String): BookViewData? {
         val product = ProductFileExtension.getType(productSlug) ?: return null
         val book = bookRepo.getBook(bookSlug)
-        var url: String? = null
-
-        for (priority in priorityList) {
-            val fileAccessRequest = when (product) {
-                ProductFileExtension.BTTR -> getBTTRFileAccessRequest(bookSlug, priority)
-                ProductFileExtension.MP3 -> getMp3FileAccessRequest(bookSlug, priority)
-                ProductFileExtension.ORATURE -> TODO("add orature backend support")
-            }
-
-            val bookFile = storage.getBookFile(fileAccessRequest)
-            if (bookFile != null) {
-                url = getBookDownloadUrl(bookFile)
-                break
-            }
-        }
+        val url = getBookDownloadUrl(bookSlug, product)
 
         return if (book != null) BookViewData(
             index = book.index,
@@ -117,8 +103,20 @@ class FetchBookViewData(
         )
     }
 
-    private fun getBookDownloadUrl(bookFile: File): String {
-        val relativeBookPath = bookFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
-        return "//${System.getenv("CDN_BASE_URL")}/$relativeBookPath"
+    private fun getBookDownloadUrl(bookSlug: String, product: ProductFileExtension): String? {
+        for (priority in priorityList) {
+            val fileAccessRequest = when (product) {
+                ProductFileExtension.BTTR -> getBTTRFileAccessRequest(bookSlug, priority)
+                ProductFileExtension.MP3 -> getMp3FileAccessRequest(bookSlug, priority)
+                ProductFileExtension.ORATURE -> return "./$bookSlug/$ALL_CHAPTERS_PARAM"
+            }
+
+            val bookFile = storage.getBookFile(fileAccessRequest)
+            if (bookFile != null) {
+                val relativeBookPath = bookFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
+                return "//${System.getenv("CDN_BASE_URL")}/$relativeBookPath"
+            }
+        }
+        return null
     }
 }
