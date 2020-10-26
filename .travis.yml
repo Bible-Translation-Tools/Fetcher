@@ -28,7 +28,11 @@ script:
 - docker tag bibletranslationtools/fetcher:$TRAVIS_COMMIT bibletranslationtools/fetcher:$TRAVIS_BRANCH
 - docker tag bibletranslationtools/fetcher:$TRAVIS_COMMIT bibletranslationtools/fetcher:latest
 deploy:
-  provider: script
-  script: bash docker_push.sh
-  on:
-    branch: dev
+  - provider: script
+    script: bash docker_push.sh
+    on:
+      branch: dev
+  - provider: script
+    script: bash docker_push.sh
+    on:
+      branch: master

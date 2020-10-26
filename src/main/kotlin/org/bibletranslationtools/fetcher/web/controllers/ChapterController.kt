@@ -143,7 +143,7 @@ private fun chaptersView(
                 "fileTypesNavTitle" to productTitle,
                 "fileTypesNavUrl" to "/$GL_ROUTE/${params.languageCode}",
                 "booksNavTitle" to bookViewData.localizedName,
-                "booksNavUrl" to "/$GL_ROUTE/${params.languageCode}/${params.productSlug}",
+                "booksNavUrl" to GL_ROUTE/${params.languageCode}/${params.productSlug}",
                 "isRequestLink" to isRequestLink
             ),
             locale = getPreferredLocale(contentLanguage, "chapters")
