@@ -17,7 +17,7 @@
         <div class="chaptercard__download" th:classappend="${url == null}? 'unavailable'">
             <div class="chaptercard__download-target" th:if="${isRequestLink}" th:classappend="${url == null}? 'unavailable'">
                 <em class="material-icons chaptercard__icon" th:classappend="${url == null}? 'unavailable'">get_app</em>
-                <img class="chaptercard__spinner hidden" height="24" width="24" src="/static/img/spinner_icon.gif" />
+                <img class="chaptercard__spinner hidden" alt="Spinner Icon" height="24" width="24" src="/static/img/spinner_icon.gif" />
                 <p class="chaptercard__download-text" name="request-text" th:text="#{request}">Request</p>
                 <p class="chaptercard__download-text hidden" name="requesting-text" th:text="#{requesting}">Requesting</p>
                 <p class="chaptercard__download-text hidden" name="download-text" th:text="#{download}">Download</p>
