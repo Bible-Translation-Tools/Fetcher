@@ -132,7 +132,7 @@ private fun chaptersView(
     } else {
         val languageName = getLanguageName(params.languageCode, resolver)
         val productTitle = getProductTitleKey(params.productSlug, resolver)
-        val isRequestLink = params.productSlug == "bttr"
+        val isRequestLink = params.productSlug == "orature" // orature file type
         ThymeleafContent(
             template = "chapters",
             model = mapOf(
@@ -143,7 +143,7 @@ private fun chaptersView(
                 "fileTypesNavTitle" to productTitle,
                 "fileTypesNavUrl" to "/$GL_ROUTE/${params.languageCode}",
                 "booksNavTitle" to bookViewData.localizedName,
-                "booksNavUrl" to GL_ROUTE/${params.languageCode}/${params.productSlug}",
+                "booksNavUrl" to "/$GL_ROUTE/${params.languageCode}/${params.productSlug}",
                 "isRequestLink" to isRequestLink
             ),
             locale = getPreferredLocale(contentLanguage, "chapters")

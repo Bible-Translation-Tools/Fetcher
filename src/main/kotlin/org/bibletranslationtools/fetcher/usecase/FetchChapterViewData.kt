@@ -36,8 +36,8 @@ class FetchChapterViewData(
 
     fun getViewDataList(): List<ChapterViewData>? {
         return when (product) {
-            ProductFileExtension.MP3 -> chaptersFromDirectory()
-            ProductFileExtension.BTTR -> chaptersFromCatalog()
+            ProductFileExtension.BTTR, ProductFileExtension.MP3 -> chaptersFromDirectory()
+            else -> chaptersFromCatalog() // orature
         }
     }
 
