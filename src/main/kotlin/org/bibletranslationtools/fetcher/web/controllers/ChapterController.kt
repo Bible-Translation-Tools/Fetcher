@@ -38,12 +38,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                 bs = call.parameters[BOOK_PARAM_KEY]
             )
 
-            val validator = RoutingValidator(resolver)
-            if (
-                !validator.isLanguageCodeValid(params.languageCode) ||
-                !validator.isProductSlugValid(params.productSlug) ||
-                !validator.isBookSlugValid(params.bookSlug)
-            ) {
+            if (!validateParameters(params, resolver)) {
                 call.respond(
                     errorPage(
                         "invalid_route_parameter",
@@ -64,12 +59,10 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                     bs = call.parameters[BOOK_PARAM_KEY],
                     ch = call.parameters[CHAPTER_PARAM_KEY]
                 )
-                val validator = RoutingValidator(resolver)
+
                 if (
-                    !validator.isLanguageCodeValid(params.languageCode) ||
-//                    !validator.isProductSlugValid(params.productSlug) ||
-                    params.productSlug != "bttr" ||
-                    !validator.isBookSlugValid(params.bookSlug)
+                    !validateParameters(params, resolver) ||
+                    params.productSlug != "orature"
                 ) {
                     call.respond(
                         errorPage(
@@ -171,4 +164,15 @@ private fun requestRCDownloadLink(
             null
         }
     }
+}
+
+private fun validateParameters(
+    params: UrlParameters,
+    resolver: DependencyResolver
+): Boolean {
+    val validator = RoutingValidator(resolver)
+
+    return validator.isLanguageCodeValid(params.languageCode) &&
+            validator.isProductSlugValid(params.productSlug) &&
+            validator.isBookSlugValid(params.bookSlug)
 }
