@@ -71,7 +71,7 @@ class ChapterRepositoryImpl(
     ): File? {
         val url = String.format(rcRepoUrlTemplate, languageCode, resourceId)
         // download rc from repo
-        val downloadLocation = File("path/on/file/system")
+        val downloadLocation = File(System.getenv("RC_TEMP"))
 
         return downloadClient.downloadFromUrl(url, downloadLocation)
     }
