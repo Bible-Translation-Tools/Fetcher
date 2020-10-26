@@ -76,6 +76,25 @@ class FetchBookViewData(
         }
     }
 
+    private fun getBookDownloadUrl(bookSlug: String, product: ProductFileExtension): String? {
+        var url: String? = null
+        for (priority in priorityList) {
+            val fileAccessRequest = when (product) {
+                ProductFileExtension.BTTR -> getBTTRFileAccessRequest(bookSlug, priority)
+                ProductFileExtension.MP3 -> getMp3FileAccessRequest(bookSlug, priority)
+                ProductFileExtension.ORATURE -> return "./$bookSlug/$ALL_CHAPTERS_PARAM"
+            }
+
+            val bookFile = storage.getBookFile(fileAccessRequest)
+            if (bookFile != null) {
+                val relativeBookPath = bookFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
+                url = "//${System.getenv("CDN_BASE_URL")}/$relativeBookPath"
+                break
+            }
+        }
+        return url
+    }
+
     private fun getBTTRFileAccessRequest(
         bookSlug: String,
         priorityItem: PriorityItem
@@ -101,22 +120,5 @@ class FetchBookViewData(
             bookSlug = bookSlug,
             mediaQuality = priorityItem.mediaQuality
         )
-    }
-
-    private fun getBookDownloadUrl(bookSlug: String, product: ProductFileExtension): String? {
-        for (priority in priorityList) {
-            val fileAccessRequest = when (product) {
-                ProductFileExtension.BTTR -> getBTTRFileAccessRequest(bookSlug, priority)
-                ProductFileExtension.MP3 -> getMp3FileAccessRequest(bookSlug, priority)
-                ProductFileExtension.ORATURE -> return "./$bookSlug/$ALL_CHAPTERS_PARAM"
-            }
-
-            val bookFile = storage.getBookFile(fileAccessRequest)
-            if (bookFile != null) {
-                val relativeBookPath = bookFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
-                return "//${System.getenv("CDN_BASE_URL")}/$relativeBookPath"
-            }
-        }
-        return null
     }
 }
