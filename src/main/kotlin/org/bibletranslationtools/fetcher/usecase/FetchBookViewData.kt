@@ -1,5 +1,6 @@
 package org.bibletranslationtools.fetcher.usecase
 
+import java.io.File
 import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.repository.BookRepository
@@ -7,7 +8,6 @@ import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.ALL_CHAPTERS_PARAM
-import java.io.File
 
 class FetchBookViewData(
     private val bookRepo: BookRepository,
