@@ -64,8 +64,8 @@ class RCServiceImpl : ResourceContainerService {
     ): File? {
         val url = String.format(rcRepoUrlTemplate, languageCode, resourceId)
         // download rc from repo
-        val downloadLocation = File(System.getenv("RC_TEMP"))
-
+        val downloadLocation = File(System.getenv("RC_TEMP")).resolve(languageCode)
+        downloadLocation.mkdir()
         return downloadClient.downloadFromUrl(url, downloadLocation)
     }
 
