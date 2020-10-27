@@ -16,7 +16,8 @@ import org.wycliffeassociates.resourcecontainer.ResourceContainer
 class ChapterRepositoryImpl(
     private val chapterCatalog: ChapterCatalog
 ) : ChapterRepository {
-    private val rcRepoUrlTemplate = "https://content.bibletranslationtools.org/WA-Catalog/%s_%s/archive/master.zip"
+    private val rcRepoUrlTemplate = System.getenv("RC_Repository") ?:
+        "https://content.bibletranslationtools.org/WA-Catalog/%s_%s/archive/master.zip"
 
     override fun getAll(languageCode: String, bookSlug: String): List<Chapter> {
         return chapterCatalog.getAll(languageCode, bookSlug)

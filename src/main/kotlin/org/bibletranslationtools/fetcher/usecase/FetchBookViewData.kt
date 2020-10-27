@@ -1,12 +1,12 @@
 package org.bibletranslationtools.fetcher.usecase
 
-import java.io.File
 import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
+import org.bibletranslationtools.fetcher.web.controllers.utils.ALL_CHAPTERS_PARAM
 
 class FetchBookViewData(
     private val bookRepo: BookRepository,
@@ -26,22 +26,27 @@ class FetchBookViewData(
     )
 
     fun getViewDataList(currentPath: String): List<BookViewData> {
-        val fileExtensionFromProduct = ProductFileExtension.getType(productSlug)!!.fileType
+        val productType = ProductFileExtension.getType(productSlug)!!
 
         // expected file extensions to seek for
-        val fileExtensionList = if (ContainerExtensions.isSupported(fileExtensionFromProduct)) {
+        val fileExtensionList = if (ContainerExtensions.isSupported(productType.fileType)) {
             listOf("tr")
         } else {
             listOf("wav", "mp3")
         }
 
-        books.forEach { book ->
-            book.availability = storage.hasBookContent(
-                languageCode,
-                resourceId = resourceId,
-                bookSlug = book.slug,
-                fileExtensionList = fileExtensionList
-            )
+        when (productType) {
+            ProductFileExtension.ORATURE -> books.forEach { it.availability = true }
+            else -> {
+                books.forEach { book ->
+                    book.availability = storage.hasBookContent(
+                        languageCode,
+                        resourceId = resourceId,
+                        bookSlug = book.slug,
+                        fileExtensionList = fileExtensionList
+                    )
+                }
+            }
         }
 
         return books.map {
@@ -58,20 +63,7 @@ class FetchBookViewData(
     fun getViewData(bookSlug: String): BookViewData? {
         val product = ProductFileExtension.getType(productSlug) ?: return null
         val book = bookRepo.getBook(bookSlug)
-        var url: String? = null
-
-        for (priority in priorityList) {
-            val fileAccessRequest = when (product) {
-                ProductFileExtension.BTTR -> getBTTRFileAccessRequest(bookSlug, priority)
-                ProductFileExtension.MP3 -> getMp3FileAccessRequest(bookSlug, priority)
-            }
-
-            val bookFile = storage.getBookFile(fileAccessRequest)
-            if (bookFile != null) {
-                url = getBookDownloadUrl(bookFile)
-                break
-            }
-        }
+        val url = getBookDownloadUrl(bookSlug, product)
 
         return if (book != null) BookViewData(
             index = book.index,
@@ -82,6 +74,25 @@ class FetchBookViewData(
         ) else {
             null
         }
+    }
+
+    private fun getBookDownloadUrl(bookSlug: String, product: ProductFileExtension): String? {
+        var url: String? = null
+        for (priority in priorityList) {
+            val fileAccessRequest = when (product) {
+                ProductFileExtension.ORATURE -> return "./$bookSlug/$ALL_CHAPTERS_PARAM"
+                ProductFileExtension.BTTR -> getBTTRFileAccessRequest(bookSlug, priority)
+                ProductFileExtension.MP3 -> getMp3FileAccessRequest(bookSlug, priority)
+            }
+
+            val bookFile = storage.getBookFile(fileAccessRequest)
+            if (bookFile != null) {
+                val relativeBookPath = bookFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
+                url = "//${System.getenv("CDN_BASE_URL")}/$relativeBookPath"
+                break
+            }
+        }
+        return url
     }
 
     private fun getBTTRFileAccessRequest(

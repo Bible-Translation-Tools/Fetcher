@@ -13,6 +13,7 @@ import java.util.Locale
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
+import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.ALL_CHAPTERS_PARAM
@@ -63,7 +64,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
 
                 if (
                     !validateParameters(params, resolver) ||
-                    params.productSlug != "orature"
+                    ProductFileExtension.getType(params.productSlug) != ProductFileExtension.ORATURE
                 ) {
                     call.respond(
                         errorPage(
@@ -126,7 +127,8 @@ private fun chaptersView(
     } else {
         val languageName = getLanguageName(params.languageCode, resolver)
         val productTitle = getProductTitleKey(params.productSlug, resolver)
-        val isRequestLink = params.productSlug == "orature" // orature file type
+        val isRequestLink =
+            ProductFileExtension.getType(params.productSlug) == ProductFileExtension.ORATURE
         ThymeleafContent(
             template = "chapters",
             model = mapOf(

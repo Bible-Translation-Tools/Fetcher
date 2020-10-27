@@ -6,6 +6,12 @@
     "iconUrl": "img/recorder_icon.png"
   },
   {
+    "slug": "orature",
+    "titleKey": "orature_title",
+    "descriptionKey": "orature_description",
+    "iconUrl": "img/orature_icon.svg"
+  },
+  {
     "slug": "mp3",
     "titleKey": "mp3_title",
     "descriptionKey": "mp3_description",
