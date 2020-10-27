@@ -80,9 +80,9 @@ class FetchBookViewData(
         var url: String? = null
         for (priority in priorityList) {
             val fileAccessRequest = when (product) {
+                ProductFileExtension.ORATURE -> return "./$bookSlug/$ALL_CHAPTERS_PARAM"
                 ProductFileExtension.BTTR -> getBTTRFileAccessRequest(bookSlug, priority)
                 ProductFileExtension.MP3 -> getMp3FileAccessRequest(bookSlug, priority)
-                ProductFileExtension.ORATURE -> return "./$bookSlug/$ALL_CHAPTERS_PARAM"
             }
 
             val bookFile = storage.getBookFile(fileAccessRequest)
