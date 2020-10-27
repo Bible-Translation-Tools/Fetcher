@@ -30,7 +30,6 @@ object DependencyResolver {
     )
     val productCatalog: ProductCatalog = ProductCatalogImpl()
     val bookRepository: BookRepository = BookRepositoryImpl(
-        storageAccess = storageAccess,
         bookCatalog = BookCatalogImpl()
     )
     val chapterRepository: ChapterRepository = ChapterRepositoryImpl(chapterCatalog)
