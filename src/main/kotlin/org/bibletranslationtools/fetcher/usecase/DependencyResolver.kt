@@ -7,6 +7,7 @@ import org.bibletranslationtools.fetcher.impl.repository.DirectoryProviderImpl
 import org.bibletranslationtools.fetcher.impl.repository.LanguageRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.PortGatewayLanguageCatalog
 import org.bibletranslationtools.fetcher.impl.repository.ProductCatalogImpl
+import org.bibletranslationtools.fetcher.impl.repository.RCServiceImpl
 import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
@@ -14,6 +15,7 @@ import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
+import org.bibletranslationtools.fetcher.repository.ResourceContainerService
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 
 object DependencyResolver {
