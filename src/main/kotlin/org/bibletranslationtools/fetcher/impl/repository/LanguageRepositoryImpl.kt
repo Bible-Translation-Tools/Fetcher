@@ -10,10 +10,13 @@ class LanguageRepositoryImpl(
     private val languageCatalog: LanguageCatalog
 ) : LanguageRepository {
     override fun getLanguages(): List<Language> {
+        val availableLanguageCodes = storageAccess.getLanguageCodes()
         val languages = languageCatalog.getAll()
 
         languages.forEach {
-            it.availability = true
+            if (it.code in availableLanguageCodes) {
+                it.availability = true
+            }
         }
 
         return languages
