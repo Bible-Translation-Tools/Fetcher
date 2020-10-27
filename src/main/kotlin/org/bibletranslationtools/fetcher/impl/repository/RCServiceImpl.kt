@@ -2,9 +2,7 @@ package org.bibletranslationtools.fetcher.impl.repository
 
 import java.io.File
 import java.util.zip.ZipFile
-import org.bibletranslationtools.fetcher.data.Chapter
-import org.bibletranslationtools.fetcher.repository.ChapterCatalog
-import org.bibletranslationtools.fetcher.repository.ChapterRepository
+import org.bibletranslationtools.fetcher.repository.ResourceContainerService
 import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
 import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
@@ -13,15 +11,9 @@ import org.wycliffeassociates.rcmediadownloader.io.DownloadClient
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
-class ChapterRepositoryImpl(
-    private val chapterCatalog: ChapterCatalog
-) : ChapterRepository {
-    private val rcRepoUrlTemplate = System.getenv("RC_Repository") ?:
-        "https://content.bibletranslationtools.org/WA-Catalog/%s_%s/archive/master.zip"
-
-    override fun getAll(languageCode: String, bookSlug: String): List<Chapter> {
-        return chapterCatalog.getAll(languageCode, bookSlug)
-    }
+class RCServiceImpl : ResourceContainerService {
+    private val rcRepoUrlTemplate = System.getenv("RC_Repository")
+    ?: "https://content.bibletranslationtools.org/WA-Catalog/%s_%s/archive/master.zip"
 
     override fun getChapterRC(
         languageCode: String,
@@ -72,8 +64,8 @@ class ChapterRepositoryImpl(
     ): File? {
         val url = String.format(rcRepoUrlTemplate, languageCode, resourceId)
         // download rc from repo
-        val downloadLocation = File(System.getenv("RC_TEMP"))
-
+        val downloadLocation = File(System.getenv("RC_TEMP")).resolve(languageCode)
+        downloadLocation.mkdir()
         return downloadClient.downloadFromUrl(url, downloadLocation)
     }
 

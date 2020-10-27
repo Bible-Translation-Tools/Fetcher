@@ -1,10 +1,8 @@
 package org.bibletranslationtools.fetcher.repository
 
 import java.io.File
-import org.bibletranslationtools.fetcher.data.Chapter
 
-interface ChapterRepository {
-    fun getAll(languageCode: String, bookSlug: String): List<Chapter>
+interface ResourceContainerService {
     fun getChapterRC(
         languageCode: String,
         bookSlug: String,

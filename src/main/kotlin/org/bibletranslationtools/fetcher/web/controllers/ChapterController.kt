@@ -14,6 +14,7 @@ import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
 import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
+import org.bibletranslationtools.fetcher.usecase.RequestResourceContainer
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.ALL_CHAPTERS_PARAM
@@ -102,7 +103,7 @@ private fun chaptersView(
 
     val chapterViewDataList: List<ChapterViewData>? = try {
         FetchChapterViewData(
-            chapterRepository = resolver.chapterRepository,
+            chapterCatalog = resolver.chapterCatalog,
             storage = resolver.storageAccess,
             languageCode = params.languageCode,
             productSlug = params.productSlug,
@@ -161,12 +162,12 @@ private fun requestRCDownloadLink(
     } else {
         return try {
             val chapterNumber = params.chapter.toInt()
-            val downloadFileUrl = resolver.chapterRepository.getChapterRC(
-                languageCode = params.languageCode,
-                bookSlug = params.bookSlug,
-                chapterNumber = chapterNumber,
-                resourceId = "ulb"
-            )
+            val downloadFileUrl =
+                RequestResourceContainer(resolver.rcService).getChapterRC(
+                    languageCode = params.languageCode,
+                    bookSlug = params.bookSlug,
+                    chapterNumber = chapterNumber
+                )
             downloadFileUrl?.path
         } catch (ex: NumberFormatException) {
             null
