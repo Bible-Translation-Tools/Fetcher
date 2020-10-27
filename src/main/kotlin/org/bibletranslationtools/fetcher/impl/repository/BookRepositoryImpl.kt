@@ -18,7 +18,6 @@ class BookRepositoryImpl(
     private val bookCatalog: BookCatalog
 ) : BookRepository {
     private val englishLanguageCode = "en"
-    private val rcRepoUrlTemplate = "https://content.bibletranslationtools.org/WA-Catalog/%s_%s/archive/master.zip"
 
     override fun getBooks(resourceId: String, languageCode: String): List<Book> {
         val books = bookCatalog.getAll()
