@@ -9,4 +9,6 @@ interface ResourceContainerService {
         chapterNumber: Int,
         resourceId: String = "ulb"
     ): File?
+
+    fun getBookRC(languageCode: String, bookSlug: String, resourceId: String = "ulb"): File?
 }

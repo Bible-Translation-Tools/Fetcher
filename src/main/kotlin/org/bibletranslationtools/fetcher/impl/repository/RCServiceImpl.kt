@@ -57,6 +57,39 @@ class RCServiceImpl : ResourceContainerService {
         } else null
     }
 
+    override fun getBookRC(
+        languageCode: String,
+        bookSlug: String,
+        resourceId: String
+    ): File? {
+        val downloadClient: IDownloadClient = DownloadClient()
+        val rcFile = getTemplateResourceContainer(
+            languageCode,
+            resourceId,
+            downloadClient
+        ) ?: return null
+
+        val mediaTypes = listOf(MediaType.WAV, MediaType.MP3)
+        val downloadParameters = MediaUrlParameter(
+            projectId = bookSlug,
+            mediaDivision = MediaDivision.CHAPTER,
+            mediaTypes = mediaTypes,
+            chapter = null
+        )
+        val rcWithMedia = RCMediaDownloader.download(
+            rcFile,
+            downloadParameters,
+            downloadClient,
+            overwrite = true
+        )
+        // verify the content is available
+        return if (
+            anyChapterInRC(rcWithMedia, bookSlug, mediaTypes)
+        ) {
+            rcWithMedia
+        } else null
+    }
+
     private fun getTemplateResourceContainer(
         languageCode: String,
         resourceId: String,
@@ -92,6 +125,32 @@ class RCServiceImpl : ResourceContainerService {
                     val listEntries = rcZip.entries().toList()
                     isExisting = listEntries.any { entry ->
                         entry.name.contains(pathInMediaManifest)
+                    }
+                }
+                if (isExisting) return true
+            }
+        }
+        return isExisting
+    }
+
+    private fun anyChapterInRC(rcFile: File, slug: String, mediaTypes: List<MediaType>): Boolean {
+        var isExisting = false
+        ResourceContainer.load(rcFile).use { rc ->
+            val mediaProject = rc.media?.projects?.firstOrNull {
+                it.identifier == slug
+            }
+
+            for (mediaType in mediaTypes) {
+                val media = mediaProject?.media?.firstOrNull {
+                    it.identifier == mediaType.name.toLowerCase()
+                }
+                val pathInRC = media?.chapterUrl ?: continue
+                val chapterPathRegex = pathInRC.replace("{chapter}", "[0-9]{1,3}")
+
+                ZipFile(rcFile).use { rcZip ->
+                    val listEntries = rcZip.entries().toList()
+                    isExisting = listEntries.any { entry ->
+                        entry.name.matches(Regex(".*/$chapterPathRegex\$"))
                     }
                 }
                 if (isExisting) return true

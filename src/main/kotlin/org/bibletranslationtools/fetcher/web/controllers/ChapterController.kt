@@ -154,10 +154,9 @@ private fun requestRCDownloadLink(
 ): String? {
     if (params.chapter == ALL_CHAPTERS_PARAM) {
         // all available chapters
-        return resolver.bookRepository.getBookRC(
-            slug = params.bookSlug,
-            languageCode = params.languageCode,
-            resourceId = "ulb"
+        return RequestResourceContainer(resolver.rcService).getBookRC(
+            bookSlug = params.bookSlug,
+            languageCode = params.languageCode
         )?.path
     } else {
         return try {
