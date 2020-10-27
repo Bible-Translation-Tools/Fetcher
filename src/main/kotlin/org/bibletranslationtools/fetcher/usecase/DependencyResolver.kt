@@ -20,7 +20,7 @@ import org.bibletranslationtools.fetcher.repository.StorageAccess
 
 object DependencyResolver {
     private val directoryProvider: DirectoryProvider = DirectoryProviderImpl()
-    private val chapterCatalog: ChapterCatalog = ChapterCatalogImpl()
+    val chapterCatalog: ChapterCatalog = ChapterCatalogImpl()
     val languageCatalog: LanguageCatalog = PortGatewayLanguageCatalog()
 
     val storageAccess: StorageAccess = StorageAccessImpl(directoryProvider)
@@ -33,5 +33,5 @@ object DependencyResolver {
         storageAccess = storageAccess,
         bookCatalog = BookCatalogImpl()
     )
-    val chapterRepository: ChapterRepository = ChapterRepositoryImpl(chapterCatalog)
+    val rcService: ResourceContainerService = RCServiceImpl()
 }

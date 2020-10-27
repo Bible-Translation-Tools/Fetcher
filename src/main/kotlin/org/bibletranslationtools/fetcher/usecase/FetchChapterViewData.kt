@@ -3,13 +3,13 @@ package org.bibletranslationtools.fetcher.usecase
 import io.ktor.client.features.ClientRequestException
 import java.io.File
 import org.bibletranslationtools.fetcher.data.Chapter
-import org.bibletranslationtools.fetcher.repository.ChapterRepository
+import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 
 class FetchChapterViewData(
-    chapterRepository: ChapterRepository,
+    chapterCatalog: ChapterCatalog,
     private val storage: StorageAccess,
     private val languageCode: String,
     productSlug: String,
@@ -26,7 +26,7 @@ class FetchChapterViewData(
     )
 
     private val chapters: List<Chapter> = try {
-        chapterRepository.getAll(
+        chapterCatalog.getAll(
             languageCode = languageCode,
             bookSlug = bookSlug
         ).sortedBy { it.number }
