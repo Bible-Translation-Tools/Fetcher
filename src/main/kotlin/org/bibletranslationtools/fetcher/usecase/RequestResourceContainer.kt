@@ -1,7 +1,7 @@
 package org.bibletranslationtools.fetcher.usecase
 
-import org.bibletranslationtools.fetcher.repository.ResourceContainerService
 import java.io.File
+import org.bibletranslationtools.fetcher.repository.ResourceContainerService
 
 class RequestResourceContainer(private val service: ResourceContainerService) {
     fun getChapterRC(
@@ -11,7 +11,7 @@ class RequestResourceContainer(private val service: ResourceContainerService) {
         resourceId: String = "ulb"
     ): File? {
         val rcFile = service.getChapterRC(languageCode, bookSlug, chapterNumber, resourceId)
-        //to do: replace path with file server url for download
+        // to do: replace path with file server url for download
         return rcFile
     }
 }

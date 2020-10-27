@@ -8,9 +8,13 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
-import org.bibletranslationtools.fetcher.usecase.*
 import java.lang.NumberFormatException
 import java.util.Locale
+import org.bibletranslationtools.fetcher.usecase.DependencyResolver
+import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
+import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
+import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
+import org.bibletranslationtools.fetcher.usecase.RequestResourceContainer
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.ALL_CHAPTERS_PARAM
