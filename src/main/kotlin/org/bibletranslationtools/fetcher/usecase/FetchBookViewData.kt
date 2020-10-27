@@ -26,22 +26,27 @@ class FetchBookViewData(
     )
 
     fun getViewDataList(currentPath: String): List<BookViewData> {
-        val fileExtensionFromProduct = ProductFileExtension.getType(productSlug)!!.fileType
+        val productType = ProductFileExtension.getType(productSlug)!!
 
         // expected file extensions to seek for
-        val fileExtensionList = if (ContainerExtensions.isSupported(fileExtensionFromProduct)) {
+        val fileExtensionList = if (ContainerExtensions.isSupported(productType.fileType)) {
             listOf("tr")
         } else {
             listOf("wav", "mp3")
         }
 
-        books.forEach { book ->
-            book.availability = storage.hasBookContent(
-                languageCode,
-                resourceId = resourceId,
-                bookSlug = book.slug,
-                fileExtensionList = fileExtensionList
-            )
+        when (productType) {
+            ProductFileExtension.ORATURE -> books.forEach { it.availability = true }
+            else -> {
+                books.forEach { book ->
+                    book.availability = storage.hasBookContent(
+                        languageCode,
+                        resourceId = resourceId,
+                        bookSlug = book.slug,
+                        fileExtensionList = fileExtensionList
+                    )
+                }
+            }
         }
 
         return books.map {
@@ -64,6 +69,7 @@ class FetchBookViewData(
             val fileAccessRequest = when (product) {
                 ProductFileExtension.BTTR -> getBTTRFileAccessRequest(bookSlug, priority)
                 ProductFileExtension.MP3 -> getMp3FileAccessRequest(bookSlug, priority)
+                ProductFileExtension.ORATURE -> TODO("add orature backend support")
             }
 
             val bookFile = storage.getBookFile(fileAccessRequest)
