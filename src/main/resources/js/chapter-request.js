@@ -9,58 +9,68 @@ window.addEventListener('DOMContentLoaded', (event) => {
 })
 
 function requestLinkHandler(event) {
+    event.preventDefault()
     let card = this
-    if (card.href == "javascript:void(0)") {
-        event.preventDefault()
-        return;
-    }
-    card.querySelectorAll(".chaptercard__download-target p,.chaptercard__icon").forEach(item => {
+    card.href = "javascript:void(0)" // prevent multiple request
+    card.querySelectorAll(
+        ".chaptercard__download-target p,.chaptercard__icon"
+    ).forEach(item => {
         item.classList.add("hidden")
     })
-    card.querySelectorAll("p[name='requesting-text'],.chaptercard__spinner").forEach(item => {
-        item.classList.remove("hidden")
+    card.querySelectorAll(
+        "p[name='requesting-text'],.chaptercard__spinner"
+    ).forEach(item => {
+        item.classList.remove("hidden") // show spinner
     })
     card.querySelector(".chaptercard__download-target").classList.add("requesting")
-    let url = card.href
-    card.href = "javascript:void(0)" // prevent multi click
+
+    let url = window.location.pathname + '/' + card.dataset.chapterId
     fetch(url).then(response => {
         if (!response.ok) {
             throw new Error('Requested content is not available');
         }
         return response.text()
     }).then(data => {
-        card.href = data
-        card.setAttribute("target", "_blank")
-        card.querySelector(".chaptercard__icon").textContent = "get_app"
-        card.querySelector(".chaptercard__download-target").classList.add("download-ready")
-        card.querySelector(".chaptercard__download-target").classList.remove("requesting")
-        card.querySelectorAll(".chaptercard__download-target p,.chaptercard__spinner").forEach(item => {
-            item.classList.add("hidden")
-        })
-        card.querySelectorAll("p[name='download-text'],.chaptercard__icon").forEach(item => {
-            item.classList.remove("hidden")
-        })
+        renderSuccess(data, card)
     }).catch(error => {
         console.log(error)
-        card.href = "javascript:void(0)"
-        card.classList.add("unavailable")
-        card.querySelectorAll("div").forEach(item => {
-            item.classList.add("unavailable")
-        })
-        card.querySelectorAll("p[name='requesting-text'],.chaptercard__spinner").forEach(item => {
-            item.classList.add("hidden")
-        })
+        renderError(card)
     })
     card.removeEventListener('click', requestLinkHandler)
 }
 
-function downloadRC(url) {
-    if (response.ok) {
-        element.href = response.text()
-        element.querySelector(".chaptercard__icon").textContent = "get_app"
-        element.querySelector(".chaptercard__download-text").textContent = "Download"
-    } else {
-        // render chapter unavailable
-        element.querySelector(".chaptercard__download-text").textContent = "Unavailable"
-    }
+function renderSuccess(data, card) {
+    card.href = data
+    card.setAttribute("target", "_blank")
+    card.querySelector(".chaptercard__icon").textContent = "get_app"
+    card.querySelector(".chaptercard__download-target").classList.add("download-ready")
+    card.querySelector(".chaptercard__download-target").classList.remove("requesting")
+    card.querySelectorAll(
+    ".chaptercard__download-target p,.chaptercard__spinner"
+    ).forEach(item => {
+        item.classList.add("hidden")
+    })
+    card.querySelectorAll(
+        "p[name='download-text'],.chaptercard__icon"
+    ).forEach(item => {
+        item.classList.remove("hidden")
+    })
+}
+
+function renderError(card) {
+    card.classList.add("unavailable")
+    card.querySelector(".chaptercard__title").classList.add("unavailable")
+    card.querySelector(".chaptercard__download-target").classList.remove("requesting")
+    card.querySelector(".chaptercard__download").classList.add("request-unavailable")
+    card.querySelectorAll(
+        ".chaptercard__download-target p,.chaptercard__spinner"
+    ).forEach(item => {
+        item.classList.add("hidden")
+    })
+    card.querySelector(".chaptercard__icon").textContent = "error"
+    card.querySelectorAll(
+        "p[name='unavailable-text'],.chaptercard__icon"
+    ).forEach(item => {
+        item.classList.remove("hidden")
+    })
 }

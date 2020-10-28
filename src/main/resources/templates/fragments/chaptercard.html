@@ -8,6 +8,7 @@
        th:attrappend="data-slug=${code}, data-angname=${anglicizedText}, data-localname=${localizedText}"
        th:classappend="${url == null}? 'unavailable'"
        th:href="${url == null}? '#' : ${url}"
+       th:data-chapter-id="${index}"
        th:target="${url == null || isRequestLink}? '' : '_blank'">
 
         <div class="chaptercard__title" th:classappend="${url == null}? 'unavailable'">
@@ -21,6 +22,7 @@
                 <p class="chaptercard__download-text" name="request-text" th:text="#{request}">Request</p>
                 <p class="chaptercard__download-text hidden" name="requesting-text" th:text="#{requesting}">Requesting</p>
                 <p class="chaptercard__download-text hidden" name="download-text" th:text="#{download}">Download</p>
+                <p class="chaptercard__download-text hidden" name="unavailable-text" th:text="#{unavailable}">Unavailable</p>
             </div>
             <div class="chaptercard__download-target" th:unless="${isRequestLink}" th:classappend="${url == null}? 'unavailable'">
                 <em class="material-icons chaptercard__icon" th:classappend="${url == null}? 'unavailable'">get_app</em>

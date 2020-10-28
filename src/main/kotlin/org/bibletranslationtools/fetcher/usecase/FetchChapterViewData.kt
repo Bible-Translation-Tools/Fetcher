@@ -37,7 +37,7 @@ class FetchChapterViewData(
     fun getViewDataList(): List<ChapterViewData>? {
         return when (product) {
             ProductFileExtension.BTTR, ProductFileExtension.MP3 -> chaptersFromDirectory()
-            else -> chaptersFromCatalog() // all chapters are available
+            else -> chaptersForOrature() // all chapters are available
         }
     }
 
@@ -66,8 +66,8 @@ class FetchChapterViewData(
         return chapterList
     }
 
-    private fun chaptersFromCatalog(): List<ChapterViewData> {
-        val requestUrl = "./$bookSlug/%d"
+    private fun chaptersForOrature(): List<ChapterViewData> {
+        val requestUrl = "#" // front-end handled script
         return chapters.map {
             ChapterViewData(it.number, url = String.format(requestUrl, it.number))
         }

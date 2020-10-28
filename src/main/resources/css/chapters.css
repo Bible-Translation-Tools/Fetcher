@@ -102,6 +102,16 @@
 .download-ready p{
     text-decoration: none;
 }
+.request-unavailable {
+	color: #dc0000e6;
+}
+.request-unavailable div:hover {
+    background: none;
+}
+.request-unavailable p {
+	text-decoration: none;
+	margin-left: 0;
+}
 /* --layout for tablets  */
 @media only  screen
 and (max-device-width: 1200px) {
@@ -160,5 +170,11 @@ and (min-device-width: 320px) {
     .download-ready {
         background-color: unset !important;
         color: unset !important;
+    }
+    .request-unavailable {
+    	border: none;
+    }
+    .request-unavailable * {
+        color: #dc0000e6 !important;
     }
 }
