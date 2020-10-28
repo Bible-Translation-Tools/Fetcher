@@ -6,7 +6,6 @@ import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
-import org.bibletranslationtools.fetcher.web.controllers.utils.ALL_CHAPTERS_PARAM
 
 class FetchBookViewData(
     private val bookRepo: BookRepository,
