@@ -84,6 +84,7 @@ class FetchBookViewData(
                 ProductFileExtension.ORATURE -> return "./$bookSlug/$ALL_CHAPTERS_PARAM"
                 ProductFileExtension.BTTR -> getBTTRFileAccessRequest(bookSlug, priority)
                 ProductFileExtension.MP3 -> getMp3FileAccessRequest(bookSlug, priority)
+                ProductFileExtension.ORATURE -> TODO("add orature backend support")
             }
 
             val bookFile = storage.getBookFile(fileAccessRequest)
