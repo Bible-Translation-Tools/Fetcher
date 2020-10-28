@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title th:text="#{chapters}">Chapters</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" >
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="/static/img/fetcher_logo.png">
     <link rel="stylesheet" href="/static/common.css">
     <link rel="stylesheet" href="/static/chapters.css">
@@ -29,14 +29,22 @@
     <a class="chapter-download-card__button"
        th:classappend="${book.url == null}? 'unavailable'"
        th:href="${book.url == null}? '#' : ${book.url}"
-       th:target="${book.url == null}? '' : '_blank'">
+       th:data-chapter-id="${isRequestLink}? 'all' : ''"
+       th:target="${book.url == null || isRequestLink}? '' : '_blank'">
 
-    <em class="material-icons">get_app</em>
-        <p th:text="#{download_book}">Download Book</p>
+        <em class="material-icons chaptercard__icon">get_app</em>
+        <img class="chaptercard__spinner hidden" alt="Spinner Icon" height="24" width="24" src="/static/img/spinner_icon.gif" />
+
+        <p th:text="#{download_book}"
+           th:classappend="${isRequestLink}? 'hidden' : ''" name="download-text">Download Book</p>
+        <p th:text="#{request_book}"
+           th:classappend="${isRequestLink}? '' : 'hidden'" name="request-text">Request Book</p>
+        <p th:text="#{requesting}" class="hidden" name="requesting-text">Requesting</p>
+        <p th:text="#{unavailable}" class="hidden" name="unavailable-text">Unavailable</p>
     </a>
 </div>
 
-<div class="l-list-container" >
+<div class="l-list-container">
     <div th:each="chapter: ${chapterList}">
         <div th:insert="fragments/chaptercard :: chaptercard(${chapter.chapterNumber}, #{${chapter.titleKey}(${chapter.chapterNumber})}, ${chapter.url})"></div>
     </div>

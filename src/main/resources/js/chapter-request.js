@@ -1,14 +1,22 @@
 window.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelector(
+    ".chapter-download-card__button"
+    ).classList.add("request-book")
+
     document.querySelectorAll(".chaptercard__icon").forEach(element => {
         element.textContent = "send"
     })
 
     document.querySelectorAll(".chaptercard").forEach(card => {
-            card.addEventListener('click', requestLinkHandler)
+        card.addEventListener('click', requestChapterHandler)
     })
+
+    document.querySelector(".chapter-download-card__button").addEventListener(
+        'click', requestBookHandler
+    )
 })
 
-function requestLinkHandler(event) {
+function requestChapterHandler(event) {
     event.preventDefault()
     let card = this
     card.href = "javascript:void(0)" // prevent multiple request
@@ -17,12 +25,12 @@ function requestLinkHandler(event) {
     ).forEach(item => {
         item.classList.add("hidden")
     })
+    card.querySelector(".chaptercard__download-target").classList.add("requesting")
     card.querySelectorAll(
         "p[name='requesting-text'],.chaptercard__spinner"
     ).forEach(item => {
         item.classList.remove("hidden") // show spinner
     })
-    card.querySelector(".chaptercard__download-target").classList.add("requesting")
 
     let url = window.location.pathname + '/' + card.dataset.chapterId
     fetch(url).then(response => {
@@ -36,7 +44,7 @@ function requestLinkHandler(event) {
         console.log(error)
         renderError(card)
     })
-    card.removeEventListener('click', requestLinkHandler)
+    card.removeEventListener('click', requestChapterHandler)
 }
 
 function renderSuccess(data, card) {
@@ -69,6 +77,70 @@ function renderError(card) {
     })
     card.querySelector(".chaptercard__icon").textContent = "error"
     card.querySelectorAll(
+        "p[name='unavailable-text'],.chaptercard__icon"
+    ).forEach(item => {
+        item.classList.remove("hidden")
+    })
+}
+
+function requestBookHandler(event) {
+    event.preventDefault()
+    let element = this
+    element.href = "javascript:void(0)" // prevent multiple request
+    element.classList.add("requesting")
+    element.querySelectorAll(
+        "p,.chaptercard__icon"
+    ).forEach(item => {
+        item.classList.add("hidden")
+    })
+    element.querySelectorAll(
+        "p[name='requesting-text'],.chaptercard__spinner"
+    ).forEach(item => {
+        item.classList.remove("hidden") // show spinner
+    })
+
+    let url = window.location.pathname + '/' + element.dataset.chapterId
+    fetch(url).then(response => {
+        if (!response.ok) {
+            throw new Error('Requested content is not available');
+        }
+        return response.text()
+    }).then(data => {
+        element.href = data
+        renderBookSuccess(element)
+    }).catch(error => {
+        console.log(error)
+        renderBookError(element)
+    })
+    element.removeEventListener('click', requestBookHandler)
+}
+
+function renderBookSuccess(element) {
+    element.setAttribute("target","_blank")
+    element.classList.remove("requesting","request-book")
+    element.querySelector(".chaptercard__icon").textContent = "get_app"
+    element.querySelectorAll(
+    "p,.chaptercard__spinner"
+    ).forEach(item => {
+        item.classList.add("hidden")
+    })
+    element.querySelectorAll(
+        "p[name='download-text'],.chaptercard__icon"
+    ).forEach(item => {
+        item.classList.remove("hidden")
+    })
+}
+
+function renderBookError(element) {
+    element.classList.remove("requesting")
+    element.classList.add("request-unavailable")
+    element.querySelectorAll(
+        "p,.chaptercard__spinner"
+    ).forEach(item => {
+        item.classList.add("hidden")
+    })
+    element.querySelector(".chaptercard__icon").textContent = "error"
+    element.querySelectorAll(
         "p[name='unavailable-text'],.chaptercard__icon"
     ).forEach(item => {
         item.classList.remove("hidden")

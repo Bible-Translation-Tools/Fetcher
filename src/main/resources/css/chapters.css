@@ -85,8 +85,19 @@
 .hidden {
     display: none !important;
 }
+.request-book {
+    background: white;
+    color: #015ad9;
+}
+.request-book p {
+    margin-left: 5px;
+    text-decoration: none;
+}
+.request-book:hover {
+    background: #e0d7cb;
+}
 .requesting {
-    background-color: rgba(10, 51, 115, 0.1);
+    background-color: rgb(220 220 220);
     color: rgba(10, 51, 115, 0.6);
 }
 .requesting p {
@@ -104,14 +115,17 @@
 }
 .request-unavailable {
 	color: #dc0000e6;
+	background: white;
 }
-.request-unavailable div:hover {
-    background: none;
+.request-unavailable:hover,.request-unavailable div:hover {
+    cursor: no-drop;
+    background: white;
 }
 .request-unavailable p {
 	text-decoration: none;
-	margin-left: 0;
+	margin-left: 2px;
 }
+
 /* --layout for tablets  */
 @media only  screen
 and (max-device-width: 1200px) {

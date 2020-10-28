@@ -1,6 +1,5 @@
 package org.bibletranslationtools.fetcher.usecase
 
-import java.io.File
 import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.repository.BookRepository
@@ -81,7 +80,7 @@ class FetchBookViewData(
         var url: String? = null
         for (priority in priorityList) {
             val fileAccessRequest = when (product) {
-                ProductFileExtension.ORATURE -> return "./$bookSlug/$ALL_CHAPTERS_PARAM"
+                ProductFileExtension.ORATURE -> return "#"
                 ProductFileExtension.BTTR -> getBTTRFileAccessRequest(bookSlug, priority)
                 ProductFileExtension.MP3 -> getMp3FileAccessRequest(bookSlug, priority)
             }
