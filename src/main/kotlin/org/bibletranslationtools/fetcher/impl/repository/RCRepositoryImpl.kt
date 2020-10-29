@@ -7,7 +7,6 @@ import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
 import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
 import org.wycliffeassociates.rcmediadownloader.data.MediaUrlParameter
-import org.wycliffeassociates.rcmediadownloader.io.DownloadClient
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
@@ -32,11 +31,13 @@ class RCRepositoryImpl(
         ) ?: return null
 
         // make new copy of the original
-        val fileName = if (chapterNumber == null) {
-            "${languageCode}_${resourceId}_${bookSlug}.${templateRC.extension}" // book rc
-        } else {
-            "${languageCode}_${resourceId}_${bookSlug}_c${chapterNumber}.${templateRC.extension}" // chapter rc
-        }
+        val fileName = createRCFileName(
+            languageCode = languageCode,
+            resourceId = resourceId,
+            bookSlug = bookSlug,
+            extension = templateRC.extension,
+            chapter = chapterNumber
+        )
         val newFilePath = templateRC.parentFile.resolve(fileName)
         val rcFile = templateRC.copyTo(newFilePath, true)
 
@@ -53,6 +54,7 @@ class RCRepositoryImpl(
             downloadClient,
             overwrite = true
         )
+
         // verify the chapter is downloaded properly
         return if (
             verifyChapterExists(rcWithMedia, bookSlug, mediaTypes, chapterNumber)
@@ -71,6 +73,20 @@ class RCRepositoryImpl(
         val downloadLocation = File(System.getenv("RC_TEMP")).resolve(languageCode)
         downloadLocation.mkdir()
         return downloadClient.downloadFromUrl(url, downloadLocation)
+    }
+
+    private fun createRCFileName(
+        languageCode: String,
+        resourceId: String,
+        bookSlug: String,
+        extension: String,
+        chapter: Int?
+    ): String {
+        return if (chapter == null) {
+            "${languageCode}_${resourceId}_$bookSlug.$extension" // book rc
+        } else {
+            "${languageCode}_${resourceId}_${bookSlug}_c$chapter.$extension" // chapter rc
+        }
     }
 
     private fun verifyChapterExists(
