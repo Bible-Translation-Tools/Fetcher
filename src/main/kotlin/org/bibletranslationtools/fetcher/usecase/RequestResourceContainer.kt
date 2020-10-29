@@ -1,18 +1,24 @@
 package org.bibletranslationtools.fetcher.usecase
 
 import java.io.File
-import org.bibletranslationtools.fetcher.repository.ResourceContainerService
+import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
+import org.wycliffeassociates.rcmediadownloader.data.MediaType
 
-class RequestResourceContainer(private val service: ResourceContainerService) {
+class RequestResourceContainer(
+    private val rcRepository: ResourceContainerRepository
+) {
+    private val mediaTypes = listOf(MediaType.WAV, MediaType.MP3)
+
     fun getChapterRC(
         languageCode: String,
         bookSlug: String,
         chapterNumber: Int,
         resourceId: String = "ulb"
     ): File? {
-        val rcFile = service.getChapterRC(
+        val rcFile = rcRepository.getRC(
             languageCode = languageCode,
             bookSlug = bookSlug,
+            mediaTypes = mediaTypes,
             chapterNumber = chapterNumber,
             resourceId = resourceId
         )
@@ -25,9 +31,11 @@ class RequestResourceContainer(private val service: ResourceContainerService) {
         bookSlug: String,
         resourceId: String = "ulb"
     ): File? {
-        val rcFile = service.getBookRC(
+        val rcFile = rcRepository.getRC(
             languageCode = languageCode,
             bookSlug = bookSlug,
+            mediaTypes = mediaTypes,
+            chapterNumber = null,
             resourceId = resourceId
         )
         // to do: replace path with file server url for download
