@@ -10,8 +10,7 @@ import org.wycliffeassociates.rcmediadownloader.data.MediaUrlParameter
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
 class RCRepositoryImpl(
-    private val downloadClient: IDownloadClient,
-    private val util: RCUtils
+    private val downloadClient: IDownloadClient
 ) : ResourceContainerRepository {
     private val rcRepoTemplateUrl = System.getenv("RC_Repository")
         ?: DEFAULT_REPO_TEMPLATE_URL
@@ -28,7 +27,7 @@ class RCRepositoryImpl(
         ) ?: return null
 
         // make new copy of the original
-        val fileName = util.createRCFileName(
+        val fileName = RCUtils.createRCFileName(
             resourceParams,
             extension = templateRC.extension,
             chapter = chapterNumber
@@ -52,7 +51,7 @@ class RCRepositoryImpl(
 
         // verify the chapter is downloaded properly
         return if (
-            util.verifyChapterExists(rcWithMedia, resourceParams.bookSlug, mediaTypes, chapterNumber)
+            RCUtils.verifyChapterExists(rcWithMedia, resourceParams.bookSlug, mediaTypes, chapterNumber)
         ) {
             rcWithMedia
         } else null
