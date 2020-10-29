@@ -22,7 +22,7 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.PRODUCT_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.RoutingValidator
-import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
+import org.bibletranslationtools.fetcher.web.controllers.utils.MediaResourceParameters
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
 import org.bibletranslationtools.fetcher.web.controllers.utils.getLanguageName
@@ -33,7 +33,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}/{$BOOK_PARAM_KEY}") {
         get {
             // chapters page
-            val params = UrlParameters(
+            val params = MediaResourceParameters(
                 languageCode = call.parameters[LANGUAGE_PARAM_KEY],
                 productSlug = call.parameters[PRODUCT_PARAM_KEY],
                 bookSlug = call.parameters[BOOK_PARAM_KEY]
@@ -54,7 +54,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
         }
         route("{$CHAPTER_PARAM_KEY}") {
             get {
-                val params = UrlParameters(
+                val params = MediaResourceParameters(
                     languageCode = call.parameters[LANGUAGE_PARAM_KEY],
                     productSlug = call.parameters[PRODUCT_PARAM_KEY],
                     bookSlug = call.parameters[BOOK_PARAM_KEY],
@@ -90,7 +90,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
 }
 
 private fun chaptersView(
-    params: UrlParameters,
+    params: MediaResourceParameters,
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
@@ -150,12 +150,13 @@ private fun chaptersView(
 }
 
 private fun validateParameters(
-    params: UrlParameters,
+    params: MediaResourceParameters,
     resolver: DependencyResolver
 ): Boolean {
     val validator = RoutingValidator(resolver)
 
     return validator.isLanguageCodeValid(params.languageCode) &&
             validator.isProductSlugValid(params.productSlug) &&
-            validator.isBookSlugValid(params.bookSlug)
+            validator.isBookSlugValid(params.bookSlug) &&
+            validator.isChapterValid(params.chapter)
 }

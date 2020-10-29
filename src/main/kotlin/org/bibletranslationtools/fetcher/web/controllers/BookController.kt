@@ -15,7 +15,7 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.PRODUCT_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.RoutingValidator
-import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
+import org.bibletranslationtools.fetcher.web.controllers.utils.MediaResourceParameters
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
 import org.bibletranslationtools.fetcher.web.controllers.utils.getLanguageName
@@ -28,7 +28,7 @@ fun Routing.bookController(resolver: DependencyResolver) {
         get {
             // books page
             val path = normalizeUrl(call.request.path())
-            val params = UrlParameters(
+            val params = MediaResourceParameters(
                 languageCode = call.parameters[LANGUAGE_PARAM_KEY],
                 productSlug = call.parameters[PRODUCT_PARAM_KEY]
             )
@@ -40,7 +40,7 @@ fun Routing.bookController(resolver: DependencyResolver) {
 }
 
 private fun booksView(
-    params: UrlParameters,
+    params: MediaResourceParameters,
     path: String,
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>

@@ -1,14 +1,6 @@
 package org.bibletranslationtools.fetcher.usecase
 
-import org.bibletranslationtools.fetcher.impl.repository.BookCatalogImpl
-import org.bibletranslationtools.fetcher.impl.repository.BookRepositoryImpl
-import org.bibletranslationtools.fetcher.impl.repository.ChapterCatalogImpl
-import org.bibletranslationtools.fetcher.impl.repository.DirectoryProviderImpl
-import org.bibletranslationtools.fetcher.impl.repository.LanguageRepositoryImpl
-import org.bibletranslationtools.fetcher.impl.repository.PortGatewayLanguageCatalog
-import org.bibletranslationtools.fetcher.impl.repository.ProductCatalogImpl
-import org.bibletranslationtools.fetcher.impl.repository.RCRepositoryImpl
-import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
+import org.bibletranslationtools.fetcher.impl.repository.*
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
@@ -33,5 +25,5 @@ object DependencyResolver {
     val bookRepository: BookRepository = BookRepositoryImpl(
         bookCatalog = BookCatalogImpl()
     )
-    val rcRepository: ResourceContainerRepository = RCRepositoryImpl(DownloadClient())
+    val rcRepository: ResourceContainerRepository = RCRepositoryImpl(DownloadClient(), RCUtils())
 }

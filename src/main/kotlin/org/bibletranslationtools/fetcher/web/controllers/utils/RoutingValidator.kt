@@ -1,6 +1,7 @@
 package org.bibletranslationtools.fetcher.web.controllers.utils
 
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
+import java.lang.NumberFormatException
 
 class RoutingValidator(private val resolver: DependencyResolver) {
 
@@ -25,6 +26,15 @@ class RoutingValidator(private val resolver: DependencyResolver) {
             bookSlug.isNullOrEmpty() -> false
             resolver.bookRepository.getBook(bookSlug) == null -> false
             else -> true
+        }
+    }
+
+    fun isChapterValid(chapter: String?): Boolean {
+        return try {
+            chapter?.toInt()
+            true
+        } catch (ex: NumberFormatException) {
+            chapter == ALL_CHAPTERS_PARAM
         }
     }
 }
