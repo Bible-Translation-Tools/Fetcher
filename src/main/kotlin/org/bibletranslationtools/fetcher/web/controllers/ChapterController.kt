@@ -36,9 +36,9 @@ fun Routing.chapterController(resolver: DependencyResolver) {
         get {
             // chapters page
             val params = UrlParameters(
-                language = call.parameters[LANGUAGE_PARAM_KEY],
-                product = call.parameters[PRODUCT_PARAM_KEY],
-                book = call.parameters[BOOK_PARAM_KEY]
+                languageCode = call.parameters[LANGUAGE_PARAM_KEY],
+                productSlug = call.parameters[PRODUCT_PARAM_KEY],
+                bookSlug = call.parameters[BOOK_PARAM_KEY]
             )
 
             if (!validateParameters(params, resolver)) {
@@ -57,9 +57,9 @@ fun Routing.chapterController(resolver: DependencyResolver) {
         route("{$CHAPTER_PARAM_KEY}") {
             get {
                 val params = UrlParameters(
-                    language = call.parameters[LANGUAGE_PARAM_KEY],
-                    product = call.parameters[PRODUCT_PARAM_KEY],
-                    book = call.parameters[BOOK_PARAM_KEY],
+                    languageCode = call.parameters[LANGUAGE_PARAM_KEY],
+                    productSlug = call.parameters[PRODUCT_PARAM_KEY],
+                    bookSlug = call.parameters[BOOK_PARAM_KEY],
                     chapter = call.parameters[CHAPTER_PARAM_KEY]
                 )
 
@@ -152,7 +152,7 @@ private fun requestRCDownloadLink(
     params: UrlParameters,
     resolver: DependencyResolver
 ): String? {
-    if (params.chapterParam == ALL_CHAPTERS_PARAM) {
+    if (params.chapter == ALL_CHAPTERS_PARAM) {
         // all available chapters
         return RequestResourceContainer(resolver.rcService).getResourceContainer(
             bookSlug = params.bookSlug,
@@ -161,7 +161,7 @@ private fun requestRCDownloadLink(
         )?.path
     } else {
         return try {
-            val chapterNumber = params.chapterParam.toInt()
+            val chapterNumber = params.chapter.toInt()
             val downloadFileUrl =
                 RequestResourceContainer(resolver.rcService).getResourceContainer(
                     languageCode = params.languageCode,

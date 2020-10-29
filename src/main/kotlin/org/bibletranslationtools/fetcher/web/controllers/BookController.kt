@@ -29,8 +29,8 @@ fun Routing.bookController(resolver: DependencyResolver) {
             // books page
             val path = normalizeUrl(call.request.path())
             val params = UrlParameters(
-                language = call.parameters[LANGUAGE_PARAM_KEY],
-                product = call.parameters[PRODUCT_PARAM_KEY]
+                languageCode = call.parameters[LANGUAGE_PARAM_KEY],
+                productSlug = call.parameters[PRODUCT_PARAM_KEY]
             )
             call.respond(
                 booksView(params, path, resolver, contentLanguage)
