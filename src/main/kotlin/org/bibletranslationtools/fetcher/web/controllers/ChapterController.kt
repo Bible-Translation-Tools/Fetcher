@@ -36,9 +36,9 @@ fun Routing.chapterController(resolver: DependencyResolver) {
         get {
             // chapters page
             val params = UrlParameters(
-                lc = call.parameters[LANGUAGE_PARAM_KEY],
-                ps = call.parameters[PRODUCT_PARAM_KEY],
-                bs = call.parameters[BOOK_PARAM_KEY]
+                _languageCode = call.parameters[LANGUAGE_PARAM_KEY],
+                _productSlug = call.parameters[PRODUCT_PARAM_KEY],
+                _bookSlug = call.parameters[BOOK_PARAM_KEY]
             )
 
             if (!validateParameters(params, resolver)) {
@@ -57,10 +57,10 @@ fun Routing.chapterController(resolver: DependencyResolver) {
         route("{$CHAPTER_PARAM_KEY}") {
             get {
                 val params = UrlParameters(
-                    lc = call.parameters[LANGUAGE_PARAM_KEY],
-                    ps = call.parameters[PRODUCT_PARAM_KEY],
-                    bs = call.parameters[BOOK_PARAM_KEY],
-                    ch = call.parameters[CHAPTER_PARAM_KEY]
+                    _languageCode = call.parameters[LANGUAGE_PARAM_KEY],
+                    _productSlug = call.parameters[PRODUCT_PARAM_KEY],
+                    _bookSlug = call.parameters[BOOK_PARAM_KEY],
+                    _chapter = call.parameters[CHAPTER_PARAM_KEY]
                 )
 
                 if (
