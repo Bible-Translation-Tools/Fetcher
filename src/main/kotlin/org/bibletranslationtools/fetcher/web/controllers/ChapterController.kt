@@ -154,15 +154,16 @@ private fun requestRCDownloadLink(
 ): String? {
     if (params.chapter == ALL_CHAPTERS_PARAM) {
         // all available chapters
-        return RequestResourceContainer(resolver.rcService).getBookRC(
+        return RequestResourceContainer(resolver.rcService).getResourceContainer(
             bookSlug = params.bookSlug,
-            languageCode = params.languageCode
+            languageCode = params.languageCode,
+            chapterNumber = null
         )?.path
     } else {
         return try {
             val chapterNumber = params.chapter.toInt()
             val downloadFileUrl =
-                RequestResourceContainer(resolver.rcService).getChapterRC(
+                RequestResourceContainer(resolver.rcService).getResourceContainer(
                     languageCode = params.languageCode,
                     bookSlug = params.bookSlug,
                     chapterNumber = chapterNumber

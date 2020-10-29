@@ -9,10 +9,10 @@ class RequestResourceContainer(
 ) {
     private val mediaTypes = listOf(MediaType.WAV, MediaType.MP3)
 
-    fun getChapterRC(
+    fun getResourceContainer(
         languageCode: String,
         bookSlug: String,
-        chapterNumber: Int,
+        chapterNumber: Int?,
         resourceId: String = "ulb"
     ): File? {
         val rcFile = rcRepository.getRC(
@@ -20,22 +20,6 @@ class RequestResourceContainer(
             bookSlug = bookSlug,
             mediaTypes = mediaTypes,
             chapterNumber = chapterNumber,
-            resourceId = resourceId
-        )
-        // to do: replace path with file server url for download
-        return rcFile
-    }
-
-    fun getBookRC(
-        languageCode: String,
-        bookSlug: String,
-        resourceId: String = "ulb"
-    ): File? {
-        val rcFile = rcRepository.getRC(
-            languageCode = languageCode,
-            bookSlug = bookSlug,
-            mediaTypes = mediaTypes,
-            chapterNumber = null,
             resourceId = resourceId
         )
         // to do: replace path with file server url for download
