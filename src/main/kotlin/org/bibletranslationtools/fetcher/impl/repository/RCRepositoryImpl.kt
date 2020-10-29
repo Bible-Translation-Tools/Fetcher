@@ -11,7 +11,9 @@ import org.wycliffeassociates.rcmediadownloader.io.DownloadClient
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
-class RCRepositoryImpl : ResourceContainerRepository {
+class RCRepositoryImpl(
+    private val downloadClient: IDownloadClient
+) : ResourceContainerRepository {
     private val rcRepoUrlTemplate = System.getenv("RC_Repository")
         ?: "https://content.bibletranslationtools.org/WA-Catalog/%s_%s/archive/master.zip"
 
@@ -23,7 +25,6 @@ class RCRepositoryImpl : ResourceContainerRepository {
         resourceId: String
     ): File? {
         // get the rc from git repo
-        val downloadClient: IDownloadClient = DownloadClient()
         val templateRC = getTemplateResourceContainer(
             languageCode,
             resourceId,
