@@ -3,7 +3,6 @@ package org.bibletranslationtools.fetcher.usecase
 import java.io.File
 import java.lang.NumberFormatException
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
-import org.bibletranslationtools.fetcher.web.controllers.utils.ALL_CHAPTERS_PARAM
 import org.bibletranslationtools.fetcher.web.controllers.utils.MediaResourceParameters
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
 

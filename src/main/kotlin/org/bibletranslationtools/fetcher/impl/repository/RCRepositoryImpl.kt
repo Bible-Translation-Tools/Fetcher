@@ -1,7 +1,6 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import java.io.File
-import java.util.zip.ZipFile
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.web.controllers.utils.MediaResourceParameters
 import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
@@ -9,7 +8,6 @@ import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
 import org.wycliffeassociates.rcmediadownloader.data.MediaUrlParameter
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
-import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
 class RCRepositoryImpl(
     private val downloadClient: IDownloadClient,
@@ -70,7 +68,6 @@ class RCRepositoryImpl(
         downloadLocation.mkdir()
         return downloadClient.downloadFromUrl(url, downloadLocation)
     }
-
 
     private companion object {
         const val DEFAULT_REPO_TEMPLATE_URL =

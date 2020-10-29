@@ -1,7 +1,7 @@
 package org.bibletranslationtools.fetcher.repository
 
-import org.bibletranslationtools.fetcher.web.controllers.utils.MediaResourceParameters
 import java.io.File
+import org.bibletranslationtools.fetcher.web.controllers.utils.MediaResourceParameters
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
 
 interface ResourceContainerRepository {

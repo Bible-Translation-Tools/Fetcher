@@ -1,10 +1,10 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
+import java.io.File
+import java.util.zip.ZipFile
 import org.bibletranslationtools.fetcher.web.controllers.utils.MediaResourceParameters
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
-import java.io.File
-import java.util.zip.ZipFile
 
 class RCUtils {
     fun createRCFileName(

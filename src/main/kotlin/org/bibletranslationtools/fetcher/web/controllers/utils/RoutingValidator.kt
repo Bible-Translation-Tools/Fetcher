@@ -1,7 +1,7 @@
 package org.bibletranslationtools.fetcher.web.controllers.utils
 
-import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import java.lang.NumberFormatException
+import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 
 class RoutingValidator(private val resolver: DependencyResolver) {
 
