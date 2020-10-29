@@ -8,7 +8,6 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
-import java.lang.NumberFormatException
 import java.util.Locale
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
@@ -17,7 +16,6 @@ import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
 import org.bibletranslationtools.fetcher.usecase.RequestResourceContainer
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
-import org.bibletranslationtools.fetcher.web.controllers.utils.ALL_CHAPTERS_PARAM
 import org.bibletranslationtools.fetcher.web.controllers.utils.BOOK_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.CHAPTER_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
@@ -77,7 +75,10 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                     )
                     return@get
                 }
-                val downloadLink = requestRCDownloadLink(params, resolver)
+
+                val downloadLink = RequestResourceContainer(resolver.rcService)
+                    .getResourceContainer(params)?.path
+
                 if (downloadLink == null) {
                     call.respond(HttpStatusCode.NotFound)
                 } else {
@@ -145,33 +146,6 @@ private fun chaptersView(
             ),
             locale = getPreferredLocale(contentLanguage, "chapters")
         )
-    }
-}
-
-private fun requestRCDownloadLink(
-    params: UrlParameters,
-    resolver: DependencyResolver
-): String? {
-    if (params.chapter == ALL_CHAPTERS_PARAM) {
-        // all available chapters
-        return RequestResourceContainer(resolver.rcService).getResourceContainer(
-            bookSlug = params.bookSlug,
-            languageCode = params.languageCode,
-            chapterNumber = null
-        )?.path
-    } else {
-        return try {
-            val chapterNumber = params.chapter.toInt()
-            val downloadFileUrl =
-                RequestResourceContainer(resolver.rcService).getResourceContainer(
-                    languageCode = params.languageCode,
-                    bookSlug = params.bookSlug,
-                    chapterNumber = chapterNumber
-                )
-            downloadFileUrl?.path
-        } catch (ex: NumberFormatException) {
-            null
-        }
     }
 }
 

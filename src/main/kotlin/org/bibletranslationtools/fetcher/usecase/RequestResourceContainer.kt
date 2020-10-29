@@ -1,7 +1,9 @@
 package org.bibletranslationtools.fetcher.usecase
 
 import java.io.File
+import java.lang.NumberFormatException
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
+import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
 
 class RequestResourceContainer(
@@ -10,14 +12,18 @@ class RequestResourceContainer(
     private val mediaTypes = listOf(MediaType.WAV, MediaType.MP3)
 
     fun getResourceContainer(
-        languageCode: String,
-        bookSlug: String,
-        chapterNumber: Int?,
+        parameters: UrlParameters,
         resourceId: String = "ulb"
     ): File? {
+        val chapterNumber: Int? = try {
+            parameters.chapter.toInt()
+        } catch (ex: NumberFormatException) {
+            null
+        }
+
         val rcFile = rcRepository.getRC(
-            languageCode = languageCode,
-            bookSlug = bookSlug,
+            languageCode = parameters.languageCode,
+            bookSlug = parameters.bookSlug,
             mediaTypes = mediaTypes,
             chapterNumber = chapterNumber,
             resourceId = resourceId
