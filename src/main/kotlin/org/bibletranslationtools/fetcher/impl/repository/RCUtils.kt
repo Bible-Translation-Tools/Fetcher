@@ -6,7 +6,7 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.MediaResourcePara
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
-class RCUtils {
+object RCUtils {
     fun createRCFileName(
         params: MediaResourceParameters,
         extension: String,
