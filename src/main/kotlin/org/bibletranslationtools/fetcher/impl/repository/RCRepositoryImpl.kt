@@ -96,6 +96,8 @@ class RCRepositoryImpl(
         chapterNumber: Int?
     ): Boolean {
         var isExisting = false
+        val chapterNumberPattern = chapterNumber?.toString() ?: "[0-9]{1,3}"
+
         ResourceContainer.load(rcFile).use { rc ->
             val mediaProject = rc.media?.projects?.firstOrNull {
                 it.identifier == bookSlug
@@ -106,24 +108,18 @@ class RCRepositoryImpl(
                     it.identifier == mediaType.name.toLowerCase()
                 }
                 val pathInRC = media?.chapterUrl ?: continue
-                val pathInMediaManifest = pathInRC.replace("{chapter}", chapterNumber.toString())
+                val chapterPath = pathInRC.replace("{chapter}", chapterNumberPattern)
 
                 ZipFile(rcFile).use { rcZip ->
                     val listEntries = rcZip.entries().toList()
-                    isExisting = if (chapterNumber != null) {
-                        listEntries.any { entry ->
-                            entry.name.contains(pathInMediaManifest)
-                        }
-                    } else {
-                        val chapterPathRegex = pathInRC.replace("{chapter}", "[0-9]{1,3}")
-                        listEntries.any { entry ->
-                            entry.name.matches(Regex(".*/$chapterPathRegex\$"))
-                        }
+                    isExisting = listEntries.any { entry ->
+                        entry.name.matches(Regex(".*/$chapterPath\$"))
                     }
                 }
-                if (isExisting) return true
             }
+            if (isExisting) return true
         }
+
         return isExisting
     }
 }
