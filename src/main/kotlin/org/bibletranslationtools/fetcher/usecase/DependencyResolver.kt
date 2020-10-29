@@ -33,5 +33,5 @@ object DependencyResolver {
     val bookRepository: BookRepository = BookRepositoryImpl(
         bookCatalog = BookCatalogImpl()
     )
-    val rcService: ResourceContainerRepository = RCRepositoryImpl(DownloadClient())
+    val rcRepository: ResourceContainerRepository = RCRepositoryImpl(DownloadClient())
 }

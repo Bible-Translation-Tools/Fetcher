@@ -76,7 +76,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                     return@get
                 }
 
-                val downloadLink = RequestResourceContainer(resolver.rcService)
+                val downloadLink = RequestResourceContainer(resolver.rcRepository)
                     .getResourceContainer(params)?.path
 
                 if (downloadLink == null) {
