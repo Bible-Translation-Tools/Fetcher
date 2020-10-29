@@ -27,7 +27,7 @@ fun Routing.productController(resolver: DependencyResolver) {
             // products page
             val path = normalizeUrl(call.request.path())
             val params = UrlParameters(
-                _languageCode = call.parameters[LANGUAGE_PARAM_KEY]
+                language = call.parameters[LANGUAGE_PARAM_KEY]
             )
             call.respond(
                 productsView(params, path, resolver, contentLanguage)

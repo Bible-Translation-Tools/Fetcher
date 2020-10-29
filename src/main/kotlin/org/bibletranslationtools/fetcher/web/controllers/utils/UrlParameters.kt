@@ -1,20 +1,20 @@
 package org.bibletranslationtools.fetcher.web.controllers.utils
 
 data class UrlParameters(
-    private val _languageCode: String? = null,
-    private val _productSlug: String? = null,
-    private val _bookSlug: String? = null,
-    private val _chapter: String? = null
+    private val language: String? = null,
+    private val product: String? = null,
+    private val book: String? = null,
+    private val chapter: String? = null
 ) {
     val languageCode: String
-        get() = _languageCode ?: ""
+        get() = language ?: ""
 
     val productSlug: String
-        get() = _productSlug ?: ""
+        get() = product ?: ""
 
     val bookSlug: String
-        get() = _bookSlug ?: ""
+        get() = book ?: ""
 
-    val chapter: String
-        get() = _chapter ?: ""
+    val chapterParam: String
+        get() = chapter ?: ""
 }
