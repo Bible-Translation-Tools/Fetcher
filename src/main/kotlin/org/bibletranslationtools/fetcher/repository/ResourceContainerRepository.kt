@@ -1,7 +1,7 @@
 package org.bibletranslationtools.fetcher.repository
 
-import org.wycliffeassociates.rcmediadownloader.data.MediaType
 import java.io.File
+import org.wycliffeassociates.rcmediadownloader.data.MediaType
 
 interface ResourceContainerRepository {
     fun getRC(

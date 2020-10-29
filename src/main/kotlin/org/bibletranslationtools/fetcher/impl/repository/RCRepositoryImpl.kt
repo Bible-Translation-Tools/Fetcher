@@ -13,8 +13,8 @@ import org.wycliffeassociates.resourcecontainer.ResourceContainer
 class RCRepositoryImpl(
     private val downloadClient: IDownloadClient
 ) : ResourceContainerRepository {
-    private val rcRepoUrlTemplate = System.getenv("RC_Repository")
-        ?: "https://content.bibletranslationtools.org/WA-Catalog/%s_%s/archive/master.zip"
+    private val rcRepoTemplateUrl = System.getenv("RC_Repository")
+        ?: DEFAULT_REPO_TEMPLATE_URL
 
     override fun getRC(
         languageCode: String,
@@ -68,7 +68,7 @@ class RCRepositoryImpl(
         resourceId: String,
         downloadClient: IDownloadClient
     ): File? {
-        val url = String.format(rcRepoUrlTemplate, languageCode, resourceId)
+        val url = String.format(rcRepoTemplateUrl, languageCode, resourceId)
         // download rc from repo
         val downloadLocation = File(System.getenv("RC_TEMP")).resolve(languageCode)
         downloadLocation.mkdir()
@@ -121,5 +121,10 @@ class RCRepositoryImpl(
         }
 
         return isExisting
+    }
+
+    private companion object {
+        const val DEFAULT_REPO_TEMPLATE_URL =
+            "https://content.bibletranslationtools.org/WA-Catalog/%s_%s/archive/master.zip"
     }
 }
