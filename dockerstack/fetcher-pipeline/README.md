@@ -2,7 +2,11 @@
 
 ### Requirements
 
-Python 3.8
+Python 3.8  
+
+Java 11  
+
+NodeJs 14  
 
 ### How to use  
 
