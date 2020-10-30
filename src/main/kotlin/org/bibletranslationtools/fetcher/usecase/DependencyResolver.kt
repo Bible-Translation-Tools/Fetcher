@@ -8,7 +8,6 @@ import org.bibletranslationtools.fetcher.impl.repository.LanguageRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.PortGatewayLanguageCatalog
 import org.bibletranslationtools.fetcher.impl.repository.ProductCatalogImpl
 import org.bibletranslationtools.fetcher.impl.repository.RCRepositoryImpl
-import org.bibletranslationtools.fetcher.impl.repository.RCUtils
 import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
