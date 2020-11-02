@@ -50,6 +50,8 @@ class RequestResourceContainer(
     }
 
     fun allocateRcFileLocation(sourceFile: File, deliverable: Deliverable): File {
+        // storage access
+
         val newFileName = RCUtils.createRCFileName(
             deliverable,
             extension = sourceFile.extension

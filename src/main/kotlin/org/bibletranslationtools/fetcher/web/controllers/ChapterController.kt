@@ -72,7 +72,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                     return@get
                 }
 
-                val contentMetadata = RCMetadataBuilder(
+                val contentMetadata = DeliverableBuilder(
                     params,
                     resolver.languageCatalog,
                     resolver.productCatalog,
@@ -80,7 +80,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                 ).build()
 
                 val downloadLink = RequestResourceContainer(resolver.rcRepository, resolver.downloadClient)
-                    .getResourceContainer(contentMetadata)?.file?.path
+                    .getResourceContainer(contentMetadata)?.url
 
                 if (downloadLink == null) {
                     call.respond(HttpStatusCode.NotFound)

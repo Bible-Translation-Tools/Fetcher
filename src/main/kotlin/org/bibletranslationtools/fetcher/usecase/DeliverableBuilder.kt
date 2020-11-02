@@ -8,7 +8,7 @@ import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
 import java.lang.NumberFormatException
 
-class RCMetadataBuilder(
+class DeliverableBuilder(
     parameters: UrlParameters,
     languageCatalog: LanguageCatalog,
     productCatalog: ProductCatalog,
