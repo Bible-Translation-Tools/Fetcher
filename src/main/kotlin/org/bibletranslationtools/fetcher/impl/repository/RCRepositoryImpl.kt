@@ -2,7 +2,7 @@ package org.bibletranslationtools.fetcher.impl.repository
 
 import java.io.File
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
-import org.bibletranslationtools.fetcher.web.controllers.utils.MediaResourceParameters
+import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
 import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
 import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
@@ -16,54 +16,12 @@ class RCRepositoryImpl(
         ?: DEFAULT_REPO_TEMPLATE_URL
 
     override fun getRC(
-        resourceParams: MediaResourceParameters,
-        mediaTypes: List<MediaType>,
-        chapterNumber: Int?
+        languageCode: String,
+        resourceId: String
     ): File? {
-        // get the rc from git repo
-        val templateRC = getTemplateResourceContainer(
-            resourceParams,
-            downloadClient
-        ) ?: return null
-
-        // make new copy of the original
-        val fileName = RCUtils.createRCFileName(
-            resourceParams,
-            extension = templateRC.extension,
-            chapter = chapterNumber
-        )
-        val newFilePath = templateRC.parentFile.resolve(fileName)
-        val rcFile = templateRC.copyTo(newFilePath, true)
-
-        // pass into the download library
-        val downloadParameters = MediaUrlParameter(
-            projectId = resourceParams.bookSlug,
-            mediaDivision = MediaDivision.CHAPTER,
-            mediaTypes = mediaTypes,
-            chapter = chapterNumber
-        )
-        val rcWithMedia = RCMediaDownloader.download(
-            rcFile,
-            downloadParameters,
-            downloadClient,
-            overwrite = true
-        )
-
-        // verify the chapter is downloaded properly
-        return if (
-            RCUtils.verifyChapterExists(rcWithMedia, resourceParams.bookSlug, mediaTypes, chapterNumber)
-        ) {
-            rcWithMedia
-        } else null
-    }
-
-    private fun getTemplateResourceContainer(
-        params: MediaResourceParameters,
-        downloadClient: IDownloadClient
-    ): File? {
-        val url = String.format(rcRepoTemplateUrl, params.languageCode, params.resourceId)
+        val url = String.format(rcRepoTemplateUrl, languageCode, resourceId)
         // download rc from repo
-        val downloadLocation = File(System.getenv("RC_TEMP")).resolve(params.languageCode)
+        val downloadLocation = File(System.getenv("RC_TEMP")).resolve(languageCode)
         downloadLocation.mkdir()
         return downloadClient.downloadFromUrl(url, downloadLocation)
     }

@@ -8,19 +8,15 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
+import org.bibletranslationtools.fetcher.usecase.*
 import java.util.Locale
-import org.bibletranslationtools.fetcher.usecase.DependencyResolver
-import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
-import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
-import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
-import org.bibletranslationtools.fetcher.usecase.RequestResourceContainer
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.BOOK_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.CHAPTER_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
-import org.bibletranslationtools.fetcher.web.controllers.utils.MediaResourceParameters
+import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
 import org.bibletranslationtools.fetcher.web.controllers.utils.PRODUCT_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.RoutingValidator
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
@@ -33,7 +29,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}/{$BOOK_PARAM_KEY}") {
         get {
             // chapters page
-            val params = MediaResourceParameters(
+            val params = UrlParameters(
                 languageCode = call.parameters[LANGUAGE_PARAM_KEY],
                 productSlug = call.parameters[PRODUCT_PARAM_KEY],
                 bookSlug = call.parameters[BOOK_PARAM_KEY]
@@ -54,7 +50,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
         }
         route("{$CHAPTER_PARAM_KEY}") {
             get {
-                val params = MediaResourceParameters(
+                val params = UrlParameters(
                     languageCode = call.parameters[LANGUAGE_PARAM_KEY],
                     productSlug = call.parameters[PRODUCT_PARAM_KEY],
                     bookSlug = call.parameters[BOOK_PARAM_KEY],
@@ -76,8 +72,15 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                     return@get
                 }
 
-                val downloadLink = RequestResourceContainer(resolver.rcRepository)
-                    .getResourceContainer(params)?.path
+                val contentMetadata = RCMetadataBuilder(
+                    params,
+                    resolver.languageCatalog,
+                    resolver.productCatalog,
+                    resolver.bookRepository
+                ).build()
+
+                val downloadLink = RequestResourceContainer(resolver.rcRepository, resolver.downloadClient)
+                    .getResourceContainer(contentMetadata)?.file?.path
 
                 if (downloadLink == null) {
                     call.respond(HttpStatusCode.NotFound)
@@ -90,7 +93,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
 }
 
 private fun chaptersView(
-    params: MediaResourceParameters,
+    params: UrlParameters,
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
@@ -150,10 +153,14 @@ private fun chaptersView(
 }
 
 private fun validateParameters(
-    params: MediaResourceParameters,
+    params: UrlParameters,
     resolver: DependencyResolver
 ): Boolean {
-    val validator = RoutingValidator(resolver)
+    val validator = RoutingValidator(
+        resolver.languageCatalog,
+        resolver.productCatalog,
+        resolver.bookRepository
+    )
 
     return validator.isLanguageCodeValid(params.languageCode) &&
             validator.isProductSlugValid(params.productSlug) &&

@@ -1,13 +1,13 @@
 package org.bibletranslationtools.fetcher.repository
 
 import java.io.File
-import org.bibletranslationtools.fetcher.web.controllers.utils.MediaResourceParameters
+import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
+import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
 interface ResourceContainerRepository {
     fun getRC(
-        resourceParams: MediaResourceParameters,
-        mediaTypes: List<MediaType>,
-        chapterNumber: Int?
+        languageCode: String,
+        resourceId: String
     ): File?
 }
