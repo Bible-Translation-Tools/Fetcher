@@ -1,5 +1,6 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
+import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import java.io.File
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
@@ -10,6 +11,7 @@ import org.wycliffeassociates.rcmediadownloader.data.MediaUrlParameter
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
 class RCRepositoryImpl(
+    private val directoryProvider: DirectoryProvider,
     private val downloadClient: IDownloadClient
 ) : ResourceContainerRepository {
     private val rcRepoTemplateUrl = System.getenv("RC_Repository")
@@ -21,8 +23,8 @@ class RCRepositoryImpl(
     ): File? {
         val url = String.format(rcRepoTemplateUrl, languageCode, resourceId)
         // download rc from repo
-        val downloadLocation = File(System.getenv("RC_TEMP")).resolve(languageCode)
-        downloadLocation.mkdir()
+        val downloadLocation = directoryProvider.getDownloadDir()
+
         return downloadClient.downloadFromUrl(url, downloadLocation)
     }
 

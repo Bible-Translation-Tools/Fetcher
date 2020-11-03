@@ -36,5 +36,5 @@ object DependencyResolver {
     )
 
     val downloadClient: IDownloadClient = DownloadClient()
-    val rcRepository: ResourceContainerRepository = RCRepositoryImpl(downloadClient)
+    val rcRepository: ResourceContainerRepository = RCRepositoryImpl(directoryProvider, downloadClient)
 }

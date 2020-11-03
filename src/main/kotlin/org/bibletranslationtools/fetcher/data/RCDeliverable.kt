@@ -1,7 +1,5 @@
 package org.bibletranslationtools.fetcher.data
 
-import java.io.File
-
 class RCDeliverable(
     resourceId: String,
     language: Language,
@@ -9,4 +7,13 @@ class RCDeliverable(
     product: Product,
     chapter: Chapter?,
     val url: String
-): Deliverable(resourceId, language, book, product, chapter)
+) : Deliverable(resourceId, language, book, product, chapter) {
+    constructor(deliverable: Deliverable, url: String) : this(
+        deliverable.resourceId,
+        deliverable.language,
+        deliverable.book,
+        deliverable.product,
+        deliverable.chapter,
+        url
+    )
+}

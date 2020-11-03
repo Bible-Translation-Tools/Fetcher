@@ -3,8 +3,8 @@ package org.bibletranslationtools.fetcher.usecase
 import org.bibletranslationtools.fetcher.data.Deliverable
 import org.bibletranslationtools.fetcher.data.RCDeliverable
 import org.bibletranslationtools.fetcher.impl.repository.RCUtils
+import org.bibletranslationtools.fetcher.repository.*
 import java.io.File
-import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
 import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
@@ -13,6 +13,7 @@ import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
 class RequestResourceContainer(
     private val rcRepository: ResourceContainerRepository,
+    private val storageAccess: StorageAccess,
     private val downloadClient: IDownloadClient
 ) {
     private val mediaTypes = listOf(MediaType.WAV, MediaType.MP3)
@@ -38,29 +39,19 @@ class RequestResourceContainer(
                 deliverable.chapter?.number
             )
         ) {
-            RCDeliverable(
-                deliverable.resourceId,
-                deliverable.language,
-                deliverable.book,
-                deliverable.product,
-                deliverable.chapter,
-                contentDownloadUrl(rcWithMedia)
-            )
+            RCDeliverable(deliverable, rcWithMedia.path)
         } else null
     }
 
-    fun allocateRcFileLocation(sourceFile: File, deliverable: Deliverable): File {
-        // storage access
-
+    private fun allocateRcFileLocation(rcFile: File, deliverable: Deliverable): File {
         val newFileName = RCUtils.createRCFileName(
             deliverable,
-            extension = sourceFile.extension
+            extension = rcFile.extension
         )
-        val newFilePath = sourceFile.parentFile.resolve(newFileName)
-        return sourceFile.copyTo(newFilePath, true)
+        return storageAccess.allocateRCFileLocation(rcFile, newFileName)
     }
 
-    fun downloadMediaInRC(rcFile: File, deliverable: Deliverable): File {
+    private fun downloadMediaInRC(rcFile: File, deliverable: Deliverable): File {
         val downloadParameters = MediaUrlParameter(
             projectId = deliverable.book.slug,
             mediaDivision = MediaDivision.CHAPTER,
@@ -76,7 +67,7 @@ class RequestResourceContainer(
     }
 
     private fun contentDownloadUrl(rcFile: File): String {
-        // to do: replace path with file server url for download
+        // TODO: replace path with file server url for download
         return rcFile.path
     }
 }

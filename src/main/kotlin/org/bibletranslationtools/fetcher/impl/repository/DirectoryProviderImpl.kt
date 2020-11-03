@@ -15,4 +15,8 @@ class DirectoryProviderImpl : DirectoryProvider {
     override fun getChaptersDir(languageCode: String, resourceId: String, bookSlug: String): File {
         return getProjectsDir(languageCode, resourceId).resolve(bookSlug)
     }
+
+    override fun getDownloadDir(): File {
+        return File(System.getenv("RC_TEMP")).apply { mkdirs() }
+    }
 }
