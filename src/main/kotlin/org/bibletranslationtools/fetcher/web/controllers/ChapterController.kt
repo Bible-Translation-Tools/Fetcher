@@ -77,18 +77,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                     return@get
                 }
 
-                val deliverable = DeliverableBuilder(
-                    resolver.languageCatalog,
-                    resolver.productCatalog,
-                    resolver.bookRepository
-                ).build(params)
-
-                val downloadLink = RequestResourceContainer(
-                    resolver.rcRepository,
-                    resolver.storageAccess,
-                    resolver.downloadClient
-                ).getResourceContainer(deliverable)?.url
-
+                val downloadLink = oratureFileDownload(params, resolver)
                 if (downloadLink == null) {
                     call.respond(HttpStatusCode.NotFound)
                 } else {
@@ -173,4 +162,21 @@ private fun validateParameters(
             validator.isProductSlugValid(params.productSlug) &&
             validator.isBookSlugValid(params.bookSlug) &&
             validator.isChapterValid(params.chapter)
+}
+
+private fun oratureFileDownload(
+    params: UrlParameters,
+    resolver: DependencyResolver
+): String? {
+    val deliverable = DeliverableBuilder(
+        resolver.languageCatalog,
+        resolver.productCatalog,
+        resolver.bookRepository
+    ).build(params)
+
+    return RequestResourceContainer(
+        resolver.rcRepository,
+        resolver.storageAccess,
+        resolver.downloadClient
+    ).getResourceContainer(deliverable)?.url
 }

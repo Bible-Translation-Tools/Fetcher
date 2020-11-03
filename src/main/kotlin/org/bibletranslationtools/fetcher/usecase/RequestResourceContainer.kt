@@ -66,9 +66,4 @@ class RequestResourceContainer(
             overwrite = true
         )
     }
-
-    private fun contentDownloadUrl(rcFile: File): String {
-        // to do: replace path with file server url for download
-        return rcFile.path
-    }
 }
