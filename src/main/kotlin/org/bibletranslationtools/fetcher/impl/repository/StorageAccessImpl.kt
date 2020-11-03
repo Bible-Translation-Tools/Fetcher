@@ -145,6 +145,11 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
                 hasChapterFile(languageCode, resourceId, bookSlug, fileExtensionList)
     }
 
+    override fun allocateRCFileLocation(sourceFile: File, newFileName: String): File {
+        val newFilePath = sourceFile.parentFile.resolve(newFileName)
+        return sourceFile.copyTo(newFilePath, true)
+    }
+
     private fun hasBookFile(
         languageCode: String,
         resourceId: String,

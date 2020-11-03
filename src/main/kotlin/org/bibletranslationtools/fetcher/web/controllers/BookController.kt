@@ -29,8 +29,8 @@ fun Routing.bookController(resolver: DependencyResolver) {
             // books page
             val path = normalizeUrl(call.request.path())
             val params = UrlParameters(
-                lc = call.parameters[LANGUAGE_PARAM_KEY],
-                ps = call.parameters[PRODUCT_PARAM_KEY]
+                languageCode = call.parameters[LANGUAGE_PARAM_KEY],
+                productSlug = call.parameters[PRODUCT_PARAM_KEY]
             )
             call.respond(
                 booksView(params, path, resolver, contentLanguage)
@@ -46,7 +46,11 @@ private fun booksView(
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
     val validator =
-        RoutingValidator(resolver)
+        RoutingValidator(
+            resolver.languageCatalog,
+            resolver.productCatalog,
+            resolver.bookRepository
+        )
 
     if (
         !validator.isLanguageCodeValid(params.languageCode) ||

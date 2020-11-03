@@ -15,7 +15,7 @@ class FetchChapterViewData(
     productSlug: String,
     private val bookSlug: String
 ) {
-    private val product = ProductFileExtension.getType(productSlug)
+    private val product = ProductFileExtension.getType(productSlug)!!
 
     private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
 
@@ -35,8 +35,13 @@ class FetchChapterViewData(
     }
 
     fun getViewDataList(): List<ChapterViewData>? {
-        if (product == null) return null
+        return when (product) {
+            ProductFileExtension.BTTR, ProductFileExtension.MP3 -> chaptersFromDirectory()
+            else -> chaptersForOrature() // all chapters are available
+        }
+    }
 
+    private fun chaptersFromDirectory(): List<ChapterViewData> {
         val chapterList = mutableListOf<ChapterViewData>()
 
         for (chapterNumber in 1..chapters.size) {
@@ -46,7 +51,7 @@ class FetchChapterViewData(
                 val fileAccessRequest = when (product) {
                     ProductFileExtension.BTTR -> getBTTRFileAccessRequest(chapterNumber, priority)
                     ProductFileExtension.MP3 -> getMp3FileAccessRequest(chapterNumber, priority)
-                    ProductFileExtension.ORATURE -> TODO("add orature backend support")
+                    else -> return listOf()
                 }
 
                 val chapterFile = storage.getChapterFile(fileAccessRequest)
@@ -59,6 +64,13 @@ class FetchChapterViewData(
         }
 
         return chapterList
+    }
+
+    private fun chaptersForOrature(): List<ChapterViewData> {
+        val requestUrl = "#" // front-end handled script
+        return chapters.map {
+            ChapterViewData(it.number, url = String.format(requestUrl, it.number))
+        }
     }
 
     private fun getBTTRFileAccessRequest(

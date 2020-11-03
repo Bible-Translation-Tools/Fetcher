@@ -1,11 +1,15 @@
 package org.bibletranslationtools.fetcher.web.controllers.utils
 
-data class UrlParameters(
-    private val lc: String? = null, // language code
-    private val ps: String? = null, // product slug
-    private val bs: String? = null // book slug
+class UrlParameters(
+    resourceId: String? = null,
+    languageCode: String? = null,
+    productSlug: String? = null,
+    bookSlug: String? = null,
+    chapter: String? = null
 ) {
-    val languageCode = lc ?: ""
-    val productSlug = ps ?: ""
-    val bookSlug = bs ?: ""
+    val resourceId: String = resourceId ?: "ulb"
+    val languageCode: String = languageCode ?: ""
+    val productSlug: String = productSlug ?: ""
+    val bookSlug: String = bookSlug ?: ""
+    val chapter: String? = chapter
 }
