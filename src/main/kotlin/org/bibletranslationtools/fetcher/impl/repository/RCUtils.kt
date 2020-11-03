@@ -24,7 +24,7 @@ fun verifyChapterExists(
     mediaTypes: List<MediaType>,
     chapterNumber: Int?
 ): Boolean {
-    var isExisting = false
+    var exists = false
     val chapterNumberPattern = chapterNumber?.toString() ?: "[0-9]{1,3}"
 
     ResourceContainer.load(rcFile).use { rc ->
@@ -41,13 +41,13 @@ fun verifyChapterExists(
 
             ZipFile(rcFile).use { rcZip ->
                 val listEntries = rcZip.entries().toList()
-                isExisting = listEntries.any { entry ->
+                exists = listEntries.any { entry ->
                     entry.name.matches(Regex(".*/$chapterPath\$"))
                 }
             }
         }
-        if (isExisting) return true
+        if (exists) return true
     }
 
-    return isExisting
+    return exists
 }
