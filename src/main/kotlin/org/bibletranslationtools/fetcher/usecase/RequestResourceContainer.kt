@@ -1,10 +1,11 @@
 package org.bibletranslationtools.fetcher.usecase
 
+import java.io.File
 import org.bibletranslationtools.fetcher.data.Deliverable
 import org.bibletranslationtools.fetcher.data.RCDeliverable
 import org.bibletranslationtools.fetcher.impl.repository.RCUtils
-import org.bibletranslationtools.fetcher.repository.*
-import java.io.File
+import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
+import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
 import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
@@ -31,7 +32,7 @@ class RequestResourceContainer(
 
         val rcWithMedia = downloadMediaInRC(rcFile, deliverable)
 
-        return if  (
+        return if (
             RCUtils.verifyChapterExists(
                 rcWithMedia,
                 deliverable.book.slug,
@@ -67,7 +68,7 @@ class RequestResourceContainer(
     }
 
     private fun contentDownloadUrl(rcFile: File): String {
-        // TODO: replace path with file server url for download
+        // to do: replace path with file server url for download
         return rcFile.path
     }
 }

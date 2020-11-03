@@ -1,13 +1,12 @@
 package org.bibletranslationtools.fetcher.usecase
 
+import java.lang.NumberFormatException
 import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.data.Deliverable
-import org.bibletranslationtools.fetcher.data.RCDeliverable
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
-import java.lang.NumberFormatException
 
 open class DeliverableBuilder(
     private val languageCatalog: LanguageCatalog,

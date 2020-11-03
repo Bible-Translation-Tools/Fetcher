@@ -1,13 +1,8 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
-import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import java.io.File
+import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
-import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
-import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
-import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
-import org.wycliffeassociates.rcmediadownloader.data.MediaType
-import org.wycliffeassociates.rcmediadownloader.data.MediaUrlParameter
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
 class RCRepositoryImpl(

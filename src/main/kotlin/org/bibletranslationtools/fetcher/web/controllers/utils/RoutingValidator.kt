@@ -1,9 +1,9 @@
 package org.bibletranslationtools.fetcher.web.controllers.utils
 
+import java.lang.NumberFormatException
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
-import java.lang.NumberFormatException
 
 class RoutingValidator(
     private val languageCatalog: LanguageCatalog,

@@ -1,8 +1,8 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
-import org.bibletranslationtools.fetcher.data.Deliverable
 import java.io.File
 import java.util.zip.ZipFile
+import org.bibletranslationtools.fetcher.data.Deliverable
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
@@ -14,7 +14,8 @@ object RCUtils {
         return if (deliverable.chapter == null) {
             "${deliverable.language.code}_${deliverable.resourceId}_${deliverable.book.slug}.$extension" // book rc
         } else {
-            "${deliverable.language.code}_${deliverable.resourceId}_${deliverable.book.slug}_c${deliverable.chapter.number}.$extension" // chapter rc
+            "${deliverable.language.code}_${deliverable.resourceId}_${deliverable.book.slug}" +
+                    "_c${deliverable.chapter.number}.$extension" // chapter rc
         }
     }
 
