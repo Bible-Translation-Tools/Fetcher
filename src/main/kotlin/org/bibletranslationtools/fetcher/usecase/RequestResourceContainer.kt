@@ -3,7 +3,8 @@ package org.bibletranslationtools.fetcher.usecase
 import java.io.File
 import org.bibletranslationtools.fetcher.data.Deliverable
 import org.bibletranslationtools.fetcher.data.RCDeliverable
-import org.bibletranslationtools.fetcher.impl.repository.RCUtils
+import org.bibletranslationtools.fetcher.impl.repository.createRCFileName
+import org.bibletranslationtools.fetcher.impl.repository.verifyChapterExists
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
@@ -33,7 +34,7 @@ class RequestResourceContainer(
         val rcWithMedia = downloadMediaInRC(rcFile, deliverable)
 
         return if (
-            RCUtils.verifyChapterExists(
+            verifyChapterExists(
                 rcWithMedia,
                 deliverable.book.slug,
                 mediaTypes,
@@ -45,7 +46,7 @@ class RequestResourceContainer(
     }
 
     private fun allocateRcFileLocation(rcFile: File, deliverable: Deliverable): File {
-        val newFileName = RCUtils.createRCFileName(
+        val newFileName = createRCFileName(
             deliverable,
             extension = rcFile.extension
         )
