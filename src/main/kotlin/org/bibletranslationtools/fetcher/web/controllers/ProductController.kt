@@ -13,8 +13,8 @@ import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
-import org.bibletranslationtools.fetcher.web.controllers.utils.MediaResourceParameters
 import org.bibletranslationtools.fetcher.web.controllers.utils.RoutingValidator
+import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
 import org.bibletranslationtools.fetcher.web.controllers.utils.getLanguageName
@@ -26,7 +26,7 @@ fun Routing.productController(resolver: DependencyResolver) {
         get {
             // products page
             val path = normalizeUrl(call.request.path())
-            val params = MediaResourceParameters(
+            val params = UrlParameters(
                 languageCode = call.parameters[LANGUAGE_PARAM_KEY]
             )
             call.respond(
@@ -37,13 +37,17 @@ fun Routing.productController(resolver: DependencyResolver) {
 }
 
 private fun productsView(
-    params: MediaResourceParameters,
+    params: UrlParameters,
     path: String,
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
     val validator =
-        RoutingValidator(resolver)
+        RoutingValidator(
+            resolver.languageCatalog,
+            resolver.productCatalog,
+            resolver.bookRepository
+        )
 
     if (!validator.isLanguageCodeValid(params.languageCode)) {
         return errorPage(

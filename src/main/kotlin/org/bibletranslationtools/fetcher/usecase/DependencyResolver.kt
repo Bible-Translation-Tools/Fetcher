@@ -18,6 +18,7 @@ import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.wycliffeassociates.rcmediadownloader.io.DownloadClient
+import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
 object DependencyResolver {
     private val directoryProvider: DirectoryProvider = DirectoryProviderImpl()
@@ -33,5 +34,7 @@ object DependencyResolver {
     val bookRepository: BookRepository = BookRepositoryImpl(
         bookCatalog = BookCatalogImpl()
     )
-    val rcRepository: ResourceContainerRepository = RCRepositoryImpl(DownloadClient())
+
+    val downloadClient: IDownloadClient = DownloadClient()
+    val rcRepository: ResourceContainerRepository = RCRepositoryImpl(directoryProvider, downloadClient)
 }
