@@ -10,6 +10,29 @@ object ContentAvailabilityCache {
     private val mediaTypes = listOf("mp3", "wav")
     private var tree: List<LanguageCache>
 
+    private data class LanguageCache(
+        val code: String,
+        var availability: Boolean = false,
+        val products: List<ProductCache> = listOf()
+    )
+
+    private data class ProductCache(
+        val slug: String,
+        var availability: Boolean = false,
+        val books: List<BookCache> = listOf()
+    )
+
+    private data class BookCache(
+        val slug: String,
+        var availability: Boolean = false,
+        val chapters: List<ChapterCache> = listOf()
+    )
+
+    private data class ChapterCache(
+        val number: Int,
+        var availability: Boolean = false
+    )
+
     init {
         tree = listOf()
     }
@@ -60,32 +83,8 @@ object ContentAvailabilityCache {
         }
     }
 
-    data class LanguageCache(
-        val code: String,
-        var availability: Boolean = false,
-        val products: List<ProductCache> = listOf()
-    )
-
-    data class ProductCache(
-        val slug: String,
-        var availability: Boolean = false,
-        val books: List<BookCache> = listOf()
-    )
-
-    data class BookCache(
-        val slug: String,
-        var availability: Boolean = false,
-        val chapters: List<ChapterCache> = listOf()
-    )
-
-    data class ChapterCache(
-        val number: Int,
-        var availability: Boolean = false
-    )
-
     private fun cacheLanguages(): List<LanguageCache> {
-//        val glList = PortGatewayLanguageCatalog().getAll()
-        val glList = listOf(LanguageCache("en"))
+        val glList = PortGatewayLanguageCatalog().getAll()
         return glList.map { lang ->
             val products = cacheProducts(lang.code)
             val availability = products.any { it.availability }
@@ -94,15 +93,15 @@ object ContentAvailabilityCache {
     }
 
     private fun cacheProducts(languageCode: String): List<ProductCache> {
-        val productList = ProductCatalogImpl().getAll().filter { it.slug == "orature" }
+        val productList = ProductCatalogImpl().getAll()
         return productList.map { prod ->
-            val books = cacheBooks(languageCode) // orature cache
+            val books = cacheBooks(languageCode, prod.slug)
             val availability = books.any { it.availability }
             ProductCache(prod.slug, availability, books)
         }
     }
 
-    private fun cacheBooks(languageCode: String): List<BookCache> {
+    private fun cacheBooks(languageCode: String, productSlug: String): List<BookCache> {
         val bookList = BookCatalogImpl().getAll()
         return bookList.map { book ->
             val chapters = cacheChapters(languageCode, book.slug)
