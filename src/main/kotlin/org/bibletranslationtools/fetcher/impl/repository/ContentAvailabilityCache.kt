@@ -21,8 +21,12 @@ object ContentAvailabilityCache {
 
     fun isLanguageAvailable(code: String): Boolean = tree.any { it.code == code && it.availability }
 
-    fun isProductAvailable(languageCode: String): Boolean {
-        
+    fun isProductAvailable(productSlug: String, languageCode: String): Boolean {
+        return tree.find {
+            it.code == languageCode && it.availability
+        }?.products?.any {
+            it.slug == productSlug
+        } ?: false
     }
 
     fun isBookAvailable(bookSlug: String, languageCode: String, productSlug: String): Boolean {
