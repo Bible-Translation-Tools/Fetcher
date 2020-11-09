@@ -1,11 +1,12 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
+import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 
-object ContentAvailabilityCache {
+object ContentAvailabilityCache: ContentCacheRepository {
     private val repoDir = File("E:/miscs/rc/tmp")
     private val mediaTypes = listOf("mp3", "wav")
     private var tree: List<LanguageCache>
@@ -38,13 +39,13 @@ object ContentAvailabilityCache {
     }
 
     @Synchronized
-    fun update() {
+    override fun update() {
         tree = cacheLanguages()
     }
 
-    fun isLanguageAvailable(code: String): Boolean = tree.any { it.code == code && it.availability }
+    override fun isLanguageAvailable(code: String) = tree.any { it.code == code && it.availability }
 
-    fun isProductAvailable(productSlug: String, languageCode: String): Boolean {
+    override fun isProductAvailable(productSlug: String, languageCode: String): Boolean {
         return tree.find {
             it.code == languageCode && it.availability
         }?.products?.any {
@@ -52,7 +53,11 @@ object ContentAvailabilityCache {
         } ?: false
     }
 
-    fun isBookAvailable(bookSlug: String, languageCode: String, productSlug: String): Boolean {
+    override fun isBookAvailable(
+        bookSlug: String,
+        languageCode: String,
+        productSlug: String
+    ): Boolean {
         val productCache = tree.find {
             it.code == languageCode && it.availability
         }?.products?.find {
@@ -64,7 +69,7 @@ object ContentAvailabilityCache {
         }
     }
 
-    fun isChapterAvailable(
+    override fun isChapterAvailable(
         number: Int,
         bookSlug: String,
         languageCode: String,
