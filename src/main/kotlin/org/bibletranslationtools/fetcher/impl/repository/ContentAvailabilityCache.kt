@@ -41,6 +41,25 @@ object ContentAvailabilityCache {
         }
     }
 
+    fun isChapterAvailable(
+        number: Int,
+        bookSlug: String,
+        languageCode: String,
+        productSlug: String
+    ): Boolean {
+        val bookCache = tree.find {
+            it.code == languageCode && it.availability
+        }?.products?.find {
+            it.slug == productSlug && it.availability
+        }?.books?.find {
+            it.slug == bookSlug && it.availability
+        } ?: return false
+
+        return bookCache.chapters.any {
+            it.number == number && it.availability
+        }
+    }
+
     data class LanguageCache(
         val code: String,
         var availability: Boolean = false,
