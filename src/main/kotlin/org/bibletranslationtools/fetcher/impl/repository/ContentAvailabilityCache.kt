@@ -1,12 +1,13 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
+import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 
-object ContentAvailabilityCache: ContentCacheRepository {
+class ContentAvailabilityCache : ContentCacheRepository {
     private val repoDir = File("E:/miscs/rc/tmp")
     private val mediaTypes = listOf("mp3", "wav")
     private var tree: List<LanguageCache>
@@ -31,6 +32,7 @@ object ContentAvailabilityCache: ContentCacheRepository {
 
     private data class ChapterCache(
         val number: Int,
+        val url: String? = null,
         var availability: Boolean = false
     )
 
@@ -92,31 +94,33 @@ object ContentAvailabilityCache: ContentCacheRepository {
         val glList = PortGatewayLanguageCatalog().getAll()
         return glList.map { lang ->
             val products = cacheProducts(lang.code)
-            val availability = products.any { it.availability }
-            LanguageCache(lang.code, availability, products)
+            val available = products.any { it.availability }
+            LanguageCache(lang.code, available, products)
         }
     }
 
     private fun cacheProducts(languageCode: String): List<ProductCache> {
-        val productList = ProductCatalogImpl().getAll()
+        val productList = ProductCatalogImpl().getAll().filter { it.slug == "orature" }
         return productList.map { prod ->
             val books = cacheBooks(languageCode, prod.slug)
-            val availability = books.any { it.availability }
-            ProductCache(prod.slug, availability, books)
+            val available = books.any { it.availability }
+            ProductCache(prod.slug, available, books)
         }
     }
 
     private fun cacheBooks(languageCode: String, productSlug: String): List<BookCache> {
         val bookList = BookCatalogImpl().getAll()
+
         return bookList.map { book ->
-            val chapters = cacheChapters(languageCode, book.slug)
-            val availability = chapters.any { it.availability }
-            BookCache(book.slug, availability, chapters)
+            val chapters = cacheChapters(languageCode, book.slug, productSlug)
+            val available = chapters.any { it.availability }
+            BookCache(book.slug, available, chapters)
         }
     }
 
     private fun cacheChapters(
         languageCode: String,
+        productSlug: String,
         bookSlug: String
     ): List<ChapterCache> {
         val chapterList = ChapterCatalogImpl().getAll(languageCode, bookSlug)
