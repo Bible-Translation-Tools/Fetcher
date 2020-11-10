@@ -5,6 +5,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
+import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
 import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
@@ -29,8 +30,8 @@ class ContentAvailabilityCache : ContentCacheRepository {
     private data class BookCache(
         val slug: String,
         var availability: Boolean = false,
-        val chapters: List<ChapterCache> = listOf(),
-        val url: String? = null
+        val url: String? = null,
+        val chapters: List<ChapterCache> = listOf()
     )
 
     private data class ChapterCache(
@@ -46,11 +47,6 @@ class ContentAvailabilityCache : ContentCacheRepository {
     @Synchronized
     override fun update() {
         tree = cacheLanguages()
-    }
-
-    fun getCache() {
-        val count = tree
-        println(count)
     }
 
     override fun isLanguageAvailable(code: String) = tree.any { it.code == code && it.availability }
@@ -99,7 +95,7 @@ class ContentAvailabilityCache : ContentCacheRepository {
     }
 
     private fun cacheLanguages(): List<LanguageCache> {
-        val glList = PortGatewayLanguageCatalog().getAll()
+        val glList = PortGatewayLanguageCatalog().getAll().filter { it.code == "en" }
         return glList.map { lang ->
             val products = cacheProducts(lang.code)
             val isAvailable = products.any { it.availability }
@@ -118,13 +114,25 @@ class ContentAvailabilityCache : ContentCacheRepository {
 
     private fun cacheBooks(languageCode: String, productSlug: String): List<BookCache> {
         val bookList = BookCatalogImpl().getAll()
-
+        val product = ProductFileExtension.getType(productSlug)!!
         return bookList.map { book ->
             val chapters = cacheChapters(
-                languageCode = languageCode, productSlug =  productSlug, bookSlug = book.slug
+                languageCode = languageCode, productSlug = productSlug, bookSlug = book.slug
             )
-            val isAvailable = chapters.any { it.availability }
-            BookCache(book.slug, isAvailable, chapters)
+            var isAvailable: Boolean = chapters.any { it.availability }
+
+            val bookUrl = when (product) {
+                ProductFileExtension.ORATURE -> null
+                else ->
+                    FetchBookViewData(
+                        DependencyResolver.bookRepository,
+                        DependencyResolver.storageAccess,
+                        languageCode,
+                        productSlug
+                    ).getBookDownloadUrl(book.slug)
+            }
+
+            BookCache(book.slug, isAvailable || bookUrl != null, bookUrl, chapters)
         }
     }
 
@@ -145,7 +153,7 @@ class ContentAvailabilityCache : ContentCacheRepository {
         languageCode: String,
         bookSlug: String
     ): List<ChapterCache> {
-        val chapterList = ChapterCatalogImpl().getAll(languageCode, bookSlug)
+        val chapterList = DependencyResolver.chapterCatalog.getAll(languageCode, bookSlug)
         val resultList = chapterList.map { ChapterCache(it.number) }
         val baseRcName = "%s_%s.zip"
         val resourceId = "ulb"
@@ -179,7 +187,7 @@ class ContentAvailabilityCache : ContentCacheRepository {
             DependencyResolver.storageAccess,
             languageCode = languageCode,
             productSlug = productSlug,
-            bookSlug =  bookSlug
+            bookSlug = bookSlug
         ).chaptersFromDirectory()
 
         return chaptersFromDirectory.map {
