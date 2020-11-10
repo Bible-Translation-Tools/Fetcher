@@ -11,7 +11,7 @@ import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
 class ContentAvailabilityCache : ContentCacheRepository {
-    private val repoDir = File("E:/miscs/rc/tmp")
+    private val repoDir = File(System.getenv("ORATURE_REPO_DIR"))
     private val mediaTypes = listOf("mp3", "wav")
     private var tree: List<LanguageCache>
 
@@ -164,9 +164,12 @@ class ContentAvailabilityCache : ContentCacheRepository {
             val mediaList =
                 rc.media?.projects?.find { it.identifier == bookSlug }
                     ?.media?.filter { it.identifier in mediaTypes && it.chapterUrl.isNotEmpty() }
+
             mediaList?.forEach { media ->
                 for (chapter in resultList) {
                     val url = URL(media.chapterUrl.replace("{chapter}", chapter.number.toString()))
+
+                    // check if remote content is available
                     val conn = url.openConnection() as HttpURLConnection
                     conn.requestMethod = "HEAD"
                     if (conn.responseCode == 200) chapter.availability = true
