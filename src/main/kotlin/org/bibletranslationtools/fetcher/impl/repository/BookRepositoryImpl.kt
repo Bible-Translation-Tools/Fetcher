@@ -4,10 +4,8 @@ import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.BookCatalog
 import org.bibletranslationtools.fetcher.repository.BookRepository
-import org.bibletranslationtools.fetcher.repository.StorageAccess
 
 class BookRepositoryImpl(
-    private val storageAccess: StorageAccess,
     private val bookCatalog: BookCatalog
 ) : BookRepository {
     private val englishLanguageCode = "en"

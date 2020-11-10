@@ -27,7 +27,7 @@ fun Routing.productController(resolver: DependencyResolver) {
             // products page
             val path = normalizeUrl(call.request.path())
             val params = UrlParameters(
-                lc = call.parameters[LANGUAGE_PARAM_KEY]
+                languageCode = call.parameters[LANGUAGE_PARAM_KEY]
             )
             call.respond(
                 productsView(params, path, resolver, contentLanguage)
@@ -43,7 +43,11 @@ private fun productsView(
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
     val validator =
-        RoutingValidator(resolver)
+        RoutingValidator(
+            resolver.languageCatalog,
+            resolver.productCatalog,
+            resolver.bookRepository
+        )
 
     if (!validator.isLanguageCodeValid(params.languageCode)) {
         return errorPage(

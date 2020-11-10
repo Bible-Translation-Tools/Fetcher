@@ -27,6 +27,7 @@ sourceCompatibility = 11
 
 repositories {
     mavenCentral()
+    maven { url "https://nexus-registry.walink.org/repository/maven-public/" }
     jcenter()
     flatDir {
         dirs 'libs'
@@ -47,6 +48,9 @@ dependencies {
     implementation "org.mockito:mockito-core:$mockito_core_ver"
     implementation "io.ktor:ktor-client-cio:$ktor_client_ver"
     implementation name: "thymeleaf-1.0-SNAPSHOT"
+    implementation "org.wycliffeassociates:kotlin-resource-container:$resource_container_ver"
+    implementation "org.wycliffeassociates:rcmediadownloader:$rc_media_downloader_ver"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_ver"
 
     detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_ver"
 }

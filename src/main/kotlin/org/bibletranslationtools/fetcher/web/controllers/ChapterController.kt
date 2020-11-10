@@ -9,12 +9,16 @@ import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
 import java.util.Locale
+import org.bibletranslationtools.fetcher.usecase.DeliverableBuilder
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
+import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
+import org.bibletranslationtools.fetcher.usecase.RequestResourceContainer
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.BOOK_PARAM_KEY
+import org.bibletranslationtools.fetcher.web.controllers.utils.CHAPTER_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.PRODUCT_PARAM_KEY
@@ -31,17 +35,12 @@ fun Routing.chapterController(resolver: DependencyResolver) {
         get {
             // chapters page
             val params = UrlParameters(
-                lc = call.parameters[LANGUAGE_PARAM_KEY],
-                ps = call.parameters[PRODUCT_PARAM_KEY],
-                bs = call.parameters[BOOK_PARAM_KEY]
+                languageCode = call.parameters[LANGUAGE_PARAM_KEY],
+                productSlug = call.parameters[PRODUCT_PARAM_KEY],
+                bookSlug = call.parameters[BOOK_PARAM_KEY]
             )
 
-            val validator = RoutingValidator(resolver)
-            if (
-                !validator.isLanguageCodeValid(params.languageCode) ||
-                !validator.isProductSlugValid(params.productSlug) ||
-                !validator.isBookSlugValid(params.bookSlug)
-            ) {
+            if (!validateParameters(params, resolver)) {
                 call.respond(
                     errorPage(
                         "invalid_route_parameter",
@@ -53,6 +52,38 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                 return@get
             }
             call.respond(chaptersView(params, resolver, contentLanguage))
+        }
+        route("{$CHAPTER_PARAM_KEY}") {
+            get {
+                val params = UrlParameters(
+                    languageCode = call.parameters[LANGUAGE_PARAM_KEY],
+                    productSlug = call.parameters[PRODUCT_PARAM_KEY],
+                    bookSlug = call.parameters[BOOK_PARAM_KEY],
+                    chapter = call.parameters[CHAPTER_PARAM_KEY]
+                )
+
+                if (
+                    !validateParameters(params, resolver) ||
+                    ProductFileExtension.getType(params.productSlug) != ProductFileExtension.ORATURE
+                ) {
+                    call.respond(
+                        errorPage(
+                            "invalid_route_parameter",
+                            "invalid_route_parameter_message",
+                            HttpStatusCode.NotFound,
+                            contentLanguage
+                        )
+                    )
+                    return@get
+                }
+
+                val downloadLink = oratureFileDownload(params, resolver)
+                if (downloadLink == null) {
+                    call.respond(HttpStatusCode.NotFound)
+                } else {
+                    call.respond(downloadLink)
+                }
+            }
         }
     }
 }
@@ -97,6 +128,8 @@ private fun chaptersView(
     } else {
         val languageName = getLanguageName(params.languageCode, resolver)
         val productTitle = getProductTitleKey(params.productSlug, resolver)
+        val isRequestLink =
+            ProductFileExtension.getType(params.productSlug) == ProductFileExtension.ORATURE
         ThymeleafContent(
             template = "chapters",
             model = mapOf(
@@ -107,9 +140,43 @@ private fun chaptersView(
                 "fileTypesNavTitle" to productTitle,
                 "fileTypesNavUrl" to "/$GL_ROUTE/${params.languageCode}",
                 "booksNavTitle" to bookViewData.localizedName,
-                "booksNavUrl" to "/$GL_ROUTE/${params.languageCode}/${params.productSlug}"
+                "booksNavUrl" to "/$GL_ROUTE/${params.languageCode}/${params.productSlug}",
+                "isRequestLink" to isRequestLink
             ),
             locale = getPreferredLocale(contentLanguage, "chapters")
         )
     }
+}
+
+private fun validateParameters(
+    params: UrlParameters,
+    resolver: DependencyResolver
+): Boolean {
+    val validator = RoutingValidator(
+        resolver.languageCatalog,
+        resolver.productCatalog,
+        resolver.bookRepository
+    )
+
+    return validator.isLanguageCodeValid(params.languageCode) &&
+            validator.isProductSlugValid(params.productSlug) &&
+            validator.isBookSlugValid(params.bookSlug) &&
+            validator.isChapterValid(params.chapter)
+}
+
+private fun oratureFileDownload(
+    params: UrlParameters,
+    resolver: DependencyResolver
+): String? {
+    val deliverable = DeliverableBuilder(
+        resolver.languageCatalog,
+        resolver.productCatalog,
+        resolver.bookRepository
+    ).build(params)
+
+    return RequestResourceContainer(
+        resolver.rcRepository,
+        resolver.storageAccess,
+        resolver.downloadClient
+    ).getResourceContainer(deliverable)?.url
 }
