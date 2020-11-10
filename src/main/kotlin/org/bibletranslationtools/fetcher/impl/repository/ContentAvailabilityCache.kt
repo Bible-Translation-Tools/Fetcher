@@ -1,11 +1,12 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
-import org.bibletranslationtools.fetcher.repository.BookRepository
-import org.bibletranslationtools.fetcher.repository.ChapterCatalog
-import java.io.File
+import io.ktor.http.HttpStatusCode
 import java.net.HttpURLConnection
 import java.net.URL
+import org.bibletranslationtools.fetcher.repository.BookRepository
+import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
+import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
@@ -16,11 +17,13 @@ import org.wycliffeassociates.resourcecontainer.ResourceContainer
 class ContentAvailabilityCache(
     private val chapterCatalog: ChapterCatalog,
     private val bookRepository: BookRepository,
-    private val storageAccess: StorageAccess
+    private val storageAccess: StorageAccess,
+    directoryProvider: DirectoryProvider
 ) : ContentCacheRepository {
-    private val repoDir = File(System.getenv("ORATURE_REPO_DIR"))
+    private val repoDir = directoryProvider.getRCRepositoriesDir()
     private val templateRCName = "%s_%s.zip"
-    private var tree: List<LanguageCache>
+    private val resourceId = "ulb"
+    private var root: List<LanguageCache>
 
     private data class LanguageCache(
         val code: String,
@@ -48,18 +51,18 @@ class ContentAvailabilityCache(
     )
 
     init {
-        tree = cacheLanguages()
+        root = cacheLanguages()
     }
 
     @Synchronized
     override fun update() {
-        tree = cacheLanguages()
+        root = cacheLanguages()
     }
 
-    override fun isLanguageAvailable(code: String) = tree.any { it.code == code && it.availability }
+    override fun isLanguageAvailable(code: String) = root.any { it.code == code && it.availability }
 
     override fun isProductAvailable(productSlug: String, languageCode: String): Boolean {
-        return tree.find {
+        return root.find {
             it.code == languageCode && it.availability
         }?.products?.any {
             it.slug == productSlug
@@ -71,7 +74,7 @@ class ContentAvailabilityCache(
         languageCode: String,
         productSlug: String
     ): Boolean {
-        val productCache = tree.find {
+        val productCache = root.find {
             it.code == languageCode && it.availability
         }?.products?.find {
             it.slug == productSlug && it.availability
@@ -88,7 +91,7 @@ class ContentAvailabilityCache(
         languageCode: String,
         productSlug: String
     ): Boolean {
-        val bookCache = tree.find {
+        val bookCache = root.find {
             it.code == languageCode && it.availability
         }?.products?.find {
             it.slug == productSlug && it.availability
@@ -120,8 +123,9 @@ class ContentAvailabilityCache(
     }
 
     private fun cacheBooks(languageCode: String, productSlug: String): List<BookCache> {
-        val bookList = BookCatalogImpl().getAll()
         val product = ProductFileExtension.getType(productSlug)!!
+        val bookList = bookRepository.getBooks(resourceId)
+
         return bookList.map { book ->
             val chapters = cacheChapters(
                 languageCode = languageCode, productSlug = productSlug, bookSlug = book.slug
@@ -162,13 +166,12 @@ class ContentAvailabilityCache(
     ): List<ChapterCache> {
         val chapterList = chapterCatalog.getAll(languageCode, bookSlug)
         val resultList = chapterList.map { ChapterCache(it.number) }
-        val resourceId = "ulb"
-        val rcName = repoDir.resolve(String.format(templateRCName, languageCode, resourceId))
-        if (!rcName.isFile) return resultList
+        val rcFile = repoDir.resolve(String.format(templateRCName, languageCode, resourceId))
+        if (!rcFile.isFile) return resultList
 
         val mediaTypes = RequestResourceContainer.mediaTypes.map { it.name.toLowerCase() }
 
-        ResourceContainer.load(rcName).use { rc ->
+        ResourceContainer.load(rcFile).use { rc ->
             val mediaList =
                 rc.media?.projects?.find { it.identifier == bookSlug }
                     ?.media?.filter { it.identifier in mediaTypes && it.chapterUrl.isNotEmpty() }
@@ -180,7 +183,7 @@ class ContentAvailabilityCache(
                     // check if remote content is available
                     val conn = url.openConnection() as HttpURLConnection
                     conn.requestMethod = "HEAD"
-                    if (conn.responseCode == 200) chapter.availability = true
+                    chapter.availability = (conn.responseCode == HttpStatusCode.OK.value)
                 }
             }
         }
