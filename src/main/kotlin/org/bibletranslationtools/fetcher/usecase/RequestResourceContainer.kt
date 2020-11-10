@@ -18,8 +18,6 @@ class RequestResourceContainer(
     private val storageAccess: StorageAccess,
     private val downloadClient: IDownloadClient
 ) {
-    private val mediaTypes = listOf(MediaType.WAV, MediaType.MP3)
-
     fun getResourceContainer(
         deliverable: Deliverable
     ): RCDeliverable? {
@@ -66,5 +64,9 @@ class RequestResourceContainer(
             downloadClient,
             overwrite = true
         )
+    }
+
+    companion object {
+        val mediaTypes = listOf(MediaType.WAV, MediaType.MP3)
     }
 }

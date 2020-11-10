@@ -1,18 +1,25 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
+import org.bibletranslationtools.fetcher.repository.BookRepository
+import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
-import org.bibletranslationtools.fetcher.usecase.DependencyResolver
+import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
 import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
+import org.bibletranslationtools.fetcher.usecase.RequestResourceContainer
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
-class ContentAvailabilityCache : ContentCacheRepository {
+class ContentAvailabilityCache(
+    private val chapterCatalog: ChapterCatalog,
+    private val bookRepository: BookRepository,
+    private val storageAccess: StorageAccess
+) : ContentCacheRepository {
     private val repoDir = File(System.getenv("ORATURE_REPO_DIR"))
-    private val mediaTypes = listOf("mp3", "wav")
+    private val templateRCName = "%s_%s.zip"
     private var tree: List<LanguageCache>
 
     private data class LanguageCache(
@@ -95,7 +102,7 @@ class ContentAvailabilityCache : ContentCacheRepository {
     }
 
     private fun cacheLanguages(): List<LanguageCache> {
-        val glList = PortGatewayLanguageCatalog().getAll().filter { it.code == "en" }
+        val glList = PortGatewayLanguageCatalog().getAll()
         return glList.map { lang ->
             val products = cacheProducts(lang.code)
             val isAvailable = products.any { it.availability }
@@ -125,8 +132,8 @@ class ContentAvailabilityCache : ContentCacheRepository {
                 ProductFileExtension.ORATURE -> null
                 else ->
                     FetchBookViewData(
-                        DependencyResolver.bookRepository,
-                        DependencyResolver.storageAccess,
+                        bookRepository,
+                        storageAccess,
                         languageCode,
                         productSlug
                     ).getBookDownloadUrl(book.slug)
@@ -153,12 +160,13 @@ class ContentAvailabilityCache : ContentCacheRepository {
         languageCode: String,
         bookSlug: String
     ): List<ChapterCache> {
-        val chapterList = DependencyResolver.chapterCatalog.getAll(languageCode, bookSlug)
+        val chapterList = chapterCatalog.getAll(languageCode, bookSlug)
         val resultList = chapterList.map { ChapterCache(it.number) }
-        val baseRcName = "%s_%s.zip"
         val resourceId = "ulb"
-        val rcName = repoDir.resolve(String.format(baseRcName, languageCode, resourceId))
+        val rcName = repoDir.resolve(String.format(templateRCName, languageCode, resourceId))
         if (!rcName.isFile) return resultList
+
+        val mediaTypes = RequestResourceContainer.mediaTypes.map { it.name.toLowerCase() }
 
         ResourceContainer.load(rcName).use { rc ->
             val mediaList =
@@ -186,8 +194,8 @@ class ContentAvailabilityCache : ContentCacheRepository {
         bookSlug: String
     ): List<ChapterCache> {
         val chaptersFromDirectory = FetchChapterViewData(
-            DependencyResolver.chapterCatalog,
-            DependencyResolver.storageAccess,
+            chapterCatalog,
+            storageAccess,
             languageCode = languageCode,
             productSlug = productSlug,
             bookSlug = bookSlug
