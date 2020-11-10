@@ -41,7 +41,7 @@ class FetchChapterViewData(
         }
     }
 
-    private fun chaptersFromDirectory(): List<ChapterViewData> {
+    fun chaptersFromDirectory(): List<ChapterViewData> {
         val chapterList = mutableListOf<ChapterViewData>()
 
         for (chapterNumber in 1..chapters.size) {

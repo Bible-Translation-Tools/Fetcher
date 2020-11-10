@@ -72,7 +72,7 @@ class FetchBookViewData(
         }
     }
 
-    private fun getBookDownloadUrl(bookSlug: String): String? {
+    fun getBookDownloadUrl(bookSlug: String): String? {
         var url: String? = null
         for (priority in priorityList) {
             val fileAccessRequest = when (product) {

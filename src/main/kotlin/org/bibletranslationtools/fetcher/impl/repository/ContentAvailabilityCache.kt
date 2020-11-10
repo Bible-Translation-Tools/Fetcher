@@ -4,6 +4,9 @@ import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
+import org.bibletranslationtools.fetcher.usecase.DependencyResolver
+import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
+import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
 class ContentAvailabilityCache : ContentCacheRepository {
@@ -26,22 +29,28 @@ class ContentAvailabilityCache : ContentCacheRepository {
     private data class BookCache(
         val slug: String,
         var availability: Boolean = false,
-        val chapters: List<ChapterCache> = listOf()
+        val chapters: List<ChapterCache> = listOf(),
+        val url: String? = null
     )
 
     private data class ChapterCache(
         val number: Int,
-        val url: String? = null,
-        var availability: Boolean = false
+        var availability: Boolean = false,
+        val url: String? = null
     )
 
     init {
-        tree = listOf()
+        tree = cacheLanguages()
     }
 
     @Synchronized
     override fun update() {
         tree = cacheLanguages()
+    }
+
+    fun getCache() {
+        val count = tree
+        println(count)
     }
 
     override fun isLanguageAvailable(code: String) = tree.any { it.code == code && it.availability }
@@ -93,17 +102,17 @@ class ContentAvailabilityCache : ContentCacheRepository {
         val glList = PortGatewayLanguageCatalog().getAll()
         return glList.map { lang ->
             val products = cacheProducts(lang.code)
-            val available = products.any { it.availability }
-            LanguageCache(lang.code, available, products)
+            val isAvailable = products.any { it.availability }
+            LanguageCache(lang.code, isAvailable, products)
         }
     }
 
     private fun cacheProducts(languageCode: String): List<ProductCache> {
-        val productList = ProductCatalogImpl().getAll().filter { it.slug == "orature" }
+        val productList = ProductCatalogImpl().getAll()
         return productList.map { prod ->
             val books = cacheBooks(languageCode, prod.slug)
-            val available = books.any { it.availability }
-            ProductCache(prod.slug, available, books)
+            val isAvailable = books.any { it.availability }
+            ProductCache(prod.slug, isAvailable, books)
         }
     }
 
@@ -111,9 +120,11 @@ class ContentAvailabilityCache : ContentCacheRepository {
         val bookList = BookCatalogImpl().getAll()
 
         return bookList.map { book ->
-            val chapters = cacheChapters(languageCode, book.slug, productSlug)
-            val available = chapters.any { it.availability }
-            BookCache(book.slug, available, chapters)
+            val chapters = cacheChapters(
+                languageCode = languageCode, productSlug =  productSlug, bookSlug = book.slug
+            )
+            val isAvailable = chapters.any { it.availability }
+            BookCache(book.slug, isAvailable, chapters)
         }
     }
 
@@ -122,10 +133,23 @@ class ContentAvailabilityCache : ContentCacheRepository {
         productSlug: String,
         bookSlug: String
     ): List<ChapterCache> {
+        return when (ProductFileExtension.getType(productSlug)) {
+            ProductFileExtension.ORATURE ->
+                oratureChapters(languageCode, bookSlug)
+            else ->
+                audioChapters(languageCode, productSlug, bookSlug)
+        }
+    }
+
+    private fun oratureChapters(
+        languageCode: String,
+        bookSlug: String
+    ): List<ChapterCache> {
         val chapterList = ChapterCatalogImpl().getAll(languageCode, bookSlug)
         val resultList = chapterList.map { ChapterCache(it.number) }
         val baseRcName = "%s_%s.zip"
-        val rcName = repoDir.resolve(String.format(baseRcName, languageCode, "ulb"))
+        val resourceId = "ulb"
+        val rcName = repoDir.resolve(String.format(baseRcName, languageCode, resourceId))
         if (!rcName.isFile) return resultList
 
         ResourceContainer.load(rcName).use { rc ->
@@ -143,5 +167,24 @@ class ContentAvailabilityCache : ContentCacheRepository {
         }
 
         return resultList
+    }
+
+    private fun audioChapters(
+        languageCode: String,
+        productSlug: String,
+        bookSlug: String
+    ): List<ChapterCache> {
+        val chaptersFromDirectory = FetchChapterViewData(
+            DependencyResolver.chapterCatalog,
+            DependencyResolver.storageAccess,
+            languageCode = languageCode,
+            productSlug = productSlug,
+            bookSlug =  bookSlug
+        ).chaptersFromDirectory()
+
+        return chaptersFromDirectory.map {
+            val isAvailable = it.url != null
+            ChapterCache(it.chapterNumber, isAvailable, it.url)
+        }
     }
 }
