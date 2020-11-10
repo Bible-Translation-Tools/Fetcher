@@ -2,13 +2,13 @@ package org.bibletranslationtools.fetcher
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import junit.framework.Assert.assertNotNull
-import org.bibletranslationtools.fetcher.data.Product
-import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
-import org.junit.Test
-import org.slf4j.LoggerFactory
 import java.io.FileNotFoundException
 import java.io.InputStream
+import org.bibletranslationtools.fetcher.data.Product
+import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
+import org.junit.Assert.assertNotNull
+import org.junit.Test
+import org.slf4j.LoggerFactory
 
 class ProductFileExtensionTest {
     private val productCatalogFileName = "/product_catalog.json"

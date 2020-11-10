@@ -2,10 +2,10 @@ package org.bibletranslationtools.fetcher
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import org.bibletranslationtools.fetcher.impl.repository.verifyChapterExists
 import java.io.File
 import java.io.FileNotFoundException
 import java.net.URL
+import org.bibletranslationtools.fetcher.impl.repository.verifyChapterExists
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.slf4j.LoggerFactory
