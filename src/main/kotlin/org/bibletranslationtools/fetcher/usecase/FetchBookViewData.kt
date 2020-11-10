@@ -1,6 +1,5 @@
 package org.bibletranslationtools.fetcher.usecase
 
-import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
@@ -11,10 +10,10 @@ class FetchBookViewData(
     private val bookRepo: BookRepository,
     private val storage: StorageAccess,
     private val languageCode: String,
-    private val productSlug: String
+    productSlug: String
 ) {
     private val resourceId = "ulb"
-    private val books: List<Book> = bookRepo.getBooks(resourceId = resourceId, languageCode = languageCode)
+    private val product = ProductFileExtension.getType(productSlug)!!
 
     private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
 
@@ -25,16 +24,15 @@ class FetchBookViewData(
     )
 
     fun getViewDataList(currentPath: String): List<BookViewData> {
-        val productType = ProductFileExtension.getType(productSlug)!!
-
         // expected file extensions to seek for
-        val fileExtensionList = if (ContainerExtensions.isSupported(productType.fileType)) {
+        val fileExtensionList = if (ContainerExtensions.isSupported(product.fileType)) {
             listOf("tr")
         } else {
             listOf("wav", "mp3")
         }
 
-        when (productType) {
+        val books = bookRepo.getBooks(resourceId = resourceId, languageCode = languageCode)
+        when (product) {
             ProductFileExtension.ORATURE -> books.forEach { it.availability = true }
             else -> {
                 books.forEach { book ->
@@ -60,9 +58,8 @@ class FetchBookViewData(
     }
 
     fun getViewData(bookSlug: String): BookViewData? {
-        val product = ProductFileExtension.getType(productSlug) ?: return null
         val book = bookRepo.getBook(bookSlug)
-        val url = getBookDownloadUrl(bookSlug, product)
+        val url = getBookDownloadUrl(bookSlug)
 
         return if (book != null) BookViewData(
             index = book.index,
@@ -75,7 +72,7 @@ class FetchBookViewData(
         }
     }
 
-    private fun getBookDownloadUrl(bookSlug: String, product: ProductFileExtension): String? {
+    private fun getBookDownloadUrl(bookSlug: String): String? {
         var url: String? = null
         for (priority in priorityList) {
             val fileAccessRequest = when (product) {

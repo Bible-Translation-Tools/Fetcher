@@ -1,11 +1,10 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
-import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
-import org.bibletranslationtools.fetcher.repository.StorageAccess
-import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
+import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
+import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
 class ContentAvailabilityCache : ContentCacheRepository {
     private val repoDir = File("E:/miscs/rc/tmp")
