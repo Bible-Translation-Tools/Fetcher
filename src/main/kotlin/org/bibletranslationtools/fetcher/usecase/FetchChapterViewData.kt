@@ -4,6 +4,7 @@ import io.ktor.client.features.ClientRequestException
 import java.io.File
 import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
+import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
@@ -12,7 +13,7 @@ class FetchChapterViewData(
     chapterCatalog: ChapterCatalog,
     private val storage: StorageAccess,
     private val languageCode: String,
-    productSlug: String,
+    private val productSlug: String,
     private val bookSlug: String
 ) {
     private val product = ProductFileExtension.getType(productSlug)!!
@@ -34,10 +35,10 @@ class FetchChapterViewData(
         throw ex
     }
 
-    fun getViewDataList(): List<ChapterViewData>? {
+    fun getViewDataList(contentCache: ContentCacheRepository): List<ChapterViewData> {
         return when (product) {
             ProductFileExtension.BTTR, ProductFileExtension.MP3 -> chaptersFromDirectory()
-            else -> chaptersForOrature() // all chapters are available
+            else -> chaptersForOrature(contentCache) // all chapters are available
         }
     }
 
@@ -66,10 +67,15 @@ class FetchChapterViewData(
         return chapterList
     }
 
-    private fun chaptersForOrature(): List<ChapterViewData> {
-        val requestUrl = "#" // front-end handled script
+    private fun chaptersForOrature(contentCache: ContentCacheRepository): List<ChapterViewData> {
         return chapters.map {
-            ChapterViewData(it.number, url = String.format(requestUrl, it.number))
+            val requestUrl = if (contentCache.isChapterAvailable(
+                    number = it.number,
+                    bookSlug = bookSlug,
+                    languageCode = languageCode,
+                    productSlug = productSlug
+                )) "#" else null
+            ChapterViewData(it.number, url = requestUrl)
         }
     }
 

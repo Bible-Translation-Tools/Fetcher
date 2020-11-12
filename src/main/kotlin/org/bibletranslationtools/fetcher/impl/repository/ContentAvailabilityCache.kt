@@ -12,6 +12,7 @@ import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
 import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
 import org.bibletranslationtools.fetcher.usecase.RequestResourceContainer
+import org.slf4j.LoggerFactory
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import java.io.IOException
 
@@ -25,6 +26,7 @@ class ContentAvailabilityCache(
     private val templateRCName = "%s_%s.zip"
     private val resourceId = "ulb"
     private var root: List<LanguageCache>
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     private data class LanguageCache(
         val code: String,
@@ -108,6 +110,7 @@ class ContentAvailabilityCache(
     private fun cacheLanguages(): List<LanguageCache> {
         val glList = PortGatewayLanguageCatalog().getAll()
         return glList.map { lang ->
+            println(glList.indexOf(lang))
             val products = cacheProducts(lang.code)
             val isAvailable = products.any { it.availability }
             LanguageCache(lang.code, isAvailable, products)
@@ -165,7 +168,13 @@ class ContentAvailabilityCache(
         languageCode: String,
         bookSlug: String
     ): List<ChapterCache> {
-        val chapterList = chapterCatalog.getAll(languageCode, bookSlug)
+        val chapterList = try {
+            chapterCatalog.getAll(languageCode, bookSlug)
+        } catch (ex: Exception) {
+            logger.error("An error occurred while getting chapter catalog for $languageCode - $bookSlug")
+            throw ex
+        }
+
         val resultList = chapterList.map { ChapterCache(it.number) }
         val rcFile = repoDir.resolve(String.format(templateRCName, languageCode, resourceId))
         if (!rcFile.isFile) return resultList

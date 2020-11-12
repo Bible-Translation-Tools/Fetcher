@@ -9,16 +9,14 @@ import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 
 class LanguageRepositoryImpl(
     private val storageAccess: StorageAccess,
-    private val languageCatalog: LanguageCatalog,
-    private val contentCache: ContentCacheRepository
+    private val languageCatalog: LanguageCatalog
 ) : LanguageRepository {
     override fun getLanguages(): List<Language> {
         val availableLanguageCodes = storageAccess.getLanguageCodes()
         val languages = languageCatalog.getAll()
 
         languages.forEach {
-            it.availability = it.code in availableLanguageCodes ||
-                    contentCache.isLanguageAvailable(it.code)
+            it.availability = it.code in availableLanguageCodes
         }
 
         return languages

@@ -2,6 +2,7 @@ package org.bibletranslationtools.fetcher.usecase
 
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.repository.BookRepository
+import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
@@ -10,7 +11,7 @@ class FetchBookViewData(
     private val bookRepo: BookRepository,
     private val storage: StorageAccess,
     private val languageCode: String,
-    productSlug: String
+    private val productSlug: String
 ) {
     private val resourceId = "ulb"
     private val product = ProductFileExtension.getType(productSlug)!!
@@ -23,7 +24,10 @@ class FetchBookViewData(
         PriorityItem("wav", "")
     )
 
-    fun getViewDataList(currentPath: String): List<BookViewData> {
+    fun getViewDataList(
+        currentPath: String,
+        contentCache: ContentCacheRepository
+    ): List<BookViewData> {
         // expected file extensions to seek for
         val fileExtensionList = if (ContainerExtensions.isSupported(product.fileType)) {
             listOf("tr")
@@ -36,12 +40,7 @@ class FetchBookViewData(
             ProductFileExtension.ORATURE -> books.forEach { it.availability = true }
             else -> {
                 books.forEach { book ->
-                    book.availability = storage.hasBookContent(
-                        languageCode,
-                        resourceId = resourceId,
-                        bookSlug = book.slug,
-                        fileExtensionList = fileExtensionList
-                    )
+                    book.availability = contentCache.isBookAvailable(book.slug, languageCode, productSlug)
                 }
             }
         }
