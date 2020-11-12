@@ -3,7 +3,8 @@ package org.bibletranslationtools.fetcher.usecase
 import org.bibletranslationtools.fetcher.impl.repository.BookCatalogImpl
 import org.bibletranslationtools.fetcher.impl.repository.BookRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.ChapterCatalogImpl
-import org.bibletranslationtools.fetcher.impl.repository.ContentAvailabilityCache
+import org.bibletranslationtools.fetcher.impl.repository.AvailabilityCacheRepo
+import org.bibletranslationtools.fetcher.impl.repository.ContentAvailabilityCacheBuilder
 import org.bibletranslationtools.fetcher.impl.repository.DirectoryProviderImpl
 import org.bibletranslationtools.fetcher.impl.repository.LanguageRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.PortGatewayLanguageCatalog
@@ -12,7 +13,7 @@ import org.bibletranslationtools.fetcher.impl.repository.RCRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
-import org.bibletranslationtools.fetcher.repository.ContentCacheRepository 
+import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
@@ -39,11 +40,14 @@ object DependencyResolver {
 
     val downloadClient: IDownloadClient = DownloadClient()
     val rcRepository: ResourceContainerRepository = RCRepositoryImpl(directoryProvider, downloadClient)
-    val contentCache: ContentCacheRepository = ContentAvailabilityCache(
+    private val cacheBuilder = ContentAvailabilityCacheBuilder(
         languageCatalog,
         chapterCatalog,
         bookRepository,
         storageAccess,
         directoryProvider
+    )
+    val contentCache: ContentCacheRepository = AvailabilityCacheRepo(
+        cacheBuilder
     )
 }
