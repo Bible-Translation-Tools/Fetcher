@@ -3,17 +3,14 @@ package org.bibletranslationtools.fetcher.impl.repository
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.ktor.client.HttpClient
-import io.ktor.client.features.ClientRequestException
 import io.ktor.client.request.get
 import io.ktor.util.error
-import kotlinx.coroutines.runBlocking
-import org.bibletranslationtools.fetcher.data.Chapter
-import org.bibletranslationtools.fetcher.repository.ChapterCatalog
-import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import org.bibletranslationtools.fetcher.data.Chapter
+import org.bibletranslationtools.fetcher.repository.ChapterCatalog
+import org.slf4j.LoggerFactory
 
 class ChapterCatalogImpl : ChapterCatalog {
     private val catalogUrlTemplate = "https://api.unfoldingword.org/ts/txt/2/%s/en/ulb/chunks.json"

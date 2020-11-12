@@ -1,25 +1,26 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import io.ktor.http.HttpStatusCode
+import java.io.File
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
 import org.bibletranslationtools.fetcher.data.cache.AvailabilityCache
 import org.bibletranslationtools.fetcher.data.cache.BookCache
 import org.bibletranslationtools.fetcher.data.cache.ChapterCache
 import org.bibletranslationtools.fetcher.data.cache.LanguageCache
 import org.bibletranslationtools.fetcher.data.cache.ProductCache
-import org.bibletranslationtools.fetcher.repository.LanguageCatalog
-import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.BookRepository
-import org.bibletranslationtools.fetcher.repository.StorageAccess
+import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
+import org.bibletranslationtools.fetcher.repository.LanguageCatalog
+import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
 import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
 import org.bibletranslationtools.fetcher.usecase.RequestResourceContainer
 import org.slf4j.LoggerFactory
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
 
 class ContentAvailabilityCacheBuilder(
     private val languageCatalog: LanguageCatalog,
@@ -98,45 +99,20 @@ class ContentAvailabilityCacheBuilder(
         languageCode: String,
         bookSlug: String
     ): List<ChapterCache> {
-        val chapterList = try {
+        val chapters = try {
             chapterCatalog.getAll(languageCode, bookSlug)
         } catch (ex: Exception) {
             logger.error("An error occurred while getting chapter catalog for $languageCode - $bookSlug")
             throw ex
         }
 
-        val resultList = chapterList.map { ChapterCache(it.number) }
+        val chapterList = chapters.map { ChapterCache(it.number) }
         val rcFile = repoDir.resolve(String.format(templateRCName, languageCode, resourceId))
-        if (!rcFile.isFile) return resultList
+        if (!rcFile.isFile) return chapterList
 
-        val mediaTypes = RequestResourceContainer.mediaTypes.map { it.name.toLowerCase() }
+        fetchFromRepo(rcFile, bookSlug, chapterList)
 
-        ResourceContainer.load(rcFile).use { rc ->
-            val mediaList =
-                rc.media?.projects?.find { it.identifier == bookSlug }
-                    ?.media?.filter { it.identifier in mediaTypes && it.chapterUrl.isNotEmpty() }
-
-            mediaList?.forEach { media ->
-                for (chapter in resultList) {
-                    val url = URL(media.chapterUrl.replace("{chapter}", chapter.number.toString()))
-
-                    // check if remote content is available
-                    try {
-                        val conn = url.openConnection() as HttpURLConnection
-                        conn.requestMethod = "HEAD"
-                        if (conn.responseCode == HttpStatusCode.OK.value) {
-                            chapter.availability = true
-                            chapter.url = "#"
-                        }
-                        conn.disconnect()
-                    } catch (ex: IOException) {
-                        chapter.availability = false
-                    }
-                }
-            }
-        }
-
-        return resultList
+        return chapterList
     }
 
     private fun audioChapters(
@@ -155,6 +131,37 @@ class ContentAvailabilityCacheBuilder(
         return chaptersFromDirectory.map {
             val isAvailable = it.url != null
             ChapterCache(it.chapterNumber, isAvailable, it.url)
+        }
+    }
+
+    private fun fetchFromRepo(
+        rcFile: File,
+        bookSlug: String,
+        chapterList: List<ChapterCache>
+    ) {
+        val mediaTypes = RequestResourceContainer.mediaTypes.map { it.name.toLowerCase() }
+
+        ResourceContainer.load(rcFile).use { rc ->
+            val mediaList =
+                rc.media?.projects?.find { it.identifier == bookSlug }
+                    ?.media?.filter { it.identifier in mediaTypes && it.chapterUrl.isNotEmpty() }
+
+            mediaList?.forEach { media ->
+                for (chapter in chapterList) {
+                    val url = URL(media.chapterUrl.replace("{chapter}", chapter.number.toString()))
+
+                    // check if remote content is available
+                    try {
+                        val conn = url.openConnection() as HttpURLConnection
+                        conn.requestMethod = "HEAD"
+                        chapter.availability = conn.responseCode == HttpStatusCode.OK.value
+                        conn.disconnect()
+                    } catch (ex: IOException) {
+                        chapter.availability = false
+                    }
+                    if (chapter.availability) chapter.url = "#"
+                }
+            }
         }
     }
 }

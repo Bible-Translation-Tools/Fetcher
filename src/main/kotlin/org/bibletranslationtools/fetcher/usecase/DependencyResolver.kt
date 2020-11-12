@@ -1,9 +1,9 @@
 package org.bibletranslationtools.fetcher.usecase
 
+import org.bibletranslationtools.fetcher.impl.repository.AvailabilityCacheRepo
 import org.bibletranslationtools.fetcher.impl.repository.BookCatalogImpl
 import org.bibletranslationtools.fetcher.impl.repository.BookRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.ChapterCatalogImpl
-import org.bibletranslationtools.fetcher.impl.repository.AvailabilityCacheRepo
 import org.bibletranslationtools.fetcher.impl.repository.ContentAvailabilityCacheBuilder
 import org.bibletranslationtools.fetcher.impl.repository.DirectoryProviderImpl
 import org.bibletranslationtools.fetcher.impl.repository.LanguageRepositoryImpl

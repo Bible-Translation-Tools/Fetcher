@@ -56,6 +56,8 @@ class ContentAvailabilityCacheTest {
         )
         val cache = AvailabilityCacheRepo(cacheBuilder)
 
+        assertTrue(cache.isLanguageAvailable(languageCode))
+        assertTrue(cache.isBookAvailable(titus, languageCode, "orature"))
         assertNotNull(cache.getChapterUrl(chapterNumber, titus, languageCode, "mp3"))
         assertNotNull(cache.getChapterUrl(chapterNumber, titus, languageCode, "orature"))
         assertNull(cache.getChapterUrl(chapterNumber, titus, languageCode, "bttr"))
