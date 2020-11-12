@@ -13,6 +13,7 @@ import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
 import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
 import org.bibletranslationtools.fetcher.usecase.RequestResourceContainer
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
+import java.io.IOException
 
 class ContentAvailabilityCache(
     private val chapterCatalog: ChapterCatalog,
@@ -105,7 +106,7 @@ class ContentAvailabilityCache(
     }
 
     private fun cacheLanguages(): List<LanguageCache> {
-        val glList = PortGatewayLanguageCatalog().getAll()
+        val glList = PortGatewayLanguageCatalog().getAll().filter {it.code == "en"}
         return glList.map { lang ->
             val products = cacheProducts(lang.code)
             val isAvailable = products.any { it.availability }
@@ -181,9 +182,14 @@ class ContentAvailabilityCache(
                     val url = URL(media.chapterUrl.replace("{chapter}", chapter.number.toString()))
 
                     // check if remote content is available
-                    val conn = url.openConnection() as HttpURLConnection
-                    conn.requestMethod = "HEAD"
-                    chapter.availability = (conn.responseCode == HttpStatusCode.OK.value)
+                    try {
+                        val conn = url.openConnection() as HttpURLConnection
+                        conn.requestMethod = "HEAD"
+                        chapter.availability = (conn.responseCode == HttpStatusCode.OK.value)
+                        conn.disconnect()
+                    } catch (ex: IOException) {
+                        chapter.availability = false
+                    }
                 }
             }
         }
