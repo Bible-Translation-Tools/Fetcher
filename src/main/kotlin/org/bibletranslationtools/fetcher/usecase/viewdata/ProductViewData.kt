@@ -5,5 +5,5 @@ data class ProductViewData(
     val titleKey: String,
     val descriptionKey: String,
     val iconUrl: String,
-    val url: String
+    val url: String?
 )

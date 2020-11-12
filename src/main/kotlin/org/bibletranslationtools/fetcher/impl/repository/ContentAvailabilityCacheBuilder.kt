@@ -38,7 +38,7 @@ class ContentAvailabilityCacheBuilder(
     }
 
     private fun cacheLanguages(): List<LanguageCache> {
-        val glList = languageCatalog.getAll()//.filter {it.code == "en" ||it.code == "fr"}
+        val glList = languageCatalog.getAll()
         return glList.map { lang ->
             println(glList.indexOf(lang))
             val products = cacheProducts(lang.code)

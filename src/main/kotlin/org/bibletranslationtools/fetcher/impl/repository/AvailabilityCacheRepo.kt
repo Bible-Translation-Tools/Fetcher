@@ -24,7 +24,7 @@ class AvailabilityCacheRepo(
         return cache.languages.find {
             it.code == languageCode && it.availability
         }?.products?.any {
-            it.slug == productSlug
+            it.slug == productSlug && it.availability
         } ?: false
     }
 
