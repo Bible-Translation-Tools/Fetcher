@@ -3,14 +3,13 @@ package org.bibletranslationtools.fetcher
 import java.io.File
 import java.io.FileNotFoundException
 import org.bibletranslationtools.fetcher.data.Chapter
-import org.bibletranslationtools.fetcher.impl.repository.ContentAvailabilityCache
-import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
+import org.bibletranslationtools.fetcher.data.Language
+import org.bibletranslationtools.fetcher.impl.repository.*
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
+import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.StorageAccess
-import org.bibletranslationtools.fetcher.usecase.DependencyResolver
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.`when`
@@ -18,7 +17,7 @@ import org.mockito.Mockito.mock
 
 class ContentAvailabilityCacheTest {
     private val languageCode = "en"
-    private val titusSlug = "tit"
+    private val titus = "tit"
     private val chapterNumber = 1
     private val rcFileName = "en_ulb.zip"
 
@@ -31,29 +30,35 @@ class ContentAvailabilityCacheTest {
         ).apply { mkdirs() }
         chapterPath.resolve("en_ulb_nt_tit_c$chapterNumber.mp3").createNewFile()
 
+        val mockLanguageCatalog = mock(LanguageCatalog::class.java)
+        val mockChapterCatalog = mock(ChapterCatalog::class.java)
         val mockDirectoryProvider = mock(DirectoryProvider::class.java)
         val mockStorageAccess: StorageAccess = StorageAccessImpl(mockDirectoryProvider)
-        val mockChapterCatalog = mock(ChapterCatalog::class.java)
+        val bookRepository =  BookRepositoryImpl(BookCatalogImpl())
 
         `when`(mockDirectoryProvider.getRCRepositoriesDir()).thenReturn(tempDir)
         `when`(mockDirectoryProvider.getContentRoot()).thenReturn(tempDir)
+        `when`(mockLanguageCatalog.getAll()).thenReturn(
+            listOf(Language("en", "", "", true))
+        )
         `when`(
             mockChapterCatalog.getAll(anyString(), anyString())
         ).thenReturn(
             listOf(Chapter(chapterNumber))
         )
 
-        val cache = ContentAvailabilityCache(
+        val cacheBuilder = ContentAvailabilityCacheBuilder(
+            mockLanguageCatalog,
             mockChapterCatalog,
-            DependencyResolver.bookRepository,
+            bookRepository,
             mockStorageAccess,
             mockDirectoryProvider
         )
+        val cache = AvailabilityCacheRepo(cacheBuilder)
 
-        assertTrue(cache.isChapterAvailable(chapterNumber, titusSlug, languageCode, "mp3"))
-        assertTrue(cache.isChapterAvailable(chapterNumber, titusSlug, languageCode, "orature"))
-        assertFalse(cache.isChapterAvailable(chapterNumber, titusSlug, languageCode, "bttr"))
-        println(tempDir.deleteRecursively())
+        assertNotNull(cache.getChapterUrl(chapterNumber, titus, languageCode, "mp3"))
+        assertNotNull(cache.getChapterUrl(chapterNumber, titus, languageCode, "orature"))
+        assertNull(cache.getChapterUrl(chapterNumber, titus, languageCode, "bttr"))
     }
 
     @Throws(FileNotFoundException::class)
