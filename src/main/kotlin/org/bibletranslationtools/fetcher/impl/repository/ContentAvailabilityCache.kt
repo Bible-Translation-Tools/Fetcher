@@ -106,7 +106,7 @@ class ContentAvailabilityCache(
     }
 
     private fun cacheLanguages(): List<LanguageCache> {
-        val glList = PortGatewayLanguageCatalog().getAll().filter {it.code == "en"}
+        val glList = PortGatewayLanguageCatalog().getAll()
         return glList.map { lang ->
             val products = cacheProducts(lang.code)
             val isAvailable = products.any { it.availability }

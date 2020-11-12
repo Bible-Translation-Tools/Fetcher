@@ -41,6 +41,9 @@ class ChapterCatalogImpl : ChapterCatalog {
             conn.disconnect()
         } catch (ex: IOException) {
             throw ex
+        } catch (ex: Exception) {
+            logger.error("An error occurred when getting chapter catalog: $languageCode - $bookSlug", ex)
+            throw ex
         }
 
         val mapper = ObjectMapper().registerModule(KotlinModule())
