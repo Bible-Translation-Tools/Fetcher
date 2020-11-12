@@ -24,7 +24,9 @@ cache:
 script:
 - cd fetcher-web
 - "./gradlew check build"
+- cd ..
 - sonar-scanner
+- cd fetcher-web
 - docker build -t bibletranslationtools/fetcher:$TRAVIS_COMMIT .
 - docker tag bibletranslationtools/fetcher:$TRAVIS_COMMIT bibletranslationtools/fetcher:$TRAVIS_BRANCH
 - docker tag bibletranslationtools/fetcher:$TRAVIS_COMMIT bibletranslationtools/fetcher:latest
@@ -42,3 +44,5 @@ deploy:
     script: bash docker_push.sh
     on:
       branch: master
+
+move web and pipeline into their own folders
