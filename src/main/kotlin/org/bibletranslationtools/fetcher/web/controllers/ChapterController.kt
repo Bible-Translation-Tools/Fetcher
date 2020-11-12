@@ -99,7 +99,7 @@ private fun chaptersView(
         resolver.storageAccess,
         params.languageCode,
         params.productSlug
-    ).getViewData(params.bookSlug)
+    ).getViewData(params.bookSlug, resolver.contentCache)
 
     val chapterViewDataList: List<ChapterViewData>? = try {
         FetchChapterViewData(

@@ -48,9 +48,9 @@ class FetchBookViewData(
         }
     }
 
-    fun getViewData(bookSlug: String): BookViewData? {
+    fun getViewData(bookSlug: String, cacheRepository: ContentCacheRepository): BookViewData? {
         val book = bookRepo.getBook(bookSlug)
-        val url = getBookDownloadUrl(bookSlug)
+        val url = cacheRepository.getBookUrl(bookSlug, languageCode, productSlug)
 
         return if (book != null) BookViewData(
             index = book.index,
