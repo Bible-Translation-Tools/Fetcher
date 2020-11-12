@@ -11,10 +11,16 @@ interface ContentCacheRepository {
         productSlug: String
     ): Boolean
 
-    fun isChapterAvailable(
+    fun getChapterUrl(
         number: Int,
         bookSlug: String,
         languageCode: String,
         productSlug: String
-    ): Boolean
+    ): String?
+
+    fun getBookUrl(
+        bookSlug: String,
+        languageCode: String,
+        productSlug: String
+    ): String?
 }

@@ -40,6 +40,7 @@ object DependencyResolver {
     val downloadClient: IDownloadClient = DownloadClient()
     val rcRepository: ResourceContainerRepository = RCRepositoryImpl(directoryProvider, downloadClient)
     val contentCache: ContentCacheRepository = ContentAvailabilityCache(
+        languageCatalog,
         chapterCatalog,
         bookRepository,
         storageAccess,

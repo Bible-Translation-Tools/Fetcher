@@ -36,22 +36,14 @@ class FetchBookViewData(
         }
 
         val books = bookRepo.getBooks(resourceId = resourceId, languageCode = languageCode)
-        when (product) {
-            ProductFileExtension.ORATURE -> books.forEach { it.availability = true }
-            else -> {
-                books.forEach { book ->
-                    book.availability = contentCache.isBookAvailable(book.slug, languageCode, productSlug)
-                }
-            }
-        }
-
-        return books.map {
+        return books.map { book ->
+            book.availability = contentCache.isBookAvailable(book.slug, languageCode, productSlug)
             BookViewData(
-                index = it.index,
-                slug = it.slug,
-                anglicizedName = it.anglicizedName,
-                localizedName = it.localizedName,
-                url = if (it.availability) "$currentPath/${it.slug}" else null
+                index = book.index,
+                slug = book.slug,
+                anglicizedName = book.anglicizedName,
+                localizedName = book.localizedName,
+                url = if (book.availability) "$currentPath/${book.slug}" else null
             )
         }
     }

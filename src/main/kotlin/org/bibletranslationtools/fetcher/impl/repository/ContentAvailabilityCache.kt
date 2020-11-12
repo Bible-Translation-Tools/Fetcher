@@ -1,13 +1,14 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import io.ktor.http.HttpStatusCode
-import java.net.HttpURLConnection
-import java.net.URL
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
+import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.StorageAccess
+import java.net.HttpURLConnection
+import java.net.URL
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
 import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
@@ -17,6 +18,7 @@ import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import java.io.IOException
 
 class ContentAvailabilityCache(
+    private val languageCatalog: LanguageCatalog,
     private val chapterCatalog: ChapterCatalog,
     private val bookRepository: BookRepository,
     private val storageAccess: StorageAccess,
@@ -50,7 +52,7 @@ class ContentAvailabilityCache(
     private data class ChapterCache(
         val number: Int,
         var availability: Boolean = false,
-        val url: String? = null
+        var url: String? = null
     )
 
     init {
@@ -88,28 +90,42 @@ class ContentAvailabilityCache(
         }
     }
 
-    override fun isChapterAvailable(
+    override fun getChapterUrl(
         number: Int,
         bookSlug: String,
         languageCode: String,
         productSlug: String
-    ): Boolean {
+    ): String? {
         val bookCache = root.find {
             it.code == languageCode && it.availability
         }?.products?.find {
             it.slug == productSlug && it.availability
         }?.books?.find {
             it.slug == bookSlug && it.availability
-        } ?: return false
+        } ?: return null
 
-        return bookCache.chapters.any {
-            it.number == number && it.availability
-        }
+        return bookCache.chapters.find {
+            it.number == number
+        }?.url
+    }
+
+    override fun getBookUrl(
+        bookSlug: String,
+        languageCode: String,
+        productSlug: String
+    ): String? {
+        return root.find {
+            it.code == languageCode && it.availability
+        }?.products?.find {
+            it.slug == productSlug && it.availability
+        }?.books?.find {
+            it.slug == bookSlug
+        }?.url
     }
 
     private fun cacheLanguages(): List<LanguageCache> {
-        val glList = PortGatewayLanguageCatalog().getAll()
-        return glList.map { lang ->
+        val glList = languageCatalog.getAll()//.filter {it.code == "en" ||it.code == "fr"}
+            return glList.map { lang ->
             println(glList.indexOf(lang))
             val products = cacheProducts(lang.code)
             val isAvailable = products.any { it.availability }
@@ -134,10 +150,10 @@ class ContentAvailabilityCache(
             val chapters = cacheChapters(
                 languageCode = languageCode, productSlug = productSlug, bookSlug = book.slug
             )
-            var isAvailable: Boolean = chapters.any { it.availability }
+            val isAvailable: Boolean = chapters.any { it.availability }
 
             val bookUrl = when (product) {
-                ProductFileExtension.ORATURE -> null
+                ProductFileExtension.ORATURE -> if (isAvailable) "#" else null
                 else ->
                     FetchBookViewData(
                         bookRepository,
@@ -194,7 +210,10 @@ class ContentAvailabilityCache(
                     try {
                         val conn = url.openConnection() as HttpURLConnection
                         conn.requestMethod = "HEAD"
-                        chapter.availability = (conn.responseCode == HttpStatusCode.OK.value)
+                        if (conn.responseCode == HttpStatusCode.OK.value) {
+                            chapter.availability = true
+                            chapter.url = "#"
+                        }
                         conn.disconnect()
                     } catch (ex: IOException) {
                         chapter.availability = false

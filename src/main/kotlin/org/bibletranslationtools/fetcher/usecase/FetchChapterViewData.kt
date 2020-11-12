@@ -36,9 +36,14 @@ class FetchChapterViewData(
     }
 
     fun getViewDataList(contentCache: ContentCacheRepository): List<ChapterViewData> {
-        return when (product) {
-            ProductFileExtension.BTTR, ProductFileExtension.MP3 -> chaptersFromDirectory()
-            else -> chaptersForOrature(contentCache) // all chapters are available
+        return chapters.map {
+            val requestUrl = contentCache.getChapterUrl(
+                number = it.number,
+                bookSlug = bookSlug,
+                languageCode = languageCode,
+                productSlug = productSlug
+            )
+            ChapterViewData(it.number, url = requestUrl)
         }
     }
 
@@ -65,18 +70,6 @@ class FetchChapterViewData(
         }
 
         return chapterList
-    }
-
-    private fun chaptersForOrature(contentCache: ContentCacheRepository): List<ChapterViewData> {
-        return chapters.map {
-            val requestUrl = if (contentCache.isChapterAvailable(
-                    number = it.number,
-                    bookSlug = bookSlug,
-                    languageCode = languageCode,
-                    productSlug = productSlug
-                )) "#" else null
-            ChapterViewData(it.number, url = requestUrl)
-        }
     }
 
     private fun getBTTRFileAccessRequest(
