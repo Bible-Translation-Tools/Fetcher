@@ -100,7 +100,7 @@ class ContentAvailabilityCacheBuilder(
         val chapters = chapterCatalog.getAll(languageCode, bookSlug)
         val chapterList = chapters.map { ChapterCache(it.number) }
         val rcFile = repoDir.resolve(String.format(templateRCName, languageCode, resourceId))
-        if (!rcFile.isFile) return chapterList
+        if (!rcFile.exists()) return chapterList
 
         val mediaTypes = RequestResourceContainer.mediaTypes.map { it.name.toLowerCase() }
 
