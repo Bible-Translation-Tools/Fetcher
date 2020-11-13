@@ -28,13 +28,6 @@ class FetchBookViewData(
         currentPath: String,
         contentCache: ContentCacheRepository
     ): List<BookViewData> {
-        // expected file extensions to seek for
-        val fileExtensionList = if (ContainerExtensions.isSupported(product.fileType)) {
-            listOf("tr")
-        } else {
-            listOf("wav", "mp3")
-        }
-
         val books = bookRepo.getBooks(resourceId = resourceId, languageCode = languageCode)
         return books.map { book ->
             book.availability = contentCache.isBookAvailable(book.slug, languageCode, productSlug)
