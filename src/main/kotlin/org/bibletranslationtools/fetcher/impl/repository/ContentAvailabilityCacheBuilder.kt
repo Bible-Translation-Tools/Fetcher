@@ -1,7 +1,6 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import io.ktor.http.HttpStatusCode
-import java.io.File
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
@@ -41,7 +40,6 @@ class ContentAvailabilityCacheBuilder(
     private fun cacheLanguages(): List<LanguageCache> {
         val glList = languageCatalog.getAll()
         return glList.map { lang ->
-            println(glList.indexOf(lang))
             val products = cacheProducts(lang.code)
             val isAvailable = products.any { it.availability }
             LanguageCache(lang.code, isAvailable, products)
@@ -104,7 +102,17 @@ class ContentAvailabilityCacheBuilder(
         val rcFile = repoDir.resolve(String.format(templateRCName, languageCode, resourceId))
         if (!rcFile.isFile) return chapterList
 
-        fetchFromRepo(rcFile, bookSlug, chapterList)
+        val mediaTypes = RequestResourceContainer.mediaTypes.map { it.name.toLowerCase() }
+
+        ResourceContainer.load(rcFile).use { rc ->
+            val mediaList =
+                rc.media?.projects?.find { it.identifier == bookSlug }
+                    ?.media?.filter { it.identifier in mediaTypes && it.chapterUrl.isNotEmpty() }
+
+            mediaList?.forEach { media ->
+                fetchChaptersFromMediaUrl(media.chapterUrl, chapterList)
+            }
+        }
 
         return chapterList
     }
@@ -128,34 +136,20 @@ class ContentAvailabilityCacheBuilder(
         }
     }
 
-    private fun fetchFromRepo(
-        rcFile: File,
-        bookSlug: String,
-        chapterList: List<ChapterCache>
-    ) {
-        val mediaTypes = RequestResourceContainer.mediaTypes.map { it.name.toLowerCase() }
+    private fun fetchChaptersFromMediaUrl(url: String, chapterList: List<ChapterCache>) {
+        for (chapter in chapterList) {
+            val url = URL(url.replace("{chapter}", chapter.number.toString()))
 
-        ResourceContainer.load(rcFile).use { rc ->
-            val mediaList =
-                rc.media?.projects?.find { it.identifier == bookSlug }
-                    ?.media?.filter { it.identifier in mediaTypes && it.chapterUrl.isNotEmpty() }
-
-            mediaList?.forEach { media ->
-                for (chapter in chapterList) {
-                    val url = URL(media.chapterUrl.replace("{chapter}", chapter.number.toString()))
-
-                    // check if remote content is available
-                    try {
-                        val conn = url.openConnection() as HttpURLConnection
-                        conn.requestMethod = "HEAD"
-                        chapter.availability = conn.responseCode == HttpStatusCode.OK.value
-                        conn.disconnect()
-                    } catch (ex: IOException) {
-                        chapter.availability = false
-                    }
-                    if (chapter.availability) chapter.url = "#"
-                }
+            // check if remote content is available
+            try {
+                val conn = url.openConnection() as HttpURLConnection
+                conn.requestMethod = "HEAD"
+                chapter.availability = conn.responseCode == HttpStatusCode.OK.value
+                conn.disconnect()
+            } catch (ex: IOException) {
+                chapter.availability = false
             }
+            if (chapter.availability) chapter.url = "#"
         }
     }
 }
