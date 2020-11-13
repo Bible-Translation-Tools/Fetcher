@@ -32,6 +32,14 @@ services:
       FTP_PASS: ${fetcher_ftp_pass}
       PASV_ADDRESS: ${fetcher_ftp_ip}
     restart: always
+  pipeline:
+    build: ./fetcher-pipeline
+    environment:
+      SENTRY_DSN: ${SENTRY_DSN}
+      PM2_PUBLIC_KEY: ${PM2_PUBLIC_KEY}
+      PM2_SECRET_KEY: ${PM2_SECRET_KEY}
+    volumes:
+      - fetcher-content:/content
 
 volumes:
   fetcher-content:
