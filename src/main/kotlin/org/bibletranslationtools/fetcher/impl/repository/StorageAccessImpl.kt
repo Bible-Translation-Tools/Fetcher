@@ -146,7 +146,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
     }
 
     override fun allocateRCFileLocation(source: File, newFileName: String): File {
-        val destFilePath =  directoryProvider.getDownloadDir().resolve(newFileName)
+        val destFilePath = directoryProvider.getDownloadDir().resolve(newFileName)
         source.copyRecursively(destFilePath, true)
         return destFilePath
     }

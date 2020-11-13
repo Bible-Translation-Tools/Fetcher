@@ -1,16 +1,16 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
-import java.util.zip.ZipFile
-import org.bibletranslationtools.fetcher.data.Deliverable
-import org.wycliffeassociates.rcmediadownloader.data.MediaType
-import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.zip.ZipEntry
 import java.util.zip.ZipException
+import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
+import org.bibletranslationtools.fetcher.data.Deliverable
+import org.wycliffeassociates.rcmediadownloader.data.MediaType
+import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
 fun createRCFileName(
     deliverable: Deliverable,
@@ -62,7 +62,6 @@ fun verifyChapterExists(
                 }
             }
         }
-
     }
 
     return exists
@@ -82,9 +81,7 @@ fun zipDirectory(sourcePath: File, destFile: File): Boolean {
                 val entry = ZipEntry("$rootName\\$zipFileName$suffix")
                 zos.putNextEntry(entry)
 
-                if (fileInSource.isFile) {
-                    fileInSource.inputStream().copyTo(zos)
-                }
+                if (fileInSource.isFile) fileInSource.inputStream().copyTo(zos)
             }
         }
     } catch (ex: FileNotFoundException) {
