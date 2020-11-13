@@ -5,6 +5,7 @@ import org.bibletranslationtools.fetcher.data.Deliverable
 import org.bibletranslationtools.fetcher.data.RCDeliverable
 import org.bibletranslationtools.fetcher.impl.repository.createRCFileName
 import org.bibletranslationtools.fetcher.impl.repository.verifyChapterExists
+import org.bibletranslationtools.fetcher.impl.repository.zipDirectory
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
@@ -26,9 +27,8 @@ class RequestResourceContainer(
             deliverable.resourceId
         ) ?: return null
 
-        // make new copy to serve out
+        // allocate rc to delivery location
         val rcFile = allocateRcFileLocation(templateRC, deliverable)
-
         val rcWithMedia = downloadMediaInRC(rcFile, deliverable)
 
         return if (
@@ -39,16 +39,22 @@ class RequestResourceContainer(
                 deliverable.chapter?.number
             )
         ) {
-            RCDeliverable(deliverable, rcWithMedia.path)
-        } else null
+            val zipFile = rcWithMedia.parentFile.resolve("${rcFile.name}.zip")
+                .apply { createNewFile() }
+            zipDirectory(rcFile, zipFile)
+            RCDeliverable(deliverable, zipFile.path)
+        } else {
+            rcFile.deleteRecursively()
+            null
+        }
     }
 
     private fun allocateRcFileLocation(rcFile: File, deliverable: Deliverable): File {
-        val newFileName = createRCFileName(
+        val rcName = createRCFileName(
             deliverable,
             extension = rcFile.extension
         )
-        return storageAccess.allocateRCFileLocation(rcFile, newFileName)
+        return storageAccess.allocateRCFileLocation(rcFile, rcName)
     }
 
     private fun downloadMediaInRC(rcFile: File, deliverable: Deliverable): File {

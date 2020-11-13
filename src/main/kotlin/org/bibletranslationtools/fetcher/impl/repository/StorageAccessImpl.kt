@@ -145,9 +145,15 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
                 hasChapterFile(languageCode, resourceId, bookSlug, fileExtensionList)
     }
 
-    override fun allocateRCFileLocation(sourceFile: File, newFileName: String): File {
-        val newFilePath = sourceFile.parentFile.resolve(newFileName)
-        return sourceFile.copyTo(newFilePath, true)
+    override fun allocateRCFileLocation(source: File, newFileName: String): File {
+        val destFilePath =  directoryProvider.getDownloadDir().resolve(newFileName)
+        source.copyRecursively(destFilePath, true)
+        return destFilePath
+    }
+
+    override fun getRepoFromFileSystem(name: String): File? {
+        val repo = directoryProvider.getRCRepositoriesDir().resolve(name)
+        return if (repo.exists()) repo else null
     }
 
     private fun hasBookFile(

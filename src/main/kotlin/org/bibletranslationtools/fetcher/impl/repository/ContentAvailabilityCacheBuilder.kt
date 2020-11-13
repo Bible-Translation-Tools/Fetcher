@@ -11,14 +11,13 @@ import org.bibletranslationtools.fetcher.data.cache.LanguageCache
 import org.bibletranslationtools.fetcher.data.cache.ProductCache
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
-import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
+import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
 import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
 import org.bibletranslationtools.fetcher.usecase.RequestResourceContainer
-import org.slf4j.LoggerFactory
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
 class ContentAvailabilityCacheBuilder(
@@ -26,12 +25,9 @@ class ContentAvailabilityCacheBuilder(
     private val chapterCatalog: ChapterCatalog,
     private val bookRepository: BookRepository,
     private val storageAccess: StorageAccess,
-    directoryProvider: DirectoryProvider
+    private val rcRepo: ResourceContainerRepository
 ) {
-    private val repoDir = directoryProvider.getRCRepositoriesDir()
-    private val templateRCName = "%s_%s.zip"
     private val resourceId = "ulb"
-    private val logger = LoggerFactory.getLogger(javaClass)
 
     fun build(): AvailabilityCache {
         return AvailabilityCache(cacheLanguages())
@@ -99,9 +95,8 @@ class ContentAvailabilityCacheBuilder(
     ): List<ChapterCache> {
         val chapters = chapterCatalog.getAll(languageCode, bookSlug)
         val chapterList = chapters.map { ChapterCache(it.number) }
-        val rcFile = repoDir.resolve(String.format(templateRCName, languageCode, resourceId))
-        if (!rcFile.exists()) return chapterList
-
+        val rcFile = rcRepo.getRC(languageCode, resourceId)
+            ?: return chapterList
         val mediaTypes = RequestResourceContainer.mediaTypes.map { it.name.toLowerCase() }
 
         ResourceContainer.load(rcFile).use { rc ->
