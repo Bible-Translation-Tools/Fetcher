@@ -4,12 +4,18 @@ import java.io.File
 import java.io.FileNotFoundException
 import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.data.Language
-import org.bibletranslationtools.fetcher.impl.repository.*
+import org.bibletranslationtools.fetcher.impl.repository.AvailabilityCacheRepo
+import org.bibletranslationtools.fetcher.impl.repository.BookCatalogImpl
+import org.bibletranslationtools.fetcher.impl.repository.BookRepositoryImpl
+import org.bibletranslationtools.fetcher.impl.repository.ContentAvailabilityCacheBuilder
+import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.StorageAccess
-import org.junit.Assert.*
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.`when`
@@ -34,7 +40,7 @@ class ContentAvailabilityCacheTest {
         val mockChapterCatalog = mock(ChapterCatalog::class.java)
         val mockDirectoryProvider = mock(DirectoryProvider::class.java)
         val mockStorageAccess: StorageAccess = StorageAccessImpl(mockDirectoryProvider)
-        val bookRepository =  BookRepositoryImpl(BookCatalogImpl())
+        val bookRepository = BookRepositoryImpl(BookCatalogImpl())
 
         `when`(mockDirectoryProvider.getRCRepositoriesDir()).thenReturn(tempDir)
         `when`(mockDirectoryProvider.getContentRoot()).thenReturn(tempDir)
@@ -61,6 +67,8 @@ class ContentAvailabilityCacheTest {
         assertNotNull(cache.getChapterUrl(chapterNumber, titus, languageCode, "mp3"))
         assertNotNull(cache.getChapterUrl(chapterNumber, titus, languageCode, "orature"))
         assertNull(cache.getChapterUrl(chapterNumber, titus, languageCode, "bttr"))
+
+        tempDir.deleteRecursively()
     }
 
     @Throws(FileNotFoundException::class)

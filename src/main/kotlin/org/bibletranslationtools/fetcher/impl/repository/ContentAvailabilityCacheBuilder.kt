@@ -99,13 +99,7 @@ class ContentAvailabilityCacheBuilder(
         languageCode: String,
         bookSlug: String
     ): List<ChapterCache> {
-        val chapters = try {
-            chapterCatalog.getAll(languageCode, bookSlug)
-        } catch (ex: Exception) {
-            logger.error("An error occurred while getting chapter catalog for $languageCode - $bookSlug")
-            throw ex
-        }
-
+        val chapters = chapterCatalog.getAll(languageCode, bookSlug)
         val chapterList = chapters.map { ChapterCache(it.number) }
         val rcFile = repoDir.resolve(String.format(templateRCName, languageCode, resourceId))
         if (!rcFile.isFile) return chapterList
