@@ -12,10 +12,12 @@ import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
+import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.`when`
@@ -25,12 +27,17 @@ class ContentAvailabilityCacheTest {
     private val languageCode = "en"
     private val titus = "tit"
     private val chapterNumber = 1
-    private val rcFileName = "en_ulb.zip"
+    private val rcFileName = "en_ulb"
 
     @Test
     fun testCacheContent() {
         val tempDir = createTempDir("testDir")
-        getTestRCFile().copyTo(tempDir.resolve(rcFileName))
+        val testRCPath = tempDir.resolve(rcFileName)
+        val copy = getTestRCFile().copyRecursively(testRCPath)
+        if (!copy) {
+            fail("Cannot attach repo $rcFileName to test directory.")
+        }
+
         val chapterPath = tempDir.resolve(
             "en/ulb/tit/$chapterNumber/CONTENTS/mp3/hi/chapter"
         ).apply { mkdirs() }
@@ -41,9 +48,18 @@ class ContentAvailabilityCacheTest {
         val mockDirectoryProvider = mock(DirectoryProvider::class.java)
         val mockStorageAccess: StorageAccess = StorageAccessImpl(mockDirectoryProvider)
         val bookRepository = BookRepositoryImpl(BookCatalogImpl())
+        val mockRCRepository = mock(ResourceContainerRepository::class.java)
 
         `when`(mockDirectoryProvider.getRCRepositoriesDir()).thenReturn(tempDir)
         `when`(mockDirectoryProvider.getContentRoot()).thenReturn(tempDir)
+        `when`(
+            mockRCRepository.getRC(anyString(), anyString())
+        ).thenAnswer {
+            if (it.arguments[0] == languageCode && it.arguments[1] == "ulb") {
+                testRCPath
+            } else null
+        }
+
         `when`(mockLanguageCatalog.getAll()).thenReturn(
             listOf(Language("en", "", "", true))
         )
@@ -58,7 +74,7 @@ class ContentAvailabilityCacheTest {
             mockChapterCatalog,
             bookRepository,
             mockStorageAccess,
-            mockDirectoryProvider
+            mockRCRepository
         )
         val cache = AvailabilityCacheRepo(cacheBuilder)
 
