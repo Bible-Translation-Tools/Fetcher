@@ -39,7 +39,7 @@ deploy:
   - provider: script
     script: bash docker_push.sh
     on:
-      branch: dev
+      branch: audiobieldev.walink.org
   - provider: script
     script: bash docker_push.sh
     on:
