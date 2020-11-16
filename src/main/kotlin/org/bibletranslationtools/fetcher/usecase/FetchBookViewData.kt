@@ -1,8 +1,7 @@
 package org.bibletranslationtools.fetcher.usecase
 
-import org.bibletranslationtools.fetcher.data.Book
-import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.repository.BookRepository
+import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
@@ -14,7 +13,7 @@ class FetchBookViewData(
     private val productSlug: String
 ) {
     private val resourceId = "ulb"
-    private val books: List<Book> = bookRepo.getBooks(resourceId = resourceId, languageCode = languageCode)
+    private val product = ProductFileExtension.getType(productSlug)!!
 
     private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
 
@@ -24,45 +23,26 @@ class FetchBookViewData(
         PriorityItem("wav", "")
     )
 
-    fun getViewDataList(currentPath: String): List<BookViewData> {
-        val productType = ProductFileExtension.getType(productSlug)!!
-
-        // expected file extensions to seek for
-        val fileExtensionList = if (ContainerExtensions.isSupported(productType.fileType)) {
-            listOf("tr")
-        } else {
-            listOf("wav", "mp3")
-        }
-
-        when (productType) {
-            ProductFileExtension.ORATURE -> books.forEach { it.availability = true }
-            else -> {
-                books.forEach { book ->
-                    book.availability = storage.hasBookContent(
-                        languageCode,
-                        resourceId = resourceId,
-                        bookSlug = book.slug,
-                        fileExtensionList = fileExtensionList
-                    )
-                }
-            }
-        }
-
-        return books.map {
+    fun getViewDataList(
+        currentPath: String,
+        contentCache: ContentCacheRepository
+    ): List<BookViewData> {
+        val books = bookRepo.getBooks(resourceId = resourceId, languageCode = languageCode)
+        return books.map { book ->
+            book.availability = contentCache.isBookAvailable(book.slug, languageCode, productSlug)
             BookViewData(
-                index = it.index,
-                slug = it.slug,
-                anglicizedName = it.anglicizedName,
-                localizedName = it.localizedName,
-                url = if (it.availability) "$currentPath/${it.slug}" else null
+                index = book.index,
+                slug = book.slug,
+                anglicizedName = book.anglicizedName,
+                localizedName = book.localizedName,
+                url = if (book.availability) "$currentPath/${book.slug}" else null
             )
         }
     }
 
-    fun getViewData(bookSlug: String): BookViewData? {
-        val product = ProductFileExtension.getType(productSlug) ?: return null
+    fun getViewData(bookSlug: String, cacheRepository: ContentCacheRepository): BookViewData? {
         val book = bookRepo.getBook(bookSlug)
-        val url = getBookDownloadUrl(bookSlug, product)
+        val url = cacheRepository.getBookUrl(bookSlug, languageCode, productSlug)
 
         return if (book != null) BookViewData(
             index = book.index,
@@ -75,7 +55,7 @@ class FetchBookViewData(
         }
     }
 
-    private fun getBookDownloadUrl(bookSlug: String, product: ProductFileExtension): String? {
+    fun getBookDownloadUrl(bookSlug: String): String? {
         var url: String? = null
         for (priority in priorityList) {
             val fileAccessRequest = when (product) {

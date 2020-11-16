@@ -3,11 +3,11 @@ package org.bibletranslationtools.fetcher.impl.repository
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.ktor.client.HttpClient
-import io.ktor.client.features.ClientRequestException
 import io.ktor.client.request.get
 import io.ktor.util.error
-import kotlinx.coroutines.runBlocking
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
 import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.slf4j.LoggerFactory
@@ -24,17 +24,21 @@ class ChapterCatalogImpl : ChapterCatalog {
         fun getChapter(): Int = id.split("-")[0].toInt()
     }
 
-    @Throws(ClientRequestException::class)
+    @Throws(IOException::class)
     override fun getAll(languageCode: String, bookSlug: String): List<Chapter> {
-        val client = HttpClient()
         val url = getChunksURL(bookSlug)
-        val response: ByteArray = runBlocking {
-            try {
-                client.get<ByteArray>(url)
-            } catch (ex: ClientRequestException) {
-                logger.error("An error occurred when requesting from $url", ex)
-                throw ex
+        var response: String = ""
+
+        try {
+            val conn = (URL(url).openConnection() as HttpURLConnection)
+            conn.requestMethod = "GET"
+            conn.inputStream.reader().use {
+                response = it.readText()
             }
+            conn.disconnect()
+        } catch (ex: IOException) {
+            logger.error("An error occurred when getting chapter catalog: $languageCode - $bookSlug", ex)
+            throw ex
         }
 
         val mapper = ObjectMapper().registerModule(KotlinModule())

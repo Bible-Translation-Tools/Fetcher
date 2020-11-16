@@ -43,7 +43,9 @@
 .product-card__icon {
     display: none;
 }
-
+.unavailable img {
+    opacity: 0.3 !important
+}
 
 /* --mobile layout for phones  */
 @media only screen

@@ -19,4 +19,8 @@ class DirectoryProviderImpl : DirectoryProvider {
     override fun getDownloadDir(): File {
         return File(System.getenv("RC_TEMP")).apply { mkdirs() }
     }
+
+    override fun getRCRepositoriesDir(): File {
+        return File(System.getenv("ORATURE_REPO_DIR"))
+    }
 }

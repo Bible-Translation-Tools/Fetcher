@@ -40,7 +40,7 @@ private fun gatewayLanguagesView(
     return ThymeleafContent(
         template = "languages",
         model = mapOf(
-            "languageList" to model.getListViewData(path),
+            "languageList" to model.getListViewData(path, resolver.contentCache),
             "languagesNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "languages")

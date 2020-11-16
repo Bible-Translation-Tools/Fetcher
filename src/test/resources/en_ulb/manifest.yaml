@@ -1,0 +1,41 @@
+---
+dublin_core:
+  conformsto: 'rc0.2'
+  contributor: []
+  creator: 'Door43 World Missions Community'
+  description: "An open-licensed update of the ASV, intended to provide a 'form-centric' understanding of the Bible. It increases the translator's understanding of the lexical and grammatical composition of the underlying text by adhering closely to the word order and structure of the originals."
+  format: 'text/usfm'
+  identifier: 'ulb'
+  issued: '2017-11-29'
+  language:
+    direction: 'ltr'
+    identifier: 'en-x-demo1'
+    title: 'English'
+  modified: '2017-11-29'
+  publisher: 'unfoldingWord'
+  relation:
+    - 'en/tw'
+    - 'en/tq'
+    - 'en/tn'
+  rights: 'CC BY-SA 4.0'
+  source:
+    -
+      identifier: 'asv'
+      language: 'en'
+      version: '1901'
+  subject: 'Bible'
+  title: 'Unlocked Literal Bible'
+  type: 'bundle'
+  version: '12'
+checking:
+  checking_entity:
+    - 'unfoldingWord'
+  checking_level: '3'
+projects:
+  -
+    title: 'Titus'
+    versification: 'ufw'
+    identifier: 'tit'
+    sort: 60
+    path: './60-JAS.usfm'
+    categories: [ 'bible-nt'  ]

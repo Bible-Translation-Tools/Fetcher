@@ -2,10 +2,10 @@ package org.bibletranslationtools.fetcher
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import org.bibletranslationtools.fetcher.impl.repository.verifyChapterExists
 import java.io.File
 import java.io.FileNotFoundException
 import java.net.URL
+import org.bibletranslationtools.fetcher.impl.repository.RCUtils
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.slf4j.LoggerFactory
@@ -29,7 +29,7 @@ class RCUtilTest {
         val testCases = getVerifyChapterExistsTestCase()
         for (case in testCases) {
             val mediaTypes = case.mediaTypes.mapNotNull { MediaType.get(it) }
-            val result = verifyChapterExists(
+            val result = RCUtils.verifyChapterExists(
                 rcFile,
                 case.bookSlug,
                 mediaTypes,

@@ -58,13 +58,13 @@ private fun productsView(
         )
     }
 
-    val model = FetchProductViewData(resolver.productCatalog)
+    val model = FetchProductViewData(resolver.productCatalog, params.languageCode)
     val languageName = getLanguageName(params.languageCode, resolver)
 
     return ThymeleafContent(
         template = "products",
         model = mapOf(
-            "productList" to model.getListViewData(path),
+            "productList" to model.getListViewData(path, resolver.contentCache),
             "languagesNavTitle" to languageName,
             "languagesNavUrl" to "/$GL_ROUTE",
             "fileTypesNavUrl" to "#"

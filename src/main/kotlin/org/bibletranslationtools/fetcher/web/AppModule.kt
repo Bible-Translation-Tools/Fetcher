@@ -14,6 +14,7 @@ import io.ktor.request.uri
 import io.ktor.routing.Routing
 import io.ktor.routing.routing
 import java.util.Locale
+import kotlin.concurrent.thread
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.web.controllers.bookController
 import org.bibletranslationtools.fetcher.web.controllers.chapterController
@@ -22,6 +23,8 @@ import org.bibletranslationtools.fetcher.web.controllers.languageController
 import org.bibletranslationtools.fetcher.web.controllers.productController
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
+
+const val CACHE_REFRESH_RATE_PER_HOUR = 3600000
 
 fun Application.appModule() {
     install(DefaultHeaders)
@@ -35,6 +38,7 @@ fun Application.appModule() {
     install(CallLogging)
     install(Routing) {
         val resolver = DependencyResolver
+        scheduleCacheUpdate()
         routing {
             // Static contents declared here
             static("static") {
@@ -58,6 +62,16 @@ fun Application.appModule() {
             productController(resolver)
             bookController(resolver)
             chapterController(resolver)
+        }
+    }
+}
+
+private fun scheduleCacheUpdate() {
+    thread(start = true, isDaemon = true) {
+        val hours = System.getenv("CACHE_REFRESH_TIME_HRS").toLong()
+        while (true) {
+            Thread.sleep(CACHE_REFRESH_RATE_PER_HOUR * hours)
+            DependencyResolver.contentCache.update()
         }
     }
 }

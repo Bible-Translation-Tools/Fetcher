@@ -14,9 +14,7 @@ class LanguageRepositoryImpl(
         val languages = languageCatalog.getAll()
 
         languages.forEach {
-            if (it.code in availableLanguageCodes) {
-                it.availability = true
-            }
+            it.availability = it.code in availableLanguageCodes
         }
 
         return languages

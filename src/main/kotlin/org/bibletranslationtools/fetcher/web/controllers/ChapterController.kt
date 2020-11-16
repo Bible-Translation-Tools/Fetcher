@@ -99,7 +99,7 @@ private fun chaptersView(
         resolver.storageAccess,
         params.languageCode,
         params.productSlug
-    ).getViewData(params.bookSlug)
+    ).getViewData(params.bookSlug, resolver.contentCache)
 
     val chapterViewDataList: List<ChapterViewData>? = try {
         FetchChapterViewData(
@@ -108,7 +108,7 @@ private fun chaptersView(
             languageCode = params.languageCode,
             productSlug = params.productSlug,
             bookSlug = params.bookSlug
-        ).getViewDataList()
+        ).getViewDataList(resolver.contentCache)
     } catch (ex: ClientRequestException) {
         return errorPage(
             "internal_error",

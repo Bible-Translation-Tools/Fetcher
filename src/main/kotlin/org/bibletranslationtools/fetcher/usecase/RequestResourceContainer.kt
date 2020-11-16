@@ -3,8 +3,7 @@ package org.bibletranslationtools.fetcher.usecase
 import java.io.File
 import org.bibletranslationtools.fetcher.data.Deliverable
 import org.bibletranslationtools.fetcher.data.RCDeliverable
-import org.bibletranslationtools.fetcher.impl.repository.createRCFileName
-import org.bibletranslationtools.fetcher.impl.repository.verifyChapterExists
+import org.bibletranslationtools.fetcher.impl.repository.RCUtils
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
@@ -18,8 +17,6 @@ class RequestResourceContainer(
     private val storageAccess: StorageAccess,
     private val downloadClient: IDownloadClient
 ) {
-    private val mediaTypes = listOf(MediaType.WAV, MediaType.MP3)
-
     fun getResourceContainer(
         deliverable: Deliverable
     ): RCDeliverable? {
@@ -28,29 +25,34 @@ class RequestResourceContainer(
             deliverable.resourceId
         ) ?: return null
 
-        // make new copy to serve out
+        // allocate rc to delivery location
         val rcFile = allocateRcFileLocation(templateRC, deliverable)
+        downloadMediaInRC(rcFile, deliverable)
 
-        val rcWithMedia = downloadMediaInRC(rcFile, deliverable)
+        val hasContent = RCUtils.verifyChapterExists(
+            rcFile,
+            deliverable.book.slug,
+            mediaTypes,
+            deliverable.chapter?.number
+        )
 
-        return if (
-            verifyChapterExists(
-                rcWithMedia,
-                deliverable.book.slug,
-                mediaTypes,
-                deliverable.chapter?.number
-            )
-        ) {
-            RCDeliverable(deliverable, rcWithMedia.path)
-        } else null
+        val zipFile = rcFile.parentFile.resolve("${rcFile.name}.zip")
+            .apply { createNewFile() }
+
+        return if (hasContent || RCUtils.zipDirectory(rcFile, zipFile)) {
+            RCDeliverable(deliverable, zipFile.path)
+        } else {
+            rcFile.deleteRecursively()
+            null
+        }
     }
 
     private fun allocateRcFileLocation(rcFile: File, deliverable: Deliverable): File {
-        val newFileName = createRCFileName(
+        val rcName = RCUtils.createRCFileName(
             deliverable,
             extension = rcFile.extension
         )
-        return storageAccess.allocateRCFileLocation(rcFile, newFileName)
+        return storageAccess.allocateRCFileLocation(rcFile, rcName)
     }
 
     private fun downloadMediaInRC(rcFile: File, deliverable: Deliverable): File {
@@ -66,5 +68,9 @@ class RequestResourceContainer(
             downloadClient,
             overwrite = true
         )
+    }
+
+    companion object {
+        val mediaTypes = listOf(MediaType.WAV, MediaType.MP3)
     }
 }

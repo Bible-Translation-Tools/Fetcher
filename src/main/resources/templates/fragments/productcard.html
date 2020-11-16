@@ -6,15 +6,21 @@
 <body>
 <a th:fragment="productcard(iconUrl, productTitle, productDescription, url)"
    class="product-card"
-   th:href="${url}">
-    <div class="product-card__icon-container">
+   th:classappend="${url == null}? 'unavailable' "
+   th:href="${url == null}? '#' : ${url}">
+    <div class="product-card__icon-container" th:classappend="${url == null}? 'unavailable' ">
         <img alt="product_image" class="product-card__product-icon" th:src="${'/static/' + iconUrl}"/>
     </div>
-    <div class="product-card__text">
-        <p th:text="${productTitle}"class="product-card__title">አማርኛ</p>
-        <p th:text="${productDescription}" class="product-card__description"><span>Amharic</span></p>
+    <div class="product-card__text" th:classappend="${url == null}? 'unavailable' ">
+        <p th:text="${productTitle}"
+           class="product-card__title"
+           th:classappend="${url == null}? 'unavailable' ">File Type</p>
+        <p th:text="${productDescription}"
+           class="product-card__description"
+           th:classappend="${url == null}? 'unavailable' "><span>File Type Description</span></p>
     </div>
-    <span class="product-card__icon">
+    <span class="product-card__icon"
+          th:classappend="${url == null}? 'unavailable' ">
         <em class="material-icons">arrow_forward</em></span>
 </a>
 </body>
