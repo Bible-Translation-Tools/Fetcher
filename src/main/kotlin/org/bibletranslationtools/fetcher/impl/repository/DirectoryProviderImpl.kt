@@ -17,7 +17,7 @@ class DirectoryProviderImpl : DirectoryProvider {
     }
 
     override fun getDownloadDir(): File {
-        return File(System.getenv("RC_TEMP_DIR")).apply { mkdirs() }
+        return File(System.getenv("RC_TEMP")).apply { mkdirs() }
     }
 
     override fun getRCRepositoriesDir(): File {
