@@ -14,6 +14,7 @@ import io.ktor.request.uri
 import io.ktor.routing.Routing
 import io.ktor.routing.routing
 import java.util.Locale
+import kotlin.concurrent.thread
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.web.controllers.bookController
 import org.bibletranslationtools.fetcher.web.controllers.chapterController
@@ -22,7 +23,6 @@ import org.bibletranslationtools.fetcher.web.controllers.languageController
 import org.bibletranslationtools.fetcher.web.controllers.productController
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
-import kotlin.concurrent.thread
 
 fun Application.appModule() {
     install(DefaultHeaders)

@@ -4,11 +4,6 @@ import io.ktor.http.HttpStatusCode
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
-import org.bibletranslationtools.fetcher.usecase.cache.AvailabilityCache
-import org.bibletranslationtools.fetcher.usecase.cache.BookCache
-import org.bibletranslationtools.fetcher.usecase.cache.ChapterCache
-import org.bibletranslationtools.fetcher.usecase.cache.LanguageCache
-import org.bibletranslationtools.fetcher.usecase.cache.ProductCache
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
@@ -18,6 +13,11 @@ import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
 import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
 import org.bibletranslationtools.fetcher.usecase.RequestResourceContainer
+import org.bibletranslationtools.fetcher.usecase.cache.AvailabilityCache
+import org.bibletranslationtools.fetcher.usecase.cache.BookCache
+import org.bibletranslationtools.fetcher.usecase.cache.ChapterCache
+import org.bibletranslationtools.fetcher.usecase.cache.LanguageCache
+import org.bibletranslationtools.fetcher.usecase.cache.ProductCache
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
 class ContentAvailabilityCacheBuilder(
