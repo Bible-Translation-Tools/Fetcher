@@ -2,6 +2,8 @@ package org.bibletranslationtools.fetcher.impl.repository
 
 import java.io.File
 import java.io.FileFilter
+import java.util.UUID
+import kotlin.NoSuchElementException
 import org.bibletranslationtools.fetcher.data.CompressedExtensions
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.data.Division
@@ -146,7 +148,10 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
     }
 
     override fun allocateRCFileLocation(source: File, newFileName: String): File {
-        val destFilePath = directoryProvider.getDownloadDir().resolve(newFileName)
+        val tempDir = directoryProvider.getDownloadDir()
+            .resolve(UUID.randomUUID().toString())
+            .apply { mkdirs() }
+        val destFilePath = tempDir.resolve(newFileName)
         source.copyRecursively(destFilePath, true)
         return destFilePath
     }
