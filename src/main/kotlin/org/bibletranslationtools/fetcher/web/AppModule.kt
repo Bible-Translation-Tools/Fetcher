@@ -24,6 +24,8 @@ import org.bibletranslationtools.fetcher.web.controllers.productController
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 
+const val CACHE_REFRESH_RATE_PER_HOUR = 3600000
+
 fun Application.appModule() {
     install(DefaultHeaders)
     install(Thymeleaf) {
@@ -66,9 +68,9 @@ fun Application.appModule() {
 
 private fun scheduleCacheUpdate() {
     thread(start = true, isDaemon = true) {
-        val interval = System.getenv("CACHE_REFRESH_TIME_HRS").toLong()
+        val hours = System.getenv("CACHE_REFRESH_TIME_HRS").toLong()
         while (true) {
-            Thread.sleep(1000 * 3600 * interval)
+            Thread.sleep(CACHE_REFRESH_RATE_PER_HOUR * hours)
             DependencyResolver.contentCache.update()
         }
     }

@@ -1,5 +1,5 @@
 package org.bibletranslationtools.fetcher.usecase.cache
 
-data class AvailabilityCache(
+class AvailabilityCache(
     var languages: List<LanguageCache>
 )

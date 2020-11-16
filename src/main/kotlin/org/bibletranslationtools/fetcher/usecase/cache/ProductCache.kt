@@ -1,6 +1,6 @@
 package org.bibletranslationtools.fetcher.usecase.cache
 
-data class ProductCache(
+class ProductCache(
     val slug: String,
     var availability: Boolean = false,
     val books: List<BookCache> = listOf()

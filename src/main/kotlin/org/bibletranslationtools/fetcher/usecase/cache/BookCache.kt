@@ -1,6 +1,6 @@
 package org.bibletranslationtools.fetcher.usecase.cache
 
-data class BookCache(
+class BookCache(
     val slug: String,
     var availability: Boolean = false,
     val url: String? = null,
