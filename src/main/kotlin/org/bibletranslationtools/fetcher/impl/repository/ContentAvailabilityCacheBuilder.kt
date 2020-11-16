@@ -30,7 +30,6 @@ class ContentAvailabilityCacheBuilder(
     private val resourceId = "ulb"
 
     fun build(): AvailabilityCache {
-        println("updating...")
         return AvailabilityCache(cacheLanguages())
     }
 

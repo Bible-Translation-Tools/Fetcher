@@ -36,13 +36,7 @@ fun Application.appModule() {
     install(CallLogging)
     install(Routing) {
         val resolver = DependencyResolver
-        thread(start = true, isDaemon = true) {
-            val interval = System.getenv("CACHE_REFRESH_TIME_HRS").toLong()
-            while (true) {
-                Thread.sleep(1000 * 3600 * interval)
-                resolver.contentCache.update()
-            }
-        }
+        scheduleCacheUpdate()
         routing {
             // Static contents declared here
             static("static") {
@@ -66,6 +60,16 @@ fun Application.appModule() {
             productController(resolver)
             bookController(resolver)
             chapterController(resolver)
+        }
+    }
+}
+
+private fun scheduleCacheUpdate() {
+    thread(start = true, isDaemon = true) {
+        val interval = System.getenv("CACHE_REFRESH_TIME_HRS").toLong()
+        while (true) {
+            Thread.sleep(1000 * 3600 * interval)
+            DependencyResolver.contentCache.update()
         }
     }
 }
