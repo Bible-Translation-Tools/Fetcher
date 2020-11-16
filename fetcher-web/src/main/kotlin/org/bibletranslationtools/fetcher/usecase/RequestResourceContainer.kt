@@ -38,8 +38,9 @@ class RequestResourceContainer(
 
         val zipFile = rcFile.parentFile.resolve("${rcFile.name}.zip")
             .apply { createNewFile() }
+        val packedUp = RCUtils.zipDirectory(rcFile, zipFile)
 
-        return if (hasContent || RCUtils.zipDirectory(rcFile, zipFile)) {
+        return if (hasContent || packedUp) {
             RCDeliverable(deliverable, zipFile.path)
         } else {
             rcFile.deleteRecursively()
