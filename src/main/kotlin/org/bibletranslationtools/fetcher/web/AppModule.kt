@@ -22,6 +22,7 @@ import org.bibletranslationtools.fetcher.web.controllers.languageController
 import org.bibletranslationtools.fetcher.web.controllers.productController
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
+import kotlin.concurrent.thread
 
 fun Application.appModule() {
     install(DefaultHeaders)
@@ -35,6 +36,13 @@ fun Application.appModule() {
     install(CallLogging)
     install(Routing) {
         val resolver = DependencyResolver
+        thread(start = true, isDaemon = true) {
+            val interval = System.getenv("CACHE_REFRESH_TIME_HRS").toLong()
+            while (true) {
+                Thread.sleep(1000 * 3600 * interval)
+                resolver.contentCache.update()
+            }
+        }
         routing {
             // Static contents declared here
             static("static") {
