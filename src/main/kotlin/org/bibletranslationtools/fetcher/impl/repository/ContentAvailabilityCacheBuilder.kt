@@ -4,11 +4,11 @@ import io.ktor.http.HttpStatusCode
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
-import org.bibletranslationtools.fetcher.data.cache.AvailabilityCache
-import org.bibletranslationtools.fetcher.data.cache.BookCache
-import org.bibletranslationtools.fetcher.data.cache.ChapterCache
-import org.bibletranslationtools.fetcher.data.cache.LanguageCache
-import org.bibletranslationtools.fetcher.data.cache.ProductCache
+import org.bibletranslationtools.fetcher.usecase.cache.AvailabilityCache
+import org.bibletranslationtools.fetcher.usecase.cache.BookCache
+import org.bibletranslationtools.fetcher.usecase.cache.ChapterCache
+import org.bibletranslationtools.fetcher.usecase.cache.LanguageCache
+import org.bibletranslationtools.fetcher.usecase.cache.ProductCache
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
@@ -30,6 +30,7 @@ class ContentAvailabilityCacheBuilder(
     private val resourceId = "ulb"
 
     fun build(): AvailabilityCache {
+        println("updating...")
         return AvailabilityCache(cacheLanguages())
     }
 

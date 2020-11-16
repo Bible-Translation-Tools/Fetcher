@@ -1,6 +1,6 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
-import org.bibletranslationtools.fetcher.data.cache.AvailabilityCache
+import org.bibletranslationtools.fetcher.usecase.cache.AvailabilityCache
 import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
 
 class AvailabilityCacheRepo(

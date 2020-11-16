@@ -1,4 +1,4 @@
-package org.bibletranslationtools.fetcher.data.cache
+package org.bibletranslationtools.fetcher.usecase.cache
 
 data class ProductCache(
     val slug: String,
