@@ -22,16 +22,24 @@ cache:
   - "$HOME/.gradle/wrapper"
   - "$HOME/.sonar/cache"
 script:
+- cd fetcher-web
 - "./gradlew check build"
+- cd ..
 - sonar-scanner
+- cd fetcher-web
 - docker build -t bibletranslationtools/fetcher:$TRAVIS_COMMIT .
 - docker tag bibletranslationtools/fetcher:$TRAVIS_COMMIT bibletranslationtools/fetcher:$TRAVIS_BRANCH
 - docker tag bibletranslationtools/fetcher:$TRAVIS_COMMIT bibletranslationtools/fetcher:latest
+- cd ../fetcher-pipeline
+- docker build -t bibletranslationtools/fetcher-pipeline:$TRAVIS_COMMIT .
+- docker tag bibletranslationtools/fetcher-pipeline:$TRAVIS_COMMIT bibletranslationtools/fetcher-pipeline:$TRAVIS_BRANCH
+- docker tag bibletranslationtools/fetcher-pipeline:$TRAVIS_COMMIT bibletranslationtools/fetcher-pipeline:latest
+- cd ..
 deploy:
   - provider: script
     script: bash docker_push.sh
     on:
-      branch: dev
+      branch: audiobieldev.walink.org
   - provider: script
     script: bash docker_push.sh
     on:
