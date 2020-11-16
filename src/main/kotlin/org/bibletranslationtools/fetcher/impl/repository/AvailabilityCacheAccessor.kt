@@ -3,7 +3,7 @@ package org.bibletranslationtools.fetcher.impl.repository
 import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
 import org.bibletranslationtools.fetcher.usecase.cache.AvailabilityCache
 
-class AvailabilityCacheRepo(
+class AvailabilityCacheAccessor(
     private val cacheBuilder: ContentAvailabilityCacheBuilder
 ) : ContentCacheRepository {
 
@@ -18,8 +18,10 @@ class AvailabilityCacheRepo(
         cache = cacheBuilder.build()
     }
 
+    @Synchronized
     override fun isLanguageAvailable(code: String) = cache.languages.any { it.code == code && it.availability }
 
+    @Synchronized
     override fun isProductAvailable(productSlug: String, languageCode: String): Boolean {
         return cache.languages.find {
             it.code == languageCode && it.availability
@@ -28,6 +30,7 @@ class AvailabilityCacheRepo(
         } ?: false
     }
 
+    @Synchronized
     override fun isBookAvailable(
         bookSlug: String,
         languageCode: String,
@@ -44,6 +47,7 @@ class AvailabilityCacheRepo(
         }
     }
 
+    @Synchronized
     override fun getChapterUrl(
         number: Int,
         bookSlug: String,
@@ -63,6 +67,7 @@ class AvailabilityCacheRepo(
         }?.url
     }
 
+    @Synchronized
     override fun getBookUrl(
         bookSlug: String,
         languageCode: String,

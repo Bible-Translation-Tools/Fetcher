@@ -29,6 +29,7 @@ class ContentAvailabilityCacheBuilder(
 ) {
     private val resourceId = "ulb"
 
+    @Synchronized
     fun build(): AvailabilityCache {
         return AvailabilityCache(cacheLanguages())
     }

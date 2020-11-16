@@ -4,7 +4,7 @@ import java.io.File
 import java.io.FileNotFoundException
 import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.data.Language
-import org.bibletranslationtools.fetcher.impl.repository.AvailabilityCacheRepo
+import org.bibletranslationtools.fetcher.impl.repository.AvailabilityCacheAccessor
 import org.bibletranslationtools.fetcher.impl.repository.BookCatalogImpl
 import org.bibletranslationtools.fetcher.impl.repository.BookRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.ContentAvailabilityCacheBuilder
@@ -76,7 +76,7 @@ class ContentAvailabilityCacheTest {
             mockStorageAccess,
             mockRCRepository
         )
-        val cache = AvailabilityCacheRepo(cacheBuilder)
+        val cache = AvailabilityCacheAccessor(cacheBuilder)
 
         assertTrue(cache.isLanguageAvailable(languageCode))
         assertTrue(cache.isBookAvailable(titus, languageCode, "orature"))

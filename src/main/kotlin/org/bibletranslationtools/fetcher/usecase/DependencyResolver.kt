@@ -1,6 +1,6 @@
 package org.bibletranslationtools.fetcher.usecase
 
-import org.bibletranslationtools.fetcher.impl.repository.AvailabilityCacheRepo
+import org.bibletranslationtools.fetcher.impl.repository.AvailabilityCacheAccessor
 import org.bibletranslationtools.fetcher.impl.repository.BookCatalogImpl
 import org.bibletranslationtools.fetcher.impl.repository.BookRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.ChapterCatalogImpl
@@ -47,7 +47,7 @@ object DependencyResolver {
         storageAccess,
         rcRepository
     )
-    val contentCache: ContentCacheRepository = AvailabilityCacheRepo(
+    val contentCache: ContentCacheRepository = AvailabilityCacheAccessor(
         cacheBuilder
     )
 }
