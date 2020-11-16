@@ -1,19 +1,19 @@
 files:
-  - source: /src/main/resources/templates/books_en.properties
-    translation: /src/main/resources/templates/books_%two_letters_code%.properties
-  - source: /src/main/resources/templates/chapters_en.properties
-    translation: /src/main/resources/templates/chapters_%two_letters_code%.properties
-  - source: /src/main/resources/templates/landing_en.properties
-    translation: /src/main/resources/templates/landing_%two_letters_code%.properties
-  - source: /src/main/resources/templates/languages_en.properties
-    translation: /src/main/resources/templates/languages_%two_letters_code%.properties
-  - source: /src/main/resources/templates/products_en.properties
-    translation: /src/main/resources/templates/products_%two_letters_code%.properties
-  - source: /src/main/resources/templates/fragments/navbar_en.properties
+  - source: /fetcher-web/src/main/resources/templates/books_en.properties
+    translation: /fetcher-web/src/main/resources/templates/books_%two_letters_code%.properties
+  - source: /fetcher-web/src/main/resources/templates/chapters_en.properties
+    translation: /fetcher-web/src/main/resources/templates/chapters_%two_letters_code%.properties
+  - source: /fetcher-web/src/main/resources/templates/landing_en.properties
+    translation: /fetcher-web/src/main/resources/templates/landing_%two_letters_code%.properties
+  - source: /fetcher-web/src/main/resources/templates/languages_en.properties
+    translation: /fetcher-web/src/main/resources/templates/languages_%two_letters_code%.properties
+  - source: /fetcher-web/src/main/resources/templates/products_en.properties
+    translation: /fetcher-web/src/main/resources/templates/products_%two_letters_code%.properties
+  - source: /fetcher-web/src/main/resources/templates/fragments/navbar_en.properties
     translation: >-
-      /src/main/resources/templates/fragments/navbar_%two_letters_code%.properties
-  - source: /src/main/resources/templates/fragments/searchbar_en.properties
+      /fetcher-web/src/main/resources/templates/fragments/navbar_%two_letters_code%.properties
+  - source: /fetcher-web/src/main/resources/templates/fragments/searchbar_en.properties
     translation: >-
-      /src/main/resources/templates/fragments/searchbar_%two_letters_code%.properties
-  - source: /src/main/resources/templates/error_en.properties
-    translation: /src/main/resources/templates/error_%two_letters_code%.properties
+      /fetcher-web/src/main/resources/templates/fragments/searchbar_%two_letters_code%.properties
+  - source: /fetcher-web/src/main/resources/templates/error_en.properties
+    translation: /fetcher-web/src/main/resources/templates/error_%two_letters_code%.properties
