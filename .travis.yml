@@ -22,7 +22,7 @@ cache:
   - "$HOME/.gradle/wrapper"
   - "$HOME/.sonar/cache"
 script:
-- "./fetcher-web/gradlew check build"
+- "cd fetcher-web && ./gradlew check build && cd .."
 - sonar-scanner
 - docker build -t bibletranslationtools/fetcher:$TRAVIS_COMMIT ./fetcher-web
 - docker tag bibletranslationtools/fetcher:$TRAVIS_COMMIT bibletranslationtools/fetcher:$TRAVIS_BRANCH
