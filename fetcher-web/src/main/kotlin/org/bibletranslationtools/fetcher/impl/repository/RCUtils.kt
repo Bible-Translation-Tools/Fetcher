@@ -1,13 +1,7 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.IOException
-import java.util.zip.ZipEntry
-import java.util.zip.ZipException
 import java.util.zip.ZipFile
-import java.util.zip.ZipOutputStream
 import org.bibletranslationtools.fetcher.data.Deliverable
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
@@ -55,37 +49,6 @@ object RCUtils {
         }
 
         return exists
-    }
-
-    @Throws(Exception::class)
-    fun zipDirectory(sourcePath: File, destFile: File): Boolean {
-        val rootName = sourcePath.name
-        var success = true
-
-        try {
-            ZipOutputStream(FileOutputStream(destFile).buffered()).use { zos ->
-                sourcePath.walkTopDown().forEach { fileInSource ->
-                    val zipFileName = fileInSource.absolutePath
-                        .removePrefix(sourcePath.absolutePath).removePrefix("\\")
-                    val suffix = if (fileInSource.isDirectory) "\\" else ""
-
-                    val entry = ZipEntry("$rootName\\$zipFileName$suffix")
-                    zos.putNextEntry(entry)
-
-                    if (fileInSource.isFile) fileInSource.inputStream().copyTo(zos)
-                }
-            }
-        } catch (ex: FileNotFoundException) {
-            success = false
-        } catch (ex: IllegalArgumentException) {
-            success = false
-        } catch (ex: ZipException) {
-            success = false
-        } catch (ex: IOException) {
-            success = false
-        }
-
-        return success
     }
 
     private fun checkFromZipFile(rcFile: File, chapterPath: String): Boolean {
