@@ -38,7 +38,7 @@ class RequestResourceContainer(
             ZipFile(zipFile).addFolder(templateRC)
             true
         } catch (ex: ZipException) {
-            logger.error("error zipping folder $templateRC", ex)
+            logger.error("An error occurred while zipping folder $templateRC", ex)
             false
         }
 
