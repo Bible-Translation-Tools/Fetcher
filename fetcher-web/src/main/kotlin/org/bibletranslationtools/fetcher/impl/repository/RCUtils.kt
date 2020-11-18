@@ -80,13 +80,7 @@ object RCUtils {
                 }
             }
             true
-        } catch (ex: IOException) {
-            false
-        } catch (ex: ProviderNotFoundException) {
-            false
-        } catch (ex: InvalidPathException) {
-            false
-        } catch (ex: SecurityException) {
+        } catch (ex: Exception) {
             false
         }
 
