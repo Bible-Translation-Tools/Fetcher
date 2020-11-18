@@ -2,6 +2,7 @@ package org.bibletranslationtools.fetcher.impl.repository
 
 import java.io.File
 import java.io.FileFilter
+import java.util.UUID
 import org.bibletranslationtools.fetcher.data.CompressedExtensions
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.data.Division
@@ -9,6 +10,7 @@ import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.slf4j.LoggerFactory
+import kotlin.NoSuchElementException
 
 class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : StorageAccess {
 
@@ -146,7 +148,10 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
     }
 
     override fun allocateRCFileLocation(newFileName: String): File {
-        return directoryProvider.getDownloadDir().resolve(newFileName)
+        return directoryProvider.getDownloadDir()
+            .resolve(UUID.randomUUID().toString())
+            .apply { mkdirs() }
+            .resolve(newFileName)
     }
 
     override fun getRepoFromFileSystem(name: String): File? {
