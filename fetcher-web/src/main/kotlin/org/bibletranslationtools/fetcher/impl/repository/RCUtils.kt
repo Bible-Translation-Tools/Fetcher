@@ -60,6 +60,10 @@ object RCUtils {
     }
 
     fun zipDirectory(source: File, dest: File): Boolean {
+        if (!source.isDirectory || dest.exists()) {
+            return false
+        }
+
         val env = mapOf("create" to "true")
 
         val success = try {
