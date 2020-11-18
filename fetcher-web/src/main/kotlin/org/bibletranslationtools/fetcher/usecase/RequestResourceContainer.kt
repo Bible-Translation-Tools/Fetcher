@@ -1,14 +1,11 @@
 package org.bibletranslationtools.fetcher.usecase
 
 import java.io.File
-import net.lingala.zip4j.ZipFile
-import net.lingala.zip4j.exception.ZipException
 import org.bibletranslationtools.fetcher.data.Deliverable
 import org.bibletranslationtools.fetcher.data.RCDeliverable
 import org.bibletranslationtools.fetcher.impl.repository.RCUtils
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
-import org.slf4j.LoggerFactory
 import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
 import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
@@ -20,8 +17,6 @@ class RequestResourceContainer(
     private val storageAccess: StorageAccess,
     private val downloadClient: IDownloadClient
 ) {
-    private val logger = LoggerFactory.getLogger(javaClass)
-
     fun getResourceContainer(
         deliverable: Deliverable
     ): RCDeliverable? {
@@ -34,13 +29,7 @@ class RequestResourceContainer(
         val zipName = RCUtils.createRCFileName(deliverable, "zip")
         val zipFile = storageAccess.allocateRCFileLocation(zipName)
 
-        val packedUp = try {
-            ZipFile(zipFile).addFolder(templateRC)
-            true
-        } catch (ex: ZipException) {
-            logger.error("An error occurred while zipping folder $templateRC", ex)
-            false
-        }
+        val packedUp = RCUtils.zipDirectory(templateRC, zipFile)
 
         downloadMediaInRC(zipFile, deliverable)
 

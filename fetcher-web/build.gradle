@@ -51,7 +51,6 @@ dependencies {
     implementation "org.wycliffeassociates:kotlin-resource-container:$resource_container_ver"
     implementation "org.wycliffeassociates:rcmediadownloader:$rc_media_downloader_ver"
     implementation "com.squareup.retrofit2:retrofit:$retrofit_ver"
-    implementation "net.lingala.zip4j:zip4j:$zip4j_ver"
 
     detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_ver"
 }

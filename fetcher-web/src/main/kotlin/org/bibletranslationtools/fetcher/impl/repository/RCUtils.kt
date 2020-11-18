@@ -1,6 +1,14 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import java.io.File
+import java.io.IOException
+import java.net.URI
+import java.nio.file.FileSystems
+import java.nio.file.Files
+import java.nio.file.InvalidPathException
+import java.nio.file.Paths
+import java.nio.file.ProviderNotFoundException
+import java.nio.file.StandardCopyOption
 import java.util.zip.ZipFile
 import org.bibletranslationtools.fetcher.data.Deliverable
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
@@ -49,6 +57,40 @@ object RCUtils {
         }
 
         return exists
+    }
+
+    fun zipDirectory(source: File, dest: File): Boolean {
+        val env = mapOf("create" to "true")
+        val uri: URI = URI.create("jar:file:/${dest.invariantSeparatorsPath}")
+
+        val success = try {
+            FileSystems.newFileSystem(uri, env).use { zipFileSystem ->
+
+                source.walk().forEach {
+                    val fileFromSource = Paths.get(it.path)
+                    val pathInZipFile = zipFileSystem.getPath(
+                        source.name + it.path.removePrefix(source.path)
+                    )
+
+                    // copy into zip file
+                    Files.copy(
+                        fileFromSource, pathInZipFile,
+                        StandardCopyOption.REPLACE_EXISTING
+                    )
+                }
+            }
+            true
+        } catch (ex: IOException) {
+            false
+        } catch (ex: ProviderNotFoundException) {
+            false
+        } catch (ex: InvalidPathException) {
+            false
+        } catch (ex: SecurityException) {
+            false
+        }
+
+        return success
     }
 
     private fun checkFromZipFile(rcFile: File, chapterPath: String): Boolean {
