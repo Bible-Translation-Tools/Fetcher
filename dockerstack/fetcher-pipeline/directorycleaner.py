@@ -28,11 +28,11 @@ class DirectoryCleaner:
             seconds_since_target_time = (now - target_time).total_seconds()
 
             if 0 <= seconds_since_target_time < self.sleep_timer:
-                self.delete_stuff_in_dir()
+                self.delete_temp_rc_content()
 
             sleep(self.sleep_timer)
 
-    def delete_stuff_in_dir(self):
+    def delete_temp_rc_content(self):
         file_paths = glob.glob(self.content_dir + "/*.zip")
 
         for file_path in file_paths:
@@ -62,7 +62,7 @@ def main():
     args, unknown = get_arguments()
 
     app = DirectoryCleaner(args.input_dir, args.verbose, args.hour, args.minute)
-    app.delete_stuff_in_dir()
+    app.start()
 
 
 if __name__ == "__main__":
