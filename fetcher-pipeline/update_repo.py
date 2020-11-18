@@ -4,7 +4,7 @@ from time import sleep
 
 GIT_CLONE = "git clone {}"
 PULL_ALL_CMD = "find . -mindepth 1 -maxdepth 1 -type d -print -exec git -C {} pull \;"
-GL_REPO_URLS = "urls.txt"
+GL_REPO_URLS = "gl_repo_urls.txt"
 
 class RepositoryUpdater:
 
