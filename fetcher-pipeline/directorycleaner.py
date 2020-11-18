@@ -11,9 +11,8 @@ from typing import Tuple, List
 
 class DirectoryCleaner:
 
-    def __init__(self, input_dir: Path, verbose=False, hour=0, minute=0):
-        self.content_dir = input_dir
-        self.verbose = verbose
+    def __init__(self, hour=0, minute=0):
+        self.content_dir = os.getenv("RC_TEMP_DIR")
         self.hour = hour
         self.minute = minute
 
@@ -48,9 +47,6 @@ def get_arguments() -> Tuple[Namespace, List[str]]:
 
     parser = argparse.ArgumentParser(description='')
 
-    parser.add_argument('-i', '--input-dir', type=lambda p: Path(p).absolute(), help='Input Directory')
-    parser.add_argument('-t', '--trace', action='store_true', help='Enable tracing output')
-    parser.add_argument('-v', '--verbose', action='store_true', help='Enable logs from subprocess')
     parser.add_argument('-hr', '--hour', type=int, default=0, help='Hour, when to delete directories')
     parser.add_argument('-mn', '--minute', type=int, default=0, help='Minute, when to delete directories')
 
@@ -61,7 +57,7 @@ def main():
 
     args, unknown = get_arguments()
 
-    app = DirectoryCleaner(args.input_dir, args.verbose, args.hour, args.minute)
+    app = DirectoryCleaner(args.hour, args.minute)
     app.start()
 
 
