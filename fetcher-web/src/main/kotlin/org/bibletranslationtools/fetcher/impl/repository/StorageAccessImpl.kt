@@ -3,6 +3,7 @@ package org.bibletranslationtools.fetcher.impl.repository
 import java.io.File
 import java.io.FileFilter
 import java.util.UUID
+import kotlin.NoSuchElementException
 import org.bibletranslationtools.fetcher.data.CompressedExtensions
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.data.Division
@@ -10,7 +11,6 @@ import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.slf4j.LoggerFactory
-import kotlin.NoSuchElementException
 
 class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : StorageAccess {
 
