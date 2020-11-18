@@ -1,16 +1,25 @@
+import argparse
+import datetime
 import os
+import logging
 import requests
 from time import sleep
+from argparse import Namespace
+from typing import Tuple, List
 
-GIT_CLONE = "git clone {}"
-PULL_ALL_CMD = "find . -mindepth 1 -maxdepth 1 -type d -print -exec git -C {} pull \;"
+from src.process_tools import git_clone, pull_all_repos
+
 GL_REPO_URLS = "gl_repo_urls.txt"
+
 
 class RepositoryUpdater:
 
-    def __init__(self):
+    def __init__(self, verbose, hour, minute):
+        self.verbose = verbose
+        self.hour = hour
+        self.minute = minute
         self.repo_dir = os.getenv("ORATURE_REPO_DIR")
-        self.sleep_timer = os.getenv("REFRESH_INTERVAL_HRS") * 3600
+        self.sleep_timer = 60
 
     def clone_repos(self):
         try:
@@ -20,27 +29,57 @@ class RepositoryUpdater:
                 request = requests.head(url)
 
                 if request.status_code == 200:
-                    cmd = GIT_CLONE.format(url)
-                    os.system(cmd)
+                    git_clone(url, self.verbose)
 
-        except FileNotFoundError:
-            print("An error occurred when reading file: " + file)
+        except FileNotFoundError as ex:
+            logging.error("An error occurred when reading " + GL_REPO_URLS)
+            logging.exception(str(ex))
 
         finally:
             file.close()
 
     def start(self):
-    	# Go to repo directory
+        # Go to repo directory
         os.chdir(self.repo_dir)
 
         while True:
-            self.clone_repos()
+            now = datetime.now()
+            target_time = now.replace(hour=self.hour, minute=self.minute, second=0)
+            seconds_since_target_time = (now - target_time).total_seconds()
 
-            # Pull all repos after cloning
-            os.system(PULL_ALL_CMD)
-            
+            if 0 <= seconds_since_target_time < self.sleep_timer:
+                self.clone_repos()
+
+                # Pull all repos after cloning
+                pull_all_repos(self.verbose)
+
             sleep(self.sleep_timer)
 
+
+def get_arguments() -> Tuple[Namespace, List[str]]:
+    """ Parse command line arguments """
+
+    parser = argparse.ArgumentParser(description='Clone and pull repositories')
+    parser.add_argument("-t", "--trace", action="store_true", help="Enable tracing output")
+    parser.add_argument("-v", "--verbose", action="store_true", help="Enable logs from subprocess")
+    parser.add_argument("-hr", "--hour", type=int, default=0, help="Hour, when to execute workers")
+    parser.add_argument("-mn", "--minute", type=int, default=0, help="Minute, when to execute workers")
+
+    return parser.parse_known_args()
+
 def main():
-    app = RepositoryUpdater()
+    args, unknown = get_arguments()
+
+    if args.trace:
+        log_level = logging.DEBUG
+    else:
+        log_level = logging.WARNING
+
+    logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', level=log_level)
+
+    app = RepositoryUpdater(args.verbose, args.hour, args.minute)
     app.start()
+
+
+if __name__ == "__main__":
+    main()

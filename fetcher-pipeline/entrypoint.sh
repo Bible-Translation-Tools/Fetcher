@@ -3,6 +3,6 @@
 cd /fetcher-pipeline || exit
 
 pm2 start "python3.8 app.py -i /content -t -v -hr 0 -mn 0" --name fetcher-pipeline
-pm2 start "python3.8 update_repo.py" --name update-rc-respository
+pm2 start "python3.8 update_repo.py -t -v -hr 0 -mn 0" --name update-rc-respository
 
 pm2 logs
