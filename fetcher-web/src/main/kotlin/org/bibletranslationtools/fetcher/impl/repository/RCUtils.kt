@@ -61,9 +61,9 @@ object RCUtils {
 
     fun zipDirectory(source: File, dest: File): Boolean {
         val env = mapOf("create" to "true")
-        val uri: URI = URI.create("jar:file:/${dest.invariantSeparatorsPath}")
 
         val success = try {
+            val uri: URI = URI.create("jar:file:/${dest.invariantSeparatorsPath}")
             FileSystems.newFileSystem(uri, env).use { zipFileSystem ->
 
                 source.walk().forEach {
