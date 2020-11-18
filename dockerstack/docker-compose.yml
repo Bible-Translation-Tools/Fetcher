@@ -5,7 +5,8 @@ services:
     ports:
       - "8081:80"
     volumes:
-      - fetcher-content:/srv/files
+      - fetcher-content:/srv/content
+      - fetcher-rc:/srv/rc
     restart: always
   fetcher-app:
   # for local development, tag your image with "local" e.g. `docker build -t bibletranslationtools/fetcher:local .`
@@ -33,7 +34,7 @@ services:
       PASV_ADDRESS: ${fetcher_ftp_ip}
     restart: always
   pipeline:
-    build: ./fetcher-pipeline
+    image: bibletranslationtools/fetcher-pipeline:${FETCHER_IMAGE_TAG}
     environment:
       SENTRY_DSN: ${SENTRY_DSN}
       PM2_PUBLIC_KEY: ${PM2_PUBLIC_KEY}
@@ -43,3 +44,4 @@ services:
 
 volumes:
   fetcher-content:
+  fetcher-rc:

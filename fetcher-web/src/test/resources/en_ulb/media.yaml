@@ -1,0 +1,12 @@
+resource:
+  version: '{latest}'
+projects:
+  -
+    identifier: 'tit'
+    version: '{latest}'
+    media:
+      -
+       identifier: 'mp3'
+       version: '{latest}'
+       contributor: []
+       chapter_url: 'https://audio-content.bibleineverylanguage.org/en/ulb/tit/{chapter}/CONTENTS/mp3/hi/chapter/en_nt_ulb_tit_c0{chapter}.mp3'
