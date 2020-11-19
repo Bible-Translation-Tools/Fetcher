@@ -14,7 +14,7 @@ GL_REPO_URLS = "gl_repo_urls.txt"
 
 class RepositoryUpdater:
 
-    def __init__(self, verbose, hour, minute):
+    def __init__(self, verbose, hour=0, minute=0):
         self.verbose = verbose
         self.hour = hour
         self.minute = minute
@@ -67,8 +67,6 @@ def get_arguments() -> Tuple[Namespace, List[str]]:
     parser = argparse.ArgumentParser(description='Clone and pull repositories')
     parser.add_argument("-t", "--trace", action="store_true", help="Enable tracing output")
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable logs from subprocess")
-    parser.add_argument("-hr", "--hour", type=int, default=0, help="Hour, when to execute workers")
-    parser.add_argument("-mn", "--minute", type=int, default=0, help="Minute, when to execute workers")
 
     return parser.parse_known_args()
 
@@ -83,7 +81,16 @@ def main():
 
     logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', level=log_level)
 
-    app = RepositoryUpdater(args.verbose, args.hour, args.minute)
+    hour = args.hour
+    minute = args.minute
+
+    try:
+        hour = int(os.getenv("EXEC_AT_HOUR"))
+        minute = int(os.getenv("EXEC_AT_MIN"))
+    except:
+        logging.info("Execution time is not set by environment variables. Default is used.")
+
+    app = RepositoryUpdater(args.verbose, hour, minute)
     app.start()
 
 
