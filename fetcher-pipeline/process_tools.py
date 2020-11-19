@@ -31,6 +31,20 @@ def create_tr(input_dir, verbose=False):
     )
 
 
+def git_clone(url, verbose=False):
+    run_process(
+        f'git clone {url}',
+        verbose
+    )
+
+
+def pull_all_repos(verbose=False):
+    run_process(
+        'find . -mindepth 1 -maxdepth 1 -type d -print -exec git -C {} pull \\;',
+        verbose
+    )
+
+
 def run_process(command, verbose=False):
     process = subprocess.run(
         command,
