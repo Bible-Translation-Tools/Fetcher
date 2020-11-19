@@ -43,7 +43,7 @@ class RequestResourceContainer(
         return if (hasContent && packedUp) {
             RCDeliverable(deliverable, zipFile.path)
         } else {
-            zipFile.deleteRecursively()
+            zipFile.parentFile.deleteRecursively()
             null
         }
     }
