@@ -13,6 +13,6 @@ interface StorageAccess {
         bookSlug: String,
         fileExtensionList: List<String>
     ): Boolean
-    fun allocateRCFileLocation(source: File, newFileName: String): File
+    fun allocateRCFileLocation(newFileName: String): File
     fun getRepoFromFileSystem(name: String): File?
 }
