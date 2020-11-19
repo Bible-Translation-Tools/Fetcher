@@ -17,6 +17,6 @@ RUN curl -O https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.2_linux-x
     tar zxvf openjdk-11.0.2_linux-x64_bin.tar.gz && mv jdk-11* /usr/local/
 
 COPY entrypoint.sh /entrypoint.sh
-COPY gl_repo_urls.txt /repos/gl_repo_urls.txt
+COPY gl_repo_urls.txt /repourls/gl_repo_urls.txt
 
 ENTRYPOINT ["/entrypoint.sh"]
