@@ -21,14 +21,19 @@ class RepositoryUpdater:
         self.repo_dir = os.getenv("ORATURE_REPO_DIR")
         self.sleep_timer = 60
 
+    def repo_exists(self, name):
+        dir_names = os.listdir(".")
+        return name in dir_names
+
     def clone_repos(self):
         try:
             file = open(GL_REPO_URLS)
 
             for url in file.read().split():
+                repo_name = os.path.split(url)[1]
                 request = requests.head(url)
 
-                if request.status_code == 200:
+                if not self.repo_exists(repo_name) and request.status_code == 200:
                     git_clone(url, self.verbose)
 
         except FileNotFoundError as ex:
@@ -66,6 +71,7 @@ def get_arguments() -> Tuple[Namespace, List[str]]:
     parser.add_argument("-mn", "--minute", type=int, default=0, help="Minute, when to execute workers")
 
     return parser.parse_known_args()
+
 
 def main():
     args, unknown = get_arguments()
