@@ -26,34 +26,26 @@ class RequestResourceContainer(
         ) ?: return null
 
         // allocate rc to delivery location
-        val rcFile = allocateRcFileLocation(templateRC, deliverable)
-        downloadMediaInRC(rcFile, deliverable)
+        val zipName = RCUtils.createRCFileName(deliverable, "zip")
+        val zipFile = storageAccess.allocateRCFileLocation(zipName)
+
+        val packedUp = RCUtils.zipDirectory(templateRC, zipFile)
+
+        downloadMediaInRC(zipFile, deliverable)
 
         val hasContent = RCUtils.verifyChapterExists(
-            rcFile,
+            zipFile,
             deliverable.book.slug,
             mediaTypes,
             deliverable.chapter?.number
         )
 
-        val zipFile = rcFile.parentFile.resolve("${rcFile.name}.zip")
-            .apply { createNewFile() }
-        val packedUp = RCUtils.zipDirectory(rcFile, zipFile)
-
-        return if (hasContent || packedUp) {
+        return if (hasContent && packedUp) {
             RCDeliverable(deliverable, zipFile.path)
         } else {
-            rcFile.deleteRecursively()
+            zipFile.parentFile.deleteRecursively()
             null
         }
-    }
-
-    private fun allocateRcFileLocation(rcFile: File, deliverable: Deliverable): File {
-        val rcName = RCUtils.createRCFileName(
-            deliverable,
-            extension = rcFile.extension
-        )
-        return storageAccess.allocateRCFileLocation(rcFile, rcName)
     }
 
     private fun downloadMediaInRC(rcFile: File, deliverable: Deliverable): File {

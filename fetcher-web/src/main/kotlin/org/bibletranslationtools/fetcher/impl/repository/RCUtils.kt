@@ -1,13 +1,12 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.FileOutputStream
-import java.io.IOException
-import java.util.zip.ZipEntry
-import java.util.zip.ZipException
+import java.net.URI
+import java.nio.file.FileSystems
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 import java.util.zip.ZipFile
-import java.util.zip.ZipOutputStream
 import org.bibletranslationtools.fetcher.data.Deliverable
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
@@ -57,32 +56,33 @@ object RCUtils {
         return exists
     }
 
-    @Throws(Exception::class)
-    fun zipDirectory(sourcePath: File, destFile: File): Boolean {
-        val rootName = sourcePath.name
-        var success = true
+    fun zipDirectory(source: File, dest: File): Boolean {
+        if (!source.isDirectory || dest.exists()) {
+            return false
+        }
 
-        try {
-            ZipOutputStream(FileOutputStream(destFile).buffered()).use { zos ->
-                sourcePath.walkTopDown().forEach { fileInSource ->
-                    val zipFileName = fileInSource.absolutePath
-                        .removePrefix(sourcePath.absolutePath).removePrefix("\\")
-                    val suffix = if (fileInSource.isDirectory) "\\" else ""
+        val env = mapOf("create" to "true")
 
-                    val entry = ZipEntry("$rootName\\$zipFileName$suffix")
-                    zos.putNextEntry(entry)
+        val success = try {
+            val uri: URI = URI.create("jar:file:/${dest.invariantSeparatorsPath}")
+            FileSystems.newFileSystem(uri, env).use { zipFileSystem ->
 
-                    if (fileInSource.isFile) fileInSource.inputStream().copyTo(zos)
+                source.walk().forEach {
+                    val fileFromSource = Paths.get(it.path)
+                    val pathInZipFile = zipFileSystem.getPath(
+                        source.name + it.path.removePrefix(source.path)
+                    )
+
+                    // copy into zip file
+                    Files.copy(
+                        fileFromSource, pathInZipFile,
+                        StandardCopyOption.REPLACE_EXISTING
+                    )
                 }
             }
-        } catch (ex: FileNotFoundException) {
-            success = false
-        } catch (ex: IllegalArgumentException) {
-            success = false
-        } catch (ex: ZipException) {
-            success = false
-        } catch (ex: IOException) {
-            success = false
+            true
+        } catch (ex: Exception) {
+            false
         }
 
         return success
