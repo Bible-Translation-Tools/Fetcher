@@ -48,6 +48,7 @@ def get_arguments() -> Tuple[Namespace, List[str]]:
 
     parser = argparse.ArgumentParser(description='')
 
+    parser.add_argument("-t", "--trace", action="store_true", help="Enable tracing output")
     parser.add_argument('-hr', '--hour', type=int, default=0, help='Hour, when to delete directories')
     parser.add_argument('-mn', '--minute', type=int, default=0, help='Minute, when to delete directories')
 
