@@ -18,4 +18,5 @@ RUN curl -O https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.2_linux-x
 
 COPY entrypoint.sh /entrypoint.sh
 COPY gl_repo_urls.txt $ORATURE_REPO_DIR
+
 ENTRYPOINT ["/entrypoint.sh"]
