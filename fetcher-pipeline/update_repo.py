@@ -31,9 +31,8 @@ class RepositoryUpdater:
 
             for url in file.read().split():
                 repo_name = os.path.split(url)[1]
-                request = requests.head(url)
 
-                if not self.repo_exists(repo_name) and request.status_code == 200:
+                if not self.repo_exists(repo_name) and requests.head(url).status_code == 200:
                     git_clone(url, self.verbose)
 
         except FileNotFoundError as ex:
