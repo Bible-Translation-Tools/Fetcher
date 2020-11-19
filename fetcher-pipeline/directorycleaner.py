@@ -3,6 +3,7 @@ import time
 import os
 import glob
 import logging
+import shutil
 from datetime import datetime
 from time import sleep
 from argparse import Namespace
@@ -32,7 +33,7 @@ class DirectoryCleaner:
             sleep(self.sleep_timer)
 
     def delete_temp_rc_content(self):
-        file_paths = glob.glob(self.content_dir + "/*.zip")
+        file_paths = glob.glob("{}/*".format(self.content_dir))
 
         for file_path in file_paths:
             time_created = time.ctime(os.path.getctime(file_path))
@@ -40,7 +41,7 @@ class DirectoryCleaner:
             file_age = (datetime.now() - time_created_date).total_seconds()
 
             if file_age > self.max_allowed_file_age:
-                os.remove(file_path)
+                shutil.rmtree(file_path)
                 logging.info("File deleted at {}".format(file_path))
 
 
