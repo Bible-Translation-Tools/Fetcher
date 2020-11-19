@@ -2,7 +2,7 @@ import argparse
 import time
 import os
 import glob
-from pathlib import Path
+import logging
 from datetime import datetime
 from time import sleep
 from argparse import Namespace
@@ -41,6 +41,7 @@ class DirectoryCleaner:
 
             if file_age > self.max_allowed_file_age:
                 os.remove(file_path)
+                logging.info("File deleted at {}".format(file_path))
 
 
 def get_arguments() -> Tuple[Namespace, List[str]]:
@@ -56,6 +57,13 @@ def get_arguments() -> Tuple[Namespace, List[str]]:
 def main():
 
     args, unknown = get_arguments()
+
+    if args.trace:
+        log_level = logging.DEBUG
+    else:
+        log_level = logging.WARNING
+
+    logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', level=log_level)
 
     app = DirectoryCleaner(args.hour, args.minute)
     app.start()
