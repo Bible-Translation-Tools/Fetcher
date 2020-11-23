@@ -1,7 +1,7 @@
 package org.bibletranslationtools.fetcher.usecase
 
 import org.bibletranslationtools.fetcher.data.Language
-import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
+import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.usecase.viewdata.LanguageViewData
 
@@ -12,7 +12,7 @@ class FetchLanguageViewData(
 
     fun getListViewData(
         currentPath: String,
-        contentCache: ContentCacheRepository,
+        contentCache: ContentCacheAccessor,
         isGateway: Boolean
     ): List<LanguageViewData> {
         return languages.map {

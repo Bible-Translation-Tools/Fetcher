@@ -1,11 +1,11 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
-import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
+import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.usecase.cache.AvailabilityCache
 
 class AvailabilityCacheAccessor(
     private val cacheBuilder: ContentAvailabilityCacheBuilder
-) : ContentCacheRepository {
+) : ContentCacheAccessor {
 
     private var cache: AvailabilityCache
 

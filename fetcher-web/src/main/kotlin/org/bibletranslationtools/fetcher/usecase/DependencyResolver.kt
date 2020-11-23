@@ -13,7 +13,7 @@ import org.bibletranslationtools.fetcher.impl.repository.RCRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
-import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
+import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
@@ -47,7 +47,7 @@ object DependencyResolver {
         storageAccess,
         rcRepository
     )
-    val contentCache: ContentCacheRepository = AvailabilityCacheAccessor(
+    val contentCache: ContentCacheAccessor = AvailabilityCacheAccessor(
         cacheBuilder
     )
 }
