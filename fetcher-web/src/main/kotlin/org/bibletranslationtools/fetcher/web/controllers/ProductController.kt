@@ -30,7 +30,7 @@ fun Routing.productController(resolver: DependencyResolver) {
                 languageCode = call.parameters[LANGUAGE_PARAM_KEY]
             )
             call.respond(
-                productsView(params, path, resolver, contentLanguage)
+                productsView(params, path, resolver)
             )
         }
     }
@@ -39,8 +39,7 @@ fun Routing.productController(resolver: DependencyResolver) {
 private fun productsView(
     params: UrlParameters,
     path: String,
-    resolver: DependencyResolver,
-    contentLanguage: List<Locale.LanguageRange>
+    resolver: DependencyResolver
 ): ThymeleafContent {
     val validator =
         RoutingValidator(
@@ -53,8 +52,7 @@ private fun productsView(
         return errorPage(
             "invalid_route_parameter",
             "invalid_route_parameter_message",
-            HttpStatusCode.NotFound,
-            contentLanguage
+            HttpStatusCode.NotFound
         )
     }
 
