@@ -8,7 +8,6 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
-import java.util.Locale
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
@@ -42,8 +41,7 @@ fun Routing.bookController(resolver: DependencyResolver) {
 private fun booksView(
     params: UrlParameters,
     path: String,
-    resolver: DependencyResolver,
-    contentLanguage: List<Locale.LanguageRange>
+    resolver: DependencyResolver
 ): ThymeleafContent {
     val validator =
         RoutingValidator(
@@ -59,8 +57,7 @@ private fun booksView(
         return errorPage(
             "invalid_route_parameter",
             "invalid_route_parameter_message",
-            HttpStatusCode.NotFound,
-            contentLanguage
+            HttpStatusCode.NotFound
         )
     }
 

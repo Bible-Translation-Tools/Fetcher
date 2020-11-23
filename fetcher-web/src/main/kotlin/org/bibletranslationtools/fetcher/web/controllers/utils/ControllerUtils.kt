@@ -43,8 +43,7 @@ fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templateName:
 fun errorPage(
     titleKey: String,
     messageKey: String,
-    errorCode: HttpStatusCode,
-    contentLanguage: List<Locale.LanguageRange>
+    errorCode: HttpStatusCode
 ): ThymeleafContent {
     return ThymeleafContent(
         template = "error",

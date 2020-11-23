@@ -7,10 +7,13 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
-import java.util.Locale
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchLanguageViewData
-import org.bibletranslationtools.fetcher.web.controllers.utils.*
+import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
+import org.bibletranslationtools.fetcher.web.controllers.utils.HL_ROUTE
+import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
+import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
+import org.bibletranslationtools.fetcher.web.controllers.utils.normalizeUrl
 
 fun Routing.languageController(resolver: DependencyResolver) {
     route(GL_ROUTE) {
@@ -21,8 +24,7 @@ fun Routing.languageController(resolver: DependencyResolver) {
                 languagesView(
                     path,
                     true,
-                    resolver,
-                    contentLanguage
+                    resolver
                 )
             )
         }
@@ -35,8 +37,7 @@ fun Routing.languageController(resolver: DependencyResolver) {
                 languagesView(
                     path,
                     false,
-                    resolver,
-                    contentLanguage
+                    resolver
                 )
             )
         }
@@ -46,8 +47,7 @@ fun Routing.languageController(resolver: DependencyResolver) {
 private fun languagesView(
     path: String,
     isGateway: Boolean,
-    resolver: DependencyResolver,
-    contentLanguage: List<Locale.LanguageRange>
+    resolver: DependencyResolver
 ): ThymeleafContent {
     val model = FetchLanguageViewData(resolver.languageRepository)
     return ThymeleafContent(

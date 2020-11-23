@@ -8,7 +8,6 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
-import java.util.Locale
 import org.bibletranslationtools.fetcher.usecase.DeliverableBuilder
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
@@ -45,13 +44,12 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                     errorPage(
                         "invalid_route_parameter",
                         "invalid_route_parameter_message",
-                        HttpStatusCode.NotFound,
-                        contentLanguage
+                        HttpStatusCode.NotFound
                     )
                 )
                 return@get
             }
-            call.respond(chaptersView(params, resolver, contentLanguage))
+            call.respond(chaptersView(params, resolver))
         }
         route("{$CHAPTER_PARAM_KEY}") {
             get {
@@ -70,8 +68,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                         errorPage(
                             "invalid_route_parameter",
                             "invalid_route_parameter_message",
-                            HttpStatusCode.NotFound,
-                            contentLanguage
+                            HttpStatusCode.NotFound
                         )
                     )
                     return@get
@@ -90,8 +87,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
 
 private fun chaptersView(
     params: UrlParameters,
-    resolver: DependencyResolver,
-    contentLanguage: List<Locale.LanguageRange>
+    resolver: DependencyResolver
 ): ThymeleafContent {
 
     val bookViewData: BookViewData? = FetchBookViewData(
@@ -113,8 +109,7 @@ private fun chaptersView(
         return errorPage(
             "internal_error",
             "internal_error_message",
-            HttpStatusCode.InternalServerError,
-            contentLanguage
+            HttpStatusCode.InternalServerError
         )
     }
 
@@ -122,8 +117,7 @@ private fun chaptersView(
         errorPage(
             "not_found",
             "not_found_message",
-            HttpStatusCode.NotFound,
-            contentLanguage
+            HttpStatusCode.NotFound
         )
     } else {
         val languageName = getLanguageName(params.languageCode, resolver)
