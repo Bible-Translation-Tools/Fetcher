@@ -10,10 +10,7 @@ import io.ktor.routing.route
 import java.util.Locale
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchLanguageViewData
-import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
-import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
-import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
-import org.bibletranslationtools.fetcher.web.controllers.utils.normalizeUrl
+import org.bibletranslationtools.fetcher.web.controllers.utils.*
 
 fun Routing.languageController(resolver: DependencyResolver) {
     route(GL_ROUTE) {
@@ -21,8 +18,23 @@ fun Routing.languageController(resolver: DependencyResolver) {
             // languages page
             val path = normalizeUrl(call.request.path())
             call.respond(
-                gatewayLanguagesView(
+                languagesView(
                     path,
+                    true,
+                    resolver,
+                    contentLanguage
+                )
+            )
+        }
+    }
+
+    route(HL_ROUTE) {
+        get {
+            val path = normalizeUrl(call.request.path())
+            call.respond(
+                languagesView(
+                    path,
+                    false,
                     resolver,
                     contentLanguage
                 )
@@ -31,8 +43,9 @@ fun Routing.languageController(resolver: DependencyResolver) {
     }
 }
 
-private fun gatewayLanguagesView(
+private fun languagesView(
     path: String,
+    isGateway: Boolean,
     resolver: DependencyResolver,
     contentLanguage: List<Locale.LanguageRange>
 ): ThymeleafContent {
@@ -40,7 +53,7 @@ private fun gatewayLanguagesView(
     return ThymeleafContent(
         template = "languages",
         model = mapOf(
-            "languageList" to model.getListViewData(path, resolver.contentCache),
+            "languageList" to model.getListViewData(path, resolver.contentCache, isGateway),
             "languagesNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "languages")

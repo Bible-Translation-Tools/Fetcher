@@ -12,16 +12,44 @@ class FetchLanguageViewData(
 
     fun getListViewData(
         currentPath: String,
+        contentCache: ContentCacheRepository,
+        isGateway: Boolean = false
+    ): List<LanguageViewData> {
+        return if (isGateway) {
+            gatewayLanguagesViewData(currentPath, contentCache)
+        } else {
+            heartLanguagesViewData(currentPath)
+        }
+    }
+
+    private fun gatewayLanguagesViewData(
+        path: String,
         contentCache: ContentCacheRepository
     ): List<LanguageViewData> {
         return languages.map {
-            val availableInCache = contentCache.isLanguageAvailable(it.code)
+            val available = contentCache.isLanguageAvailable(it.code)
+
             LanguageViewData(
                 code = it.code,
                 anglicizedName = it.anglicizedName,
                 localizedName = it.localizedName,
-                url = if (it.availability || availableInCache) {
-                    "$currentPath/${it.code}"
+                url = if (available) {
+                    "$path/${it.code}"
+                } else {
+                    null
+                }
+            )
+        }
+    }
+
+    private fun heartLanguagesViewData(path: String): List<LanguageViewData> {
+        return languages.map {
+            LanguageViewData(
+                code = it.code,
+                anglicizedName = it.anglicizedName,
+                localizedName = it.localizedName,
+                url = if (it.availability) {
+                    "$path/${it.code}"
                 } else {
                     null
                 }
