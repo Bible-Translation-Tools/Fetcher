@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.sun.org.slf4j.internal.LoggerFactory
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
+import org.slf4j.LoggerFactory
 import java.io.FileNotFoundException
 import java.io.InputStream
 
