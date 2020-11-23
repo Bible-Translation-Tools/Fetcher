@@ -137,6 +137,22 @@ span {
     font-weight: 300;
     width: 753px;
 }
+.language_search_grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 4rem;
+    align-items: center;
+}
+.language_toggle {
+    display: flex;
+    flex-direction: row;
+    padding: 0 8px 0 8px;
+}
+.language_toggle > button {
+    width: 160px;
+    height: 40px;
+    margin: 4px;
+}
 .searchbar {
     display: flex;
     align-items: center;
