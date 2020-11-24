@@ -18,7 +18,9 @@ class FetchLanguageViewData(
         return languages.map {
             val available = if (isGateway) {
                 contentCache.isLanguageAvailable(it.code)
-            } else it.availability
+            } else {
+                it.availability
+            }
 
             LanguageViewData(
                 code = it.code,

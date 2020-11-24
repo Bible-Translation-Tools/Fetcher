@@ -40,7 +40,12 @@ class FetchBookViewData(
             book.availability = if (isGateway) {
                 cacheAccessor.isBookAvailable(book.slug, languageCode, productSlug)
             } else {
-                storage.hasBookContent(languageCode, resourceId, book.slug, fileExtensionList)
+                storage.hasBookContent(
+                    languageCode,
+                    resourceId,
+                    book.slug,
+                    fileExtensionList
+                )
             }
 
             BookViewData(
