@@ -8,7 +8,6 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
-import java.util.Locale
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
@@ -30,7 +29,7 @@ fun Routing.productController(resolver: DependencyResolver) {
                 languageCode = call.parameters[LANGUAGE_PARAM_KEY]
             )
             call.respond(
-                productsView(params, path, resolver, contentLanguage)
+                productsView(params, path, resolver)
             )
         }
     }
@@ -39,12 +38,11 @@ fun Routing.productController(resolver: DependencyResolver) {
 private fun productsView(
     params: UrlParameters,
     path: String,
-    resolver: DependencyResolver,
-    contentLanguage: List<Locale.LanguageRange>
+    resolver: DependencyResolver
 ): ThymeleafContent {
     val validator =
         RoutingValidator(
-            resolver.languageCatalog,
+            resolver.languageRepository,
             resolver.productCatalog,
             resolver.bookRepository
         )
@@ -53,8 +51,7 @@ private fun productsView(
         return errorPage(
             "invalid_route_parameter",
             "invalid_route_parameter_message",
-            HttpStatusCode.NotFound,
-            contentLanguage
+            HttpStatusCode.NotFound
         )
     }
 

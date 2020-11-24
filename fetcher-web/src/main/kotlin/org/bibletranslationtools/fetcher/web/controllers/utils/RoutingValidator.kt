@@ -3,18 +3,18 @@ package org.bibletranslationtools.fetcher.web.controllers.utils
 import java.lang.NumberFormatException
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
+import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
 
 class RoutingValidator(
-    private val languageCatalog: LanguageCatalog,
+    private val languageRepository: LanguageRepository,
     private val productCatalog: ProductCatalog,
     private val bookRepository: BookRepository
 ) {
-
     fun isLanguageCodeValid(languageCode: String?): Boolean {
         return when {
             languageCode.isNullOrEmpty() -> false
-            languageCatalog.getLanguage(languageCode) == null -> false
+            languageRepository.getLanguage(languageCode) == null -> false
             else -> true
         }
     }

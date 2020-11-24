@@ -14,7 +14,7 @@ var contentLanguage = listOf<Locale.LanguageRange>()
 fun normalizeUrl(path: String): String = java.io.File(path).invariantSeparatorsPath
 
 fun getLanguageName(languageCode: String, resolver: DependencyResolver): String {
-    return resolver.languageCatalog.getLanguage(languageCode)?.localizedName ?: ""
+    return resolver.languageRepository.getLanguage(languageCode)?.localizedName ?: ""
 }
 
 fun getProductTitleKey(productSlug: String, resolver: DependencyResolver): String {
@@ -43,8 +43,7 @@ fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templateName:
 fun errorPage(
     titleKey: String,
     messageKey: String,
-    errorCode: HttpStatusCode,
-    contentLanguage: List<Locale.LanguageRange>
+    errorCode: HttpStatusCode
 ): ThymeleafContent {
     return ThymeleafContent(
         template = "error",

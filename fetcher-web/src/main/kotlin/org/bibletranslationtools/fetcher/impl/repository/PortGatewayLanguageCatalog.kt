@@ -51,8 +51,11 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
             .readValues(languagesStream)
 
         val languageList = mutableListOf<Language>()
-        languagesIterator.forEach {
-            languageList.add(Language(it.code, it.anglicizedName, it.localizedName))
+
+        languagesIterator.use {
+            it.forEach { lang ->
+                languageList.add(Language(lang.code, lang.anglicizedName, lang.localizedName))
+            }
         }
 
         return languageList

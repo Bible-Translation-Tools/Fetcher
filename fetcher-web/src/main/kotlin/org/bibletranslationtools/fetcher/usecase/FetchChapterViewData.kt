@@ -4,7 +4,7 @@ import io.ktor.client.features.ClientRequestException
 import java.io.File
 import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
-import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
+import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
@@ -35,15 +35,22 @@ class FetchChapterViewData(
         throw ex
     }
 
-    fun getViewDataList(contentCache: ContentCacheRepository): List<ChapterViewData> {
-        return chapters.map {
-            val requestUrl = contentCache.getChapterUrl(
-                number = it.number,
-                bookSlug = bookSlug,
-                languageCode = languageCode,
-                productSlug = productSlug
-            )
-            ChapterViewData(it.number, url = requestUrl)
+    fun getViewDataList(
+        contentCache: ContentCacheAccessor,
+        isGateway: Boolean
+    ): List<ChapterViewData> {
+        return if(isGateway) {
+            chapters.map {
+                val requestUrl = contentCache.getChapterUrl(
+                    number = it.number,
+                    bookSlug = bookSlug,
+                    languageCode = languageCode,
+                    productSlug = productSlug
+                )
+                ChapterViewData(it.number, url = requestUrl)
+            }
+        } else {
+            chaptersFromDirectory()
         }
     }
 

@@ -6,10 +6,10 @@ import com.fasterxml.jackson.databind.MappingIterator
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import org.bibletranslationtools.fetcher.data.Language
-import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import java.io.FileNotFoundException
 import java.io.InputStream
+import org.bibletranslationtools.fetcher.data.Language
+import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.slf4j.LoggerFactory
 
 const val UW_LANGUAGE_CODE_ID = "lc"
@@ -35,24 +35,25 @@ class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
 
     @Throws(FileNotFoundException::class)
     private fun parseCatalog(): List<Language> {
-        val jsonLanguages: InputStream = try {
+        val jsonInputStream: InputStream = try {
             getLanguageCatalogFile()
         } catch (e: FileNotFoundException) {
             logger.error("$unfoldingWordLanguageFileName not found in resources.", e)
             throw e // crash on fatal exception: critical resource not found
         }
 
-        val mapper = jacksonObjectMapper().registerModule(KotlinModule())
-        val languagesIterator: MappingIterator<UnfoldingWordHeartLanguage> = mapper.readerFor(
-            UnfoldingWordHeartLanguage::class.java
-        ).readValues(jsonLanguages)
+        jsonInputStream.use {
+            val languages: List<UnfoldingWordGatewayLanguage> =
+                jacksonObjectMapper().readValue(jsonInputStream)
 
-        val languageList = mutableListOf<Language>()
-        languagesIterator.forEach {
-            languageList.add(Language(it.code, it.anglicizedName, it.localizedName))
+            return languages.map {
+                Language(
+                    it.code,
+                    it.anglicizedName,
+                    it.localizedName
+                )
+            }
         }
-
-        return languageList
     }
 
     @Throws(FileNotFoundException::class)
@@ -64,5 +65,4 @@ class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
 
         return catalogFileStream
     }
-
 }
