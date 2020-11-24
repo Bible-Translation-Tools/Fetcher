@@ -51,9 +51,9 @@ private fun languagesView(
 ): ThymeleafContent {
     val model = FetchLanguageViewData(resolver.languageRepository)
     val languageList = if(isGateway) {
-        model.getGLListViewData(path, resolver.contentCache)
+        model.getGLViewDataList(path, resolver.contentCache)
     } else {
-        model.getHLListViewData(path)
+        model.getHLViewDataList(path)
     }
 
     return ThymeleafContent(

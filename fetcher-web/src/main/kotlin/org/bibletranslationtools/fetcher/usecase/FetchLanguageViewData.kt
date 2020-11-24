@@ -8,7 +8,7 @@ import org.bibletranslationtools.fetcher.usecase.viewdata.LanguageViewData
 class FetchLanguageViewData(
     private val languageRepo: LanguageRepository
 ) {
-    fun getGLListViewData(
+    fun getGLViewDataList(
         currentPath: String,
         contentCache: ContentCacheAccessor
     ): List<LanguageViewData> {
@@ -30,7 +30,7 @@ class FetchLanguageViewData(
         }
     }
 
-    fun getHLListViewData(
+    fun getHLViewDataList(
         currentPath: String
     ): List<LanguageViewData> {
         val languages = languageRepo.getHeartLanguages()
