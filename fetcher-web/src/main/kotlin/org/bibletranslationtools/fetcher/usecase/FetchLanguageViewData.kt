@@ -10,17 +10,12 @@ class FetchLanguageViewData(
 ) {
     private val languages: List<Language> = languageRepo.getLanguages()
 
-    fun getListViewData(
+    fun getGLListViewData(
         currentPath: String,
-        contentCache: ContentCacheAccessor,
-        isGateway: Boolean
+        contentCache: ContentCacheAccessor
     ): List<LanguageViewData> {
         return languages.map {
-            val available = if (isGateway) {
-                contentCache.isLanguageAvailable(it.code)
-            } else {
-                it.availability
-            }
+            val available = contentCache.isLanguageAvailable(it.code)
 
             LanguageViewData(
                 code = it.code,
@@ -28,6 +23,23 @@ class FetchLanguageViewData(
                 localizedName = it.localizedName,
                 url = if (available) {
                     "$currentPath/${it.code}"
+                } else {
+                    null
+                }
+            )
+        }
+    }
+
+    fun getHLListViewData(
+        currentPath: String
+    ): List<LanguageViewData> {
+        return languages.map {
+            LanguageViewData(
+                code = it.code,
+                anglicizedName = it.anglicizedName,
+                localizedName = it.localizedName,
+                url = if (it.availability) {
+                    "$currentPath/${it.code}/${ProductFileExtension.MP3.name.toLowerCase()}"
                 } else {
                     null
                 }
