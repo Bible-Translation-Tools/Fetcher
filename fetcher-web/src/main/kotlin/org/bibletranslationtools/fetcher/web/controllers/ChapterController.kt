@@ -133,7 +133,7 @@ private fun chaptersView(
             languageCode = params.languageCode,
             productSlug = params.productSlug,
             bookSlug = params.bookSlug
-        ).getViewDataList(resolver.contentCache)
+        ).getViewDataList(resolver.contentCache, isGateway)
     } catch (ex: ClientRequestException) {
         return errorPage(
             "internal_error",

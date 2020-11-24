@@ -35,15 +35,22 @@ class FetchChapterViewData(
         throw ex
     }
 
-    fun getViewDataList(contentCache: ContentCacheAccessor): List<ChapterViewData> {
-        return chapters.map {
-            val requestUrl = contentCache.getChapterUrl(
-                number = it.number,
-                bookSlug = bookSlug,
-                languageCode = languageCode,
-                productSlug = productSlug
-            )
-            ChapterViewData(it.number, url = requestUrl)
+    fun getViewDataList(
+        contentCache: ContentCacheAccessor,
+        isGateway: Boolean
+    ): List<ChapterViewData> {
+        return if(isGateway) {
+            chapters.map {
+                val requestUrl = contentCache.getChapterUrl(
+                    number = it.number,
+                    bookSlug = bookSlug,
+                    languageCode = languageCode,
+                    productSlug = productSlug
+                )
+                ChapterViewData(it.number, url = requestUrl)
+            }
+        } else {
+            chaptersFromDirectory()
         }
     }
 
