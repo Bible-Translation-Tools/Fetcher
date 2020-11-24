@@ -1,6 +1,5 @@
 package org.bibletranslationtools.fetcher.usecase
 
-import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
@@ -9,6 +8,8 @@ import org.bibletranslationtools.fetcher.usecase.viewdata.LanguageViewData
 class FetchLanguageViewData(
     private val languageRepo: LanguageRepository
 ) {
+    private val displayLimit = 30
+
     fun getGLViewDataList(
         currentPath: String,
         contentCache: ContentCacheAccessor
@@ -43,6 +44,7 @@ class FetchLanguageViewData(
                 it.availability = it.code in availableLanguageCodes
                 it.availability
             }
+            .take(displayLimit)
             .map {
                 LanguageViewData(
                     code = it.code,
