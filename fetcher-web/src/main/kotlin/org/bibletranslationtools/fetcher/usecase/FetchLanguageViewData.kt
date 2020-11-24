@@ -6,14 +6,14 @@ import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.usecase.viewdata.LanguageViewData
 
 class FetchLanguageViewData(
-    languageRepo: LanguageRepository
+    private val languageRepo: LanguageRepository
 ) {
-    private val languages: List<Language> = languageRepo.getLanguages()
-
     fun getGLListViewData(
         currentPath: String,
         contentCache: ContentCacheAccessor
     ): List<LanguageViewData> {
+        val languages = languageRepo.getGatewayLanguages()
+
         return languages.map {
             val available = contentCache.isLanguageAvailable(it.code)
 
@@ -33,6 +33,8 @@ class FetchLanguageViewData(
     fun getHLListViewData(
         currentPath: String
     ): List<LanguageViewData> {
+        val languages = languageRepo.getHeartLanguages()
+
         return languages.map {
             LanguageViewData(
                 code = it.code,

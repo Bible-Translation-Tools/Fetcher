@@ -42,7 +42,7 @@ private fun productsView(
 ): ThymeleafContent {
     val validator =
         RoutingValidator(
-            resolver.languageCatalog,
+            resolver.languageRepository,
             resolver.productCatalog,
             resolver.bookRepository
         )

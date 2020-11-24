@@ -11,6 +11,7 @@ import org.bibletranslationtools.fetcher.impl.repository.PortGatewayLanguageCata
 import org.bibletranslationtools.fetcher.impl.repository.ProductCatalogImpl
 import org.bibletranslationtools.fetcher.impl.repository.RCRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
+import org.bibletranslationtools.fetcher.impl.repository.UnfoldingWordHeartLanguagesCatalog
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
@@ -25,13 +26,14 @@ import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
 object DependencyResolver {
     private val directoryProvider: DirectoryProvider = DirectoryProviderImpl()
+    private val gatewayLanguageCatalog: LanguageCatalog = PortGatewayLanguageCatalog()
+    private val heartLanguageCatalog: LanguageCatalog = UnfoldingWordHeartLanguagesCatalog()
     val chapterCatalog: ChapterCatalog = ChapterCatalogImpl()
-    val languageCatalog: LanguageCatalog = PortGatewayLanguageCatalog()
 
     val storageAccess: StorageAccess = StorageAccessImpl(directoryProvider)
     val languageRepository: LanguageRepository = LanguageRepositoryImpl(
-        storageAccess = storageAccess,
-        languageCatalog = languageCatalog
+        gatewayLanguageCatalog,
+        heartLanguageCatalog
     )
     val productCatalog: ProductCatalog = ProductCatalogImpl()
     val bookRepository: BookRepository = BookRepositoryImpl(
@@ -41,7 +43,7 @@ object DependencyResolver {
     val downloadClient: IDownloadClient = DownloadClient()
     val rcRepository: ResourceContainerRepository = RCRepositoryImpl(storageAccess)
     private val cacheBuilder = ContentAvailabilityCacheBuilder(
-        languageCatalog,
+        gatewayLanguageCatalog,
         chapterCatalog,
         bookRepository,
         storageAccess,

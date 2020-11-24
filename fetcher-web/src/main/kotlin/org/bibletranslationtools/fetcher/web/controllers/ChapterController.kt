@@ -175,7 +175,7 @@ private fun validateParameters(
     resolver: DependencyResolver
 ): Boolean {
     val validator = RoutingValidator(
-        resolver.languageCatalog,
+        resolver.languageRepository,
         resolver.productCatalog,
         resolver.bookRepository
     )
@@ -191,7 +191,7 @@ private fun oratureFileDownload(
     resolver: DependencyResolver
 ): String? {
     val deliverable = DeliverableBuilder(
-        resolver.languageCatalog,
+        resolver.languageRepository,
         resolver.productCatalog,
         resolver.bookRepository
     ).build(params)
