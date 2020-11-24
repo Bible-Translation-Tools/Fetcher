@@ -33,14 +33,25 @@ class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
 
     @Throws(FileNotFoundException::class)
     private fun parseCatalog(): List<Language> {
-        val jsonProducts: InputStream = try {
+        val jsonInputStream: InputStream = try {
             getLanguageCatalogFile()
         } catch (e: FileNotFoundException) {
             logger.error("$unfoldingWordLanguageFileName not found in resources.", e)
             throw e // crash on fatal exception: critical resource not found
         }
 
-        return jacksonObjectMapper().readValue(jsonProducts)
+        jsonInputStream.use {
+            val languages: List<UnfoldingWordGatewayLanguage> =
+                jacksonObjectMapper().readValue(jsonInputStream)
+
+            return languages.map {
+                Language(
+                    it.code,
+                    it.anglicizedName,
+                    it.localizedName
+                )
+            }
+        }
     }
 
     @Throws(FileNotFoundException::class)
