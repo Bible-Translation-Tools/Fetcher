@@ -3,7 +3,6 @@ package org.bibletranslationtools.fetcher.impl.repository
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
-import org.bibletranslationtools.fetcher.repository.StorageAccess
 
 class LanguageRepositoryImpl(
     private val gatewayCatalog: LanguageCatalog,

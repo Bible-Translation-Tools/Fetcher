@@ -39,7 +39,7 @@ class FetchChapterViewData(
         contentCache: ContentCacheAccessor,
         isGateway: Boolean
     ): List<ChapterViewData> {
-        return if(isGateway) {
+        return if (isGateway) {
             chapters.map {
                 val requestUrl = contentCache.getChapterUrl(
                     number = it.number,
