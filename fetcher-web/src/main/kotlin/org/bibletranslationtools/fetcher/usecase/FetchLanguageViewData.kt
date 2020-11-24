@@ -3,6 +3,7 @@ package org.bibletranslationtools.fetcher.usecase
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
+import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.LanguageViewData
 
 class FetchLanguageViewData(
@@ -31,11 +32,15 @@ class FetchLanguageViewData(
     }
 
     fun getHLViewDataList(
-        currentPath: String
+        currentPath: String,
+        storage: StorageAccess
     ): List<LanguageViewData> {
         val languages = languageRepo.getHeartLanguages()
+        val availableLanguageCodes = storage.getLanguageCodes()
 
         return languages.map {
+            it.availability = it.code in availableLanguageCodes
+
             LanguageViewData(
                 code = it.code,
                 anglicizedName = it.anglicizedName,
