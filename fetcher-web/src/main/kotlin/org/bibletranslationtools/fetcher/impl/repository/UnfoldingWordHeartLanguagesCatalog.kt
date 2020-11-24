@@ -43,7 +43,7 @@ class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
         }
 
         jsonInputStream.use {
-            val languages: List<UnfoldingWordGatewayLanguage> =
+            val languages: List<UnfoldingWordHeartLanguage> =
                 jacksonObjectMapper().readValue(jsonInputStream)
 
             return languages.map {
