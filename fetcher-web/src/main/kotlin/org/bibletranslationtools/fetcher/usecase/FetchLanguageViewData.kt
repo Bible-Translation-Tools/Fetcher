@@ -38,19 +38,22 @@ class FetchLanguageViewData(
         val languages = languageRepo.getHeartLanguages()
         val availableLanguageCodes = storage.getLanguageCodes()
 
-        return languages.map {
-            it.availability = it.code in availableLanguageCodes
-
-            LanguageViewData(
-                code = it.code,
-                anglicizedName = it.anglicizedName,
-                localizedName = it.localizedName,
-                url = if (it.availability) {
-                    "$currentPath/${it.code}/${ProductFileExtension.MP3.name.toLowerCase()}"
-                } else {
-                    null
-                }
-            )
-        }
+        return languages
+            .filter {
+                it.availability = it.code in availableLanguageCodes
+                it.availability
+            }
+            .map {
+                LanguageViewData(
+                    code = it.code,
+                    anglicizedName = it.anglicizedName,
+                    localizedName = it.localizedName,
+                    url = if (it.availability) {
+                        "$currentPath/${it.code}/${ProductFileExtension.MP3.name.toLowerCase()}"
+                    } else {
+                        null
+                    }
+                )
+            }
     }
 }
