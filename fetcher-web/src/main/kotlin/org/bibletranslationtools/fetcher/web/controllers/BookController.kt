@@ -11,6 +11,7 @@ import io.ktor.routing.route
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
+import org.bibletranslationtools.fetcher.web.controllers.utils.HL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.PRODUCT_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.RoutingValidator
@@ -32,7 +33,20 @@ fun Routing.bookController(resolver: DependencyResolver) {
                 productSlug = call.parameters[PRODUCT_PARAM_KEY]
             )
             call.respond(
-                booksView(params, path, resolver, contentLanguage)
+                booksView(params, path, resolver)
+            )
+        }
+    }
+    route("/$HL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}") {
+        get {
+            // books page
+            val path = normalizeUrl(call.request.path())
+            val params = UrlParameters(
+                languageCode = call.parameters[LANGUAGE_PARAM_KEY],
+                productSlug = call.parameters[PRODUCT_PARAM_KEY]
+            )
+            call.respond(
+                booksView(params, path, resolver)
             )
         }
     }

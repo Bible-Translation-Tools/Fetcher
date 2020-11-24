@@ -1,5 +1,6 @@
 package org.bibletranslationtools.fetcher.usecase
 
+import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
@@ -17,6 +18,12 @@ class FetchBookViewData(
 
     private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
 
+    private val fileExtensionList = if (ContainerExtensions.isSupported(product.fileType)) {
+        listOf("tr")
+    } else {
+        listOf("wav", "mp3")
+    }
+
     private val priorityList = listOf(
         PriorityItem("mp3", "hi"),
         PriorityItem("mp3", "low"),
@@ -25,11 +32,17 @@ class FetchBookViewData(
 
     fun getViewDataList(
         currentPath: String,
-        cacheAccessor: ContentCacheAccessor
+        cacheAccessor: ContentCacheAccessor,
+        isGateway: Boolean = true
     ): List<BookViewData> {
         val books = bookRepo.getBooks(resourceId = resourceId, languageCode = languageCode)
         return books.map { book ->
-            book.availability = cacheAccessor.isBookAvailable(book.slug, languageCode, productSlug)
+            book.availability = if (isGateway) {
+                cacheAccessor.isBookAvailable(book.slug, languageCode, productSlug)
+            } else {
+                storage.hasBookContent(languageCode, resourceId, book.slug, fileExtensionList)
+            }
+
             BookViewData(
                 index = book.index,
                 slug = book.slug,
@@ -40,7 +53,11 @@ class FetchBookViewData(
         }
     }
 
-    fun getViewData(bookSlug: String, cacheAccessor: ContentCacheAccessor): BookViewData? {
+    fun getViewData(
+        bookSlug: String,
+        cacheAccessor: ContentCacheAccessor,
+        isGateway: Boolean = true
+    ): BookViewData? {
         val book = bookRepo.getBook(bookSlug)
         val url = cacheAccessor.getBookUrl(bookSlug, languageCode, productSlug)
 
