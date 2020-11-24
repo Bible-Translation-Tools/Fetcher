@@ -22,7 +22,7 @@
 <div th:insert="fragments/hero :: hero(#{page_title}, #{page_info})"></div>
 
 <div class="language_search_grid">
-    <span th:insert="fragments/language_toggle :: language_toggle"></span>
+    <span th:insert="fragments/language_toggle :: language_toggle(${isGateway})"></span>
     <span th:insert="fragments/searchbar :: searchbar"></span>
 </div>
 

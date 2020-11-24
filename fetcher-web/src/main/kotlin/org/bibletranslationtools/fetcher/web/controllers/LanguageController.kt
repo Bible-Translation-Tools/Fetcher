@@ -60,7 +60,8 @@ private fun languagesView(
         template = "languages",
         model = mapOf(
             "languageList" to languageList,
-            "languagesNavUrl" to "#"
+            "languagesNavUrl" to "#",
+            "isGateway" to isGateway
         ),
         locale = getPreferredLocale(contentLanguage, "languages")
     )
