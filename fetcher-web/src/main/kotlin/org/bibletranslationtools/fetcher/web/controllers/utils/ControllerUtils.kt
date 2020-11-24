@@ -10,6 +10,11 @@ import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.slf4j.LoggerFactory
 
 var contentLanguage = listOf<Locale.LanguageRange>()
+val validator = RoutingValidator(
+    DependencyResolver.languageRepository,
+    DependencyResolver.productCatalog,
+    DependencyResolver.bookRepository
+)
 
 fun normalizeUrl(path: String): String = java.io.File(path).invariantSeparatorsPath
 

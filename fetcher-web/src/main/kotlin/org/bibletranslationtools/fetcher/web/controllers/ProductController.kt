@@ -12,13 +12,13 @@ import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
-import org.bibletranslationtools.fetcher.web.controllers.utils.RoutingValidator
 import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
 import org.bibletranslationtools.fetcher.web.controllers.utils.getLanguageName
 import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
 import org.bibletranslationtools.fetcher.web.controllers.utils.normalizeUrl
+import org.bibletranslationtools.fetcher.web.controllers.utils.validator
 
 fun Routing.productController(resolver: DependencyResolver) {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}") {
@@ -40,13 +40,6 @@ private fun productsView(
     path: String,
     resolver: DependencyResolver
 ): ThymeleafContent {
-    val validator =
-        RoutingValidator(
-            resolver.languageRepository,
-            resolver.productCatalog,
-            resolver.bookRepository
-        )
-
     if (!validator.isLanguageCodeValid(params.languageCode)) {
         return errorPage(
             "invalid_route_parameter",

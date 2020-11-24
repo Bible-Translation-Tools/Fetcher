@@ -23,13 +23,13 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.HL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.PRODUCT_PARAM_KEY
-import org.bibletranslationtools.fetcher.web.controllers.utils.RoutingValidator
 import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
 import org.bibletranslationtools.fetcher.web.controllers.utils.getLanguageName
 import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
 import org.bibletranslationtools.fetcher.web.controllers.utils.getProductTitleKey
+import org.bibletranslationtools.fetcher.web.controllers.utils.validator
 
 fun Routing.chapterController(resolver: DependencyResolver) {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}/{$BOOK_PARAM_KEY}") {
@@ -151,7 +151,7 @@ private fun chaptersView(
     } else {
         val languageName = getLanguageName(params.languageCode, resolver)
         val productTitle = getProductTitleKey(params.productSlug, resolver)
-        val languageRoute = if(isGateway) GL_ROUTE else HL_ROUTE
+        val languageRoute = if (isGateway) GL_ROUTE else HL_ROUTE
         val isRequestLink =
             ProductFileExtension.getType(params.productSlug) == ProductFileExtension.ORATURE
 
@@ -177,12 +177,6 @@ private fun validateParameters(
     params: UrlParameters,
     resolver: DependencyResolver
 ): Boolean {
-    val validator = RoutingValidator(
-        resolver.languageRepository,
-        resolver.productCatalog,
-        resolver.bookRepository
-    )
-
     return validator.isLanguageCodeValid(params.languageCode) &&
             validator.isProductSlugValid(params.productSlug) &&
             validator.isBookSlugValid(params.bookSlug) &&
