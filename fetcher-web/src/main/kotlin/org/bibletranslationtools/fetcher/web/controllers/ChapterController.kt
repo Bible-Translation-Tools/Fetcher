@@ -17,7 +17,19 @@ import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
 import org.bibletranslationtools.fetcher.usecase.RequestResourceContainer
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
-import org.bibletranslationtools.fetcher.web.controllers.utils.*
+import org.bibletranslationtools.fetcher.web.controllers.utils.BOOK_PARAM_KEY
+import org.bibletranslationtools.fetcher.web.controllers.utils.CHAPTER_PARAM_KEY
+import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
+import org.bibletranslationtools.fetcher.web.controllers.utils.HL_ROUTE
+import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
+import org.bibletranslationtools.fetcher.web.controllers.utils.PRODUCT_PARAM_KEY
+import org.bibletranslationtools.fetcher.web.controllers.utils.RoutingValidator
+import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
+import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
+import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
+import org.bibletranslationtools.fetcher.web.controllers.utils.getLanguageName
+import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
+import org.bibletranslationtools.fetcher.web.controllers.utils.getProductTitleKey
 
 fun Routing.chapterController(resolver: DependencyResolver) {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}/{$BOOK_PARAM_KEY}") {
