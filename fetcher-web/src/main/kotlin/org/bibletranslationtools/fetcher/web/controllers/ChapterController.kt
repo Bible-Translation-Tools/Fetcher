@@ -51,7 +51,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                 )
                 return@get
             }
-            call.respond(chaptersView(params, resolver))
+            call.respond(chaptersView(params, resolver, true))
         }
         route("{$CHAPTER_PARAM_KEY}") {
             oratureChapters(resolver)
@@ -76,7 +76,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                 )
                 return@get
             }
-            call.respond(chaptersView(params, resolver))
+            call.respond(chaptersView(params, resolver, false))
         }
     }
 }
@@ -115,7 +115,8 @@ private fun Route.oratureChapters(resolver: DependencyResolver) {
 
 private fun chaptersView(
     params: UrlParameters,
-    resolver: DependencyResolver
+    resolver: DependencyResolver,
+    isGateway: Boolean
 ): ThymeleafContent {
 
     val bookViewData: BookViewData? = FetchBookViewData(
@@ -123,7 +124,7 @@ private fun chaptersView(
         resolver.storageAccess,
         params.languageCode,
         params.productSlug
-    ).getViewData(params.bookSlug, resolver.contentCache)
+    ).getViewData(params.bookSlug, resolver.contentCache, isGateway)
 
     val chapterViewDataList: List<ChapterViewData>? = try {
         FetchChapterViewData(
@@ -150,19 +151,21 @@ private fun chaptersView(
     } else {
         val languageName = getLanguageName(params.languageCode, resolver)
         val productTitle = getProductTitleKey(params.productSlug, resolver)
+        val languageRoute = if(isGateway) GL_ROUTE else HL_ROUTE
         val isRequestLink =
             ProductFileExtension.getType(params.productSlug) == ProductFileExtension.ORATURE
+
         ThymeleafContent(
             template = "chapters",
             model = mapOf(
                 "book" to bookViewData,
                 "chapterList" to chapterViewDataList,
                 "languagesNavTitle" to languageName,
-                "languagesNavUrl" to "/$GL_ROUTE",
+                "languagesNavUrl" to "/$languageRoute",
                 "fileTypesNavTitle" to productTitle,
-                "fileTypesNavUrl" to "/$GL_ROUTE/${params.languageCode}",
+                "fileTypesNavUrl" to "/$languageRoute/${params.languageCode}",
                 "booksNavTitle" to bookViewData.localizedName,
-                "booksNavUrl" to "/$GL_ROUTE/${params.languageCode}/${params.productSlug}",
+                "booksNavUrl" to "/$languageRoute/${params.languageCode}/${params.productSlug}",
                 "isRequestLink" to isRequestLink
             ),
             locale = getPreferredLocale(contentLanguage, "chapters")

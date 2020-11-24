@@ -64,7 +64,11 @@ class FetchBookViewData(
         isGateway: Boolean = true
     ): BookViewData? {
         val book = bookRepo.getBook(bookSlug)
-        val url = cacheAccessor.getBookUrl(bookSlug, languageCode, productSlug)
+        val url = if(isGateway) {
+            cacheAccessor.getBookUrl(bookSlug, languageCode, productSlug)
+        } else {
+            getBookDownloadUrl(bookSlug)
+        }
 
         return if (book != null) BookViewData(
             index = book.index,

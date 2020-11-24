@@ -33,7 +33,7 @@ fun Routing.bookController(resolver: DependencyResolver) {
                 productSlug = call.parameters[PRODUCT_PARAM_KEY]
             )
             call.respond(
-                booksView(params, path, resolver)
+                booksView(params, path, resolver, true)
             )
         }
     }
@@ -46,7 +46,7 @@ fun Routing.bookController(resolver: DependencyResolver) {
                 productSlug = call.parameters[PRODUCT_PARAM_KEY]
             )
             call.respond(
-                booksView(params, path, resolver)
+                booksView(params, path, resolver, false)
             )
         }
     }
@@ -55,7 +55,8 @@ fun Routing.bookController(resolver: DependencyResolver) {
 private fun booksView(
     params: UrlParameters,
     path: String,
-    resolver: DependencyResolver
+    resolver: DependencyResolver,
+    isGateway: Boolean
 ): ThymeleafContent {
     val validator =
         RoutingValidator(
@@ -77,21 +78,23 @@ private fun booksView(
 
     val languageName = getLanguageName(params.languageCode, resolver)
     val productTitle = getProductTitleKey(params.productSlug, resolver)
+    val languageRoute = if(isGateway) GL_ROUTE else HL_ROUTE
+
     val bookViewData = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,
         params.languageCode,
         params.productSlug
-    ).getViewDataList(path, resolver.contentCache)
+    ).getViewDataList(path, resolver.contentCache, isGateway)
 
     return ThymeleafContent(
         template = "books",
         model = mapOf(
             "bookList" to bookViewData,
             "languagesNavTitle" to languageName,
-            "languagesNavUrl" to "/$GL_ROUTE",
+            "languagesNavUrl" to "/$languageRoute",
             "fileTypesNavTitle" to productTitle,
-            "fileTypesNavUrl" to "/$GL_ROUTE/${params.languageCode}",
+            "fileTypesNavUrl" to "/$languageRoute/${params.languageCode}",
             "booksNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "books")
