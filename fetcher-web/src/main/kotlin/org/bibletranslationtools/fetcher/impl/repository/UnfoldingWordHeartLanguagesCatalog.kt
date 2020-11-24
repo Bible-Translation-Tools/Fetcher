@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory
 const val UW_LANGUAGE_CODE_ID = "lc"
 const val UW_ANGLICIZED_NAME_ID = "ang"
 const val UW_LOCALIZED_NAME_ID = "ln"
+const val IS_GATEWAY = "gw"
 
 class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
 
@@ -22,7 +23,8 @@ class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
     private data class UnfoldingWordHeartLanguage(
         @JsonProperty(UW_LANGUAGE_CODE_ID) val code: String,
         @JsonProperty(UW_ANGLICIZED_NAME_ID) val anglicizedName: String,
-        @JsonProperty(UW_LOCALIZED_NAME_ID) val localizedName: String
+        @JsonProperty(UW_LOCALIZED_NAME_ID) val localizedName: String,
+        @JsonProperty(IS_GATEWAY) val isGateway: Boolean
     )
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -46,13 +48,17 @@ class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
             val languages: List<UnfoldingWordHeartLanguage> =
                 jacksonObjectMapper().readValue(jsonInputStream)
 
-            return languages.map {
-                Language(
-                    it.code,
-                    it.anglicizedName,
-                    it.localizedName
-                )
-            }
+            return languages
+                .filter {
+                    !it.isGateway
+                }
+                .map {
+                    Language(
+                        it.code,
+                        it.anglicizedName,
+                        it.localizedName
+                    )
+                }
         }
     }
 
