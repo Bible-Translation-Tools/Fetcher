@@ -5,6 +5,7 @@ import io.ktor.application.call
 import io.ktor.client.features.ClientRequestException
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
+import io.ktor.routing.Route
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
@@ -16,18 +17,7 @@ import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
 import org.bibletranslationtools.fetcher.usecase.RequestResourceContainer
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
-import org.bibletranslationtools.fetcher.web.controllers.utils.BOOK_PARAM_KEY
-import org.bibletranslationtools.fetcher.web.controllers.utils.CHAPTER_PARAM_KEY
-import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
-import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
-import org.bibletranslationtools.fetcher.web.controllers.utils.PRODUCT_PARAM_KEY
-import org.bibletranslationtools.fetcher.web.controllers.utils.RoutingValidator
-import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
-import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
-import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
-import org.bibletranslationtools.fetcher.web.controllers.utils.getLanguageName
-import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
-import org.bibletranslationtools.fetcher.web.controllers.utils.getProductTitleKey
+import org.bibletranslationtools.fetcher.web.controllers.utils.*
 
 fun Routing.chapterController(resolver: DependencyResolver) {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}/{$BOOK_PARAM_KEY}") {
@@ -52,35 +42,61 @@ fun Routing.chapterController(resolver: DependencyResolver) {
             call.respond(chaptersView(params, resolver))
         }
         route("{$CHAPTER_PARAM_KEY}") {
-            get {
-                val params = UrlParameters(
-                    languageCode = call.parameters[LANGUAGE_PARAM_KEY],
-                    productSlug = call.parameters[PRODUCT_PARAM_KEY],
-                    bookSlug = call.parameters[BOOK_PARAM_KEY],
-                    chapter = call.parameters[CHAPTER_PARAM_KEY]
-                )
+            oratureChapters(resolver)
+        }
+    }
+    route("/$HL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}/{$BOOK_PARAM_KEY}") {
+        get {
+            // chapters page
+            val params = UrlParameters(
+                languageCode = call.parameters[LANGUAGE_PARAM_KEY],
+                productSlug = call.parameters[PRODUCT_PARAM_KEY],
+                bookSlug = call.parameters[BOOK_PARAM_KEY]
+            )
 
-                if (
-                    !validateParameters(params, resolver) ||
-                    ProductFileExtension.getType(params.productSlug) != ProductFileExtension.ORATURE
-                ) {
-                    call.respond(
-                        errorPage(
-                            "invalid_route_parameter",
-                            "invalid_route_parameter_message",
-                            HttpStatusCode.NotFound
-                        )
+            if (!validateParameters(params, resolver)) {
+                call.respond(
+                    errorPage(
+                        "invalid_route_parameter",
+                        "invalid_route_parameter_message",
+                        HttpStatusCode.NotFound
                     )
-                    return@get
-                }
-
-                val downloadLink = oratureFileDownload(params, resolver)
-                if (downloadLink == null) {
-                    call.respond(HttpStatusCode.NotFound)
-                } else {
-                    call.respond(downloadLink)
-                }
+                )
+                return@get
             }
+            call.respond(chaptersView(params, resolver))
+        }
+    }
+}
+
+private fun Route.oratureChapters(resolver: DependencyResolver) {
+    get {
+        val params = UrlParameters(
+            languageCode = call.parameters[LANGUAGE_PARAM_KEY],
+            productSlug = call.parameters[PRODUCT_PARAM_KEY],
+            bookSlug = call.parameters[BOOK_PARAM_KEY],
+            chapter = call.parameters[CHAPTER_PARAM_KEY]
+        )
+
+        if (
+            !validateParameters(params, resolver) ||
+            ProductFileExtension.getType(params.productSlug) != ProductFileExtension.ORATURE
+        ) {
+            call.respond(
+                errorPage(
+                    "invalid_route_parameter",
+                    "invalid_route_parameter_message",
+                    HttpStatusCode.NotFound
+                )
+            )
+            return@get
+        }
+
+        val downloadLink = oratureFileDownload(params, resolver)
+        if (downloadLink == null) {
+            call.respond(HttpStatusCode.NotFound)
+        } else {
+            call.respond(downloadLink)
         }
     }
 }
