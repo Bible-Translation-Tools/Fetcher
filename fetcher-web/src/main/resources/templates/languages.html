@@ -7,6 +7,7 @@
     <link rel="icon" href="/static/img/fetcher_logo.png">
     <link rel="stylesheet" href="/static/common.css">
     <link rel="stylesheet" href="/static/language.css">
+    <link rel="stylesheet" href="/static/heart_gateway_group.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style id="cssFilter">/*css filter placeholder*/</style>
 </head>
@@ -21,9 +22,14 @@
 
 <div th:insert="fragments/hero :: hero(#{page_title}, #{page_info})"></div>
 
-<div class="language_search_grid">
-    <span th:insert="fragments/language_toggle :: language_toggle(${isGateway})"></span>
-    <span th:insert="fragments/searchbar :: searchbar"></span>
+<!--<div class="language_search_grid">-->
+<!--    <span th:insert="fragments/language_toggle :: language_toggle(${isGateway})"></span>-->
+<!--    <span th:insert="fragments/searchbar :: searchbar"></span>-->
+<!--</div>-->
+
+<div class="language_input_group">
+    <div th:insert="fragments/language_toggle :: language_toggle(${isGateway})"></div>
+    <div th:insert="fragments/searchbar :: searchbar"></div>
 </div>
 
 <div class="l-list-container" >
