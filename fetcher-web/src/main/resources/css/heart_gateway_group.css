@@ -1,3 +1,6 @@
+.hero__page-info {
+    width: 1240px; /* this number is calculated by the card size and border, regarding the number of cards on a row (4)*/
+}
 .active_toggle {
     background: rgb(1, 90, 217);
     color: white !important;
@@ -13,8 +16,7 @@ a.toggle_button:not(.active_toggle):hover {
     display: flex;
     justify-content: space-between;
     max-width: 1240px; /* this number is calculated by the card size and border, regarding the number of cards on a row (4)*/
-    margin: auto;
-    margin-bottom: 30px;
+    margin: 20px auto 30px;
 }
 .language_input_group > div {
     width: 50%;
@@ -46,19 +48,19 @@ a.toggle_button:not(.active_toggle):hover {
     float: right;
     max-width: 80%;
 }
-/* --tablet layout 3 cards max-- */
+/* --tablet layout 3 cards-- */
 @media only screen
-and (max-device-width: 1255px)
+and (max-device-width: 1255px) /* below this number is the size of 3 cards*/
 {
-    .language_input_group {
+    .language_input_group,.hero__page-info {
         max-width: 926px; /* this number is calculated by the card size and border, regarding the number of cards on a row */
     }
 }
-/* --tablet layout 2 cards max-- */
+/* --tablet layout 2 cards-- */
 @media only screen
-and (max-device-width: 941px)
+and (max-device-width: 941px) /* below this number is the size of 2 cards*/
 {
-    .language_input_group {
+    .language_input_group,.hero__page-info {
         max-width: 612px; /* this number is calculated by the card size and border, regarding the number of cards on a row */
     }
     .searchbar {
@@ -71,6 +73,9 @@ and (max-device-width: 941px)
 and (max-device-width: 767px)
 and (min-device-width: 320px)
 {
+    .hero__page-info {
+         max-width: 312px;
+     }
     .language_input_group {
         max-width: 312px;
         width: 85%;
