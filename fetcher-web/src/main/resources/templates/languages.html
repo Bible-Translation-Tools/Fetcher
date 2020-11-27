@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" dir="ltr" th:dir="#{dir}">
 <head>
     <meta charset="UTF-8">
-    <title th:text="#{languages}">Languages</title>
+    <title th:text="#{title}">Languages</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" >
     <link rel="icon" href="/static/img/fetcher_logo.png">
     <link rel="stylesheet" href="/static/common.css">
@@ -20,12 +20,8 @@
     <div th:insert="fragments/navbar :: navbar(${languagesNavUrl}, null, null)"></div>
 </div>
 
-<div th:insert="fragments/hero :: hero(#{page_title}, #{page_info})"></div>
-
-<!--<div class="language_search_grid">-->
-<!--    <span th:insert="fragments/language_toggle :: language_toggle(${isGateway})"></span>-->
-<!--    <span th:insert="fragments/searchbar :: searchbar"></span>-->
-<!--</div>-->
+<div th:if="${isGateway}" th:insert="fragments/hero :: hero(#{page_title_gateway}, #{page_info_gateway})"></div>
+<div th:unless="${isGateway}" th:insert="fragments/hero :: hero(#{page_title_heart}, #{page_info_heart})"></div>
 
 <div class="language_input_group">
     <div th:insert="fragments/language_toggle :: language_toggle(${isGateway})"></div>
