@@ -2,7 +2,6 @@ package org.bibletranslationtools.fetcher.web.controllers.utils
 
 import java.lang.NumberFormatException
 import org.bibletranslationtools.fetcher.repository.BookRepository
-import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
 

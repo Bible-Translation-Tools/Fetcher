@@ -4,7 +4,6 @@ import java.lang.NumberFormatException
 import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.data.Deliverable
 import org.bibletranslationtools.fetcher.repository.BookRepository
-import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters

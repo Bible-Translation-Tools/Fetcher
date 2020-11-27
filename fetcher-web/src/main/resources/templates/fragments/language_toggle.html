@@ -4,9 +4,24 @@
     <title>Language Toggle</title>
 </head>
 <body>
-<div th:fragment="language_toggle" class="language_toggle">
-    <button>Gateway</button>
-    <button>Heart</button>
+<div class="language_toggle" th:fragment="language_toggle(isGateway)">
+
+    <a href="#"
+       th:href="${isGateway} ? '#' : '/gl'"
+       class="toggle_button"
+       th:classappend="${isGateway} ? 'active_toggle' : ''">
+        <em class="material-icons">language</em>
+        <span th:text="#{gateway}">Gateway</span>
+    </a>
+
+    <a href="#"
+       th:href="${isGateway} ? '/hl' : '#'"
+       class="toggle_button"
+       th:classappend="${!isGateway} ? 'active_toggle' : ''">
+        <em class="material-icons">favorite</em>
+        <span th:text="#{heart}">Heart</span>
+    </a>
+
 </div>
 </body>
 </html>
