@@ -7,10 +7,8 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
-import org.bibletranslationtools.fetcher.impl.repository.UnfoldingWordHeartLanguagesCatalog
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchLanguageViewData
-import org.bibletranslationtools.fetcher.usecase.viewdata.LanguageViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.HL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
