@@ -1,4 +1,6 @@
 window.addEventListener('load', function() {
+    document.querySelector(".searchbar__input").addEventListener("keyup", search)
+    document.querySelector(".searchbar__input ~ em").addEventListener("click", search)
     document.querySelector(".searchbar__input ~ em").addEventListener("mouseover", function(event){
         event.target.style.cursor = "pointer"
     })
