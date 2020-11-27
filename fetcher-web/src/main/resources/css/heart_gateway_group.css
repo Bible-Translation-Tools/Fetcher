@@ -12,6 +12,11 @@
 a.toggle_button:not(.active_toggle):hover {
     background-color: #dcdde4;
 }
+.toggle_button span {
+    max-width: 70%;
+    white-space: nowrap;
+    overflow: hidden;
+}
 .language_input_group {
     display: flex;
     justify-content: space-between;

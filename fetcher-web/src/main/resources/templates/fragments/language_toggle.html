@@ -11,7 +11,7 @@
        class="toggle_button"
        th:classappend="${isGateway} ? 'active_toggle' : ''">
         <em class="material-icons">language</em>
-        <span>Gateway</span>
+        <span th:text="#{gateway}">Gateway</span>
     </a>
 
     <a href="#"
@@ -19,7 +19,7 @@
        class="toggle_button"
        th:classappend="${!isGateway} ? 'active_toggle' : ''">
         <em class="material-icons">favorite</em>
-        <span>Heart</span>
+        <span th:text="#{heart}">Heart</span>
     </a>
 
 </div>
