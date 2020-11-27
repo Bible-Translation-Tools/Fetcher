@@ -69,7 +69,7 @@ class FetchLanguageViewData(
         val resultLanguages = mutableSetOf<Language>()
 
         heartLanguages.filter {
-            it.code.contains(query)
+            it.code.contains(query.toLowerCase())
         }.forEach {
             resultLanguages.add(it)
         }
@@ -79,22 +79,22 @@ class FetchLanguageViewData(
 
         heartLanguages.filter {
             it.anglicizedName in matchingResult || it.localizedName in matchingResult
-        }.forEach {
-            resultLanguages.add(it)
-        }
+        }.forEach { resultLanguages.add(it) }
 
         val availableLanguageCodes = storage.getLanguageCodes()
-        return resultLanguages.map {
-            LanguageViewData(
-                code = it.code,
-                anglicizedName = it.anglicizedName,
-                localizedName = it.localizedName,
-                url = if (it.code in availableLanguageCodes) {
-                    "$currentPath/${it.code}/${ProductFileExtension.MP3.name.toLowerCase()}"
-                } else {
-                    null
-                }
-            )
-        }
+        return resultLanguages
+            .take(displayLimit)
+            .map {
+                LanguageViewData(
+                    code = it.code,
+                    anglicizedName = it.anglicizedName,
+                    localizedName = it.localizedName,
+                    url = if (it.code in availableLanguageCodes) {
+                        "$currentPath/${it.code}/${ProductFileExtension.MP3.name.toLowerCase()}"
+                    } else {
+                        null
+                    }
+                )
+            }
     }
 }

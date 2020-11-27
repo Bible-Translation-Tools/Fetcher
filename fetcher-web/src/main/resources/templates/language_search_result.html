@@ -1,0 +1,6 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<div th:each="language: ${languageList}">
+    <div th:insert="fragments/card :: card(${language.localizedName}, ${language.anglicizedName}, '', ${language.code}, ${language.url})"></div>
+</div>
+</html>

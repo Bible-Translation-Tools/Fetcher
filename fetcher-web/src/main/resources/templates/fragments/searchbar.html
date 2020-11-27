@@ -4,9 +4,19 @@
     <title>Search Bar</title>
 </head>
 <body>
-<div th:fragment="searchbar" class="searchbar">
-    <input class="searchbar__input" placeholder="Search" th:placeholder="#{search}" id="filter">
+<!--static search filter GL-->
+<div th:if="${isGateway}" th:fragment="searchbar" class="searchbar">
+    <input class="searchbar__input" placeholder="Search"
+           th:placeholder="#{search}"
+           id="filter">
     <em class="material-icons">search</em>
+</div>
+<!--async search HL-->
+<div th:unless="${isGateway}" th:fragment="searchbar" class="searchbar">
+    <input class="searchbar__input" placeholder="Search"
+           th:placeholder="#{search}"
+           onkeyup="search(event)">
+    <em class="material-icons" onclick="search(event)">search</em>
 </div>
 </body>
 </html>
