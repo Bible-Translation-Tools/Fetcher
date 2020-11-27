@@ -12,17 +12,17 @@ import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.slf4j.LoggerFactory
 
-const val PORT_LANGUAGE_CODE_ID = "IETF Tag"
-const val PORT_ANGLICIZED_NAME_ID = "Name"
-const val PORT_LOCALIZED_NAME_ID = "National Name"
+private const val LANGUAGE_CODE_ID = "IETF Tag"
+private const val ANGLICIZED_NAME_ID = "Name"
+private const val LOCALIZED_NAME_ID = "National Name"
 
 class PortGatewayLanguageCatalog : LanguageCatalog {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private data class PortGatewayLanguage(
-        @JsonProperty(PORT_LANGUAGE_CODE_ID) val code: String,
-        @JsonProperty(PORT_ANGLICIZED_NAME_ID) val anglicizedName: String,
-        @JsonProperty(PORT_LOCALIZED_NAME_ID) val localizedName: String
+        @JsonProperty(LANGUAGE_CODE_ID) val code: String,
+        @JsonProperty(ANGLICIZED_NAME_ID) val anglicizedName: String,
+        @JsonProperty(LOCALIZED_NAME_ID) val localizedName: String
     )
 
     private val logger = LoggerFactory.getLogger(javaClass)

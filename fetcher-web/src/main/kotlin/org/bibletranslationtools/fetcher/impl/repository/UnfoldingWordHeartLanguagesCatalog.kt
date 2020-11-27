@@ -10,18 +10,18 @@ import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.slf4j.LoggerFactory
 
-const val UW_LANGUAGE_CODE_ID = "lc"
-const val UW_ANGLICIZED_NAME_ID = "ang"
-const val UW_LOCALIZED_NAME_ID = "ln"
-const val IS_GATEWAY = "gw"
+private const val LANGUAGE_CODE_ID = "lc"
+private const val ANGLICIZED_NAME_ID = "ang"
+private const val LOCALIZED_NAME_ID = "ln"
+private const val IS_GATEWAY = "gw"
 
 class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private data class UnfoldingWordHeartLanguage(
-        @JsonProperty(UW_LANGUAGE_CODE_ID) val code: String,
-        @JsonProperty(UW_ANGLICIZED_NAME_ID) val anglicizedName: String,
-        @JsonProperty(UW_LOCALIZED_NAME_ID) val localizedName: String,
+        @JsonProperty(LANGUAGE_CODE_ID) val code: String,
+        @JsonProperty(ANGLICIZED_NAME_ID) val anglicizedName: String,
+        @JsonProperty(LOCALIZED_NAME_ID) val localizedName: String,
         @JsonProperty(IS_GATEWAY) val isGateway: Boolean
     )
 
