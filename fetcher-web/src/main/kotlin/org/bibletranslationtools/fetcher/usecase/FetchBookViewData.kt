@@ -6,6 +6,7 @@ import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
+import java.io.File
 
 class FetchBookViewData(
     private val bookRepo: BookRepository,
@@ -92,8 +93,7 @@ class FetchBookViewData(
 
             val bookFile = storage.getBookFile(fileAccessRequest)
             if (bookFile != null) {
-                val relativeBookPath = bookFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
-                url = "//${System.getenv("CDN_BASE_URL")}/$relativeBookPath"
+                url = getBookDownloadUrl(bookFile)
                 break
             }
         }
@@ -125,5 +125,10 @@ class FetchBookViewData(
             bookSlug = bookSlug,
             mediaQuality = priorityItem.mediaQuality
         )
+    }
+
+    private fun getBookDownloadUrl(bookFile: File): String {
+        val relativePath = bookFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
+        return "${System.getenv("CDN_BASE_URL")}/$relativePath"
     }
 }
