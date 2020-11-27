@@ -7,8 +7,10 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
+import org.bibletranslationtools.fetcher.impl.repository.UnfoldingWordHeartLanguagesCatalog
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchLanguageViewData
+import org.bibletranslationtools.fetcher.usecase.viewdata.LanguageViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.HL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
@@ -33,6 +35,13 @@ fun Routing.languageController(resolver: DependencyResolver) {
     route(HL_ROUTE) {
         get {
             val path = normalizeUrl(call.request.path())
+            val searchQuery = call.request.queryParameters["search"]
+
+            if (!searchQuery.isNullOrEmpty()) {
+                call.respond(filterHeartLanguages(searchQuery, path, resolver))
+                return@get
+            }
+
             call.respond(
                 languagesView(
                     path,
@@ -64,5 +73,21 @@ private fun languagesView(
             "isGateway" to isGateway
         ),
         locale = getPreferredLocale(contentLanguage, "languages")
+    )
+}
+
+private fun filterHeartLanguages(
+    query: String,
+    currentPath: String,
+    resolver: DependencyResolver
+): ThymeleafContent {
+    val resultLanguages = FetchLanguageViewData(resolver.languageRepository)
+        .filterHeartLanguages(query, currentPath, resolver.storageAccess)
+
+    return ThymeleafContent(
+        template = "language_search_result",
+        model = mapOf(
+            "languageList" to resultLanguages
+        )
     )
 }

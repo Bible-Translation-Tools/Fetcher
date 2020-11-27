@@ -17,4 +17,5 @@ ext {
     retrofit_ver='2.9.0'
     resource_container_ver='0.7.0'
     rc_media_downloader_ver='1.1.2'
+    fuzzy_wuzzy_ver='1.3.1'
 }
