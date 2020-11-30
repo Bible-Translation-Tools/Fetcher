@@ -13,10 +13,16 @@ class FetchProductViewData(
 
     fun getListViewData(
         currentPath: String,
-        cacheAccessor: ContentCacheAccessor
+        cacheAccessor: ContentCacheAccessor,
+        isGateway: Boolean
     ): List<ProductViewData> {
         return products.map {
-            val isAvailable = cacheAccessor.isProductAvailable(it.slug, languageCode)
+            val isAvailable = if (isGateway) {
+                cacheAccessor.isProductAvailable(it.slug, languageCode)
+            } else {
+                it.slug == ProductFileExtension.MP3.name.toLowerCase()
+            }
+
             ProductViewData(
                 slug = it.slug,
                 titleKey = it.titleKey,
