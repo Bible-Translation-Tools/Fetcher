@@ -24,16 +24,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      
-      - name: Set output
-        id: vars
-        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+      - uses: FranzDiebold/github-env-vars-action@v1.3.0
 
       - name: Build web image
-        run: docker build -t bibletranslationtools/fetcher:$GITHUB_SHA -t bibletranslationtools/fetcher:$${{ steps.vars.outputs.short_ref }} -t bibletranslationtools/fetcher:latest ./fetcher-web
+        shell: bash
+        run: docker build -t bibletranslationtools/fetcher:$GITHUB_SHA -t bibletranslationtools/fetcher:$GITHUB_REF_NAME_SLUG -t bibletranslationtools/fetcher:latest ./fetcher-web
       
       - name: Build pipeline image
-        run: docker build -t bibletranslationtools/fetcher-pipeline:$GITHUB_SHA -t bibletranslationtools/fetcher-pipeline:$${{ steps.vars.outputs.short_ref }} -t bibletranslationtools/fetcher-pipeline:latest ./fetcher-pipeline
+        shell: bash
+        run: docker build -t bibletranslationtools/fetcher-pipeline:$GITHUB_SHA -t bibletranslationtools/fetcher-pipeline:$GITHUB_REF_NAME_SLUG -t bibletranslationtools/fetcher-pipeline:latest ./fetcher-pipeline
 
       - name: Log into registry
         shell: bash
