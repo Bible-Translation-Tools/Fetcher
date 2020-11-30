@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.FileNotFoundException
-import java.io.InputStream
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.slf4j.LoggerFactory
@@ -26,7 +28,7 @@ class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
     )
 
     private val logger = LoggerFactory.getLogger(javaClass)
-    private val unfoldingWordLanguageFileName = "/unfolding_word_heart_languages.json"
+    private val languageCatalogUrl = "http://td.unfoldingword.org/exports/langnames.json"
     private val languageList: List<Language> = parseCatalog()
 
     override fun getAll(): List<Language> = this.languageList
@@ -35,38 +37,39 @@ class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
 
     @Throws(FileNotFoundException::class)
     private fun parseCatalog(): List<Language> {
-        val jsonInputStream: InputStream = try {
-            getLanguageCatalogFile()
-        } catch (e: FileNotFoundException) {
-            logger.error("$unfoldingWordLanguageFileName not found in resources.", e)
-            throw e // crash on fatal exception: critical resource not found
-        }
+        val jsonCatalog = getLanguageCatalogContent(languageCatalogUrl)
+        val languages: List<UnfoldingWordHeartLanguage> =
+            jacksonObjectMapper().readValue(jsonCatalog)
 
-        jsonInputStream.use {
-            val languages: List<UnfoldingWordHeartLanguage> =
-                jacksonObjectMapper().readValue(jsonInputStream)
-
-            return languages
-                .filter {
-                    !it.isGateway
-                }
-                .map {
-                    Language(
-                        it.code,
-                        it.anglicizedName,
-                        it.localizedName
-                    )
-                }
-        }
+        return languages
+            .filter {
+                !it.isGateway
+            }
+            .map {
+                Language(
+                    it.code,
+                    it.anglicizedName,
+                    it.localizedName
+                )
+            }
     }
 
     @Throws(FileNotFoundException::class)
-    private fun getLanguageCatalogFile(): InputStream {
-        val catalogFileStream = javaClass.getResourceAsStream(unfoldingWordLanguageFileName)
-        if (catalogFileStream == null) {
-            throw FileNotFoundException()
+    private fun getLanguageCatalogContent(url: String): String {
+        var response: String = ""
+
+        try {
+            val conn = (URL(languageCatalogUrl).openConnection() as HttpURLConnection)
+            conn.requestMethod = "GET"
+            conn.inputStream.reader().use {
+                response = it.readText()
+            }
+            conn.disconnect()
+        } catch (ex: IOException) {
+            logger.error("An error occurred when requesting language catalog from $languageCatalogUrl", ex)
+            throw ex
         }
 
-        return catalogFileStream
+        return response
     }
 }
