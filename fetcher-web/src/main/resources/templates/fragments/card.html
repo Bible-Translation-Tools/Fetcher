@@ -7,7 +7,7 @@
 <a th:fragment="card(localizedText, anglicizedText, index, code, url)"
    th:attrappend="data-slug=${code}, data-angname=${anglicizedText}, data-localname=${localizedText}"
    class="def-card" th:classappend="${url == null}? 'unavailable' "
-   th:href="${url == null}? '#' : ${url}">
+   th:href="${url == null}? 'javascript:void(0)' : ${url}">
     <div class="def-card__code"
          th:classappend="${url == null}? 'unavailable' ">
         <span th:if="${index != ''}" th:text="${index + ' '}">01 </span>
