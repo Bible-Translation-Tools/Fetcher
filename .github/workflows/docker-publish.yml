@@ -26,6 +26,10 @@ jobs:
       - uses: actions/checkout@v2
       - uses: FranzDiebold/github-env-vars-action@v1.3.0
 
+      - name: Build the web jar
+        shell: bash
+        run: cd fetcher-web && ./gradlew check build && cd ..
+      
       - name: Build web image
         shell: bash
         run: docker build -t bibletranslationtools/fetcher:$GITHUB_SHA -t bibletranslationtools/fetcher:$GITHUB_REF_NAME_SLUG -t bibletranslationtools/fetcher:latest ./fetcher-web
