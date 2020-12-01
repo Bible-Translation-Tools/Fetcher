@@ -31,7 +31,7 @@ class App:
         wait_timer = (self.hour * 3600) + (self.minute * 60)
 
         if wait_timer == 0:
-            logging.debug("Set timer to more that zero minutes")
+            logging.debug("Set timer to more than zero minutes")
             exit(0)
 
         while True:
