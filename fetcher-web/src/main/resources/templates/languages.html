@@ -2,13 +2,14 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" dir="ltr" th:dir="#{dir}">
 <head>
     <meta charset="UTF-8">
-    <title th:text="#{title}">Languages</title>
+    <title th:text="#{${isGateway}? 'gateway_languages' : 'heart_languages'}">Languages</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" >
     <link rel="icon" href="/static/img/fetcher_logo.png">
     <link rel="stylesheet" href="/static/common.css">
     <link rel="stylesheet" href="/static/language.css">
     <link rel="stylesheet" href="/static/heart_gateway_group.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script th:if="${!isGateway}" type="text/javascript" src="/static/search-languages.js"></script>
     <style id="cssFilter">/*css filter placeholder*/</style>
 </head>
 
@@ -34,7 +35,7 @@
     </div>
 </div>
 
-<div th:insert="fragments/filter :: filter"></div>
+<div th:if="${isGateway}" th:insert="fragments/filter :: filter"></div>
 
 </body>
 

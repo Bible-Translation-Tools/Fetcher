@@ -37,7 +37,7 @@ class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
 
     @Throws(FileNotFoundException::class)
     private fun parseCatalog(): List<Language> {
-        val jsonCatalog = getLanguageCatalogContent(languageCatalogUrl)
+        val jsonCatalog = getLanguageCatalogContent()
         val languages: List<UnfoldingWordHeartLanguage> =
             jacksonObjectMapper().readValue(jsonCatalog)
 

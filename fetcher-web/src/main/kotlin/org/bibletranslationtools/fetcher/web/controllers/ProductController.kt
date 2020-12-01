@@ -11,6 +11,7 @@ import io.ktor.routing.route
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
+import org.bibletranslationtools.fetcher.web.controllers.utils.HL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
@@ -29,7 +30,19 @@ fun Routing.productController(resolver: DependencyResolver) {
                 languageCode = call.parameters[LANGUAGE_PARAM_KEY]
             )
             call.respond(
-                productsView(params, path, resolver)
+                productsView(params, path, true, resolver)
+            )
+        }
+    }
+    route("/$HL_ROUTE/{$LANGUAGE_PARAM_KEY}") {
+        get {
+            // products page
+            val path = normalizeUrl(call.request.path())
+            val params = UrlParameters(
+                languageCode = call.parameters[LANGUAGE_PARAM_KEY]
+            )
+            call.respond(
+                productsView(params, path, false, resolver)
             )
         }
     }
@@ -38,6 +51,7 @@ fun Routing.productController(resolver: DependencyResolver) {
 private fun productsView(
     params: UrlParameters,
     path: String,
+    isGateway: Boolean,
     resolver: DependencyResolver
 ): ThymeleafContent {
     if (!validator.isLanguageCodeValid(params.languageCode)) {
@@ -54,7 +68,7 @@ private fun productsView(
     return ThymeleafContent(
         template = "products",
         model = mapOf(
-            "productList" to model.getListViewData(path, resolver.contentCache),
+            "productList" to model.getListViewData(path, resolver.contentCache, isGateway),
             "languagesNavTitle" to languageName,
             "languagesNavUrl" to "/$GL_ROUTE",
             "fileTypesNavUrl" to "#"

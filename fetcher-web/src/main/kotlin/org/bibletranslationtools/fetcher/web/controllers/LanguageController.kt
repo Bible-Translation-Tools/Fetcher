@@ -33,6 +33,13 @@ fun Routing.languageController(resolver: DependencyResolver) {
     route(HL_ROUTE) {
         get {
             val path = normalizeUrl(call.request.path())
+            val searchQuery = call.request.queryParameters["search"]
+
+            if (!searchQuery.isNullOrEmpty()) {
+                call.respond(filterHeartLanguages(searchQuery, path, resolver))
+                return@get
+            }
+
             call.respond(
                 languagesView(
                     path,
@@ -64,5 +71,21 @@ private fun languagesView(
             "isGateway" to isGateway
         ),
         locale = getPreferredLocale(contentLanguage, "languages")
+    )
+}
+
+private fun filterHeartLanguages(
+    query: String,
+    currentPath: String,
+    resolver: DependencyResolver
+): ThymeleafContent {
+    val resultLanguages = FetchLanguageViewData(resolver.languageRepository)
+        .filterHeartLanguages(query, currentPath, resolver.storageAccess)
+
+    return ThymeleafContent(
+        template = "language_search_result",
+        model = mapOf(
+            "languageList" to resultLanguages
+        )
     )
 }
