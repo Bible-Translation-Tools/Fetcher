@@ -25,7 +25,7 @@ import org.mockito.Mockito.mock
 
 class ContentAvailabilityCacheTest {
     private val languageCode = "en"
-    private val titus = "tit"
+    private val `2peter` = "2pe"
     private val chapterNumber = 1
     private val rcFileName = "en_ulb"
 
@@ -39,9 +39,9 @@ class ContentAvailabilityCacheTest {
         }
 
         val chapterPath = tempDir.resolve(
-            "en/ulb/tit/$chapterNumber/CONTENTS/mp3/hi/chapter"
+            "en/ulb/2pe/$chapterNumber/CONTENTS/wav/chapter"
         ).apply { mkdirs() }
-        chapterPath.resolve("en_ulb_nt_tit_c$chapterNumber.mp3").createNewFile()
+        chapterPath.resolve("en_ulb_2pe_c$chapterNumber.wav").createNewFile()
 
         val mockLanguageCatalog = mock(LanguageCatalog::class.java)
         val mockChapterCatalog = mock(ChapterCatalog::class.java)
@@ -79,10 +79,10 @@ class ContentAvailabilityCacheTest {
         val cache = AvailabilityCacheAccessor(cacheBuilder)
 
         assertTrue(cache.isLanguageAvailable(languageCode))
-        assertTrue(cache.isBookAvailable(titus, languageCode, "orature"))
-        assertNotNull(cache.getChapterUrl(chapterNumber, titus, languageCode, "mp3"))
-        assertNotNull(cache.getChapterUrl(chapterNumber, titus, languageCode, "orature"))
-        assertNull(cache.getChapterUrl(chapterNumber, titus, languageCode, "bttr"))
+        assertTrue(cache.isBookAvailable(`2peter`, languageCode, "orature"))
+        assertNotNull(cache.getChapterUrl(chapterNumber, `2peter`, languageCode, "mp3"))
+        assertNotNull(cache.getChapterUrl(chapterNumber, `2peter`, languageCode, "orature"))
+        assertNull(cache.getChapterUrl(chapterNumber, `2peter`, languageCode, "bttr"))
 
         tempDir.deleteRecursively()
     }

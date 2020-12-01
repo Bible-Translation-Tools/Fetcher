@@ -184,6 +184,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         return false
     }
 
+    @Suppress("NestedBlockDepth")
     private fun hasChapterFile(
         languageCode: String,
         resourceId: String,
