@@ -18,8 +18,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
 function validateUrl(url) {
     try {
-        let validateUrl = new URL(url)
-        if (!validateUrl.protocol.startsWith("http")) return false
+        let urlObject = new URL(url)
+        if (!urlObject.protocol.startsWith("http")) return false
     } catch (err) {
         return false
     }
