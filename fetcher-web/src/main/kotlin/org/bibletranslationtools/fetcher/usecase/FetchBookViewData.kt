@@ -1,7 +1,8 @@
 package org.bibletranslationtools.fetcher.usecase
 
+import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.repository.BookRepository
-import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
+import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
@@ -17,6 +18,12 @@ class FetchBookViewData(
 
     private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
 
+    private val fileExtensionList = if (ContainerExtensions.isSupported(product.fileType)) {
+        listOf("tr")
+    } else {
+        listOf("wav", "mp3")
+    }
+
     private val priorityList = listOf(
         PriorityItem("mp3", "hi"),
         PriorityItem("mp3", "low"),
@@ -25,11 +32,22 @@ class FetchBookViewData(
 
     fun getViewDataList(
         currentPath: String,
-        contentCache: ContentCacheRepository
+        cacheAccessor: ContentCacheAccessor,
+        isGateway: Boolean = true
     ): List<BookViewData> {
         val books = bookRepo.getBooks(resourceId = resourceId, languageCode = languageCode)
         return books.map { book ->
-            book.availability = contentCache.isBookAvailable(book.slug, languageCode, productSlug)
+            book.availability = if (isGateway) {
+                cacheAccessor.isBookAvailable(book.slug, languageCode, productSlug)
+            } else {
+                storage.hasBookContent(
+                    languageCode,
+                    resourceId,
+                    book.slug,
+                    fileExtensionList
+                )
+            }
+
             BookViewData(
                 index = book.index,
                 slug = book.slug,
@@ -40,9 +58,17 @@ class FetchBookViewData(
         }
     }
 
-    fun getViewData(bookSlug: String, cacheRepository: ContentCacheRepository): BookViewData? {
+    fun getViewData(
+        bookSlug: String,
+        cacheAccessor: ContentCacheAccessor,
+        isGateway: Boolean = true
+    ): BookViewData? {
         val book = bookRepo.getBook(bookSlug)
-        val url = cacheRepository.getBookUrl(bookSlug, languageCode, productSlug)
+        val url = if (isGateway) {
+            cacheAccessor.getBookUrl(bookSlug, languageCode, productSlug)
+        } else {
+            getBookDownloadUrl(bookSlug)
+        }
 
         return if (book != null) BookViewData(
             index = book.index,

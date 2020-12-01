@@ -1,6 +1,6 @@
 package org.bibletranslationtools.fetcher.repository
 
-interface ContentCacheRepository {
+interface ContentCacheAccessor {
     fun update()
     fun isLanguageAvailable(code: String): Boolean
     fun isProductAvailable(productSlug: String, languageCode: String): Boolean

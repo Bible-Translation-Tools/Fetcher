@@ -1,7 +1,7 @@
 package org.bibletranslationtools.fetcher.usecase
 
 import org.bibletranslationtools.fetcher.data.Product
-import org.bibletranslationtools.fetcher.repository.ContentCacheRepository
+import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.usecase.viewdata.ProductViewData
 
@@ -13,10 +13,10 @@ class FetchProductViewData(
 
     fun getListViewData(
         currentPath: String,
-        cacheRepository: ContentCacheRepository
+        cacheAccessor: ContentCacheAccessor
     ): List<ProductViewData> {
         return products.map {
-            val isAvailable = cacheRepository.isProductAvailable(it.slug, languageCode)
+            val isAvailable = cacheAccessor.isProductAvailable(it.slug, languageCode)
             ProductViewData(
                 slug = it.slug,
                 titleKey = it.titleKey,

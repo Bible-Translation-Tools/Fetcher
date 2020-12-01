@@ -171,7 +171,7 @@ span {
     background: white !important;
     color: #111A3133 !important;
     box-shadow: none !important;
-    border: none !important;
+    border-color: transparent !important;
 }
 .unavailable:hover {
     box-shadow: none !important;

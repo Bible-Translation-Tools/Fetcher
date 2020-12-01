@@ -1,0 +1,105 @@
+.hero__page-info {
+    width: 1240px; /* this number is calculated by the card size and border, regarding the number of cards on a row (4)*/
+}
+.active_toggle {
+    background: rgb(1, 90, 217);
+    color: white !important;
+    border-color: transparent !important;
+}
+.active_toggle:hover {
+    cursor: not-allowed;
+}
+a.toggle_button:not(.active_toggle):hover {
+    background-color: #dcdde4;
+}
+.toggle_button span {
+    max-width: 70%;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.language_input_group {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1240px; /* this number is calculated by the card size and border, regarding the number of cards on a row (4)*/
+    margin: 20px auto 30px;
+}
+.language_input_group > div {
+    width: 50%;
+}
+.language_toggle {
+    display: flex;
+}
+.toggle_button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    width: 150px;
+    color: rgba(10, 51, 115, 0.8);
+    font-size: 16px;
+    font-weight: 300;
+    border-radius: 4px;
+    border: 1px solid rgba(10, 51, 115, 0.2);
+}
+.toggle_button + .toggle_button {
+    margin-left: 15px;
+    margin-right: 8px;
+}
+.toggle_button span {
+    padding-left: 5px;
+}
+.searchbar {
+    box-sizing: border-box;
+    float: right;
+    max-width: 80%;
+}
+/* --tablet layout 3 cards-- */
+@media only screen
+and (max-device-width: 1255px) /* below this number is the size of 3 cards*/
+{
+    .language_input_group,.hero__page-info {
+        max-width: 926px; /* this number is calculated by the card size and border, regarding the number of cards on a row */
+    }
+}
+/* --tablet layout 2 cards-- */
+@media only screen
+and (max-device-width: 941px) /* below this number is the size of 2 cards*/
+{
+    .language_input_group,.hero__page-info {
+        max-width: 612px; /* this number is calculated by the card size and border, regarding the number of cards on a row */
+    }
+    .searchbar {
+        width: 100%;
+        max-width: 298px;
+    }
+}
+/* --mobile layout for phones  */
+@media only screen
+and (max-device-width: 767px)
+and (min-device-width: 320px)
+{
+    .hero__page-info {
+         max-width: 312px;
+     }
+    .language_input_group {
+        max-width: 312px;
+        width: 85%;
+        align-items: center;
+        flex-direction: column;
+        margin: auto;
+    }
+    .language_input_group > div {
+        width: 100%;
+        margin: 10px auto;
+    }
+    .language_toggle {
+        justify-content: center;
+    }
+    .searchbar {
+        float: none;
+        max-width: 100%;
+    }
+    .toggle_button + .toggle_button {
+        margin-right: 0;
+    }
+}
