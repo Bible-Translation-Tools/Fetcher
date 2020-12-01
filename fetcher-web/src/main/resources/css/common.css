@@ -175,7 +175,7 @@ span {
 }
 .unavailable:hover {
     box-shadow: none !important;
-    cursor: no-drop;
+    cursor: no-drop !important;
 }
 .unavailable i {
     display: none !important;

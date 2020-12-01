@@ -16,9 +16,21 @@ window.addEventListener('DOMContentLoaded', (event) => {
     )
 })
 
+function validateUrl(url) {
+    try {
+        let urlObject = new URL(url)
+        if (!urlObject.protocol.startsWith("http")) return false
+    } catch (err) {
+        return false
+    }
+    return true
+}
+
 function requestChapterHandler(event) {
     event.preventDefault()
     let card = this
+    if (!validateUrl(card.href)) return
+
     card.href = "javascript:void(0)" // prevent multiple request
     card.querySelectorAll(
         ".chaptercard__download-target p,.chaptercard__icon"
@@ -86,6 +98,8 @@ function renderError(card) {
 function requestBookHandler(event) {
     event.preventDefault()
     let element = this
+    if (!validateUrl(element.href)) return
+
     element.href = "javascript:void(0)" // prevent multiple request
     element.classList.add("requesting")
     element.querySelectorAll(

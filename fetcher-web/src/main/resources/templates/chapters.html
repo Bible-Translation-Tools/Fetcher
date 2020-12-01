@@ -28,7 +28,7 @@
         th:text="${book.anglicizedName}">{Book Name}</h2>
     <a class="chapter-download-card__button"
        th:classappend="${book.url == null}? 'unavailable'"
-       th:href="${book.url == null}? '#' : ${book.url}"
+       th:href="${book.url == null}? 'javascript:void(0)' : ${book.url}"
        th:data-chapter-id="${isRequestLink}? 'all' : ''"
        th:target="${book.url == null || isRequestLink}? '' : '_blank'">
 
@@ -37,9 +37,12 @@
 
         <p th:text="#{download_book}"
            th:classappend="${isRequestLink}? 'hidden' : ''" name="download-text">Download Book</p>
+
         <p th:text="#{request_book}"
            th:classappend="${isRequestLink}? '' : 'hidden'" name="request-text">Request Book</p>
+
         <p th:text="#{requesting}" class="hidden" name="requesting-text">Requesting</p>
+
         <p th:text="#{unavailable}" class="hidden" name="unavailable-text">Unavailable</p>
     </a>
 </div>
