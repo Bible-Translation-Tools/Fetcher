@@ -22,7 +22,7 @@ class FetchProductViewData(
             } else {
                 it.slug == ProductFileExtension.MP3.name.toLowerCase()
             }
-            
+
             ProductViewData(
                 slug = it.slug,
                 titleKey = it.titleKey,
