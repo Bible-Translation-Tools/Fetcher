@@ -55,8 +55,8 @@ class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
     }
 
     @Throws(FileNotFoundException::class)
-    private fun getLanguageCatalogContent(url: String): String {
-        var response: String = ""
+    private fun getLanguageCatalogContent(): String {
+        var response = ""
 
         try {
             val conn = (URL(languageCatalogUrl).openConnection() as HttpURLConnection)
