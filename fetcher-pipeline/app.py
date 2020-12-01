@@ -2,7 +2,6 @@ import argparse
 import logging
 import os
 from argparse import Namespace
-from datetime import datetime
 from pathlib import Path
 from time import sleep
 from typing import Tuple, List
@@ -22,8 +21,6 @@ class App:
         self.hour = hour
         self.minute = minute
 
-        self.sleep_timer = 60
-
     def start(self):
         """ Start app """
 
@@ -31,27 +28,28 @@ class App:
         verse_worker = VerseWorker(self.__ftp_dir, self.verbose)
         tr_worker = TrWorker(self.__ftp_dir, self.verbose)
 
+        wait_timer = (self.hour * 3600) + (self.minute * 60)
+
+        if wait_timer == 0:
+            logging.debug("Set timer to more that zero minutes")
+            exit(0)
+
         while True:
-            now = datetime.now()
-            target_time = now.replace(hour=self.hour, minute=self.minute, second=0)
-            seconds_since_target_time = (now - target_time).total_seconds()
+            chapter_worker.execute()
+            verse_worker.execute()
+            tr_worker.execute()
 
-            if 0 <= seconds_since_target_time < self.sleep_timer:
-                chapter_worker.execute()
-                verse_worker.execute()
-                tr_worker.execute()
-
-                report = self.get_report(
-                    (
-                        chapter_worker.get_report(),
-                        verse_worker.get_report(),
-                        tr_worker.get_report()
-                    )
+            report = self.get_report(
+                (
+                    chapter_worker.get_report(),
+                    verse_worker.get_report(),
+                    tr_worker.get_report()
                 )
-                if report is not None:
-                    logging.error("Fetcher pipeline worker", extra=report)
+            )
+            if report is not None:
+                logging.error("Fetcher pipeline worker", extra=report)
 
-            sleep(self.sleep_timer)
+            sleep(wait_timer)
 
     @staticmethod
     def get_report(reports):
@@ -79,8 +77,8 @@ def get_arguments() -> Tuple[Namespace, List[str]]:
     parser.add_argument('-i', '--input-dir', type=lambda p: Path(p).absolute(), help='Input directory')
     parser.add_argument("-t", "--trace", action="store_true", help="Enable tracing output")
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable logs from subprocess")
-    parser.add_argument("-hr", "--hour", type=int, default=0, help="Hour, when to execute workers")
-    parser.add_argument("-mn", "--minute", type=int, default=0, help="Minute, when to execute workers")
+    parser.add_argument("-hr", "--hour", type=int, default=1, help="Frequency of executing workers in hours")
+    parser.add_argument("-mn", "--minute", type=int, default=0, help="Frequency of executing workers in minutes")
 
     return parser.parse_known_args()
 
