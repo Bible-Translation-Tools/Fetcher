@@ -16,6 +16,7 @@ a.toggle_button:not(.active_toggle):hover {
     max-width: 70%;
     white-space: nowrap;
     overflow: hidden;
+    padding-left: 5px;
 }
 .language_input_group {
     display: flex;

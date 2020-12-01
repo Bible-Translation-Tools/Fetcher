@@ -55,7 +55,7 @@ class FetchLanguageViewData(
                     anglicizedName = it.anglicizedName,
                     localizedName = it.localizedName,
                     url = if (it.availability) {
-                        "$currentPath/${it.code}/${ProductFileExtension.MP3.name.toLowerCase()}"
+                        "$currentPath/${it.code}"
                     } else {
                         null
                     }
@@ -93,7 +93,7 @@ class FetchLanguageViewData(
                     anglicizedName = it.anglicizedName,
                     localizedName = it.localizedName,
                     url = if (it.code in availableLanguageCodes) {
-                        "$currentPath/${it.code}/${ProductFileExtension.MP3.name.toLowerCase()}"
+                        "$currentPath/${it.code}"
                     } else {
                         null
                     }

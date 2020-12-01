@@ -1,0 +1,51 @@
+name: Docker
+
+on:
+  push:
+    # Publish `master` as Docker `latest` image.
+    branches:
+      - audiobieldev.walink.org
+
+  # Run tests for any PRs.
+  pull_request:
+    branches: 
+      - audiobieldev.walink.org
+
+#env:
+  # TODO: Change variable to your image's name.
+  # IMAGE_NAME: bibletranslationtools/fetcher
+
+jobs:
+  #build and push web image
+  push-web:
+
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: FranzDiebold/github-env-vars-action@v1.3.0
+
+      - name: Build the web jar
+        shell: bash
+        run: cd fetcher-web && ./gradlew check build && cd ..
+      
+      - name: Build web image
+        shell: bash
+        run: docker build -t bibletranslationtools/fetcher:$GITHUB_SHA -t bibletranslationtools/fetcher:$GITHUB_REF_NAME_SLUG -t bibletranslationtools/fetcher:latest ./fetcher-web
+      
+      - name: Build pipeline image
+        shell: bash
+        run: docker build -t bibletranslationtools/fetcher-pipeline:$GITHUB_SHA -t bibletranslationtools/fetcher-pipeline:$GITHUB_REF_NAME_SLUG -t bibletranslationtools/fetcher-pipeline:latest ./fetcher-pipeline
+
+      - name: Log into registry
+        shell: bash
+        env:
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_HUB_TOKEN }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_HUB_USER }}
+        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        
+      - name: Push image
+        run: |
+          docker push bibletranslationtools/fetcher
+          docker push bibletranslationtools/fetcher-pipeline

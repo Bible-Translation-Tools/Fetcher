@@ -41,7 +41,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                 bookSlug = call.parameters[BOOK_PARAM_KEY]
             )
 
-            if (!validateParameters(params, resolver)) {
+            if (!validateParameters(params)) {
                 call.respond(
                     errorPage(
                         "invalid_route_parameter",
@@ -66,7 +66,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                 bookSlug = call.parameters[BOOK_PARAM_KEY]
             )
 
-            if (!validateParameters(params, resolver)) {
+            if (!validateParameters(params)) {
                 call.respond(
                     errorPage(
                         "invalid_route_parameter",
@@ -91,7 +91,7 @@ private fun Route.oratureChapters(resolver: DependencyResolver) {
         )
 
         if (
-            !validateParameters(params, resolver) ||
+            !validateParameters(params) ||
             ProductFileExtension.getType(params.productSlug) != ProductFileExtension.ORATURE
         ) {
             call.respond(
@@ -173,10 +173,7 @@ private fun chaptersView(
     }
 }
 
-private fun validateParameters(
-    params: UrlParameters,
-    resolver: DependencyResolver
-): Boolean {
+private fun validateParameters(params: UrlParameters): Boolean {
     return validator.isLanguageCodeValid(params.languageCode) &&
             validator.isProductSlugValid(params.productSlug) &&
             validator.isBookSlugValid(params.bookSlug) &&
