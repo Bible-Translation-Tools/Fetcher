@@ -43,7 +43,10 @@ services:
       PM2_SECRET_KEY: ${PM2_SECRET_KEY}
     volumes:
       - fetcher-content:/content
+      - fetcher-rc:${RC_TEMP_DIR}
+      - fetcher-repos:${ORATURE_REPO_DIR}
 
 volumes:
   fetcher-content:
   fetcher-rc:
+  fetcher-repos:

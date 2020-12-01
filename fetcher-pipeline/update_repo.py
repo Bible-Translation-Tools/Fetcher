@@ -9,7 +9,7 @@ from typing import Tuple, List
 
 from src.process_tools import git_clone, pull_all_repos
 
-GL_REPO_URLS = "gl_repo_urls.txt"
+GL_REPO_URLS = "/repourls/gl_repo_urls.txt"
 
 
 class RepositoryUpdater:
