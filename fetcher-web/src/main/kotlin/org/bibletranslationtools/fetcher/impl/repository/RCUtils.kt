@@ -56,6 +56,7 @@ object RCUtils {
         return exists
     }
 
+    @Suppress("TooGenericExceptionCaught")
     fun zipDirectory(source: File, dest: File): Boolean {
         if (!source.isDirectory || dest.exists()) {
             return false

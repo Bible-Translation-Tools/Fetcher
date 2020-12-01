@@ -1,6 +1,5 @@
 package org.bibletranslationtools.fetcher.usecase
 
-import java.io.File
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
