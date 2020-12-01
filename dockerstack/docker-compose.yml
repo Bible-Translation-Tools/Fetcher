@@ -41,6 +41,8 @@ services:
       SENTRY_DSN: ${SENTRY_DSN}
       PM2_PUBLIC_KEY: ${PM2_PUBLIC_KEY}
       PM2_SECRET_KEY: ${PM2_SECRET_KEY}
+      RC_TEMP_DIR: ${RC_TEMP_DIR}
+      ORATURE_REPO_DIR: ${ORATURE_REPO_DIR}
     volumes:
       - fetcher-content:/content
       - fetcher-rc:${RC_TEMP_DIR}
