@@ -37,9 +37,12 @@
 
         <p th:text="#{download_book}"
            th:classappend="${isRequestLink}? 'hidden' : ''" name="download-text">Download Book</p>
+
         <p th:text="#{request_book}"
            th:classappend="${isRequestLink}? '' : 'hidden'" name="request-text">Request Book</p>
+
         <p th:text="#{requesting}" class="hidden" name="requesting-text">Requesting</p>
+
         <p th:text="#{unavailable}" class="hidden" name="unavailable-text">Unavailable</p>
     </a>
 </div>
