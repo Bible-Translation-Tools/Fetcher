@@ -12,13 +12,13 @@ NodeJs 14
 
 #### worker.sh script:  
 
-`./worker.sh -i /path/to/input/directory -hr 0 -mn 0 -t -v`  
+`./worker.sh -i /path/to/input/directory -hr 1 -mn 0 -t -v`  
 
 **options:**  
 
 `-i (--input-dir)` - Input directory (Normally ftp root dir)  
-`-hr (--hour)` - Hour, when the workers should run repeatedly (default: 0). Every midnight  
-`-mn (--minute)` - Minute, when the workers should run repeatedly (default: 0)  
+`-hr (--hour)` - Frequency of executing workers in hours (default: 1). Every hour  
+`-mn (--minute)` - Frequency of executing workers in minutes (default: 0)  
 `-t (--trace)` - (Optional) Enable tracing output (default: False)  
 `-v (--verbose)` - (Optional) Enable logs from subprocess (default: False)  
 
@@ -32,13 +32,13 @@ Alternatively you can run python script separately
 
 **App:**
 
-`python app.py -i /path/to/input/directory -hr 0 -mn 0 -t -v`
+`python app.py -i /path/to/input/directory -hr 1 -mn 0 -t -v`
 
 **options:**  
 
 `-i (--input-dir)` - Input directory (Normally ftp root dir)  
-`-hr (--hour)` - Hour, when the workers should run repeatedly (default: 0). Every midnight  
-`-mn (--minute)` - Minute, when the workers should run repeatedly (default: 0)  
+`-hr (--hour)` - Frequency of executing workers in hours (default: 1). Every hour  
+`-mn (--minute)` - Frequency of executing workers in minutes (default: 0)  
 `-t (--trace)` - (Optional) Enable tracing output  
 `-v (--verbose)` - (Optional) Enable logs from subprocess  
 
