@@ -233,7 +233,7 @@ and (min-device-width: 320px) {
     }
     .l-list-container > div:last-child a
     {
-        border-bottom: 1px solid #111A3133;
+        border-bottom: 1px solid #111A3133 !important;
     }
     .l-list-container a.unavailable {
         border-top: 1px solid #111A3133 !important;
