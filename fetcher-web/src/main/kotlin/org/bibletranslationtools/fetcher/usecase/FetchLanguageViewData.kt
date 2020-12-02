@@ -46,11 +46,12 @@ class FetchLanguageViewData(
         return languages
             .take(DISPLAY_ITEMS_LIMIT)
             .map {
+                val available = it.code in availableLanguageCodes
                 LanguageViewData(
                     code = it.code,
                     anglicizedName = it.anglicizedName,
                     localizedName = it.localizedName,
-                    url = if (it.availability) {
+                    url = if (available) {
                         "$currentPath/${it.code}"
                     } else {
                         null
