@@ -44,10 +44,6 @@ class FetchLanguageViewData(
         val availableLanguageCodes = storage.getLanguageCodes()
 
         return languages
-            .filter {
-                it.availability = it.code in availableLanguageCodes
-                it.availability
-            }
             .take(DISPLAY_ITEMS_LIMIT)
             .map {
                 LanguageViewData(
