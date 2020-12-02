@@ -4,7 +4,7 @@ on:
   push:
     # Publish `master` as Docker `latest` image.
     branches:
-      - audiobieldev.walink.org
+      - dan-actions
 
   # Run tests for any PRs.
   pull_request:
@@ -25,6 +25,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: FranzDiebold/github-env-vars-action@v1.3.0
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '11' # The JDK version to make available on the path.
+          java-package: jdk+fx # (jre, jdk, or jdk+fx) - defaults to jdk
+          architecture: x64 # (x64 or x86) - defaults to x64
 
       - name: Build the web jar
         shell: bash
