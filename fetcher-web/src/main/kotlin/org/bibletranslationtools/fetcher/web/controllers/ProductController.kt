@@ -64,13 +64,14 @@ private fun productsView(
 
     val model = FetchProductViewData(resolver.productCatalog, params.languageCode)
     val languageName = getLanguageName(params.languageCode, resolver)
+    val languageRoute = if (isGateway) GL_ROUTE else HL_ROUTE
 
     return ThymeleafContent(
         template = "products",
         model = mapOf(
             "productList" to model.getListViewData(path, resolver.contentCache, isGateway),
             "languagesNavTitle" to languageName,
-            "languagesNavUrl" to "/$GL_ROUTE",
+            "languagesNavUrl" to "/$languageRoute",
             "fileTypesNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "products")
