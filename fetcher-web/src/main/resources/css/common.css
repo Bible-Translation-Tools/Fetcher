@@ -67,6 +67,7 @@ span {
     border: 1px #111A3133 solid;
     width: 100%;
     height:56px;
+    box-sizing: border-box;
 }
 .c-navbar > div {
     width: 100%;
@@ -186,6 +187,8 @@ span {
     position: absolute;
         bottom: 0;
         left: 0;
+        border: none;
+        border-top: 1px #111A3133 solid;
     }
     .navbar__item {
         display: flex;
