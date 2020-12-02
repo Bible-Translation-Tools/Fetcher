@@ -1,15 +1,27 @@
 window.addEventListener('load', function() {
-    document.querySelector(".searchbar__input").addEventListener("keyup", search)
-    document.querySelector(".searchbar__input ~ em").addEventListener("click", search)
-    document.querySelector(".searchbar__input ~ em").addEventListener("mouseover", function(event){
-        event.target.style.cursor = "pointer"
+    document.querySelectorAll(".searchbar__input").forEach(function(elem, i) {
+        elem.addEventListener("keyup", search)
+        elem.id = "searchbar_".concat(i + 1)
+        elem.setAttribute("data-target", "searchbar_".concat(i + 1))
+    })
+    document.querySelectorAll(".searchbar__input ~ em").forEach(function(elem, i) {
+        elem.addEventListener("click", search)
+        elem.addEventListener("mouseover", function(event) {
+            event.target.style.cursor = "pointer"
+        })
+        elem.setAttribute("data-target", "searchbar_".concat(i + 1))
     })
 })
 
-
 function search(event) {
-    let searchBox = document.querySelector(".searchbar__input")
+    let targetId = event.target.getAttribute("data-target")
+    let searchBox = document.querySelector("#" + targetId)
     let text = searchBox.value
+
+    document.querySelectorAll(".searchbar__input").forEach(elem =>
+        elem.value = text
+    )
+
     if ((event.keyCode != undefined && event.keyCode != 13) ||
         text.trim() === "") {
         return
@@ -23,6 +35,9 @@ function search(event) {
         return response.text()
     }).then(data => {
         renderSuccess(data)
+        if (searchBox.id == "searchbar_2"){
+            document.querySelector("body").scroll(0,0)
+        }
     }).catch(error => {
         console.log(error)
     })

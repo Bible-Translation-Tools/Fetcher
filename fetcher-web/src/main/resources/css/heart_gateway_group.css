@@ -1,4 +1,4 @@
-.hero__page-info {
+.hero__page-info,.language_input_group,.bottom_section {
     width: 1240px; /* this number is calculated by the card size and border, regarding the number of cards on a row (4)*/
 }
 .active_toggle {
@@ -21,7 +21,6 @@ a.toggle_button:not(.active_toggle):hover {
 .language_input_group {
     display: flex;
     justify-content: space-between;
-    max-width: 1240px; /* this number is calculated by the card size and border, regarding the number of cards on a row (4)*/
     margin: 20px auto 30px;
 }
 .language_input_group > div {
@@ -51,11 +50,34 @@ a.toggle_button:not(.active_toggle):hover {
     float: right;
     max-width: 80%;
 }
+.bottom_section {
+    box-sizing: border-box;
+    margin: auto;
+    margin-bottom: 65px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #111A310D;
+    border-radius: 8px;
+    padding: 30px;
+}
+.bottom_section__title {
+    text-align: center;
+    color: #111A31;
+    font-size: 20px;
+    margin: auto;
+}
+.load_more_button {
+    width: 160px;
+    color: rgb(1, 90, 217);
+    border: 1px solid rgb(1, 90, 217);
+    margin-top: 25px;
+}
 /* --tablet layout 3 cards-- */
 @media only screen
 and (max-device-width: 1255px) /* below this number is the size of 3 cards*/
 {
-    .language_input_group,.hero__page-info {
+    .language_input_group,.hero__page-info,.bottom_section {
         max-width: 926px; /* this number is calculated by the card size and border, regarding the number of cards on a row */
     }
 }
@@ -63,7 +85,7 @@ and (max-device-width: 1255px) /* below this number is the size of 3 cards*/
 @media only screen
 and (max-device-width: 941px) /* below this number is the size of 2 cards*/
 {
-    .language_input_group,.hero__page-info {
+    .language_input_group,.hero__page-info,.bottom_section {
         max-width: 612px; /* this number is calculated by the card size and border, regarding the number of cards on a row */
     }
     .searchbar {
@@ -76,11 +98,14 @@ and (max-device-width: 941px) /* below this number is the size of 2 cards*/
 and (max-device-width: 767px)
 and (min-device-width: 320px)
 {
-    .hero__page-info {
-         max-width: 312px;
-     }
-    .language_input_group {
+    .hero__page-info,.language_input_group {
         max-width: 312px;
+     }
+    .bottom_section {
+        border-radius: unset;
+        max-width: 100%;
+    }
+    .language_input_group {
         width: 85%;
         align-items: center;
         flex-direction: column;
