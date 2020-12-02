@@ -19,11 +19,17 @@ jobs:
           java-version: '11' # The JDK version to make available on the path.
           java-package: jdk+fx # (jre, jdk, or jdk+fx) - defaults to jdk
           architecture: x64 # (x64 or x86) - defaults to x64
-
+      
       - name: Build the web jar
         shell: bash
         run: cd fetcher-web && ./gradlew check build && cd ..
-      
+
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
       - name: Build web image
         shell: bash
         run: docker build ./fetcher-web
@@ -37,6 +43,7 @@ jobs:
 
     runs-on: ubuntu-20.04
     if: github.event_name == 'push'
+    needs: [test]
 
     steps:
       - uses: actions/checkout@v2
