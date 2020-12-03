@@ -52,4 +52,11 @@ object DependencyResolver {
     val contentCache: ContentCacheAccessor = AvailabilityCacheAccessor(
         cacheBuilder
     )
+    val contentFetcher = FetchContent(
+        contentCache,
+        languageRepository,
+        chapterCatalog,
+        bookRepository,
+        storageAccess
+    )
 }

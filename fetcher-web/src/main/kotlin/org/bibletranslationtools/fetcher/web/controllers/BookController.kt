@@ -77,7 +77,8 @@ private fun booksView(
         resolver.bookRepository,
         resolver.storageAccess,
         params.languageCode,
-        params.productSlug
+        params.productSlug,
+        resolver.contentFetcher
     ).getViewDataList(path, resolver.contentCache, isGateway)
 
     return ThymeleafContent(

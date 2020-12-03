@@ -62,7 +62,7 @@ private fun productsView(
         )
     }
 
-    val model = FetchProductViewData(resolver.productCatalog, params.languageCode)
+    val model = FetchProductViewData(resolver.productCatalog, params.languageCode, resolver.contentFetcher)
     val languageName = getLanguageName(params.languageCode, resolver)
     val languageRoute = if (isGateway) GL_ROUTE else HL_ROUTE
 

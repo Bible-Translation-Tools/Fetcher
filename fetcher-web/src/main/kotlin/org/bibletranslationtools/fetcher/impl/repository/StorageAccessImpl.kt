@@ -10,6 +10,7 @@ import org.bibletranslationtools.fetcher.data.Division
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
+import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
 import org.slf4j.LoggerFactory
 
 class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : StorageAccess {
@@ -145,6 +146,20 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         // look for book files first, then chapters
         return hasBookFile(languageCode, resourceId, bookSlug, fileExtensionList) ||
                 hasChapterFile(languageCode, resourceId, bookSlug, fileExtensionList)
+    }
+
+    override fun hasProductContent(productSlug: String, languageCode: String): Boolean {
+        val sourceFileRootDir = directoryProvider.getContentRoot()
+        val root = sourceFileRootDir.listFiles(
+            File::isDirectory
+        )!!.find { it.name == languageCode }
+
+        return if (root == null) {
+            false
+        } else {
+            val fileExtension = ProductFileExtension.getType(productSlug)!!.fileType
+            root.walk().any { it.extension == fileExtension }
+        }
     }
 
     override fun allocateRCFileLocation(newFileName: String): File {

@@ -7,7 +7,8 @@ import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.LanguageViewData
 
 class FetchLanguageViewData(
-    private val languageRepo: LanguageRepository
+    private val languageRepo: LanguageRepository,
+    private val content: FetchContent
 ) {
     companion object {
         private const val DISPLAY_ITEMS_LIMIT = 30
@@ -48,7 +49,7 @@ class FetchLanguageViewData(
             .drop(currentIndex)
             .take(DISPLAY_ITEMS_LIMIT)
             .map {
-                val available = it.code in availableLanguageCodes
+                val available = content.isLanguageAvailable(it.code)
                 LanguageViewData(
                     code = it.code,
                     anglicizedName = it.anglicizedName,

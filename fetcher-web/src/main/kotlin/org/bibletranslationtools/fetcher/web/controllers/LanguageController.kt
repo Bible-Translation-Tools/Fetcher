@@ -83,7 +83,7 @@ private fun languagesView(
     isGateway: Boolean,
     resolver: DependencyResolver
 ): ThymeleafContent {
-    val model = FetchLanguageViewData(resolver.languageRepository)
+    val model = FetchLanguageViewData(resolver.languageRepository, resolver.contentFetcher)
     val languageList = if (isGateway) {
         model.getGLViewDataList(path, resolver.contentCache)
     } else {
@@ -106,8 +106,10 @@ private fun filterHeartLanguages(
     currentPath: String,
     resolver: DependencyResolver
 ): ThymeleafContent {
-    val resultLanguages = FetchLanguageViewData(resolver.languageRepository)
-        .filterHeartLanguages(query, currentPath, resolver.storageAccess)
+    val resultLanguages = FetchLanguageViewData(
+        resolver.languageRepository,
+        resolver.contentFetcher
+    ).filterHeartLanguages(query, currentPath, resolver.storageAccess)
 
     return ThymeleafContent(
         template = "fragments/language_list",
@@ -122,8 +124,10 @@ private fun loadMore(
     path: String,
     resolver: DependencyResolver
 ): ThymeleafContent {
-    val moreLanguages = FetchLanguageViewData(resolver.languageRepository)
-        .getHLViewDataList(path, resolver.storageAccess, currentIndex)
+    val moreLanguages = FetchLanguageViewData(
+        resolver.languageRepository,
+        resolver.contentFetcher
+    ).getHLViewDataList(path, resolver.storageAccess, currentIndex)
 
     return ThymeleafContent(
         template = "fragments/language_list",

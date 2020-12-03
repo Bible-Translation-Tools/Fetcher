@@ -7,4 +7,5 @@ interface LanguageRepository {
     fun getGatewayLanguages(): List<Language>
     fun getHeartLanguages(): List<Language>
     fun getLanguage(code: String): Language?
+    fun isGateway(code: String): Boolean
 }

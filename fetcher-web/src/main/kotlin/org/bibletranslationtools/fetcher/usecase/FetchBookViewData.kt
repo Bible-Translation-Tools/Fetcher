@@ -12,7 +12,8 @@ class FetchBookViewData(
     private val bookRepo: BookRepository,
     private val storage: StorageAccess,
     private val languageCode: String,
-    private val productSlug: String
+    private val productSlug: String,
+    private val content: FetchContent
 ) {
     private val resourceId = "ulb"
     private val product = ProductFileExtension.getType(productSlug)!!
@@ -38,16 +39,7 @@ class FetchBookViewData(
     ): List<BookViewData> {
         val books = bookRepo.getBooks(resourceId = resourceId, languageCode = languageCode)
         return books.map { book ->
-            book.availability = if (isGateway) {
-                cacheAccessor.isBookAvailable(book.slug, languageCode, productSlug)
-            } else {
-                storage.hasBookContent(
-                    languageCode,
-                    resourceId,
-                    book.slug,
-                    fileExtensionList
-                )
-            }
+            book.availability = content.isBookAvailable(book.slug, languageCode, productSlug)
 
             BookViewData(
                 index = book.index,
@@ -82,11 +74,20 @@ class FetchBookViewData(
         }
     }
 
+    fun hasBookContent(slug: String): Boolean {
+        return storage.hasBookContent(
+            languageCode,
+            resourceId,
+            slug,
+            fileExtensionList
+        )
+    }
+
     fun getBookDownloadUrl(bookSlug: String): String? {
         var url: String? = null
         for (priority in priorityList) {
             val fileAccessRequest = when (product) {
-                ProductFileExtension.ORATURE -> return "#"
+                ProductFileExtension.ORATURE -> return null
                 ProductFileExtension.BTTR -> getBTTRFileAccessRequest(bookSlug, priority)
                 ProductFileExtension.MP3 -> getMp3FileAccessRequest(bookSlug, priority)
             }

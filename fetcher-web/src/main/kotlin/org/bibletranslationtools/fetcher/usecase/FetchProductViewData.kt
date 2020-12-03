@@ -17,11 +17,7 @@ class FetchProductViewData(
         isGateway: Boolean
     ): List<ProductViewData> {
         return products.map {
-            val isAvailable = if (isGateway) {
-                cacheAccessor.isProductAvailable(it.slug, languageCode)
-            } else {
-                it.slug == ProductFileExtension.MP3.name.toLowerCase()
-            }
+            val isAvailable = content.isProductAvailable(it.slug, languageCode)
 
             ProductViewData(
                 slug = it.slug,
