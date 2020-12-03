@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="/static/language.css">
     <link rel="stylesheet" href="/static/heart_gateway_group.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <script th:if="${!isGateway}" type="text/javascript" src="/static/search-languages.js"></script>
+    <script th:if="${!isGateway}" type="text/javascript" src="/static/heart-languages.js"></script>
     <style id="cssFilter">/*css filter placeholder*/</style>
 </head>
 
@@ -44,7 +44,10 @@
     </div>
     <div th:replace="fragments/searchbar :: searchbar"></div>
 
-    <a href="#" class="toggle_button load_more_button">
+    <a href="javascript:void(0)"
+       class="toggle_button load_more_button"
+       onclick="loadMore(this)">
+
         <em class="material-icons">expand_more</em>
         <span th:text="#{show_more_languages}">Show More</span>
     </a>

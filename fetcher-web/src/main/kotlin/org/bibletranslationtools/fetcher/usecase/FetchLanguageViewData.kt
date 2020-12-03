@@ -38,12 +38,14 @@ class FetchLanguageViewData(
 
     fun getHLViewDataList(
         currentPath: String,
-        storage: StorageAccess
+        storage: StorageAccess,
+        currentIndex: Int = 0
     ): List<LanguageViewData> {
-        val languages = languageRepo.getHeartLanguages()
+        val languages = languageRepo.getAll()
         val availableLanguageCodes = storage.getLanguageCodes()
 
         return languages
+            .drop(currentIndex)
             .take(DISPLAY_ITEMS_LIMIT)
             .map {
                 val available = it.code in availableLanguageCodes
@@ -65,7 +67,7 @@ class FetchLanguageViewData(
         currentPath: String,
         storage: StorageAccess
     ): List<LanguageViewData> {
-        val heartLanguages = languageRepo.getHeartLanguages()
+        val heartLanguages = languageRepo.getAll()
         val resultLanguages = mutableSetOf<Language>()
 
         heartLanguages.filter {

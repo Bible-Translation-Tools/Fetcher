@@ -13,6 +13,22 @@ window.addEventListener('load', function() {
     })
 })
 
+function loadMore(element) {
+    let index = document.querySelector(".l-list-container").children.length
+    let url = `/hl/load-more?index=${index}`
+
+    fetch(url).then(response => {
+        if (!response.ok) {
+            throw new Error('An error occurred when requesting ' + url);
+        }
+        return response.text()
+    }).then(data => {
+        document.querySelector(".l-list-container").innerHTML += data
+    }).catch(error => {
+        console.log(error)
+    })
+}
+
 function search(event) {
     let targetId = event.target.getAttribute("data-target")
     let searchBox = document.querySelector("#" + targetId)
@@ -27,22 +43,18 @@ function search(event) {
         return
     }
 
-    let url = window.location.href + "?search=" + text
+    let url = window.location.href + "/filter?search=" + text
     fetch(url).then(response => {
         if (!response.ok) {
             throw new Error('An error occurred when requesting ' + url);
         }
         return response.text()
     }).then(data => {
-        renderSuccess(data)
+        document.querySelector(".l-list-container").innerHTML = data
         if (searchBox.id == "searchbar_2"){
             document.querySelector("body").scroll(0,0)
         }
     }).catch(error => {
         console.log(error)
     })
-}
-
-function renderSuccess(data) {
-    document.querySelector(".l-list-container").innerHTML = data
 }
