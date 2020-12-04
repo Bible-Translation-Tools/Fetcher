@@ -13,9 +13,10 @@ window.addEventListener('load', function() {
     })
 })
 
-function loadMore(element) {
-    let index = document.querySelector(".l-list-container").children.length
-    let url = `/hl/load-more?index=${index}`
+function loadMore() {
+    let listContainer = document.querySelector(".l-list-container")
+    let index = listContainer.children.length - listContainer.dataset.gatewayCount
+    let url = `/gl/load-more?index=${index}`
 
     fetch(url).then(response => {
         if (!response.ok) {
@@ -23,7 +24,7 @@ function loadMore(element) {
         }
         return response.text()
     }).then(data => {
-        document.querySelector(".l-list-container").innerHTML += data
+        listContainer.innerHTML += data
     }).catch(error => {
         console.log(error)
     })
@@ -43,7 +44,7 @@ function search(event) {
         return
     }
 
-    let url = window.location.href + "/filter?search=" + text
+    let url = window.location.href + "/filter?keyword=" + text
     fetch(url).then(response => {
         if (!response.ok) {
             throw new Error('An error occurred when requesting ' + url);

@@ -41,7 +41,7 @@ class FetchLanguageViewData(
         storage: StorageAccess,
         currentIndex: Int = 0
     ): List<LanguageViewData> {
-        val languages = languageRepo.getHeartLanguages()
+        val languages = languageRepo.getHeartLanguages() // load more is only applied to HL
         val availableLanguageCodes = storage.getLanguageCodes()
 
         return languages
