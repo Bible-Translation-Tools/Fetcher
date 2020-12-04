@@ -8,13 +8,13 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
+import java.lang.NumberFormatException
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchLanguageViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
 import org.bibletranslationtools.fetcher.web.controllers.utils.normalizeUrl
-import java.lang.NumberFormatException
 
 fun Routing.languageController(resolver: DependencyResolver) {
     route(GL_ROUTE) {
