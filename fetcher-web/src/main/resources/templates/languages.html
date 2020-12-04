@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" dir="ltr" th:dir="#{dir}">
 <head>
     <meta charset="UTF-8">
-    <title th:text="#{page_title}">Languages</title>
+    <title th:text="#{browser_title}">Languages</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="/static/img/fetcher_logo.png">
     <link rel="stylesheet" href="/static/common.css">
@@ -21,8 +21,7 @@
     <div th:insert="fragments/navbar :: navbar(${languagesNavUrl}, null, null)"></div>
 </div>
 
-<div th:insert="fragments/hero :: hero(#{page_title_gateway}, #{page_info_gateway})"></div>
-<div th:insert="fragments/hero :: hero(#{page_title_heart}, #{page_info_heart})"></div>
+<div th:insert="fragments/hero :: hero(#{header_title}, #{header_info})"></div>
 
 <div th:insert="fragments/searchbar :: searchbar"></div>
 
@@ -42,7 +41,7 @@
     <div th:replace="fragments/searchbar :: searchbar"></div>
 
     <a href="javascript:void(0)"
-       class="toggle_button load_more_button"
+       class="load_more_button"
        onclick="loadMore(this)">
 
         <em class="material-icons">expand_more</em>

@@ -33,7 +33,7 @@ fun Routing.languageController(resolver: DependencyResolver) {
         // Async request from client script
         get {
             val path = "/$GL_ROUTE"
-            val searchQuery = call.request.queryParameters["search"]
+            val searchQuery = call.request.queryParameters["keyword"]
 
             if (!searchQuery.isNullOrEmpty()) {
                 call.respond(filterLanguages(searchQuery, path, resolver))

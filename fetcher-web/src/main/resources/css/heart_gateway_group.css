@@ -1,11 +1,6 @@
 .hero__page-info,.bottom_section {
     width: 1240px; /* this number is calculated by the card size and border, regarding the number of cards on a row (4)*/
 }
-.searchbar {
-    box-sizing: border-box;
-    float: right;
-    max-width: 80%;
-}
 .bottom_section {
     box-sizing: border-box;
     margin: auto;
@@ -24,10 +19,22 @@
     margin: auto;
 }
 .load_more_button {
+    display: flex;
+    height: 38px;
     width: 160px;
+    margin-top: 25px;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
     color: rgb(1, 90, 217);
     border: 1px solid rgb(1, 90, 217);
-    margin-top: 25px;
+    border-radius: 4px;
+}
+.load_more_button span {
+    max-width: 70%;
+    white-space: nowrap;
+    overflow: hidden;
+    padding-left: 5px;
 }
 /* --tablet layout 3 cards-- */
 @media only screen
@@ -44,10 +51,6 @@ and (max-device-width: 941px) /* below this number is the size of 2 cards*/
     .hero__page-info,.bottom_section {
         max-width: 612px; /* this number is calculated by the card size and border, regarding the number of cards on a row */
     }
-    .searchbar {
-        width: 100%;
-        max-width: 298px;
-    }
 }
 /* --mobile layout for phones  */
 @media only screen
@@ -59,10 +62,6 @@ and (min-device-width: 320px)
      }
     .bottom_section {
         border-radius: unset;
-        max-width: 100%;
-    }
-    .searchbar {
-        float: none;
         max-width: 100%;
     }
 }
