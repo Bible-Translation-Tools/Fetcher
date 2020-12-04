@@ -33,7 +33,7 @@ fun Routing.bookController(resolver: DependencyResolver) {
                 productSlug = call.parameters[PRODUCT_PARAM_KEY]
             )
             call.respond(
-                booksView(params, path, resolver, true)
+                booksView(params, path, resolver)
             )
         }
     }
@@ -46,7 +46,7 @@ fun Routing.bookController(resolver: DependencyResolver) {
                 productSlug = call.parameters[PRODUCT_PARAM_KEY]
             )
             call.respond(
-                booksView(params, path, resolver, false)
+                booksView(params, path, resolver)
             )
         }
     }
@@ -55,8 +55,7 @@ fun Routing.bookController(resolver: DependencyResolver) {
 private fun booksView(
     params: UrlParameters,
     path: String,
-    resolver: DependencyResolver,
-    isGateway: Boolean
+    resolver: DependencyResolver
 ): ThymeleafContent {
     if (
         !validator.isLanguageCodeValid(params.languageCode) ||
@@ -71,6 +70,7 @@ private fun booksView(
 
     val languageName = getLanguageName(params.languageCode, resolver)
     val productTitle = getProductTitleKey(params.productSlug, resolver)
+    val isGateway = resolver.languageRepository.isGateway(params.languageCode)
     val languageRoute = if (isGateway) GL_ROUTE else HL_ROUTE
 
     val bookViewData = FetchBookViewData(

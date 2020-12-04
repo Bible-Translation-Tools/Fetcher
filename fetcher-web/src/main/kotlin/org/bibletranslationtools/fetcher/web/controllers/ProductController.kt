@@ -30,7 +30,7 @@ fun Routing.productController(resolver: DependencyResolver) {
                 languageCode = call.parameters[LANGUAGE_PARAM_KEY]
             )
             call.respond(
-                productsView(params, path, true, resolver)
+                productsView(params.languageCode, path, resolver)
             )
         }
     }
@@ -42,19 +42,18 @@ fun Routing.productController(resolver: DependencyResolver) {
                 languageCode = call.parameters[LANGUAGE_PARAM_KEY]
             )
             call.respond(
-                productsView(params, path, false, resolver)
+                productsView(params.languageCode, path, resolver)
             )
         }
     }
 }
 
 private fun productsView(
-    params: UrlParameters,
+    languageCode: String,
     path: String,
-    isGateway: Boolean,
     resolver: DependencyResolver
 ): ThymeleafContent {
-    if (!validator.isLanguageCodeValid(params.languageCode)) {
+    if (!validator.isLanguageCodeValid(languageCode)) {
         return errorPage(
             "invalid_route_parameter",
             "invalid_route_parameter_message",
@@ -62,8 +61,9 @@ private fun productsView(
         )
     }
 
-    val model = FetchProductViewData(resolver.productCatalog, params.languageCode)
-    val languageName = getLanguageName(params.languageCode, resolver)
+    val model = FetchProductViewData(resolver.productCatalog, languageCode)
+    val languageName = getLanguageName(languageCode, resolver)
+    val isGateway = resolver.languageRepository.isGateway(languageCode)
     val languageRoute = if (isGateway) GL_ROUTE else HL_ROUTE
 
     return ThymeleafContent(

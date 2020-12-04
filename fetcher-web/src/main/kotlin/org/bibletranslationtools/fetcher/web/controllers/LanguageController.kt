@@ -49,7 +49,7 @@ fun Routing.languageController(resolver: DependencyResolver) {
     route("$HL_ROUTE/filter") {
         // async request from client
         get {
-            val path = normalizeUrl(call.request.path())
+            val path = "/$HL_ROUTE"
             val searchQuery = call.request.queryParameters["search"]
 
             if (!searchQuery.isNullOrEmpty()) {
@@ -62,7 +62,7 @@ fun Routing.languageController(resolver: DependencyResolver) {
     route("$HL_ROUTE/load-more") {
         // async request from the client
         get {
-            val path = normalizeUrl(call.request.path())
+            val path = "/$HL_ROUTE"
             val index = try {
                 call.request.queryParameters["index"]?.toInt()
             } catch (ex: NumberFormatException) {

@@ -51,7 +51,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                 )
                 return@get
             }
-            call.respond(chaptersView(params, resolver, true))
+            call.respond(chaptersView(params, resolver))
         }
         route("{$CHAPTER_PARAM_KEY}") {
             oratureChapters(resolver)
@@ -76,7 +76,7 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                 )
                 return@get
             }
-            call.respond(chaptersView(params, resolver, false))
+            call.respond(chaptersView(params, resolver))
         }
     }
 }
@@ -115,10 +115,9 @@ private fun Route.oratureChapters(resolver: DependencyResolver) {
 
 private fun chaptersView(
     params: UrlParameters,
-    resolver: DependencyResolver,
-    isGateway: Boolean
+    resolver: DependencyResolver
 ): ThymeleafContent {
-
+    val isGateway = resolver.languageRepository.isGateway(params.languageCode)
     val bookViewData: BookViewData? = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,
