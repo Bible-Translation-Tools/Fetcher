@@ -7,7 +7,6 @@
     <link rel="icon" href="/static/img/fetcher_logo.png">
     <link rel="stylesheet" href="/static/common.css">
     <link rel="stylesheet" href="/static/language.css">
-    <link rel="stylesheet" href="/static/heart_gateway_group.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script type="text/javascript" src="/static/languages.js"></script>
     <style id="cssFilter">/*css filter placeholder*/</style>
@@ -25,7 +24,7 @@
 
 <div th:insert="fragments/searchbar :: searchbar"></div>
 
-<div class="l-list-container" th:data-gateway-count="${gatewayCount}">
+<div class="l-list-container" th:data-offset-count="${gatewayCount}">
     <div th:each="language: ${languageList}">
         <div th:insert="fragments/card :: card(${language.localizedName}, ${language.anglicizedName}, '', ${language.code}, ${language.url})"></div>
     </div>
@@ -36,7 +35,8 @@
         <p class="bottom_section__title">
             <b th:text="#{bottom_section_title}">You have reached the end of the list</b>
         </p>
-        <p align="center" th:text="#{bottom_section_info}">You may search for your language or continue browsing</p>
+        <p align="center" class="bottom_section__info"
+           th:text="#{bottom_section_info}">You may search for your language or continue browsing</p>
     </div>
     <div th:replace="fragments/searchbar :: searchbar"></div>
 

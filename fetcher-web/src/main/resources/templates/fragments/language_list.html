@@ -6,4 +6,5 @@
 <div th:each="language: ${languageList}">
     <div th:insert="fragments/card :: card(${language.localizedName}, ${language.anglicizedName}, '', ${language.code}, ${language.url})"></div>
 </div>
+<span id="isLast" th:if="${isLastResult}"></span>
 </html>

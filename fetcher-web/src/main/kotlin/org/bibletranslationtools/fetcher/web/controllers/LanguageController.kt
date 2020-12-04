@@ -34,11 +34,22 @@ fun Routing.languageController(resolver: DependencyResolver) {
         get {
             val path = "/$GL_ROUTE"
             val searchQuery = call.request.queryParameters["keyword"]
+            val index = try {
+                call.request.queryParameters["index"]?.toInt()
+            } catch (ex: NumberFormatException) {
+                null
+            }
 
-            if (!searchQuery.isNullOrEmpty()) {
-                call.respond(filterLanguages(searchQuery, path, resolver))
-            } else {
-                call.respond(HttpStatusCode.BadRequest)
+            return@get when {
+                !searchQuery.isNullOrEmpty() && index != null -> {
+                    call.respond(filterLanguages(searchQuery, path, resolver, index))
+                }
+                !searchQuery.isNullOrEmpty() -> {
+                    call.respond(filterLanguages(searchQuery, path, resolver))
+                }
+                else -> {
+                    call.respond(HttpStatusCode.BadRequest)
+                }
             }
         }
     }
@@ -66,8 +77,10 @@ private fun languagesView(
     resolver: DependencyResolver
 ): ThymeleafContent {
     val languageList = FetchLanguageViewData(
-        resolver.languageRepository
-    ).getViewDataList(path, resolver.contentCache)
+        resolver.languageRepository,
+        resolver.contentCache,
+        resolver.storageAccess
+    ).getViewDataList(path)
 
     return ThymeleafContent(
         template = "languages",
@@ -83,15 +96,22 @@ private fun languagesView(
 private fun filterLanguages(
     query: String,
     currentPath: String,
-    resolver: DependencyResolver
+    resolver: DependencyResolver,
+    currentIndex: Int = 0
 ): ThymeleafContent {
-    val resultLanguages = FetchLanguageViewData(resolver.languageRepository)
-        .filterLanguages(query, currentPath, resolver.storageAccess)
+    val resultLanguages = FetchLanguageViewData(
+        resolver.languageRepository,
+        resolver.contentCache,
+        resolver.storageAccess
+    ).filterLanguages(query, currentPath, currentIndex)
+
+    val isLastResult = resultLanguages.size < FetchLanguageViewData.DISPLAY_ITEMS_LIMIT
 
     return ThymeleafContent(
         template = "fragments/language_list",
         model = mapOf(
-            "languageList" to resultLanguages
+            "languageList" to resultLanguages,
+            "isLastResult" to isLastResult
         )
     )
 }
@@ -101,13 +121,19 @@ private fun loadMore(
     path: String,
     resolver: DependencyResolver
 ): ThymeleafContent {
-    val moreLanguages = FetchLanguageViewData(resolver.languageRepository)
-        .loadMoreLanguages(path, resolver.storageAccess, currentIndex)
+    val moreLanguages = FetchLanguageViewData(
+        resolver.languageRepository,
+        resolver.contentCache,
+        resolver.storageAccess
+    ).loadMoreLanguages(path, currentIndex)
+
+    val isLastResult = moreLanguages.size < FetchLanguageViewData.DISPLAY_ITEMS_LIMIT
 
     return ThymeleafContent(
         template = "fragments/language_list",
         model = mapOf(
-            "languageList" to moreLanguages
+            "languageList" to moreLanguages,
+            "isLastResult" to isLastResult
         )
     )
 }
