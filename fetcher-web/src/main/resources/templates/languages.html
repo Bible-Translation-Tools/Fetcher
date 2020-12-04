@@ -24,10 +24,7 @@
 <div th:if="${isGateway}" th:insert="fragments/hero :: hero(#{page_title_gateway}, #{page_info_gateway})"></div>
 <div th:unless="${isGateway}" th:insert="fragments/hero :: hero(#{page_title_heart}, #{page_info_heart})"></div>
 
-<div class="language_input_group">
-    <div th:insert="fragments/language_toggle :: language_toggle(${isGateway})"></div>
-    <div th:insert="fragments/searchbar :: searchbar"></div>
-</div>
+<div th:insert="fragments/searchbar :: searchbar"></div>
 
 <div class="l-list-container">
     <div th:each="language: ${languageList}">
