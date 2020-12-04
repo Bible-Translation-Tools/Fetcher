@@ -20,7 +20,6 @@ import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.BOOK_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.CHAPTER_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
-import org.bibletranslationtools.fetcher.web.controllers.utils.HL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.PRODUCT_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
@@ -55,28 +54,6 @@ fun Routing.chapterController(resolver: DependencyResolver) {
         }
         route("{$CHAPTER_PARAM_KEY}") {
             oratureChapters(resolver)
-        }
-    }
-    route("/$HL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}/{$BOOK_PARAM_KEY}") {
-        get {
-            // chapters page
-            val params = UrlParameters(
-                languageCode = call.parameters[LANGUAGE_PARAM_KEY],
-                productSlug = call.parameters[PRODUCT_PARAM_KEY],
-                bookSlug = call.parameters[BOOK_PARAM_KEY]
-            )
-
-            if (!validateParameters(params)) {
-                call.respond(
-                    errorPage(
-                        "invalid_route_parameter",
-                        "invalid_route_parameter_message",
-                        HttpStatusCode.NotFound
-                    )
-                )
-                return@get
-            }
-            call.respond(chaptersView(params, resolver))
         }
     }
 }
@@ -150,7 +127,6 @@ private fun chaptersView(
     } else {
         val languageName = getLanguageName(params.languageCode, resolver)
         val productTitle = getProductTitleKey(params.productSlug, resolver)
-        val languageRoute = if (isGateway) GL_ROUTE else HL_ROUTE
         val isRequestLink =
             ProductFileExtension.getType(params.productSlug) == ProductFileExtension.ORATURE
 
@@ -160,11 +136,11 @@ private fun chaptersView(
                 "book" to bookViewData,
                 "chapterList" to chapterViewDataList,
                 "languagesNavTitle" to languageName,
-                "languagesNavUrl" to "/$languageRoute",
+                "languagesNavUrl" to "/$GL_ROUTE",
                 "fileTypesNavTitle" to productTitle,
-                "fileTypesNavUrl" to "/$languageRoute/${params.languageCode}",
+                "fileTypesNavUrl" to "/$GL_ROUTE/${params.languageCode}",
                 "booksNavTitle" to bookViewData.localizedName,
-                "booksNavUrl" to "/$languageRoute/${params.languageCode}/${params.productSlug}",
+                "booksNavUrl" to "/$GL_ROUTE/${params.languageCode}/${params.productSlug}",
                 "isRequestLink" to isRequestLink
             ),
             locale = getPreferredLocale(contentLanguage, "chapters")

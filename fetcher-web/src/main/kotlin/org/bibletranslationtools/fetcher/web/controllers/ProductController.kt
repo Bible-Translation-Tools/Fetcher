@@ -11,7 +11,6 @@ import io.ktor.routing.route
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
-import org.bibletranslationtools.fetcher.web.controllers.utils.HL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
@@ -23,18 +22,6 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.validator
 
 fun Routing.productController(resolver: DependencyResolver) {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}") {
-        get {
-            // products page
-            val path = normalizeUrl(call.request.path())
-            val params = UrlParameters(
-                languageCode = call.parameters[LANGUAGE_PARAM_KEY]
-            )
-            call.respond(
-                productsView(params.languageCode, path, resolver)
-            )
-        }
-    }
-    route("/$HL_ROUTE/{$LANGUAGE_PARAM_KEY}") {
         get {
             // products page
             val path = normalizeUrl(call.request.path())
@@ -61,17 +48,18 @@ private fun productsView(
         )
     }
 
-    val model = FetchProductViewData(resolver.productCatalog, languageCode)
     val languageName = getLanguageName(languageCode, resolver)
     val isGateway = resolver.languageRepository.isGateway(languageCode)
-    val languageRoute = if (isGateway) GL_ROUTE else HL_ROUTE
+    val productList = FetchProductViewData(
+        resolver.productCatalog, languageCode
+    ).getListViewData(path, resolver.contentCache, isGateway)
 
     return ThymeleafContent(
         template = "products",
         model = mapOf(
-            "productList" to model.getListViewData(path, resolver.contentCache, isGateway),
+            "productList" to productList,
             "languagesNavTitle" to languageName,
-            "languagesNavUrl" to "/$languageRoute",
+            "languagesNavUrl" to "/$GL_ROUTE",
             "fileTypesNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "products")

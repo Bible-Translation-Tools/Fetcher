@@ -11,7 +11,6 @@ import io.ktor.routing.route
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchLanguageViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
-import org.bibletranslationtools.fetcher.web.controllers.utils.HL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
 import org.bibletranslationtools.fetcher.web.controllers.utils.normalizeUrl
@@ -25,44 +24,28 @@ fun Routing.languageController(resolver: DependencyResolver) {
             call.respond(
                 languagesView(
                     path,
-                    true,
                     resolver
                 )
             )
         }
     }
-
-    route(HL_ROUTE) {
-        // async request from client
+    route("$GL_ROUTE/filter") {
+        // Async request from client script
         get {
-            val path = normalizeUrl(call.request.path())
-
-            call.respond(
-                languagesView(
-                    path,
-                    false,
-                    resolver
-                )
-            )
-        }
-    }
-    route("$HL_ROUTE/filter") {
-        // async request from client
-        get {
-            val path = "/$HL_ROUTE"
+            val path = "/$GL_ROUTE"
             val searchQuery = call.request.queryParameters["search"]
 
             if (!searchQuery.isNullOrEmpty()) {
-                call.respond(filterHeartLanguages(searchQuery, path, resolver))
+                call.respond(filterLanguages(searchQuery, path, resolver))
             } else {
                 call.respond(HttpStatusCode.BadRequest)
             }
         }
     }
-    route("$HL_ROUTE/load-more") {
-        // async request from the client
+    route("$GL_ROUTE/load-more") {
+        // Async request from the client script
         get {
-            val path = "/$HL_ROUTE"
+            val path = "/$GL_ROUTE"
             val index = try {
                 call.request.queryParameters["index"]?.toInt()
             } catch (ex: NumberFormatException) {
@@ -80,34 +63,29 @@ fun Routing.languageController(resolver: DependencyResolver) {
 
 private fun languagesView(
     path: String,
-    isGateway: Boolean,
     resolver: DependencyResolver
 ): ThymeleafContent {
-    val model = FetchLanguageViewData(resolver.languageRepository)
-    val languageList = if (isGateway) {
-        model.getGLViewDataList(path, resolver.contentCache)
-    } else {
-        model.getHLViewDataList(path, resolver.storageAccess)
-    }
+    val languageList = FetchLanguageViewData(
+        resolver.languageRepository
+    ).getViewDataList(path, resolver.contentCache)
 
     return ThymeleafContent(
         template = "languages",
         model = mapOf(
             "languageList" to languageList,
-            "languagesNavUrl" to "#",
-            "isGateway" to isGateway
+            "languagesNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "languages")
     )
 }
 
-private fun filterHeartLanguages(
+private fun filterLanguages(
     query: String,
     currentPath: String,
     resolver: DependencyResolver
 ): ThymeleafContent {
     val resultLanguages = FetchLanguageViewData(resolver.languageRepository)
-        .filterHeartLanguages(query, currentPath, resolver.storageAccess)
+        .filterLanguages(query, currentPath, resolver.storageAccess)
 
     return ThymeleafContent(
         template = "fragments/language_list",
@@ -123,7 +101,7 @@ private fun loadMore(
     resolver: DependencyResolver
 ): ThymeleafContent {
     val moreLanguages = FetchLanguageViewData(resolver.languageRepository)
-        .getHLViewDataList(path, resolver.storageAccess, currentIndex)
+        .loadMoreLanguages(path, resolver.storageAccess, currentIndex)
 
     return ThymeleafContent(
         template = "fragments/language_list",

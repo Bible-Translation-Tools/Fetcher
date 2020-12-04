@@ -14,7 +14,7 @@ class FetchLanguageViewData(
         private const val SEARCH_RESULT_TAKE = 20
     }
 
-    fun getGLViewDataList(
+    fun getViewDataList(
         currentPath: String,
         contentCache: ContentCacheAccessor
     ): List<LanguageViewData> {
@@ -36,12 +36,12 @@ class FetchLanguageViewData(
         }
     }
 
-    fun getHLViewDataList(
+    fun loadMoreLanguages(
         currentPath: String,
         storage: StorageAccess,
         currentIndex: Int = 0
     ): List<LanguageViewData> {
-        val languages = languageRepo.getAll()
+        val languages = languageRepo.getHeartLanguages()
         val availableLanguageCodes = storage.getLanguageCodes()
 
         return languages
@@ -62,7 +62,7 @@ class FetchLanguageViewData(
             }
     }
 
-    fun filterHeartLanguages(
+    fun filterLanguages(
         query: String,
         currentPath: String,
         storage: StorageAccess

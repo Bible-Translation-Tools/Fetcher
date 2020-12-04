@@ -11,7 +11,6 @@ import io.ktor.routing.route
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
-import org.bibletranslationtools.fetcher.web.controllers.utils.HL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.PRODUCT_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
@@ -25,19 +24,6 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.validator
 
 fun Routing.bookController(resolver: DependencyResolver) {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}") {
-        get {
-            // books page
-            val path = normalizeUrl(call.request.path())
-            val params = UrlParameters(
-                languageCode = call.parameters[LANGUAGE_PARAM_KEY],
-                productSlug = call.parameters[PRODUCT_PARAM_KEY]
-            )
-            call.respond(
-                booksView(params, path, resolver)
-            )
-        }
-    }
-    route("/$HL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}") {
         get {
             // books page
             val path = normalizeUrl(call.request.path())
@@ -71,7 +57,6 @@ private fun booksView(
     val languageName = getLanguageName(params.languageCode, resolver)
     val productTitle = getProductTitleKey(params.productSlug, resolver)
     val isGateway = resolver.languageRepository.isGateway(params.languageCode)
-    val languageRoute = if (isGateway) GL_ROUTE else HL_ROUTE
 
     val bookViewData = FetchBookViewData(
         resolver.bookRepository,
@@ -85,9 +70,9 @@ private fun booksView(
         model = mapOf(
             "bookList" to bookViewData,
             "languagesNavTitle" to languageName,
-            "languagesNavUrl" to "/$languageRoute",
+            "languagesNavUrl" to "/$GL_ROUTE",
             "fileTypesNavTitle" to productTitle,
-            "fileTypesNavUrl" to "/$languageRoute/${params.languageCode}",
+            "fileTypesNavUrl" to "/$GL_ROUTE/${params.languageCode}",
             "booksNavUrl" to "#"
         ),
         locale = getPreferredLocale(contentLanguage, "books")
