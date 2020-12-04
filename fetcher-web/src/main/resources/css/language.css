@@ -132,11 +132,8 @@ and (min-device-width: 320px)
         display: none;
     }
 }
-
 .bottom_section {
     width: 1240px; /* this number is calculated by the card size and border, regarding the number of cards on a row (4)*/
-}
-.bottom_section {
     box-sizing: border-box;
     margin: auto;
     margin-bottom: 65px;
@@ -152,6 +149,9 @@ and (min-device-width: 320px)
     color: #111A31;
     font-size: 20px;
     line-height: 1.5;
+}
+.bottom_section__info {
+    text-align: center;
 }
 .load_more_button {
     display: flex;
