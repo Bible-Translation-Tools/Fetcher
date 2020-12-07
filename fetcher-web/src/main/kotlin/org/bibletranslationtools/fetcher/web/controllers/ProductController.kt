@@ -48,17 +48,16 @@ private fun productsView(
         )
     }
 
-    val languageName = getLanguageName(languageCode, resolver)
-    val isGateway = resolver.languageRepository.getLanguage(languageCode)!!.isGateway
+    val language = resolver.languageRepository.getLanguage(languageCode)!!
     val productList = FetchProductViewData(
         resolver.productCatalog, languageCode
-    ).getListViewData(path, resolver.contentCache, isGateway)
+    ).getListViewData(path, resolver.contentCache, language.isGateway)
 
     return ThymeleafContent(
         template = "products",
         model = mapOf(
             "productList" to productList,
-            "languagesNavTitle" to languageName,
+            "languagesNavTitle" to language.localizedName,
             "languagesNavUrl" to "/$GL_ROUTE",
             "fileTypesNavUrl" to "#"
         ),

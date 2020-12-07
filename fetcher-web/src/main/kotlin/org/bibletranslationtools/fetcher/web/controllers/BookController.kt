@@ -16,9 +16,7 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.PRODUCT_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
-import org.bibletranslationtools.fetcher.web.controllers.utils.getLanguageName
 import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
-import org.bibletranslationtools.fetcher.web.controllers.utils.getProductTitleKey
 import org.bibletranslationtools.fetcher.web.controllers.utils.normalizeUrl
 import org.bibletranslationtools.fetcher.web.controllers.utils.validator
 
@@ -31,6 +29,7 @@ fun Routing.bookController(resolver: DependencyResolver) {
                 languageCode = call.parameters[LANGUAGE_PARAM_KEY],
                 productSlug = call.parameters[PRODUCT_PARAM_KEY]
             )
+
             call.respond(
                 booksView(params, path, resolver)
             )
@@ -53,25 +52,23 @@ private fun booksView(
             HttpStatusCode.NotFound
         )
     }
-
-    val languageName = getLanguageName(params.languageCode, resolver)
-    val productTitle = getProductTitleKey(params.productSlug, resolver)
-    val isGateway = resolver.languageRepository.getLanguage(params.languageCode)!!.isGateway
+    val language = resolver.languageRepository.getLanguage(params.languageCode)!!
+    val product = resolver.productCatalog.getProduct(params.productSlug)!!
 
     val bookViewData = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,
-        params.languageCode,
-        params.productSlug
-    ).getViewDataList(path, resolver.contentCache, isGateway)
+        language,
+        product
+    ).getViewDataList(path, resolver.contentCache, language.isGateway)
 
     return ThymeleafContent(
         template = "books",
         model = mapOf(
             "bookList" to bookViewData,
-            "languagesNavTitle" to languageName,
+            "languagesNavTitle" to language.localizedName,
             "languagesNavUrl" to "/$GL_ROUTE",
-            "fileTypesNavTitle" to productTitle,
+            "fileTypesNavTitle" to product.titleKey,
             "fileTypesNavUrl" to "/$GL_ROUTE/${params.languageCode}",
             "booksNavUrl" to "#"
         ),
