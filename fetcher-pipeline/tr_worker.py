@@ -24,7 +24,7 @@ class TrWorker:
         self.__chapter_tr_files = []
 
         self.__verse_regex = r'_c[\d]+_v[\d]+(?:_t[\d]+)?\..*$'
-        self.__tr_regex = r'^.*?\/.*?\/.*?\/.*?(?:\/([\d]+))?\/CONTENTS\/tr\/(?:wav|mp3)(?:\/(?:hi|low))?\/verse'
+        self.__tr_regex = r'^.*?(?:\/([\d]+))?\/CONTENTS\/tr\/(?:wav|mp3)(?:\/(?:hi|low))?\/verse'
 
         self.verbose = verbose
 
@@ -37,6 +37,7 @@ class TrWorker:
         logging.debug("TR worker started!")
 
         self.clear_report()
+        self.clear_data()
         self.__temp_dir = init_temp_dir()
 
         existent_tr = self.find_existent_tr()
@@ -220,6 +221,10 @@ class TrWorker:
             "resources_deleted": self.resources_deleted
         }
         return report
+
+    def clear_data(self):
+        self.__book_tr_files = []
+        self.__chapter_tr_files = []
 
     def clear_report(self):
         self.resources_created.clear()

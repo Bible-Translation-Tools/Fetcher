@@ -3,6 +3,7 @@ import logging
 import os
 from argparse import Namespace
 from pathlib import Path
+from pprint import pprint
 from time import sleep
 from typing import Tuple, List
 
@@ -11,6 +12,7 @@ import sentry_sdk
 from chapter_worker import ChapterWorker
 from tr_worker import TrWorker
 from verse_worker import VerseWorker
+from book_worker import BookWorker
 
 
 class App:
@@ -27,6 +29,7 @@ class App:
         chapter_worker = ChapterWorker(self.__ftp_dir, self.verbose)
         verse_worker = VerseWorker(self.__ftp_dir, self.verbose)
         tr_worker = TrWorker(self.__ftp_dir, self.verbose)
+        book_worker = BookWorker(self.__ftp_dir, self.verbose)
 
         wait_timer = (self.hour * 3600) + (self.minute * 60)
 
@@ -38,12 +41,14 @@ class App:
             chapter_worker.execute()
             verse_worker.execute()
             tr_worker.execute()
+            book_worker.execute()
 
             report = self.get_report(
                 (
                     chapter_worker.get_report(),
                     verse_worker.get_report(),
-                    tr_worker.get_report()
+                    tr_worker.get_report(),
+                    book_worker.get_report()
                 )
             )
             if report is not None:
@@ -54,6 +59,8 @@ class App:
     @staticmethod
     def get_report(reports):
         """ Generate workers report """
+
+        pprint(reports)
 
         report = {
             "resources_created": [],

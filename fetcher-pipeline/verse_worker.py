@@ -5,6 +5,7 @@ from typing import Dict
 
 from file_utils import init_temp_dir, rm_tree, copy_file, check_file_exists, rel_path
 from process_tools import fix_metadata, convert_to_mp3
+from constants import *
 
 
 class VerseWorker:
@@ -65,18 +66,24 @@ class VerseWorker:
             fix_metadata(target_file, self.verbose)
 
             # Convert verse into mp3
-            self.convert_verse(target_file, remote_dir, grouping)
+            self.convert_verse_wav(target_file, remote_dir, grouping, 'hi')
+            self.convert_verse_wav(target_file, remote_dir, grouping, 'low')
 
         logging.debug(f'Deleting temporary directory {self.__temp_dir}')
         rm_tree(self.__temp_dir)
 
         logging.debug('Verse worker finished!')
 
-    def convert_verse(self, verse_file: Path, remote_dir: Path, grouping: str):
+    def convert_verse_wav(self, verse_file: Path, remote_dir: Path, grouping: str, quality: str):
         """ Convert verse wav file and copy to remote directory """
 
+        if verse_file.suffix != '.wav':
+            pass
+
+        bitrate = BITRATE_HIGH if quality == 'hi' else BITRATE_LOW
+
         logging.debug(f'Converting verse: {verse_file}')
-        convert_to_mp3(verse_file, self.verbose)
+        convert_to_mp3(verse_file, bitrate, False, self.verbose)
 
         # Copy converted verse file (mp3 and cue)
         mp3_file = verse_file.with_suffix('.mp3')
@@ -84,7 +91,7 @@ class VerseWorker:
             f'Copying verse mp3 {mp3_file} into {remote_dir}'
         )
         if mp3_file.exists():
-            m_file = copy_file(mp3_file, remote_dir, grouping)
+            m_file = copy_file(mp3_file, remote_dir, grouping, quality)
             self.resources_created.append(str(rel_path(m_file, self.__ftp_dir)))
 
         cue_file = verse_file.with_suffix('.cue')
