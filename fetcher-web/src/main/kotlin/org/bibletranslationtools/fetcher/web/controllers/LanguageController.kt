@@ -5,6 +5,7 @@ import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.request.path
 import io.ktor.response.respond
+import io.ktor.routing.Route
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
@@ -31,43 +32,51 @@ fun Routing.languageController(resolver: DependencyResolver) {
     }
     route("$GL_ROUTE/filter") {
         // Async request from client script
-        get {
-            val path = "/$GL_ROUTE"
-            val searchQuery = call.request.queryParameters["keyword"]
-            val index = try {
-                call.request.queryParameters["index"]?.toInt()
-            } catch (ex: NumberFormatException) {
-                null
-            }
-
-            return@get when {
-                !searchQuery.isNullOrEmpty() && index != null -> {
-                    call.respond(filterLanguages(searchQuery, path, resolver, index))
-                }
-                !searchQuery.isNullOrEmpty() -> {
-                    call.respond(filterLanguages(searchQuery, path, resolver))
-                }
-                else -> {
-                    call.respond(HttpStatusCode.BadRequest)
-                }
-            }
-        }
+        searchFilter(resolver)
     }
     route("$GL_ROUTE/load-more") {
         // Async request from the client script
-        get {
-            val path = "/$GL_ROUTE"
-            val index = try {
-                call.request.queryParameters["index"]?.toInt()
-            } catch (ex: NumberFormatException) {
-                null
-            }
+        loadMoreLanguages(resolver)
+    }
+}
 
-            if (index == null) {
-                call.respond(HttpStatusCode.BadRequest)
-            } else {
-                call.respond(loadMore(index, path, resolver))
+private fun Route.searchFilter(resolver: DependencyResolver) {
+    get {
+        val path = "/$GL_ROUTE"
+        val searchQuery = call.request.queryParameters["keyword"]
+        val index = try {
+            call.request.queryParameters["index"]?.toInt()
+        } catch (ex: NumberFormatException) {
+            null
+        }
+
+        return@get when {
+            !searchQuery.isNullOrEmpty() && index != null -> {
+                call.respond(filterLanguages(searchQuery, path, resolver, index))
             }
+            !searchQuery.isNullOrEmpty() -> {
+                call.respond(filterLanguages(searchQuery, path, resolver))
+            }
+            else -> {
+                call.respond(HttpStatusCode.BadRequest)
+            }
+        }
+    }
+}
+
+private fun Route.loadMoreLanguages(resolver: DependencyResolver) {
+    get {
+        val path = "/$GL_ROUTE"
+        val index = try {
+            call.request.queryParameters["index"]?.toInt()
+        } catch (ex: NumberFormatException) {
+            null
+        }
+
+        if (index == null) {
+            call.respond(HttpStatusCode.BadRequest)
+        } else {
+            call.respond(loadMore(index, path, resolver))
         }
     }
 }
