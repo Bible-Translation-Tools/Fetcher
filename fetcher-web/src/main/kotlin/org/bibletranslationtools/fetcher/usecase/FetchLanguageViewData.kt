@@ -44,23 +44,9 @@ class FetchLanguageViewData(
         currentPath: String,
         currentIndex: Int = 0
     ): List<LanguageViewData> {
-        val heartLanguages = languageRepo.getAll()
-        val resultLanguages = mutableSetOf<Language>()
+        val result = getMatchingLanguages(query, languageRepo.getAll())
 
-        heartLanguages.filter {
-            it.code.contains(query.toLowerCase())
-        }.forEach {
-            resultLanguages.add(it)
-        }
-
-        val choices = heartLanguages.flatMap { listOf(it.localizedName, it.anglicizedName) }
-        val matchingResult = fuzzyMatching(query, choices, MATCHING_RESULT_TAKE)
-
-        heartLanguages.filter {
-            it.anglicizedName in matchingResult || it.localizedName in matchingResult
-        }.forEach { resultLanguages.add(it) }
-
-        return resultLanguages
+        return result
             .drop(currentIndex)
             .take(DISPLAY_ITEMS_LIMIT)
             .map {
@@ -77,6 +63,27 @@ class FetchLanguageViewData(
                     }
                 )
             }
+    }
+
+    private fun getMatchingLanguages(
+        query: String,
+        languages: List<Language>
+    ): List<Language> {
+        val matchingLanguages = mutableSetOf<Language>()
+
+        languages.filter {
+            it.code.contains(query.toLowerCase())
+        }.forEach {
+            matchingLanguages.add(it)
+        }
+
+        val choices = languages.flatMap { listOf(it.localizedName, it.anglicizedName) }
+        val matchingResult = fuzzyMatching(query, choices, MATCHING_RESULT_TAKE)
+        languages.filter {
+            it.anglicizedName in matchingResult || it.localizedName in matchingResult
+        }.forEach { matchingLanguages.add(it) }
+
+        return matchingLanguages.toList()
     }
 
     fun loadMoreLanguages(
