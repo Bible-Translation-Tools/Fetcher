@@ -49,8 +49,39 @@ class FetchLanguageViewData(
             .drop(currentIndex)
             .take(DISPLAY_ITEMS_LIMIT)
             .map {
-                val available = it.code in languageCodesFromStorage ||
-                        contentCache.isLanguageAvailable(it.code)
+                val available = if (it.isGateway) {
+                    contentCache.isLanguageAvailable(it.code)
+                } else {
+                    it.code in languageCodesFromStorage
+                }
+
+                LanguageViewData(
+                    code = it.code,
+                    anglicizedName = it.anglicizedName,
+                    localizedName = it.localizedName,
+                    url = if (available) {
+                        "$currentPath/${it.code}"
+                    } else {
+                        null
+                    }
+                )
+            }
+    }
+
+    fun loadMoreLanguages(
+        currentPath: String,
+        currentIndex: Int = 0
+    ): List<LanguageViewData> {
+        if (currentIndex < 0) return listOf()
+
+        // load more (default) is only applied to HL
+        val languages = languageRepo.getHeartLanguages()
+
+        return languages
+            .drop(currentIndex)
+            .take(DISPLAY_ITEMS_LIMIT)
+            .map {
+                val available = it.code in languageCodesFromStorage
                 LanguageViewData(
                     code = it.code,
                     anglicizedName = it.anglicizedName,
@@ -83,32 +114,5 @@ class FetchLanguageViewData(
         }.forEach { matchingLanguages.add(it) }
 
         return matchingLanguages.toList()
-    }
-
-    fun loadMoreLanguages(
-        currentPath: String,
-        currentIndex: Int = 0
-    ): List<LanguageViewData> {
-        if (currentIndex < 0) return listOf()
-
-        // load more (default) is only applied to HL
-        val languages = languageRepo.getHeartLanguages()
-
-        return languages
-            .drop(currentIndex)
-            .take(DISPLAY_ITEMS_LIMIT)
-            .map {
-                val available = it.code in languageCodesFromStorage
-                LanguageViewData(
-                    code = it.code,
-                    anglicizedName = it.anglicizedName,
-                    localizedName = it.localizedName,
-                    url = if (available) {
-                        "$currentPath/${it.code}"
-                    } else {
-                        null
-                    }
-                )
-            }
     }
 }
