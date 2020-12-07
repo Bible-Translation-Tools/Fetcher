@@ -35,7 +35,7 @@ fun Routing.languageController(resolver: DependencyResolver) {
         searchFilter(resolver)
     }
     route("$GL_ROUTE/load-more") {
-        // Async request from the client script
+        // Async request from client script
         loadMoreLanguages(resolver)
     }
 }
