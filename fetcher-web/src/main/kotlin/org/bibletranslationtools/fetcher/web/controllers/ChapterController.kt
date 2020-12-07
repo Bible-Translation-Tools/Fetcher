@@ -94,7 +94,7 @@ private fun chaptersView(
     params: UrlParameters,
     resolver: DependencyResolver
 ): ThymeleafContent {
-    val isGateway = resolver.languageRepository.isGateway(params.languageCode)
+    val isGateway = resolver.languageRepository.getLanguage(params.languageCode)!!.isGateway
     val bookViewData: BookViewData? = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,

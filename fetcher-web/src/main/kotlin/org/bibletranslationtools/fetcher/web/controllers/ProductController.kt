@@ -49,7 +49,7 @@ private fun productsView(
     }
 
     val languageName = getLanguageName(languageCode, resolver)
-    val isGateway = resolver.languageRepository.isGateway(languageCode)
+    val isGateway = resolver.languageRepository.getLanguage(languageCode)!!.isGateway
     val productList = FetchProductViewData(
         resolver.productCatalog, languageCode
     ).getListViewData(path, resolver.contentCache, isGateway)

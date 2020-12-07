@@ -56,7 +56,7 @@ private fun booksView(
 
     val languageName = getLanguageName(params.languageCode, resolver)
     val productTitle = getProductTitleKey(params.productSlug, resolver)
-    val isGateway = resolver.languageRepository.isGateway(params.languageCode)
+    val isGateway = resolver.languageRepository.getLanguage(params.languageCode)!!.isGateway
 
     val bookViewData = FetchBookViewData(
         resolver.bookRepository,

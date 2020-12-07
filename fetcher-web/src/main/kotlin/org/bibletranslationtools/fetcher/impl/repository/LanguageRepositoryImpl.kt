@@ -23,8 +23,4 @@ class LanguageRepositoryImpl(
     override fun getLanguage(code: String): Language? {
         return getAll().firstOrNull { it.code == code }
     }
-
-    override fun isGateway(code: String): Boolean {
-        return getGatewayLanguages().any { it.code == code }
-    }
 }

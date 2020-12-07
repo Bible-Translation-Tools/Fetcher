@@ -46,11 +46,7 @@ class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
                 !it.isGateway
             }
             .map {
-                Language(
-                    it.code,
-                    it.anglicizedName,
-                    it.localizedName
-                )
+                Language(it.code, it.anglicizedName, it.localizedName, isGateway = false)
             }
     }
 

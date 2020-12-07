@@ -9,8 +9,7 @@ import org.bibletranslationtools.fetcher.usecase.viewdata.LanguageViewData
 class FetchLanguageViewData(
     private val languageRepo: LanguageRepository,
     private val contentCache: ContentCacheAccessor,
-    private val storage: StorageAccess
-
+    storage: StorageAccess
 ) {
     companion object {
         const val DISPLAY_ITEMS_LIMIT = 30
@@ -44,19 +43,19 @@ class FetchLanguageViewData(
         currentPath: String,
         currentIndex: Int = 0
     ): List<LanguageViewData> {
-        val heartLanguages = languageRepo.getAll()
+        val languageList = languageRepo.getAll()
         val resultLanguages = mutableSetOf<Language>()
 
-        heartLanguages.filter {
+        languageList.filter {
             it.code.contains(query.toLowerCase())
         }.forEach {
             resultLanguages.add(it)
         }
 
-        val choices = heartLanguages.flatMap { listOf(it.localizedName, it.anglicizedName) }
+        val choices = languageList.flatMap { listOf(it.localizedName, it.anglicizedName) }
         val matchingResult = fuzzyMatching(query, choices, MATCHING_RESULT_TAKE)
 
-        heartLanguages.filter {
+        languageList.filter {
             it.anglicizedName in matchingResult || it.localizedName in matchingResult
         }.forEach { resultLanguages.add(it) }
 
