@@ -25,10 +25,12 @@ class BookWorker:
     def execute(self):
         """ Execute worker """
 
-        logging.debug("Book worker started!")
+        logging.debug("-------------------------------")
+        logging.debug("----- Book worker started! ----")
+        logging.debug("-------------------------------")
 
         self.clear_report()
-        self.clear_data()
+        self.clear_cache()
         self.__temp_dir = init_temp_dir()
 
         existent_books = self.find_existent_books()
@@ -73,7 +75,7 @@ class BookWorker:
         logging.debug(f'Deleting temporary directory {self.__temp_dir}')
         rm_tree(self.__temp_dir)
 
-        logging.debug('TR worker finished!')
+        logging.debug('Book worker finished!')
 
     def find_existent_books(self) -> List[Path]:
         """ Find book files that exist in the remote directory """
@@ -87,7 +89,7 @@ class BookWorker:
         return existent_books
 
     def group_book_files(self) -> Dict[str, List[Path]]:
-        """ Group files into Book groups """
+        """ Group files into book groups """
 
         dic = {}
         root_parts = self.__ftp_dir.parts
@@ -155,10 +157,11 @@ class BookWorker:
     @staticmethod
     def merge_audio(target: Path, files: List[Path], media: str, quality: str):
         final_segment = AudioSegment.empty()
-        for f in files:
-            f_segment = AudioSegment.from_file(f, media)
-            final_segment += f_segment
+        for file in files:
+            file_segment = AudioSegment.from_file(file, media)
+            final_segment += file_segment
 
+        # Bitrate values can be 64k, 128k, 320k, etc...
         bitrate = f'{BITRATE_HIGH}k' if quality == 'hi' else f'{BITRATE_LOW}k'
         final_segment.export(target, media, bitrate=bitrate)
 
@@ -169,9 +172,9 @@ class BookWorker:
         }
         return report
 
-    def clear_data(self):
-        self.__book_verse_files = []
-
     def clear_report(self):
         self.resources_created.clear()
         self.resources_deleted.clear()
+
+    def clear_cache(self):
+        self.__book_verse_files = []

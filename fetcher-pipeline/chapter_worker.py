@@ -25,7 +25,9 @@ class ChapterWorker:
     def execute(self):
         """ Execute worker """
 
-        logging.debug("Chapter worker started!")
+        logging.debug("-------------------------------")
+        logging.debug("--- Chapter worker started! ---")
+        logging.debug("-------------------------------")
 
         self.clear_report()
         self.__temp_dir = init_temp_dir()
@@ -122,7 +124,7 @@ class ChapterWorker:
 
         bitrate = BITRATE_HIGH if quality == 'hi' else BITRATE_LOW
 
-        # Check if filed exist remotely
+        # Check if file exists remotely
         chapter_mp3_exists = check_file_exists(chapter_file, remote_dir, 'mp3', grouping, quality)
 
         if not chapter_mp3_exists:
@@ -160,6 +162,7 @@ class ChapterWorker:
             if f.suffix != '.wav':
                 continue
 
+            # Check if file exists remotely
             mp3_exists = check_file_exists(f, remote_dir, 'mp3', quality=quality)
 
             if mp3_exists:

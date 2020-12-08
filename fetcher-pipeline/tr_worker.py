@@ -34,10 +34,12 @@ class TrWorker:
     def execute(self):
         """ Execute worker """
 
-        logging.debug("TR worker started!")
+        logging.debug("-------------------------------")
+        logging.debug("------ TR worker started! -----")
+        logging.debug("-------------------------------")
 
         self.clear_report()
-        self.clear_data()
+        self.clear_cache()
         self.__temp_dir = init_temp_dir()
 
         existent_tr = self.find_existent_tr()
@@ -222,10 +224,10 @@ class TrWorker:
         }
         return report
 
-    def clear_data(self):
-        self.__book_tr_files = []
-        self.__chapter_tr_files = []
-
     def clear_report(self):
         self.resources_created.clear()
         self.resources_deleted.clear()
+
+    def clear_cache(self):
+        self.__book_tr_files = []
+        self.__chapter_tr_files = []

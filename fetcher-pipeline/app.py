@@ -3,7 +3,6 @@ import logging
 import os
 from argparse import Namespace
 from pathlib import Path
-from pprint import pprint
 from time import sleep
 from typing import Tuple, List
 
@@ -59,8 +58,6 @@ class App:
     @staticmethod
     def get_report(reports):
         """ Generate workers report """
-
-        pprint(reports)
 
         report = {
             "resources_created": [],

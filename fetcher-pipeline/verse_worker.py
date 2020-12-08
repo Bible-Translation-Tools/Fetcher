@@ -22,7 +22,11 @@ class VerseWorker:
         self.resources_deleted = []
 
     def execute(self):
-        logging.debug("Verse worker started!")
+        """ Execute worker """
+
+        logging.debug("-------------------------------")
+        logging.debug("---- Verse worker started! ----")
+        logging.debug("-------------------------------")
 
         self.clear_report()
         self.__temp_dir = init_temp_dir()
