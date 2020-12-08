@@ -82,9 +82,6 @@
 .chapter-download-card__button:hover {
     background: #c58b07;
 }
-.hidden {
-    display: none !important;
-}
 .request-book {
     background: white;
     color: #015ad9;

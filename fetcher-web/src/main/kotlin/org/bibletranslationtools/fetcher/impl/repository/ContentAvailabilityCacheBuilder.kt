@@ -1,6 +1,9 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import io.ktor.http.HttpStatusCode
+import org.bibletranslationtools.fetcher.data.Book
+import org.bibletranslationtools.fetcher.data.Language
+import org.bibletranslationtools.fetcher.data.Product
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
@@ -37,39 +40,39 @@ class ContentAvailabilityCacheBuilder(
     private fun cacheLanguages(): List<LanguageCache> {
         val glList = languageCatalog.getAll()
         return glList.map { lang ->
-            val products = cacheProducts(lang.code)
+            val products = cacheProducts(lang)
             val isAvailable = products.any { it.availability }
             LanguageCache(lang.code, isAvailable, products)
         }
     }
 
-    private fun cacheProducts(languageCode: String): List<ProductCache> {
+    private fun cacheProducts(language: Language): List<ProductCache> {
         val productList = ProductCatalogImpl().getAll()
         return productList.map { prod ->
-            val books = cacheBooks(languageCode, prod.slug)
+            val books = cacheBooks(language, prod)
             val isAvailable = books.any { it.availability }
             ProductCache(prod.slug, isAvailable, books)
         }
     }
 
-    private fun cacheBooks(languageCode: String, productSlug: String): List<BookCache> {
-        val product = ProductFileExtension.getType(productSlug)!!
+    private fun cacheBooks(language: Language, product: Product): List<BookCache> {
+        val productExtension = ProductFileExtension.getType(product.slug)!!
         val bookList = bookRepository.getBooks(resourceId)
 
         return bookList.map { book ->
             val chapters = cacheChapters(
-                languageCode = languageCode, productSlug = productSlug, bookSlug = book.slug
+                language, product, book
             )
             val isAvailable: Boolean = chapters.any { it.availability }
 
-            val bookUrl = when (product) {
+            val bookUrl = when (productExtension) {
                 ProductFileExtension.ORATURE -> if (isAvailable) "#" else null
                 else ->
                     FetchBookViewData(
                         bookRepository,
                         storageAccess,
-                        languageCode,
-                        productSlug
+                        language,
+                        product
                     ).getBookDownloadUrl(book.slug)
             }
 
@@ -78,15 +81,15 @@ class ContentAvailabilityCacheBuilder(
     }
 
     private fun cacheChapters(
-        languageCode: String,
-        productSlug: String,
-        bookSlug: String
+        language: Language,
+        product: Product,
+        book: Book
     ): List<ChapterCache> {
-        return when (ProductFileExtension.getType(productSlug)) {
+        return when (ProductFileExtension.getType(product.slug)) {
             ProductFileExtension.ORATURE ->
-                oratureChapters(languageCode, bookSlug)
+                oratureChapters(language.code, book.slug)
             else ->
-                audioChapters(languageCode, productSlug, bookSlug)
+                audioChapters(language, product, book)
         }
     }
 
@@ -114,16 +117,16 @@ class ContentAvailabilityCacheBuilder(
     }
 
     private fun audioChapters(
-        languageCode: String,
-        productSlug: String,
-        bookSlug: String
+        language: Language,
+        product: Product,
+        book: Book
     ): List<ChapterCache> {
         val chaptersFromDirectory = FetchChapterViewData(
             chapterCatalog,
             storageAccess,
-            languageCode = languageCode,
-            productSlug = productSlug,
-            bookSlug = bookSlug
+            language,
+            product,
+            book
         ).chaptersFromDirectory()
 
         return chaptersFromDirectory.map {

@@ -1,8 +1,11 @@
 package org.bibletranslationtools.fetcher.usecase
 
 import io.ktor.client.features.ClientRequestException
+import org.bibletranslationtools.fetcher.data.Book
 import java.io.File
 import org.bibletranslationtools.fetcher.data.Chapter
+import org.bibletranslationtools.fetcher.data.Language
+import org.bibletranslationtools.fetcher.data.Product
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
@@ -12,11 +15,11 @@ import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 class FetchChapterViewData(
     chapterCatalog: ChapterCatalog,
     private val storage: StorageAccess,
-    private val languageCode: String,
-    private val productSlug: String,
-    private val bookSlug: String
+    private val language: Language,
+    private val product: Product,
+    private val book: Book
 ) {
-    private val product = ProductFileExtension.getType(productSlug)!!
+    private val productExtension = ProductFileExtension.getType(product.slug)!!
 
     private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
 
@@ -28,8 +31,8 @@ class FetchChapterViewData(
 
     private val chapters: List<Chapter> = try {
         chapterCatalog.getAll(
-            languageCode = languageCode,
-            bookSlug = bookSlug
+            languageCode = language.code,
+            bookSlug = book.slug
         ).sortedBy { it.number }
     } catch (ex: ClientRequestException) {
         throw ex
@@ -43,9 +46,9 @@ class FetchChapterViewData(
             chapters.map {
                 val requestUrl = contentCache.getChapterUrl(
                     number = it.number,
-                    bookSlug = bookSlug,
-                    languageCode = languageCode,
-                    productSlug = productSlug
+                    bookSlug = book.slug,
+                    languageCode = language.code,
+                    productSlug = product.slug
                 )
                 ChapterViewData(it.number, url = requestUrl)
             }
@@ -61,7 +64,7 @@ class FetchChapterViewData(
             var url: String? = null
 
             for (priority in priorityList) {
-                val fileAccessRequest = when (product) {
+                val fileAccessRequest = when (productExtension) {
                     ProductFileExtension.BTTR -> getBTTRFileAccessRequest(chapterNumber, priority)
                     ProductFileExtension.MP3 -> getMp3FileAccessRequest(chapterNumber, priority)
                     else -> return listOf()
@@ -69,7 +72,7 @@ class FetchChapterViewData(
 
                 val chapterFile = storage.getChapterFile(fileAccessRequest)
                 if (chapterFile != null) {
-                    url = getChapterDownloadUrl(chapterFile)
+                    url = formatChapterDownloadUrl(chapterFile)
                     break
                 }
             }
@@ -84,10 +87,10 @@ class FetchChapterViewData(
         priorityItem: PriorityItem
     ): FileAccessRequest {
         return FileAccessRequest(
-            languageCode = languageCode,
+            languageCode = language.code,
             resourceId = "ulb",
             fileExtension = "tr",
-            bookSlug = bookSlug,
+            bookSlug = book.slug,
             chapter = chapterNumber.toString(),
             mediaExtension = priorityItem.fileExtension,
             mediaQuality = priorityItem.mediaQuality
@@ -99,16 +102,16 @@ class FetchChapterViewData(
         priorityItem: PriorityItem
     ): FileAccessRequest {
         return FileAccessRequest(
-            languageCode = languageCode,
+            languageCode = language.code,
             resourceId = "ulb",
             fileExtension = priorityItem.fileExtension,
-            bookSlug = bookSlug,
+            bookSlug = book.slug,
             chapter = chapterNumber.toString(),
             mediaQuality = priorityItem.mediaQuality
         )
     }
 
-    private fun getChapterDownloadUrl(chapterFile: File): String {
+    private fun formatChapterDownloadUrl(chapterFile: File): String {
         val relativeChapterPath = chapterFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
         return "${System.getenv("CDN_BASE_URL")}/$relativeChapterPath"
     }

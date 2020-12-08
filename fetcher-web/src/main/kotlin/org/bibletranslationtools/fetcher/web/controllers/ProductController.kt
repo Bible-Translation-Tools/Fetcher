@@ -11,7 +11,6 @@ import io.ktor.routing.route
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
-import org.bibletranslationtools.fetcher.web.controllers.utils.HL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
@@ -30,31 +29,18 @@ fun Routing.productController(resolver: DependencyResolver) {
                 languageCode = call.parameters[LANGUAGE_PARAM_KEY]
             )
             call.respond(
-                productsView(params, path, true, resolver)
-            )
-        }
-    }
-    route("/$HL_ROUTE/{$LANGUAGE_PARAM_KEY}") {
-        get {
-            // products page
-            val path = normalizeUrl(call.request.path())
-            val params = UrlParameters(
-                languageCode = call.parameters[LANGUAGE_PARAM_KEY]
-            )
-            call.respond(
-                productsView(params, path, false, resolver)
+                productsView(params.languageCode, path, resolver)
             )
         }
     }
 }
 
 private fun productsView(
-    params: UrlParameters,
+    languageCode: String,
     path: String,
-    isGateway: Boolean,
     resolver: DependencyResolver
 ): ThymeleafContent {
-    if (!validator.isLanguageCodeValid(params.languageCode)) {
+    if (!validator.isLanguageCodeValid(languageCode)) {
         return errorPage(
             "invalid_route_parameter",
             "invalid_route_parameter_message",
@@ -62,14 +48,16 @@ private fun productsView(
         )
     }
 
-    val model = FetchProductViewData(resolver.productCatalog, params.languageCode)
-    val languageName = getLanguageName(params.languageCode, resolver)
+    val language = resolver.languageRepository.getLanguage(languageCode)!!
+    val productList = FetchProductViewData(
+        resolver.productCatalog, languageCode
+    ).getListViewData(path, resolver.contentCache, language.isGateway)
 
     return ThymeleafContent(
         template = "products",
         model = mapOf(
-            "productList" to model.getListViewData(path, resolver.contentCache, isGateway),
-            "languagesNavTitle" to languageName,
+            "productList" to productList,
+            "languagesNavTitle" to language.localizedName,
             "languagesNavUrl" to "/$GL_ROUTE",
             "fileTypesNavUrl" to "#"
         ),
