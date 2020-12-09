@@ -5,8 +5,8 @@ from pathlib import Path
 from tempfile import mkdtemp
 
 
-def init_temp_dir() -> Path:
-    path = Path(mkdtemp())
+def init_temp_dir(prefix: str) -> Path:
+    path = Path(mkdtemp(prefix=prefix))
     return path
 
 

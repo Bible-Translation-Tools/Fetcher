@@ -31,7 +31,7 @@ class BookWorker:
 
         self.clear_report()
         self.clear_cache()
-        self.__temp_dir = init_temp_dir()
+        self.__temp_dir = init_temp_dir("book_worker")
 
         existent_books = self.find_existent_books()
 

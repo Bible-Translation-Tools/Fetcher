@@ -40,7 +40,7 @@ class TrWorker:
 
         self.clear_report()
         self.clear_cache()
-        self.__temp_dir = init_temp_dir()
+        self.__temp_dir = init_temp_dir("tr_worker")
 
         existent_tr = self.find_existent_tr()
 
