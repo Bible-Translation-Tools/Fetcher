@@ -30,7 +30,7 @@ class ChapterWorker:
         logging.debug("-------------------------------")
 
         self.clear_report()
-        self.__temp_dir = init_temp_dir("chapter_worker")
+        self.__temp_dir = init_temp_dir("chapter_worker_")
 
         for src_file in self.__ftp_dir.rglob('*.wav'):
             # Process chapter files only

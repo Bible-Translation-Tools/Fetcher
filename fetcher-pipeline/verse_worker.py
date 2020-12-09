@@ -29,7 +29,7 @@ class VerseWorker:
         logging.debug("-------------------------------")
 
         self.clear_report()
-        self.__temp_dir = init_temp_dir("verse_worker")
+        self.__temp_dir = init_temp_dir("verse_worker_")
 
         for src_file in self.__ftp_dir.rglob('*.wav'):
             # Process verse/chunk files only
