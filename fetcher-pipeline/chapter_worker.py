@@ -104,7 +104,7 @@ class ChapterWorker:
                 f'Copying original verse files from {verses_dir} into {remote_dir}'
             )
             t_dir = copy_dir(verses_dir, remote_dir)
-            if cleaning:
+            if cleaning and t_dir is not None:
                 self.resources_created.append(str(rel_path(t_dir, self.__ftp_dir)))
 
             # Convert chapter into mp3
