@@ -67,6 +67,10 @@ class ChapterWorker:
             logging.debug(f'Splitting chapter {target_file} into {verses_dir}')
             split_chapter(target_file, verses_dir, self.verbose)
 
+            if check_dir_empty(verses_dir):
+                logging.warning(f'Could not split chapter file. Make sure file is importable.')
+                continue
+
             target_verse_dir = remote_dir.joinpath("wav", "verse")
 
             is_new = check_dir_empty(target_verse_dir)
