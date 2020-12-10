@@ -7,7 +7,7 @@ from time import sleep
 from argparse import Namespace
 from typing import Tuple, List
 
-from src.process_tools import git_clone, pull_all_repos
+from process_tools import git_clone, pull_all_repos
 
 GL_REPO_URLS = "/repourls/gl_repo_urls.txt"
 
