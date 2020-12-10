@@ -38,63 +38,66 @@ class TrWorker:
         logging.debug("------ TR worker started! -----")
         logging.debug("-------------------------------")
 
-        self.clear_report()
-        self.clear_cache()
-        self.__temp_dir = init_temp_dir("tr_worker_")
+        try:
+            self.clear_report()
+            self.clear_cache()
+            self.__temp_dir = init_temp_dir("tr_worker_")
 
-        existent_tr = self.find_existent_tr()
+            existent_tr = self.find_existent_tr()
 
-        media = ['wav', 'mp3/hi', 'mp3/low']
-        for m in media:
-            for src_file in self.__ftp_dir.rglob(f'{m}/verse/*.*'):
-                if src_file.suffix == '.tr':
-                    continue
-
-                # Process verse files only
-                if not re.search(self.__verse_regex, str(src_file)):
-                    continue
-
-                self.__book_tr_files.append(src_file)
-                self.__chapter_tr_files.append(src_file)
-
-                # Extract necessary path parts
-                root_parts = self.__ftp_dir.parts
-                parts = src_file.parts[len(root_parts):]
-
-                lang = parts[0]
-                resource = parts[1]
-                book = parts[2]
-                chapter = parts[3]
-                media = parts[5]
-                quality = parts[6] if media == 'mp3' else ''
-                grouping = parts[7] if media == 'mp3' else parts[6]
-
-                regex = fr'{lang}\/{resource}\/{book}(?:\/{chapter})?\/' \
-                        fr'CONTENTS\/tr\/{media}(?:\/{quality})?\/{grouping}'
-
-                for group, tr in existent_tr:
-                    if not re.search(regex, str(tr)):
+            media = ['wav', 'mp3/hi', 'mp3/low']
+            for m in media:
+                for src_file in self.__ftp_dir.rglob(f'{m}/verse/*.*'):
+                    if src_file.suffix == '.tr':
                         continue
 
-                    if group == Group.BOOK and src_file in self.__book_tr_files:
-                        self.__book_tr_files.remove(src_file)
-                    elif group == Group.CHAPTER and src_file in self.__chapter_tr_files:
-                        self.__chapter_tr_files.remove(src_file)
+                    # Process verse files only
+                    if not re.search(self.__verse_regex, str(src_file)):
+                        continue
 
-        # Create chapter TRs
-        chapter_groups = self.group_files(self.__chapter_tr_files, Group.CHAPTER)
-        for key in chapter_groups:
-            self.create_tr_file(key, chapter_groups[key])
+                    self.__book_tr_files.append(src_file)
+                    self.__chapter_tr_files.append(src_file)
 
-        # Create book TRs
-        book_groups = self.group_files(self.__book_tr_files, Group.BOOK)
-        for key in book_groups:
-            self.create_tr_file(key, book_groups[key])
+                    # Extract necessary path parts
+                    root_parts = self.__ftp_dir.parts
+                    parts = src_file.parts[len(root_parts):]
 
-        logging.debug(f'Deleting temporary directory {self.__temp_dir}')
-        rm_tree(self.__temp_dir)
+                    lang = parts[0]
+                    resource = parts[1]
+                    book = parts[2]
+                    chapter = parts[3]
+                    media = parts[5]
+                    quality = parts[6] if media == 'mp3' else ''
+                    grouping = parts[7] if media == 'mp3' else parts[6]
 
-        logging.debug('TR worker finished!')
+                    regex = fr'{lang}\/{resource}\/{book}(?:\/{chapter})?\/' \
+                            fr'CONTENTS\/tr\/{media}(?:\/{quality})?\/{grouping}'
+
+                    for group, tr in existent_tr:
+                        if not re.search(regex, str(tr)):
+                            continue
+
+                        if group == Group.BOOK and src_file in self.__book_tr_files:
+                            self.__book_tr_files.remove(src_file)
+                        elif group == Group.CHAPTER and src_file in self.__chapter_tr_files:
+                            self.__chapter_tr_files.remove(src_file)
+
+            # Create chapter TRs
+            chapter_groups = self.group_files(self.__chapter_tr_files, Group.CHAPTER)
+            for key in chapter_groups:
+                self.create_tr_file(key, chapter_groups[key])
+
+            # Create book TRs
+            book_groups = self.group_files(self.__book_tr_files, Group.BOOK)
+            for key in book_groups:
+                self.create_tr_file(key, book_groups[key])
+        except Exception as e:
+            logging.warning(str(e))
+        finally:
+            logging.debug(f'Deleting temporary directory {self.__temp_dir}')
+            rm_tree(self.__temp_dir)
+
+            logging.debug('TR worker finished!')
 
     def find_existent_tr(self) -> List[Tuple[Group, Path]]:
         """ Find tr files that exist in the remote directory """

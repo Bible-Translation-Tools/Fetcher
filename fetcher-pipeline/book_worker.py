@@ -29,53 +29,56 @@ class BookWorker:
         logging.debug("----- Book worker started! ----")
         logging.debug("-------------------------------")
 
-        self.clear_report()
-        self.clear_cache()
-        self.__temp_dir = init_temp_dir("book_worker_")
+        try:
+            self.clear_report()
+            self.clear_cache()
+            self.__temp_dir = init_temp_dir("book_worker_")
 
-        existent_books = self.find_existent_books()
+            existent_books = self.find_existent_books()
 
-        media = ['wav', 'mp3/hi', 'mp3/low']
-        for m in media:
-            for src_file in self.__ftp_dir.rglob(f'{m}/verse/*.*'):
-                if src_file.suffix == '.tr':
-                    continue
-
-                # Process verse files only
-                if not re.search(self.__verse_regex, str(src_file)):
-                    continue
-
-                self.__book_verse_files.append(src_file)
-
-                # Extract necessary path parts
-                root_parts = self.__ftp_dir.parts
-                parts = src_file.parts[len(root_parts):]
-
-                lang = parts[0]
-                resource = parts[1]
-                book = parts[2]
-                media = parts[5]
-                quality = parts[6] if media == 'mp3' else ''
-
-                regex = fr'{lang}\/{resource}\/{book}\/' \
-                        fr'CONTENTS\/{media}(?:\/{quality})?\/book'
-
-                for book in existent_books:
-                    if not re.search(regex, str(book)):
+            media = ['wav', 'mp3/hi', 'mp3/low']
+            for m in media:
+                for src_file in self.__ftp_dir.rglob(f'{m}/verse/*.*'):
+                    if src_file.suffix == '.tr':
                         continue
 
-                    if src_file in self.__book_verse_files:
-                        self.__book_verse_files.remove(src_file)
+                    # Process verse files only
+                    if not re.search(self.__verse_regex, str(src_file)):
+                        continue
 
-        # Create book files
-        book_groups = self.group_book_files()
-        for key in book_groups:
-            self.create_book_file(key, book_groups[key])
+                    self.__book_verse_files.append(src_file)
 
-        logging.debug(f'Deleting temporary directory {self.__temp_dir}')
-        rm_tree(self.__temp_dir)
+                    # Extract necessary path parts
+                    root_parts = self.__ftp_dir.parts
+                    parts = src_file.parts[len(root_parts):]
 
-        logging.debug('Book worker finished!')
+                    lang = parts[0]
+                    resource = parts[1]
+                    book = parts[2]
+                    media = parts[5]
+                    quality = parts[6] if media == 'mp3' else ''
+
+                    regex = fr'{lang}\/{resource}\/{book}\/' \
+                            fr'CONTENTS\/{media}(?:\/{quality})?\/book'
+
+                    for book in existent_books:
+                        if not re.search(regex, str(book)):
+                            continue
+
+                        if src_file in self.__book_verse_files:
+                            self.__book_verse_files.remove(src_file)
+
+            # Create book files
+            book_groups = self.group_book_files()
+            for key in book_groups:
+                self.create_book_file(key, book_groups[key])
+        except Exception as e:
+            logging.warning(str(e))
+        finally:
+            logging.debug(f'Deleting temporary directory {self.__temp_dir}')
+            rm_tree(self.__temp_dir)
+
+            logging.debug('Book worker finished!')
 
     def find_existent_books(self) -> List[Path]:
         """ Find book files that exist in the remote directory """
