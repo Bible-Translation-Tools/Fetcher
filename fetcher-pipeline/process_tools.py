@@ -17,9 +17,10 @@ def split_chapter(input_file, output_dir, verbose=False):
     )
 
 
-def convert_to_mp3(input_file_or_dir, verbose=False):
+def convert_to_mp3(input_file_or_dir, bitrate, delete, verbose=False):
+    should_delete = '-d' if delete else ''
     run_process(
-        f'java -jar tools/audio-compressor-cli.jar -f mp3 -i {input_file_or_dir}',
+        f'java -jar tools/audio-compressor-cli.jar -f mp3 -b {bitrate} {should_delete} -i {input_file_or_dir}',
         verbose
     )
 
