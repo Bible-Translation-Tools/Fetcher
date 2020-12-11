@@ -9,6 +9,7 @@ import io.ktor.routing.Route
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
+import org.bibletranslationtools.fetcher.data.Deliverable
 import org.bibletranslationtools.fetcher.usecase.DeliverableBuilder
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
@@ -20,7 +21,6 @@ import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.BOOK_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.CHAPTER_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
-import org.bibletranslationtools.fetcher.web.controllers.utils.HL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.PRODUCT_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
@@ -28,7 +28,6 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
 import org.bibletranslationtools.fetcher.web.controllers.utils.getLanguageName
 import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
-import org.bibletranslationtools.fetcher.web.controllers.utils.getProductTitleKey
 import org.bibletranslationtools.fetcher.web.controllers.utils.validator
 
 fun Routing.chapterController(resolver: DependencyResolver) {
@@ -51,32 +50,17 @@ fun Routing.chapterController(resolver: DependencyResolver) {
                 )
                 return@get
             }
-            call.respond(chaptersView(params, resolver, true))
+
+            val paramObjects = DeliverableBuilder(
+                resolver.languageRepository,
+                resolver.productCatalog,
+                resolver.bookRepository
+            ).build(params)
+
+            call.respond(chaptersView(paramObjects, resolver))
         }
         route("{$CHAPTER_PARAM_KEY}") {
             oratureChapters(resolver)
-        }
-    }
-    route("/$HL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}/{$BOOK_PARAM_KEY}") {
-        get {
-            // chapters page
-            val params = UrlParameters(
-                languageCode = call.parameters[LANGUAGE_PARAM_KEY],
-                productSlug = call.parameters[PRODUCT_PARAM_KEY],
-                bookSlug = call.parameters[BOOK_PARAM_KEY]
-            )
-
-            if (!validateParameters(params)) {
-                call.respond(
-                    errorPage(
-                        "invalid_route_parameter",
-                        "invalid_route_parameter_message",
-                        HttpStatusCode.NotFound
-                    )
-                )
-                return@get
-            }
-            call.respond(chaptersView(params, resolver, false))
         }
     }
 }
@@ -114,25 +98,24 @@ private fun Route.oratureChapters(resolver: DependencyResolver) {
 }
 
 private fun chaptersView(
-    params: UrlParameters,
-    resolver: DependencyResolver,
-    isGateway: Boolean
+    paramObjects: Deliverable,
+    resolver: DependencyResolver
 ): ThymeleafContent {
-
+    val isGateway = paramObjects.language.isGateway
     val bookViewData: BookViewData? = FetchBookViewData(
         resolver.bookRepository,
         resolver.storageAccess,
-        params.languageCode,
-        params.productSlug
-    ).getViewData(params.bookSlug, resolver.contentCache, isGateway)
+        paramObjects.language,
+        paramObjects.product
+    ).getViewData(paramObjects.book.slug, resolver.contentCache, isGateway)
 
     val chapterViewDataList: List<ChapterViewData>? = try {
         FetchChapterViewData(
-            chapterCatalog = resolver.chapterCatalog,
-            storage = resolver.storageAccess,
-            languageCode = params.languageCode,
-            productSlug = params.productSlug,
-            bookSlug = params.bookSlug
+            resolver.chapterCatalog,
+            resolver.storageAccess,
+            paramObjects.language,
+            paramObjects.product,
+            paramObjects.book
         ).getViewDataList(resolver.contentCache, isGateway)
     } catch (ex: ClientRequestException) {
         return errorPage(
@@ -149,23 +132,20 @@ private fun chaptersView(
             HttpStatusCode.NotFound
         )
     } else {
-        val languageName = getLanguageName(params.languageCode, resolver)
-        val productTitle = getProductTitleKey(params.productSlug, resolver)
-        val languageRoute = if (isGateway) GL_ROUTE else HL_ROUTE
         val isRequestLink =
-            ProductFileExtension.getType(params.productSlug) == ProductFileExtension.ORATURE
+            ProductFileExtension.getType(paramObjects.product.slug) == ProductFileExtension.ORATURE
 
         ThymeleafContent(
             template = "chapters",
             model = mapOf(
                 "book" to bookViewData,
                 "chapterList" to chapterViewDataList,
-                "languagesNavTitle" to languageName,
-                "languagesNavUrl" to "/$languageRoute",
-                "fileTypesNavTitle" to productTitle,
-                "fileTypesNavUrl" to "/$languageRoute/${params.languageCode}",
+                "languagesNavTitle" to paramObjects.language.localizedName,
+                "languagesNavUrl" to "/$GL_ROUTE",
+                "fileTypesNavTitle" to paramObjects.product.titleKey,
+                "fileTypesNavUrl" to "/$GL_ROUTE/${paramObjects.language.code}",
                 "booksNavTitle" to bookViewData.localizedName,
-                "booksNavUrl" to "/$languageRoute/${params.languageCode}/${params.productSlug}",
+                "booksNavUrl" to "/$GL_ROUTE/${paramObjects.language.code}/${paramObjects.product.slug}",
                 "isRequestLink" to isRequestLink
             ),
             locale = getPreferredLocale(contentLanguage, "chapters")

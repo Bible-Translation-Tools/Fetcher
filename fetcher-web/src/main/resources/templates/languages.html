@@ -2,14 +2,13 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" dir="ltr" th:dir="#{dir}">
 <head>
     <meta charset="UTF-8">
-    <title th:text="#{${isGateway}? 'gateway_languages' : 'heart_languages'}">Languages</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" >
+    <title th:text="#{browser_title}">Languages</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="/static/img/fetcher_logo.png">
     <link rel="stylesheet" href="/static/common.css">
     <link rel="stylesheet" href="/static/language.css">
-    <link rel="stylesheet" href="/static/heart_gateway_group.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <script th:if="${!isGateway}" type="text/javascript" src="/static/search-languages.js"></script>
+    <script type="text/javascript" src="/static/languages.js"></script>
     <style id="cssFilter">/*css filter placeholder*/</style>
 </head>
 
@@ -21,21 +20,34 @@
     <div th:insert="fragments/navbar :: navbar(${languagesNavUrl}, null, null)"></div>
 </div>
 
-<div th:if="${isGateway}" th:insert="fragments/hero :: hero(#{page_title_gateway}, #{page_info_gateway})"></div>
-<div th:unless="${isGateway}" th:insert="fragments/hero :: hero(#{page_title_heart}, #{page_info_heart})"></div>
+<div th:insert="fragments/hero :: hero(#{header_title}, #{header_info})"></div>
 
-<div class="language_input_group">
-    <div th:insert="fragments/language_toggle :: language_toggle(${isGateway})"></div>
-    <div th:insert="fragments/searchbar :: searchbar"></div>
-</div>
+<div th:insert="fragments/searchbar :: searchbar"></div>
 
-<div class="l-list-container" >
+<div class="l-list-container" th:data-offset-count="${gatewayCount}">
     <div th:each="language: ${languageList}">
         <div th:insert="fragments/card :: card(${language.localizedName}, ${language.anglicizedName}, '', ${language.code}, ${language.url})"></div>
     </div>
 </div>
 
-<div th:if="${isGateway}" th:insert="fragments/filter :: filter"></div>
+<div class="bottom_section">
+    <div>
+        <p class="bottom_section__title">
+            <strong th:text="#{bottom_section_title}">You have reached the end of the list</strong>
+        </p>
+        <p class="bottom_section__info"
+           th:text="#{bottom_section_info}">You may search for your language or continue browsing</p>
+    </div>
+    <div th:replace="fragments/searchbar :: searchbar"></div>
+
+    <a href="javascript:void(0)"
+       class="load_more_button"
+       onclick="loadMore()">
+
+        <em class="material-icons">expand_more</em>
+        <span th:text="#{show_more_languages}">Show More</span>
+    </a>
+</div>
 
 </body>
 

@@ -5,7 +5,7 @@
 </head>
 <body>
 <script th:fragment="filter">
-    window.filter.addEventListener("input", e => {
+    document.querySelector(".searchbar__input").addEventListener("input", e => {
         let filter = e.target.value;
         let css = filter ? `
              .l-list-container a {

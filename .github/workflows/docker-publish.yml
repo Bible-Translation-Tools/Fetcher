@@ -2,10 +2,6 @@ name: Docker
 
 on: [push, pull_request]
 
-#env:
-  # TODO: Change variable to your image's name.
-  # IMAGE_NAME: bibletranslationtools/fetcher
-
 jobs:
   #test building jar and images for PR without push
   test:
@@ -60,11 +56,11 @@ jobs:
       
       - name: Build web image
         shell: bash
-        run: docker build -t bibletranslationtools/fetcher:$GITHUB_SHA -t bibletranslationtools/fetcher:$GITHUB_REF_NAME_SLUG -t bibletranslationtools/fetcher:latest ./fetcher-web
+        run: docker build -t bibletranslationtools/fetcher:$GITHUB_SHA -t bibletranslationtools/fetcher:$GITHUB_REF_NAME -t bibletranslationtools/fetcher:latest ./fetcher-web
       
       - name: Build pipeline image
         shell: bash
-        run: docker build -t bibletranslationtools/fetcher-pipeline:$GITHUB_SHA -t bibletranslationtools/fetcher-pipeline:$GITHUB_REF_NAME_SLUG -t bibletranslationtools/fetcher-pipeline:latest ./fetcher-pipeline
+        run: docker build -t bibletranslationtools/fetcher-pipeline:$GITHUB_SHA -t bibletranslationtools/fetcher-pipeline:$GITHUB_REF_NAME -t bibletranslationtools/fetcher-pipeline:latest ./fetcher-pipeline
 
       - name: Log into registry
         shell: bash

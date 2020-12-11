@@ -54,7 +54,9 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
 
         languagesIterator.use {
             it.forEach { lang ->
-                languageList.add(Language(lang.code, lang.anglicizedName, lang.localizedName))
+                languageList.add(
+                    Language(lang.code, lang.anglicizedName, lang.localizedName, isGateway = true)
+                )
             }
         }
 

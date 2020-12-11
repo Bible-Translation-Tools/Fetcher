@@ -22,10 +22,6 @@ fun getLanguageName(languageCode: String, resolver: DependencyResolver): String 
     return resolver.languageRepository.getLanguage(languageCode)?.localizedName ?: ""
 }
 
-fun getProductTitleKey(productSlug: String, resolver: DependencyResolver): String {
-    return resolver.productCatalog.getProduct(productSlug)?.titleKey ?: ""
-}
-
 fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templateName: String): Locale {
     val noFallbackController = ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_PROPERTIES)
     val logger = LoggerFactory.getLogger("GetLocale")
