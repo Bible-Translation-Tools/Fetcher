@@ -19,6 +19,8 @@ services:
      - CDN_BASE_URL=${CDN_BASE_URL}
     volumes:
       - fetcher-content:/content
+      - fetcher-rc:${RC_TEMP_DIR}
+      - fetcher-repos:${ORATURE_REPO_DIR}
     restart: always
   ftp:
     image: bogem/ftp
