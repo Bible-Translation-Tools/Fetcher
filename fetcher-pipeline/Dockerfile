@@ -11,7 +11,7 @@ RUN npm install pm2 -g
 ENV JAVA_HOME /usr/local/jdk-11.0.2
 ENV PATH $JAVA_HOME/bin:$PATH
 
-RUN apt update && apt install curl -y
+RUN apt update && apt install curl ffmpeg -y
 
 RUN curl -O https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.2_linux-x64_bin.tar.gz && \
     tar zxvf openjdk-11.0.2_linux-x64_bin.tar.gz && mv jdk-11* /usr/local/
