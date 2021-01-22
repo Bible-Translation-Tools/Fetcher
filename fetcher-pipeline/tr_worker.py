@@ -55,6 +55,8 @@ class TrWorker:
                     if not re.search(self.__verse_regex, str(src_file)):
                         continue
 
+                    logging.debug(f'Found verse file: {src_file}')
+
                     self.__book_tr_files.append(src_file)
                     self.__chapter_tr_files.append(src_file)
 
@@ -78,8 +80,10 @@ class TrWorker:
                             continue
 
                         if group == Group.BOOK and src_file in self.__book_tr_files:
+                            logging.debug(f'Verse file {src_file} is excluded: exists in BOOK TR: {tr}')
                             self.__book_tr_files.remove(src_file)
                         elif group == Group.CHAPTER and src_file in self.__chapter_tr_files:
+                            logging.debug(f'Verse file {src_file} is excluded: exists in CHAPTER TR: {tr}')
                             self.__chapter_tr_files.remove(src_file)
 
             # Create chapter TRs
@@ -108,8 +112,10 @@ class TrWorker:
             for src_file in self.__ftp_dir.rglob(f'tr/{m}/verse/*.tr'):
                 match = re.match(self.__tr_regex, str(src_file))
                 if match.group(1) is not None:
+                    logging.debug(f'Found existent CHAPTER TR file: {src_file}')
                     existent_tr.append((Group.CHAPTER, src_file))
                 else:
+                    logging.debug(f'Found existent BOOK TR file: {src_file}')
                     existent_tr.append((Group.BOOK, src_file))
 
         return existent_tr
