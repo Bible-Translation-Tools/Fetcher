@@ -70,10 +70,9 @@ class TrWorker:
                     chapter = parts[3]
                     media = parts[5]
                     quality = parts[6] if media == 'mp3' else ''
-                    grouping = parts[7] if media == 'mp3' else parts[6]
 
                     regex = fr'{lang}\/{resource}\/{book}(?:\/{chapter})?\/' \
-                            fr'CONTENTS\/tr\/{media}(?:\/{quality})?\/{grouping}'
+                            fr'CONTENTS\/tr\/{media}(?:\/{quality})?\/verse'
 
                     for group, tr in existent_tr:
                         if not re.search(regex, str(tr)):

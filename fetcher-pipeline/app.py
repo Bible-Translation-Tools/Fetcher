@@ -11,7 +11,7 @@ import sentry_sdk
 from chapter_worker import ChapterWorker
 from tr_worker import TrWorker
 from verse_worker import VerseWorker
-from book_worker import BookWorker
+from compile_worker import CompileWorker
 
 
 class App:
@@ -28,7 +28,7 @@ class App:
         chapter_worker = ChapterWorker(self.__ftp_dir, self.verbose)
         verse_worker = VerseWorker(self.__ftp_dir, self.verbose)
         tr_worker = TrWorker(self.__ftp_dir, self.verbose)
-        book_worker = BookWorker(self.__ftp_dir, self.verbose)
+        compile_worker = CompileWorker(self.__ftp_dir, self.verbose)
 
         wait_timer = (self.hour * 3600) + (self.minute * 60)
 
@@ -40,14 +40,14 @@ class App:
             chapter_worker.execute()
             verse_worker.execute()
             tr_worker.execute()
-            book_worker.execute()
+            compile_worker.execute()
 
             report = self.get_report(
                 (
                     chapter_worker.get_report(),
                     verse_worker.get_report(),
                     tr_worker.get_report(),
-                    book_worker.get_report()
+                    compile_worker.get_report()
                 )
             )
             if report is not None:
