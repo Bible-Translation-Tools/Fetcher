@@ -46,6 +46,8 @@ class BookWorker:
                     if not re.search(self.__verse_regex, str(src_file)):
                         continue
 
+                    logging.debug(f'Found verse file: {src_file}')
+
                     self.__book_verse_files.append(src_file)
 
                     # Extract necessary path parts
@@ -66,6 +68,7 @@ class BookWorker:
                             continue
 
                         if src_file in self.__book_verse_files:
+                            logging.debug(f'Verse file {src_file} is excluded: exists in BOOK: {book}')
                             self.__book_verse_files.remove(src_file)
 
             # Create book files
@@ -87,6 +90,7 @@ class BookWorker:
         media = [('wav', 'wav'), ('mp3/hi', 'mp3'), ('mp3/low', 'mp3')]
         for m, f in media:
             for src_file in self.__ftp_dir.rglob(f'{m}/book/*.{f}'):
+                logging.debug(f'Found existent BOOK file: {src_file}')
                 existent_books.append(src_file)
 
         return existent_books
@@ -149,9 +153,7 @@ class BookWorker:
         self.merge_audio(book, files, media, quality)
 
         # Copy book file to remote dir
-        logging.debug(
-            f'Copying {book} to {remote_dir}'
-        )
+        logging.debug(f'Copying {book} to {remote_dir}')
         t_file = copy_file(book, remote_dir, 'book', quality, media)
         self.resources_created.append(str(rel_path(t_file, self.__ftp_dir)))
 
