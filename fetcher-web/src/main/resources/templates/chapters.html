@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" dir="ltr" th:dir="#{dir}">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="#{chapters}">Chapters</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="/static/img/fetcher_logo.png">
+    <link rel="stylesheet" href="/static/common.css">
+    <link rel="stylesheet" href="/static/chapters.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script th:if="${isRequestLink}" type="text/javascript" src="/static/chapter-request.js"></script>
+    <style id="cssFilter">/*css filter placeholder*/</style>
+</head>
+<body>
+
+<div th:insert="fragments/header :: header"></div>
+
+<div class="c-navbar">
+    <div th:insert="fragments/navbar :: navbar(${languagesNavUrl}, ${fileTypesNavUrl}, ${booksNavUrl})"></div>
+</div>
+
+<div th:insert="fragments/hero :: hero(#{page_title}, #{page_info})"></div>
+
+<div th:insert="fragments/searchbar :: searchbar"></div>
+
+<div class="chapter-download-card">
+    <h2 class="chapter-download-card__book-name"
+        th:text="${book.anglicizedName}">{Book Name}</h2>
+    <a class="chapter-download-card__button"
+       th:classappend="${book.url == null}? 'unavailable'"
+       th:href="${book.url == null}? 'javascript:void(0)' : ${book.url}"
+       th:data-chapter-id="${isRequestLink}? 'all' : ''"
+       th:target="${book.url == null || isRequestLink}? '' : '_blank'">
+
+        <em class="material-icons chaptercard__icon">get_app</em>
+        <img class="chaptercard__spinner hidden" alt="Spinner Icon" height="24" width="24" src="/static/img/spinner_icon.gif" />
+
+        <p th:text="#{download_book}"
+           th:classappend="${isRequestLink}? 'hidden' : ''" name="download-text">Download Book</p>
+
+        <p th:text="#{request_book}"
+           th:classappend="${isRequestLink}? '' : 'hidden'" name="request-text">Request Book</p>
+
+        <p th:text="#{requesting}" class="hidden" name="requesting-text">Requesting</p>
+
+        <p th:text="#{unavailable}" class="hidden" name="unavailable-text">Unavailable</p>
+    </a>
+</div>
+
+<div class="l-list-container">
+    <div th:each="chapter: ${chapterList}">
+        <div th:insert="fragments/chaptercard :: chaptercard(${chapter.chapterNumber}, #{${chapter.titleKey}(${chapter.chapterNumber})}, ${chapter.url})"></div>
+    </div>
+</div>
+
+<div th:insert="fragments/filter :: filter"></div>
+
+</body>
+</html>
