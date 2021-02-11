@@ -24,62 +24,69 @@ class VerseWorker:
     def execute(self):
         """ Execute worker """
 
-        logging.debug("-------------------------------")
-        logging.debug("---- Verse worker started! ----")
-        logging.debug("-------------------------------")
+        logging.debug("=================================================================")
+        logging.debug(".................................................................")
+        logging.debug("=================== Verse worker started! =====================")
+        logging.debug(".................................................................")
+        logging.debug("=================================================================")
 
         self.clear_report()
         self.__temp_dir = init_temp_dir("verse_worker_")
 
         try:
             for src_file in self.__ftp_dir.rglob('*.wav'):
-                # Process verse/chunk files only
-                if not re.search(self.__verse_regex, str(src_file)):
-                    continue
+                try:
+                    # Process verse/chunk files only
+                    if not re.search(self.__verse_regex, str(src_file)):
+                        continue
 
-                # Extract necessary path parts
-                root_parts = self.__ftp_dir.parts
-                parts = src_file.parts[len(root_parts):]
+                    # Extract necessary path parts
+                    root_parts = self.__ftp_dir.parts
+                    parts = src_file.parts[len(root_parts):]
 
-                lang = parts[0]
-                resource = parts[1]
-                book = parts[2]
-                chapter = parts[3]
-                media = parts[5]
-                grouping = parts[7] if media == 'mp3' else parts[6]
+                    lang = parts[0]
+                    resource = parts[1]
+                    book = parts[2]
+                    chapter = parts[3]
+                    media = parts[5]
+                    grouping = parts[7] if media == 'mp3' else parts[6]
 
-                target_dir = self.__temp_dir.joinpath(lang, resource, book, chapter, grouping)
-                remote_dir = self.__ftp_dir.joinpath(lang, resource, book, chapter, "CONTENTS")
-                target_dir.mkdir(parents=True, exist_ok=True)
-                target_file = target_dir.joinpath(src_file.name)
+                    target_dir = self.__temp_dir.joinpath(lang, resource, book, chapter, grouping)
+                    remote_dir = self.__ftp_dir.joinpath(lang, resource, book, chapter, "CONTENTS")
+                    target_dir.mkdir(parents=True, exist_ok=True)
+                    target_file = target_dir.joinpath(src_file.name)
 
-                logging.debug(f'Found verse file: {src_file}')
+                    logging.debug(f'Found verse file: {src_file}')
 
-                mp3_exists = check_file_exists(src_file, remote_dir, 'mp3', grouping)
-                cue_exists = check_file_exists(src_file, remote_dir, 'cue', grouping)
+                    mp3_exists = check_file_exists(src_file, remote_dir, 'mp3', grouping)
+                    cue_exists = check_file_exists(src_file, remote_dir, 'cue', grouping)
 
-                if mp3_exists and cue_exists:
-                    logging.debug(f'Files exist. Skipping...')
-                    continue
+                    if mp3_exists and cue_exists:
+                        logging.debug(f'Files exist. Skipping...')
+                        continue
 
-                # Copy source file to temp dir
-                logging.debug(f'Copying file {src_file} to {target_file}')
-                target_file.write_bytes(src_file.read_bytes())
+                    # Copy source file to temp dir
+                    logging.debug(f'Copying file {src_file} to {target_file}')
+                    target_file.write_bytes(src_file.read_bytes())
 
-                # Try to fix wav metadata
-                logging.debug(f'Fixing metadata: {target_file}')
-                fix_metadata(target_file, self.verbose)
+                    # Try to fix wav metadata
+                    logging.debug(f'Fixing metadata: {target_file}')
+                    fix_metadata(target_file, self.verbose)
 
-                # Convert verse into mp3
-                self.convert_verse_wav(target_file, remote_dir, grouping, 'hi')
-                self.convert_verse_wav(target_file, remote_dir, grouping, 'low')
-        except Exception as e:
-            logging.warning(str(e))
+                    # Convert verse into mp3
+                    self.convert_verse_wav(target_file, remote_dir, grouping, 'hi')
+                    self.convert_verse_wav(target_file, remote_dir, grouping, 'low')
+                except Exception as e:
+                    logging.warning(str(e))
         finally:
             logging.debug(f'Deleting temporary directory {self.__temp_dir}')
             rm_tree(self.__temp_dir)
 
-            logging.debug('Verse worker finished!')
+            logging.debug("=================================================================")
+            logging.debug(".................................................................")
+            logging.debug("=================== Verse worker finished! =====================")
+            logging.debug(".................................................................")
+            logging.debug("=================================================================")
 
     def convert_verse_wav(self, verse_file: Path, remote_dir: Path, grouping: str, quality: str):
         """ Convert verse wav file and copy to remote directory """

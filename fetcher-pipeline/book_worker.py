@@ -25,9 +25,11 @@ class BookWorker:
     def execute(self):
         """ Execute worker """
 
-        logging.debug("-------------------------------")
-        logging.debug("----- Book worker started! ----")
-        logging.debug("-------------------------------")
+        logging.debug("=================================================================")
+        logging.debug(".................................................................")
+        logging.debug("=================== Book worker started! =====================")
+        logging.debug(".................................................................")
+        logging.debug("=================================================================")
 
         try:
             self.clear_report()
@@ -74,14 +76,21 @@ class BookWorker:
             # Create book files
             book_groups = self.group_book_files()
             for key in book_groups:
-                self.create_book_file(key, book_groups[key])
+                try:
+                    self.create_book_file(key, book_groups[key])
+                except Exception as e:
+                    logging.warning(str(e))
         except Exception as e:
             logging.warning(str(e))
         finally:
             logging.debug(f'Deleting temporary directory {self.__temp_dir}')
             rm_tree(self.__temp_dir)
 
-            logging.debug('Book worker finished!')
+            logging.debug("=================================================================")
+            logging.debug(".................................................................")
+            logging.debug("=================== Book worker finished! =====================")
+            logging.debug(".................................................................")
+            logging.debug("=================================================================")
 
     def find_existent_books(self) -> List[Path]:
         """ Find book files that exist in the remote directory """

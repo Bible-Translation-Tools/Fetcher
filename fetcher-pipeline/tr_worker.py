@@ -34,9 +34,11 @@ class TrWorker:
     def execute(self):
         """ Execute worker """
 
-        logging.debug("-------------------------------")
-        logging.debug("------ TR worker started! -----")
-        logging.debug("-------------------------------")
+        logging.debug("=================================================================")
+        logging.debug(".................................................................")
+        logging.debug("=================== TR worker started! =====================")
+        logging.debug(".................................................................")
+        logging.debug("=================================================================")
 
         try:
             self.clear_report()
@@ -89,19 +91,29 @@ class TrWorker:
             # Create chapter TRs
             chapter_groups = self.group_files(self.__chapter_tr_files, Group.CHAPTER)
             for key in chapter_groups:
-                self.create_tr_file(key, chapter_groups[key])
+                try:
+                    self.create_tr_file(key, chapter_groups[key])
+                except Exception as e:
+                    logging.warning(str(e))
 
             # Create book TRs
             book_groups = self.group_files(self.__book_tr_files, Group.BOOK)
             for key in book_groups:
-                self.create_tr_file(key, book_groups[key])
+                try:
+                    self.create_tr_file(key, book_groups[key])
+                except Exception as e:
+                    logging.warning(str(e))
         except Exception as e:
             logging.warning(str(e))
         finally:
             logging.debug(f'Deleting temporary directory {self.__temp_dir}')
             rm_tree(self.__temp_dir)
 
-            logging.debug('TR worker finished!')
+            logging.debug("=================================================================")
+            logging.debug(".................................................................")
+            logging.debug("=================== TR worker finished! =====================")
+            logging.debug(".................................................................")
+            logging.debug("=================================================================")
 
     def find_existent_tr(self) -> List[Tuple[Group, Path]]:
         """ Find tr files that exist in the remote directory """
