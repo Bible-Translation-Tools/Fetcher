@@ -29,6 +29,11 @@ class ContentAvailabilityCacheTest {
     private val chapterNumber = 1
     private val rcFileName = "en_ulb"
 
+    /**
+     *
+     *  Note: the urls in media.yaml will need to be up-to-date,
+     *  otherwise this test may fail
+     */
     @Test
     fun testCacheContent() {
         val tempDir = createTempDir("testDir")

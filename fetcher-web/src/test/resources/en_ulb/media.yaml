@@ -9,7 +9,7 @@ projects:
        identifier: 'mp3'
        version: '{latest}'
        contributor: []
-       chapter_url: 'https://audio-content.bibleineverylanguage.org/en/ulb/tit/{chapter}/CONTENTS/mp3/hi/chapter/en_nt_ulb_tit_c0{chapter}.mp3'
+       chapter_url: 'https://audio-content.bibleineverylanguage.org/content/en/ulb/tit/{chapter}/CONTENTS/mp3/hi/chapter/en_nt_ulb_tit_c0{chapter}.mp3'
   -
     identifier: '2pe'
     version: '{latest}'
@@ -18,4 +18,4 @@ projects:
        identifier: 'wav'
        version: ''
        contributor: []
-       chapter_url: 'https://audio-content.bibleineverylanguage.org/en/ulb/2pe/{chapter}/CONTENTS/wav/chapter/en_ulb_2pe_c{chapter}.wav'
+       chapter_url: 'https://audio-content.bibleineverylanguage.org/content/en/ulb/2pe/{chapter}/CONTENTS/wav/chapter/en_ulb_2pe_c{chapter}.wav'
