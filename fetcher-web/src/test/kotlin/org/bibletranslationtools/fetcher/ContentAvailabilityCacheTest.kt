@@ -30,7 +30,6 @@ class ContentAvailabilityCacheTest {
     private val rcFileName = "en_ulb"
 
     /**
-     *
      *  Note: the urls in media.yaml will need to be up-to-date,
      *  otherwise this test may fail
      */
