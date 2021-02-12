@@ -25,11 +25,7 @@ class ChapterWorker:
     def execute(self):
         """ Execute worker """
 
-        logging.debug("=================================================================")
-        logging.debug(".................................................................")
-        logging.debug("=================== Chapter worker started! =====================")
-        logging.debug(".................................................................")
-        logging.debug("=================================================================")
+        logging.debug("Chapter worker started!")
 
         self.clear_report()
         self.__temp_dir = init_temp_dir("chapter_worker_")
@@ -124,11 +120,7 @@ class ChapterWorker:
             logging.debug(f'Deleting temporary directory {self.__temp_dir}')
             rm_tree(self.__temp_dir)
 
-            logging.debug("=================================================================")
-            logging.debug(".................................................................")
-            logging.debug("=================== Chapter worker finished! =====================")
-            logging.debug(".................................................................")
-            logging.debug("=================================================================")
+            logging.debug("Chapter worker finished!")
 
     def convert_chapter_wav(self, chapter_file: Path, remote_dir: Path, grouping: str, quality: str):
         """ Convert chapter wav file and copy to remote directory"""

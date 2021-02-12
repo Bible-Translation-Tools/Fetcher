@@ -24,11 +24,7 @@ class VerseWorker:
     def execute(self):
         """ Execute worker """
 
-        logging.debug("=================================================================")
-        logging.debug(".................................................................")
-        logging.debug("=================== Verse worker started! =====================")
-        logging.debug(".................................................................")
-        logging.debug("=================================================================")
+        logging.debug("Verse worker started!")
 
         self.clear_report()
         self.__temp_dir = init_temp_dir("verse_worker_")
@@ -82,11 +78,7 @@ class VerseWorker:
             logging.debug(f'Deleting temporary directory {self.__temp_dir}')
             rm_tree(self.__temp_dir)
 
-            logging.debug("=================================================================")
-            logging.debug(".................................................................")
-            logging.debug("=================== Verse worker finished! =====================")
-            logging.debug(".................................................................")
-            logging.debug("=================================================================")
+            logging.debug("Verse worker finished!")
 
     def convert_verse_wav(self, verse_file: Path, remote_dir: Path, grouping: str, quality: str):
         """ Convert verse wav file and copy to remote directory """

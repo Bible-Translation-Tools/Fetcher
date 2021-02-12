@@ -34,11 +34,7 @@ class TrWorker:
     def execute(self):
         """ Execute worker """
 
-        logging.debug("=================================================================")
-        logging.debug(".................................................................")
-        logging.debug("=================== TR worker started! =====================")
-        logging.debug(".................................................................")
-        logging.debug("=================================================================")
+        logging.debug("TR worker started!")
 
         try:
             self.clear_report()
@@ -109,11 +105,7 @@ class TrWorker:
             logging.debug(f'Deleting temporary directory {self.__temp_dir}')
             rm_tree(self.__temp_dir)
 
-            logging.debug("=================================================================")
-            logging.debug(".................................................................")
-            logging.debug("=================== TR worker finished! =====================")
-            logging.debug(".................................................................")
-            logging.debug("=================================================================")
+            logging.debug("TR worker finished!")
 
     def find_existent_tr(self) -> List[Tuple[Group, Path]]:
         """ Find tr files that exist in the remote directory """
