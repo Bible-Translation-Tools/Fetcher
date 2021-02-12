@@ -55,6 +55,8 @@ class RepositoryUpdater:
         except FileNotFoundError as ex:
             logging.error("An error occurred when reading " + GL_REPO_URLS)
             logging.exception(str(ex))
+        except Exception as e:
+            logging.warning(str(e))
         finally:
             file.close()
 

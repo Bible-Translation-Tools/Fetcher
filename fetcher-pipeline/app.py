@@ -5,6 +5,7 @@ from argparse import Namespace
 from pathlib import Path
 from time import sleep
 from typing import Tuple, List
+from datetime import datetime
 
 import sentry_sdk
 
@@ -51,7 +52,8 @@ class App:
                 )
             )
             if report is not None:
-                logging.error("Fetcher pipeline worker", extra=report)
+                time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                logging.error(f"Fetcher Pipeline Report {time}", extra=report)
 
             sleep(wait_timer)
 
