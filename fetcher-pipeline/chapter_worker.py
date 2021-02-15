@@ -25,103 +25,107 @@ class ChapterWorker:
     def execute(self):
         """ Execute worker """
 
-        logging.debug("-------------------------------")
-        logging.debug("--- Chapter worker started! ---")
-        logging.debug("-------------------------------")
+        logging.debug("Chapter worker started!")
 
-        try:
-            self.clear_report()
-            self.__temp_dir = init_temp_dir("chapter_worker_")
+        self.clear_report()
+        self.__temp_dir = init_temp_dir("chapter_worker_")
 
-            for src_file in self.__ftp_dir.rglob('*.wav'):
-                # Process chapter files only
-                if not re.search(self.__chapter_regex, str(src_file)):
-                    continue
+        for src_file in self.__ftp_dir.rglob('*.wav'):
+            # Process chapter files only
+            if not re.search(self.__chapter_regex, str(src_file)):
+                continue
 
-                # Extract necessary path parts
-                root_parts = self.__ftp_dir.parts
-                parts = src_file.parts[len(root_parts):]
+            try:
+                self.process_chapter(src_file)
+            except Exception as e:
+                logging.warning(str(e))
 
-                lang = parts[0]
-                resource = parts[1]
-                book = parts[2]
-                chapter = parts[3]
-                grouping = parts[6]
+        logging.debug(f'Deleting temporary directory {self.__temp_dir}')
+        rm_tree(self.__temp_dir)
 
-                target_dir = self.__temp_dir.joinpath(lang, resource, book, chapter, grouping)
-                remote_dir = self.__ftp_dir.joinpath(lang, resource, book, chapter, "CONTENTS")
-                verses_dir = target_dir.joinpath("verses")
-                verses_dir.mkdir(parents=True, exist_ok=True)
-                target_file = target_dir.joinpath(src_file.name)
+        logging.debug("Chapter worker finished!")
 
-                logging.debug(f'Found chapter file: {src_file}')
+    def process_chapter(self, src_file):
+        # Extract necessary path parts
+        root_parts = self.__ftp_dir.parts
+        parts = src_file.parts[len(root_parts):]
 
-                # Copy source file to temp dir
-                logging.debug(f'Copying file {src_file} to {target_file}')
-                target_file.write_bytes(src_file.read_bytes())
+        lang = parts[0]
+        resource = parts[1]
+        book = parts[2]
+        chapter = parts[3]
+        grouping = parts[6]
 
-                # Try to fix wav metadata
-                logging.debug(f'Fixing metadata: {target_file}')
-                fix_metadata(target_file, self.verbose)
+        target_dir = self.__temp_dir.joinpath(lang, resource, book, chapter, grouping)
+        remote_dir = self.__ftp_dir.joinpath(lang, resource, book, chapter, "CONTENTS")
+        verses_dir = target_dir.joinpath("verses")
+        verses_dir.mkdir(parents=True, exist_ok=True)
+        target_file = target_dir.joinpath(src_file.name)
 
-                # Split chapter files into verses
-                logging.debug(f'Splitting chapter {target_file} into {verses_dir}')
-                split_chapter(target_file, verses_dir, self.verbose)
+        logging.debug(f'Found chapter file: {src_file}')
 
-                if check_dir_empty(verses_dir):
-                    logging.warning(f'Could not split chapter file. Make sure file is importable.')
-                    continue
+        # Copy source file to temp dir
+        logging.debug(f'Copying file {src_file} to {target_file}')
+        target_file.write_bytes(src_file.read_bytes())
 
-                target_verse_dir = remote_dir.joinpath("wav", "verse")
+        # Try to fix wav metadata
+        logging.debug(f'Fixing metadata: {target_file}')
+        fix_metadata(target_file, self.verbose)
 
-                is_new = check_dir_empty(target_verse_dir)
-                is_changed = has_new_files(verses_dir, target_verse_dir)
+        # Split chapter files into verses
+        logging.debug(f'Splitting chapter {target_file} into {verses_dir}')
+        split_chapter(target_file, verses_dir, self.verbose)
 
-                cleaning = is_new or is_changed
+        if check_dir_empty(verses_dir):
+            logging.warning(f'Could not split chapter file. Make sure file is importable.')
+            return
 
-                # If we have a new or updated chapter WAV file
-                # delete all the chapter related resources:
-                # split verses, converted files, TR files and book files
-                if cleaning:
-                    logging.debug(f'Chapter file has been changed, cleaning related files...')
+        target_verse_dir = remote_dir.joinpath("wav", "verse")
 
-                    # Delete related chapter files
-                    self.delete_chapter_files(lang, resource, book, chapter)
+        is_new = check_dir_empty(target_verse_dir)
+        is_changed = has_new_files(verses_dir, target_verse_dir)
 
-                    # Delete related verse files
-                    self.delete_verse_files(lang, resource, book, chapter)
+        should_clean = is_new or is_changed
 
-                    # Delete related book TR files
-                    self.delete_tr_book_files(lang, resource, book)
+        # If we have a new or updated chapter WAV file
+        # delete all the chapter related resources:
+        # split verses, converted files, TR files and book files
+        if should_clean:
+            self.clean_derivatives(lang, resource, book, chapter)
 
-                    # Delete related chapter TR files
-                    self.delete_tr_chapter_files(lang, resource, book, chapter)
+        # Copy original verse files
+        logging.debug(
+            f'Copying original verse files from {verses_dir} into {remote_dir}'
+        )
+        t_dir = copy_dir(verses_dir, remote_dir)
+        if should_clean and t_dir is not None:
+            self.resources_created.append(str(rel_path(t_dir, self.__ftp_dir)))
 
-                    # Delete related book audio files
-                    self.delete_book_audio_files(lang, resource, book)
+        # Convert chapter into mp3
+        self.convert_chapter_wav(target_file, remote_dir, grouping, 'hi')
+        self.convert_chapter_wav(target_file, remote_dir, grouping, 'low')
 
-                # Copy original verse files
-                logging.debug(
-                    f'Copying original verse files from {verses_dir} into {remote_dir}'
-                )
-                t_dir = copy_dir(verses_dir, remote_dir)
-                if cleaning and t_dir is not None:
-                    self.resources_created.append(str(rel_path(t_dir, self.__ftp_dir)))
+        # Convert verses into mp3
+        self.convert_verses_wav(verses_dir, remote_dir, 'hi')
+        self.convert_verses_wav(verses_dir, remote_dir, 'low')
 
-                # Convert chapter into mp3
-                self.convert_chapter_wav(target_file, remote_dir, grouping, 'hi')
-                self.convert_chapter_wav(target_file, remote_dir, grouping, 'low')
+    def clean_derivatives(self, lang, resource, book, chapter):
+        logging.debug(f'Chapter file has been changed, cleaning related files...')
 
-                # Convert verses into mp3
-                self.convert_verses_wav(verses_dir, remote_dir, 'hi')
-                self.convert_verses_wav(verses_dir, remote_dir, 'low')
-        except Exception as e:
-            logging.warning(str(e))
-        finally:
-            logging.debug(f'Deleting temporary directory {self.__temp_dir}')
-            rm_tree(self.__temp_dir)
+        # Delete related chapter files
+        self.delete_chapter_files(lang, resource, book, chapter)
 
-            logging.debug('Chapter worker finished!')
+        # Delete related verse files
+        self.delete_verse_files(lang, resource, book, chapter)
+
+        # Delete related book TR files
+        self.delete_tr_book_files(lang, resource, book)
+
+        # Delete related chapter TR files
+        self.delete_tr_chapter_files(lang, resource, book, chapter)
+
+        # Delete related book audio files
+        self.delete_book_audio_files(lang, resource, book)
 
     def convert_chapter_wav(self, chapter_file: Path, remote_dir: Path, grouping: str, quality: str):
         """ Convert chapter wav file and copy to remote directory"""

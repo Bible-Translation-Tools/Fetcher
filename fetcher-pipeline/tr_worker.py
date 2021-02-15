@@ -34,9 +34,7 @@ class TrWorker:
     def execute(self):
         """ Execute worker """
 
-        logging.debug("-------------------------------")
-        logging.debug("------ TR worker started! -----")
-        logging.debug("-------------------------------")
+        logging.debug("TR worker started!")
 
         try:
             self.clear_report()
@@ -86,22 +84,15 @@ class TrWorker:
                             logging.debug(f'Verse file {src_file} is excluded: exists in CHAPTER TR: {tr}')
                             self.__chapter_tr_files.remove(src_file)
 
-            # Create chapter TRs
-            chapter_groups = self.group_files(self.__chapter_tr_files, Group.CHAPTER)
-            for key in chapter_groups:
-                self.create_tr_file(key, chapter_groups[key])
-
-            # Create book TRs
-            book_groups = self.group_files(self.__book_tr_files, Group.BOOK)
-            for key in book_groups:
-                self.create_tr_file(key, book_groups[key])
+            self.create_chapter_trs()
+            self.create_book_trs()
         except Exception as e:
             logging.warning(str(e))
         finally:
             logging.debug(f'Deleting temporary directory {self.__temp_dir}')
             rm_tree(self.__temp_dir)
 
-            logging.debug('TR worker finished!')
+            logging.debug("TR worker finished!")
 
     def find_existent_tr(self) -> List[Tuple[Group, Path]]:
         """ Find tr files that exist in the remote directory """
@@ -156,6 +147,22 @@ class TrWorker:
             dic[key].append(f)
 
         return dic
+
+    def create_chapter_trs(self):
+        chapter_groups = self.group_files(self.__chapter_tr_files, Group.CHAPTER)
+        for key in chapter_groups:
+            try:
+                self.create_tr_file(key, chapter_groups[key])
+            except Exception as e:
+                logging.warning(str(e))
+
+    def create_book_trs(self):
+        book_groups = self.group_files(self.__book_tr_files, Group.BOOK)
+        for key in book_groups:
+            try:
+                self.create_tr_file(key, book_groups[key])
+            except Exception as e:
+                logging.warning(str(e))
 
     def create_tr_file(self, dic: str, files: List[Path]):
         """ Create tr file and copy it to the remote directory"""
