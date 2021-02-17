@@ -72,5 +72,5 @@ jobs:
         
       - name: Push image
         run: |
-          docker push bibletranslationtools/fetcher
-          docker push bibletranslationtools/fetcher-pipeline
+          docker push -a bibletranslationtools/fetcher
+          docker push -a bibletranslationtools/fetcher-pipeline
