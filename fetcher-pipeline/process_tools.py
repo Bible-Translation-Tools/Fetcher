@@ -55,7 +55,10 @@ def run_process(command, verbose=False):
     )
 
     if process.returncode != 0:
-        error_data = {"error": process.stderr}
+        error_data = {
+            "command": command,
+            "error": process.stderr
+        }
         time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         logging.error(f"Fetcher Error {time}", extra=error_data)
