@@ -59,7 +59,7 @@ def run_process(command, verbose=False):
             "error": process.stderr
         }
 
-        logging.error(command, extra=error_data)
+        logging.error(f"Error: {command}", extra=error_data)
         raise Exception(f"There was an error in a process. {process.stderr}")
     else:
         if verbose:
