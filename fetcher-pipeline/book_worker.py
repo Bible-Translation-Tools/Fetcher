@@ -1,6 +1,8 @@
 import json
 import logging
 import re
+import traceback
+
 from pydub import AudioSegment
 from pathlib import Path
 from typing import List, Dict
@@ -75,9 +77,9 @@ class BookWorker:
                 try:
                     self.create_book_file(key, book_groups[key])
                 except Exception as e:
-                    logging.warning(str(e))
+                    logging.error(f"Error: {e}", extra={"stacktrace": traceback.format_exc()})
         except Exception as e:
-            logging.warning(str(e))
+            logging.error(f"Error: {e}", extra={"stacktrace": traceback.format_exc()})
         finally:
             logging.debug(f'Deleting temporary directory {self.__temp_dir}')
             rm_tree(self.__temp_dir)

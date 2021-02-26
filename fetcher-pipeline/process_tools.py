@@ -56,7 +56,7 @@ def run_process(command, verbose=False):
     if process.returncode != 0:
         error_data = {
             "command": command,
-            "error": process.stderr
+            "stacktrace": process.stderr
         }
 
         logging.error(f"Error: {command}", extra=error_data)

@@ -1,6 +1,7 @@
 import json
 import logging
 import re
+import traceback
 from enum import Enum
 from pathlib import Path
 from typing import List, Tuple, Dict
@@ -87,7 +88,7 @@ class TrWorker:
             self.create_chapter_trs()
             self.create_book_trs()
         except Exception as e:
-            logging.warning(str(e))
+            logging.error(f"Error: {e}", extra={"stacktrace": traceback.format_exc()})
         finally:
             logging.debug(f'Deleting temporary directory {self.__temp_dir}')
             rm_tree(self.__temp_dir)
@@ -154,7 +155,7 @@ class TrWorker:
             try:
                 self.create_tr_file(key, chapter_groups[key])
             except Exception as e:
-                logging.warning(str(e))
+                logging.error(f"Error: {e}", extra={"stacktrace": traceback.format_exc()})
 
     def create_book_trs(self):
         book_groups = self.group_files(self.__book_tr_files, Group.BOOK)
@@ -162,7 +163,7 @@ class TrWorker:
             try:
                 self.create_tr_file(key, book_groups[key])
             except Exception as e:
-                logging.warning(str(e))
+                logging.error(f"Error: {e}", extra={"stacktrace": traceback.format_exc()})
 
     def create_tr_file(self, dic: str, files: List[Path]):
         """ Create tr file and copy it to the remote directory"""

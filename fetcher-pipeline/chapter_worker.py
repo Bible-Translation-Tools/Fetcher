@@ -1,5 +1,6 @@
 import logging
 import re
+import traceback
 from pathlib import Path
 from typing import Dict
 
@@ -38,7 +39,11 @@ class ChapterWorker:
             try:
                 self.process_chapter(src_file)
             except Exception as e:
-                logging.warning(str(e))
+                error_data = {
+                    "file": str(src_file),
+                    "stacktrace": traceback.format_exc()
+                }
+                logging.error(f"Error: {e}", extra=error_data)
 
         logging.debug(f'Deleting temporary directory {self.__temp_dir}')
         rm_tree(self.__temp_dir)
