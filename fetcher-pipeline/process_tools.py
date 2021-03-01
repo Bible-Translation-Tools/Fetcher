@@ -1,6 +1,5 @@
 import logging
 import subprocess
-from datetime import datetime
 
 
 def fix_metadata(input_file, verbose=False):
@@ -55,10 +54,12 @@ def run_process(command, verbose=False):
     )
 
     if process.returncode != 0:
-        error_data = {"error": process.stderr}
-        time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        error_data = {
+            "command": command,
+            "error": process.stderr
+        }
 
-        logging.error(f"Fetcher Error {time}", extra=error_data)
+        logging.error(f"Error: {command}", extra=error_data)
         raise Exception(f"There was an error in a process. {process.stderr}")
     else:
         if verbose:
