@@ -7,7 +7,7 @@ services:
     volumes:
       - fetcher-content:/srv/content
       - fetcher-rc:/srv/rc
-    restart: always
+    restart: unless-stopped
   fetcher-app:
   # for local development, tag your image with "local" e.g. `docker build -t bibletranslationtools/fetcher:local .`
     image: bibletranslationtools/fetcher:${FETCHER_IMAGE_TAG}
@@ -21,7 +21,7 @@ services:
       - fetcher-content:/content
       - fetcher-rc:${RC_TEMP_DIR}
       - fetcher-repos:${ORATURE_REPO_DIR}
-    restart: always
+    restart: unless-stopped
   ftp:
     image: bogem/ftp
     volumes:
@@ -37,6 +37,7 @@ services:
     restart: always
   pipeline:
     image: bibletranslationtools/fetcher-pipeline:${FETCHER_IMAGE_TAG}
+    restart: unless-stopped
     env_file:
       - vars.env
     environment:
