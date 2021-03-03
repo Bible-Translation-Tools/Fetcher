@@ -54,9 +54,8 @@ class ChapterWorker:
         resource = parts[1]
         book = parts[2]
         chapter = parts[3]
-        grouping = parts[6]
 
-        target_dir = self.__temp_dir.joinpath(lang, resource, book, chapter, grouping)
+        target_dir = self.__temp_dir.joinpath(lang, resource, book, chapter, 'chapter')
         remote_dir = self.__ftp_dir.joinpath(lang, resource, book, chapter, "CONTENTS")
         verses_dir = target_dir.joinpath("verses")
         verses_dir.mkdir(parents=True, exist_ok=True)
@@ -101,13 +100,17 @@ class ChapterWorker:
         if should_clean and t_dir is not None:
             self.resources_created.append(str(rel_path(t_dir, self.__ftp_dir)))
 
-        # Convert chapter into mp3
-        self.convert_chapter_wav(target_file, remote_dir, grouping, 'hi')
-        self.convert_chapter_wav(target_file, remote_dir, grouping, 'low')
+        # Convert chapter to mp3
+        self.convert_wav_to_mp3(target_file, remote_dir, 'chapter', 'hi')
+        self.convert_wav_to_mp3(target_file, remote_dir, 'chapter', 'low')
 
-        # Convert verses into mp3
-        self.convert_verses_wav(verses_dir, remote_dir, 'hi')
-        self.convert_verses_wav(verses_dir, remote_dir, 'low')
+        # Convert verses to mp3
+        for f in verses_dir.iterdir():
+            if f.is_dir():
+                continue
+
+            self.convert_wav_to_mp3(f, remote_dir, 'verse', 'hi')
+            self.convert_wav_to_mp3(f, remote_dir, 'verse', 'low')
 
     def clean_derivatives(self, lang, resource, book, chapter):
         logging.debug(f'Chapter file has been changed, cleaning related files...')
@@ -127,78 +130,37 @@ class ChapterWorker:
         # Delete related book audio files
         self.delete_book_audio_files(lang, resource, book)
 
-    def convert_chapter_wav(self, chapter_file: Path, remote_dir: Path, grouping: str, quality: str):
-        """ Convert chapter wav file and copy to remote directory"""
-
-        if chapter_file.suffix != '.wav':
+    def convert_wav_to_mp3(self, input_file: Path, remote_dir: Path, grouping: str, quality: str):
+        if input_file.suffix != '.wav':
             pass
 
         bitrate = BITRATE_HIGH if quality == 'hi' else BITRATE_LOW
 
         # Check if file exists remotely
-        chapter_mp3_exists = check_file_exists(chapter_file, remote_dir, 'mp3', grouping, quality)
+        mp3_exists = check_file_exists(input_file, remote_dir, 'mp3', grouping, quality)
 
-        if not chapter_mp3_exists:
-            logging.debug(f'Converting chapter: {chapter_file}')
-            convert_to_mp3(chapter_file, bitrate, False, self.verbose)
+        if not mp3_exists:
+            logging.debug(f'Converting file: {input_file}')
+            convert_to_mp3(input_file, bitrate, False, self.verbose)
 
-            # Copy converted chapter files
-            mp3_file = chapter_file.with_suffix('.mp3')
+            # Copy converted files
+            mp3_file = input_file.with_suffix('.mp3')
             if mp3_file.exists():
                 logging.debug(
-                    f'Copying chapter mp3 {mp3_file} into {remote_dir}'
+                    f'Copying {mp3_file} to {remote_dir}'
                 )
                 m_file = copy_file(mp3_file, remote_dir, grouping, quality)
                 self.resources_created.append(str(rel_path(m_file, self.__ftp_dir)))
 
-            cue_file = chapter_file.with_suffix('.cue')
+            cue_file = input_file.with_suffix('.cue')
             if cue_file.exists():
                 logging.debug(
-                    f'Copying chapter cue {cue_file} into {remote_dir}'
+                    f'Copying {cue_file} to {remote_dir}'
                 )
                 c_file = copy_file(cue_file, remote_dir, grouping)
                 self.resources_created.append(str(rel_path(c_file, self.__ftp_dir)))
         else:
-            logging.debug('Files exist. Skipping...')
-
-    def convert_verses_wav(self, verses_dir: Path, remote_dir: Path, quality: str):
-        """ Convert verse wav file and copy to remote directory """
-
-        bitrate = BITRATE_HIGH if quality == 'hi' else BITRATE_LOW
-
-        for f in verses_dir.iterdir():
-            if f.is_dir():
-                continue
-
-            if f.suffix != '.wav':
-                continue
-
-            # Check if file exists remotely
-            mp3_exists = check_file_exists(f, remote_dir, 'mp3', quality=quality)
-
-            if mp3_exists:
-                logging.debug('Files exist. Skipping...')
-                continue
-
-            logging.debug(f'Converting file: {f}')
-            convert_to_mp3(f, bitrate, False, self.verbose)
-
-            # Copy converted verse files
-            mp3_file = f.with_suffix('.mp3')
-            if mp3_file.exists():
-                logging.debug(
-                    f'Copying verse mp3 {mp3_file} into {remote_dir}'
-                )
-                m_file = copy_file(mp3_file, remote_dir, quality=quality)
-                self.resources_created.append(str(rel_path(m_file, self.__ftp_dir)))
-
-            cue_file = f.with_suffix('.cue')
-            if cue_file.exists():
-                logging.debug(
-                    f'Copying verse cue {mp3_file} into {remote_dir}'
-                )
-                c_file = copy_file(cue_file, remote_dir)
-                self.resources_created.append(str(rel_path(c_file, self.__ftp_dir)))
+            logging.debug('File exists. Skipping...')
 
     def delete_tr_book_files(self, lang, resource, book):
         """ Delete tr files of the specified book """
