@@ -41,7 +41,7 @@ services:
     image: bibletranslationtools/fetcher-pipeline:${FETCHER_IMAGE_TAG}
     restart: unless-stopped
     env_file:
-      - vars.env
+      - .env
     environment:
       SENTRY_DSN: ${SENTRY_DSN}
       PM2_PUBLIC_KEY: ${PM2_PUBLIC_KEY}
