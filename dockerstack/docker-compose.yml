@@ -14,9 +14,11 @@ services:
     ports:
       - "8080:8080"
     env_file:
-      - vars.env
+      - .env
     environment:
-     - CDN_BASE_URL=${CDN_BASE_URL}
+      CDN_BASE_URL: ${CDN_BASE_URL}
+      CDN_BASE_RC_URL: ${CDN_BASE_RC_URL}
+      RC_TEMP_DIR: ${RC_TEMP_DIR}
     volumes:
       - fetcher-content:/content
       - fetcher-rc:${RC_TEMP_DIR}
