@@ -148,7 +148,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
     }
 
     override fun allocateRCFileLocation(newFileName: String): File {
-        return directoryProvider.getDownloadDir()
+        return directoryProvider.getRCExportDir()
             .resolve(UUID.randomUUID().toString())
             .apply { mkdirs() }
             .resolve(newFileName)
