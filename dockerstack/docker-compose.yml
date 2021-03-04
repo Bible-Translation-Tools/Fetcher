@@ -14,9 +14,10 @@ services:
     ports:
       - "8080:8080"
     env_file:
-      - vars.env
+      - .env
     environment:
      - CDN_BASE_URL=${CDN_BASE_URL}
+     - RC_TEMP_DIR=${RC_TEMP_DIR}
     volumes:
       - fetcher-content:/content
       - fetcher-rc:${RC_TEMP_DIR}
@@ -39,7 +40,7 @@ services:
     image: bibletranslationtools/fetcher-pipeline:${FETCHER_IMAGE_TAG}
     restart: unless-stopped
     env_file:
-      - vars.env
+      - .env
     environment:
       SENTRY_DSN: ${SENTRY_DSN}
       PM2_PUBLIC_KEY: ${PM2_PUBLIC_KEY}
