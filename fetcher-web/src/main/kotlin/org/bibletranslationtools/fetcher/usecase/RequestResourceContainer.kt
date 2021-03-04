@@ -41,7 +41,8 @@ class RequestResourceContainer(
         )
 
         return if (hasContent && packedUp) {
-            RCDeliverable(deliverable, zipFile.path)
+            val url = formatDownloadUrl(zipFile)
+            RCDeliverable(deliverable, url)
         } else {
             zipFile.parentFile.deleteRecursively()
             null
@@ -61,6 +62,12 @@ class RequestResourceContainer(
             downloadClient,
             overwrite = true
         )
+    }
+
+    private fun formatDownloadUrl(file: File): String {
+        val baseUrl = System.getenv("CDN_BASE_RC_URL")
+        val relativePath = file.parentFile.name + File.separator + file.name
+        return "$baseUrl/$relativePath"
     }
 
     companion object {
