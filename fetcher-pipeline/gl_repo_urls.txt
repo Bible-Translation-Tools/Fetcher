@@ -6,7 +6,7 @@ https://content.bibletranslationtools.org/WA-Catalog/pt-br_ulb
 https://content.bibletranslationtools.org/WA-Catalog/my_ulb
 https://content.bibletranslationtools.org/WA-Catalog/ceb_ulb
 https://content.bibletranslationtools.org/WA-Catalog/zh_ulb
-https://content.bibletranslationtools.org/WA-Catalog/en_ulb
+https://content.bibletranslationtools.org/WycliffeAssociates/en_ulb
 https://content.bibletranslationtools.org/WA-Catalog/fr_ulb
 https://content.bibletranslationtools.org/WA-Catalog/gu_ulb
 https://content.bibletranslationtools.org/WA-Catalog/ha_ulb

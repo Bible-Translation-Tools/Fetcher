@@ -65,13 +65,13 @@ object RCUtils {
         val env = mapOf("create" to "true")
 
         val success = try {
-            val uri: URI = URI.create("jar:file:/${dest.invariantSeparatorsPath}")
+            val uri: URI = URI.create("jar:file:///${dest.invariantSeparatorsPath}")
             FileSystems.newFileSystem(uri, env).use { zipFileSystem ->
 
-                source.walk().forEach {
+                source.walk().filterNot { it == source }.forEach {
                     val fileFromSource = Paths.get(it.path)
                     val pathInZipFile = zipFileSystem.getPath(
-                        source.name + it.path.removePrefix(source.path)
+                        it.path.removePrefix(source.path)
                     )
 
                     // copy into zip file
@@ -93,14 +93,14 @@ object RCUtils {
         ZipFile(rcFile).use { rcZip ->
             val listEntries = rcZip.entries().toList()
             return listEntries.any { entry ->
-                entry.name.matches(Regex(".*/$chapterPath\$"))
+                entry.name.matches(Regex("^$chapterPath\$"))
             }
         }
     }
 
     private fun checkFromDirectory(rcFile: File, chapterPath: String): Boolean {
         return rcFile.walk().any {
-            it.invariantSeparatorsPath.matches(Regex(".*/$chapterPath\$"))
+            it.invariantSeparatorsPath.matches(Regex("^$chapterPath\$"))
         }
     }
 }
