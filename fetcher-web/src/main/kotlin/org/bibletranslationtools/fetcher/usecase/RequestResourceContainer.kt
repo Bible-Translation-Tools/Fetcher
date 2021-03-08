@@ -6,6 +6,7 @@ import org.bibletranslationtools.fetcher.data.RCDeliverable
 import org.bibletranslationtools.fetcher.impl.repository.RCUtils
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
+import org.slf4j.LoggerFactory
 import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
 import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
@@ -28,9 +29,10 @@ class RequestResourceContainer(
         // allocate rc to delivery location
         val zipName = RCUtils.createRCFileName(deliverable, "zip")
         val zipFile = storageAccess.allocateRCFileLocation(zipName)
-
+        val logger = LoggerFactory.getLogger(javaClass)
+        logger.info("RC File: " + zipFile.absolutePath)
         val packedUp = RCUtils.zipDirectory(templateRC, zipFile)
-
+        logger.info("RC Zipped status: $packedUp. Exists? - ${zipFile.exists()}")
         downloadMediaInRC(zipFile, deliverable)
 
         val hasContent = RCUtils.verifyChapterExists(
@@ -39,7 +41,7 @@ class RequestResourceContainer(
             mediaTypes,
             deliverable.chapter?.number
         )
-
+        logger.info("RC has any file: $hasContent")
         return if (hasContent && packedUp) {
             val url = formatDownloadUrl(zipFile)
             RCDeliverable(deliverable, url)

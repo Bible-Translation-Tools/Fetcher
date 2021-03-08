@@ -8,6 +8,7 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.zip.ZipFile
 import org.bibletranslationtools.fetcher.data.Deliverable
+import org.slf4j.LoggerFactory
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
@@ -83,6 +84,7 @@ object RCUtils {
             }
             true
         } catch (ex: Exception) {
+            LoggerFactory.getLogger(javaClass).info(ex.message)
             false
         }
 
