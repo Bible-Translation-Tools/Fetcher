@@ -84,7 +84,7 @@ object RCUtils {
             }
             true
         } catch (ex: Exception) {
-            LoggerFactory.getLogger(javaClass).info("Error zipping file $source to $dest.", ex)
+            LoggerFactory.getLogger(javaClass).info("Error zipping file $source to $dest. ${ex.message}", ex)
             false
         }
 
