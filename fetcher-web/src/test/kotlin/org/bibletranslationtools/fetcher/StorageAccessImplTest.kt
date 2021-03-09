@@ -5,9 +5,11 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
 import java.io.FileFilter
 import java.net.URL
+import org.bibletranslationtools.fetcher.impl.repository.DirectoryProviderImpl
 import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.`when`
@@ -192,5 +194,25 @@ class StorageAccessImplTest {
 
         val testCasesFile = File(testCasesResource.file)
         return jacksonObjectMapper().readValue(testCasesFile.readText())
+    }
+
+    @Test
+    fun `test write access to RC export location`() {
+        val directoryProvider = DirectoryProviderImpl()
+        val storageAccess = StorageAccessImpl(directoryProvider)
+        val fileName = "en_ulb_tit_c2.zip"
+
+        try {
+            val zipFile: File = storageAccess.allocateRCFileLocation(fileName)
+                .apply {
+                    deleteOnExit()
+                    parentFile.deleteOnExit()
+                }
+
+            assertTrue(zipFile.createNewFile())
+        } catch (ex: Exception) {
+            logger.error("Cannot write to rc export location.")
+            throw(ex)
+        }
     }
 }
