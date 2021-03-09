@@ -63,11 +63,12 @@ object RCUtils {
         }
 
         val env = mapOf("create" to "true")
-
         val success = try {
-            val uri: URI = URI.create("jar:file:///${dest.invariantSeparatorsPath}")
-            FileSystems.newFileSystem(uri, env).use { zipFileSystem ->
+            val fileURI = "jar:file:/" +
+                    dest.invariantSeparatorsPath.removePrefix("/")
+            val uri: URI = URI.create(fileURI)
 
+            FileSystems.newFileSystem(uri, env).use { zipFileSystem ->
                 source.walk().filterNot { it == source }.forEach {
                     val fileFromSource = Paths.get(it.path)
                     val pathInZipFile = zipFileSystem.getPath(
