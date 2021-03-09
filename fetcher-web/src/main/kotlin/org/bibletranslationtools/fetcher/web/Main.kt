@@ -8,6 +8,8 @@ const val PORT = 8080
 const val CLASS_LOADER = "Fetcher"
 
 fun main(args: Array<String>) {
+    EnvironmentConfigCheck.run()
+
     embeddedServer(
         factory = Netty,
         port = PORT,
