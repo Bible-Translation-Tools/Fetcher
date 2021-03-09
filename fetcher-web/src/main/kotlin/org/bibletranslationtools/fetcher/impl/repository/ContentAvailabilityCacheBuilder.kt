@@ -1,12 +1,12 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import io.ktor.http.HttpStatusCode
-import org.bibletranslationtools.fetcher.data.Book
-import org.bibletranslationtools.fetcher.data.Language
-import org.bibletranslationtools.fetcher.data.Product
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import org.bibletranslationtools.fetcher.data.Book
+import org.bibletranslationtools.fetcher.data.Language
+import org.bibletranslationtools.fetcher.data.Product
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
