@@ -1,7 +1,7 @@
 FROM gradle:6.5-jdk11 AS builder
 COPY . /fetcher-web
 WORKDIR /fetcher-web
-RUN gradle check build
+RUN gradle build
 
 FROM openjdk:11-jre-slim
 
