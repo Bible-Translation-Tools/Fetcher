@@ -60,6 +60,7 @@ class RequestResourceContainer(
             rcFile,
             downloadParameters,
             downloadClient,
+            singleProject = true,
             overwrite = true
         )
     }
