@@ -100,7 +100,7 @@ object RCUtils {
 
     private fun checkFromDirectory(rcFile: File, chapterPath: String): Boolean {
         return rcFile.walk().any {
-            it.invariantSeparatorsPath.matches(Regex("^$chapterPath\$"))
+            it.invariantSeparatorsPath.matches(Regex(".*$chapterPath\$"))
         }
     }
 }

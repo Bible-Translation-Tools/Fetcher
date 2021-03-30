@@ -1,8 +1,8 @@
 package org.bibletranslationtools.fetcher.usecase
 
 import io.ktor.client.features.ClientRequestException
-import org.bibletranslationtools.fetcher.data.Book
 import java.io.File
+import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.data.Product

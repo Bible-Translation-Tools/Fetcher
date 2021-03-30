@@ -26,21 +26,23 @@ class RequestResourceContainer(
         ) ?: return null
 
         // allocate rc to delivery location
-        val zipName = RCUtils.createRCFileName(deliverable, "zip")
-        val zipFile = storageAccess.allocateRCFileLocation(zipName)
+        val rcName = RCUtils.createRCFileName(deliverable, "")
+        val rc = storageAccess.allocateRCFileLocation(rcName)
+        templateRC.copyRecursively(rc)
 
-        val packedUp = RCUtils.zipDirectory(templateRC, zipFile)
-
-        downloadMediaInRC(zipFile, deliverable)
+        downloadMediaInRC(rc, deliverable)
 
         val hasContent = RCUtils.verifyChapterExists(
-            zipFile,
+            rc,
             deliverable.book.slug,
             mediaTypes,
             deliverable.chapter?.number
         )
+        val zipFile = rc.parentFile.resolve(rc.name + ".zip")
+        val packedUp = RCUtils.zipDirectory(rc, zipFile)
 
         return if (hasContent && packedUp) {
+            rc.deleteRecursively()
             val url = formatDownloadUrl(zipFile)
             RCDeliverable(deliverable, url)
         } else {
