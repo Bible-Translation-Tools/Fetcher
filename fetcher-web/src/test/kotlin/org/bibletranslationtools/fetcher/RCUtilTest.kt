@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
 
 class RCUtilTest {
-    private val rcFileName = "titus_test.zip"
     private val testCaseFileName = "VerifyChapterExists_TestCases.json"
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -25,24 +24,30 @@ class RCUtilTest {
 
     @Test
     fun testVerifyChapterExists() {
-        val rcFile = getTestRCFile()
+        val rcFiles = listOf(
+            getTestRCFile("titus_test"),
+            getTestRCFile("titus_test.zip")
+        )
         val testCases = getVerifyChapterExistsTestCase()
-        for (case in testCases) {
-            val mediaTypes = case.mediaTypes.mapNotNull { MediaType.get(it) }
-            val result = RCUtils.verifyChapterExists(
-                rcFile,
-                case.bookSlug,
-                mediaTypes,
-                case.chapterNumber
-            )
-            assertEquals(case.expectedResult, result)
+
+        rcFiles.forEach { rcFile ->
+            for (case in testCases) {
+                val mediaTypes = case.mediaTypes.mapNotNull { MediaType.get(it) }
+                val result = RCUtils.verifyChapterExists(
+                    rcFile,
+                    case.bookSlug,
+                    mediaTypes,
+                    case.chapterNumber
+                )
+                assertEquals(case.expectedResult, result)
+            }
         }
     }
 
     @Throws(FileNotFoundException::class)
-    private fun getTestRCFile(): File {
-        val rcFilePath = javaClass.classLoader.getResource(rcFileName)
-            ?: throw(FileNotFoundException("Test resource not found: $rcFileName"))
+    private fun getTestRCFile(rcName: String): File {
+        val rcFilePath = javaClass.classLoader.getResource(rcName)
+            ?: throw(FileNotFoundException("Test resource not found: $rcName"))
         return File(rcFilePath.file)
     }
 

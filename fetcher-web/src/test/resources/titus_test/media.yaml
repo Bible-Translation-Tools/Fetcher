@@ -1,0 +1,13 @@
+---
+resource:
+  version: "{latest}"
+  media: []
+projects:
+- identifier: "tit"
+  version: "{latest}"
+  media:
+  - identifier: "mp3"
+    version: "{latest}"
+    url: ""
+    quality: []
+    chapter_url: "media/tit/chapters/en_nt_ulb_tit_c0{chapter}.mp3"
