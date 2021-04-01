@@ -1,15 +1,28 @@
 package org.bibletranslationtools.fetcher.io
 
-import org.bibletranslationtools.fetcher.config.CDN_BASE_URL
-import org.bibletranslationtools.fetcher.config.CONTENT_ROOT_DIR
-import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 import java.io.File
+import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
-class LocalFileTransferClient: IDownloadClient {
+/**
+ * This client provides better performance
+ * for file transfer without network communication.
+ * However, it must be locally hosted in the same system
+ * and have direct access to the resources.
+ *
+ * Pass an instance of this class to RC Media Downloader
+ */
+class LocalFileTransferClient : IDownloadClient {
+    /**
+     * This method automatically converts the requested url
+     * into a local path on the system, then copy it to outputDir
+     */
     override fun downloadFromUrl(url: String, outputDir: File): File? {
-        val relativePath = File(url).relativeTo(File(CDN_BASE_URL))
+        val urlPrefix = File(System.getenv("CDN_BASE_URL"))
+        val relativePath = File(url).relativeTo(urlPrefix)
+
         // map to local path
-        val sourceFile = File(CONTENT_ROOT_DIR).resolve(relativePath)
+        val contentDir = System.getenv("CONTENT_ROOT")
+        val sourceFile = File(contentDir).resolve(relativePath)
 
         return if (sourceFile.exists()) {
             val targetFile = outputDir.resolve(File(url).name)

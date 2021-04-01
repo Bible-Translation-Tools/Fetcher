@@ -23,7 +23,6 @@ import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
-import org.wycliffeassociates.rcmediadownloader.io.OkHttpDownloadClient
 
 object DependencyResolver {
     private val directoryProvider: DirectoryProvider = DirectoryProviderImpl()
