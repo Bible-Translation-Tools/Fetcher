@@ -12,6 +12,7 @@ import org.bibletranslationtools.fetcher.impl.repository.ProductCatalogImpl
 import org.bibletranslationtools.fetcher.impl.repository.RCRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
 import org.bibletranslationtools.fetcher.impl.repository.UnfoldingWordHeartLanguagesCatalog
+import org.bibletranslationtools.fetcher.io.LocalFileTransferClient
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
@@ -40,7 +41,7 @@ object DependencyResolver {
         bookCatalog = BookCatalogImpl()
     )
 
-    val downloadClient: IDownloadClient = OkHttpDownloadClient()
+    val downloadClient: IDownloadClient = LocalFileTransferClient()
     val rcRepository: ResourceContainerRepository = RCRepositoryImpl(storageAccess)
     private val cacheBuilder = ContentAvailabilityCacheBuilder(
         gatewayLanguageCatalog,
