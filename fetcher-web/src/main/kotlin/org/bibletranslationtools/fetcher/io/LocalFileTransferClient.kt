@@ -14,7 +14,7 @@ import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 class LocalFileTransferClient : IDownloadClient {
     /**
      * This method automatically converts the requested url
-     * into a local path on the system, then copy it to outputDir
+     * into a local path on the system, then copies it to outputDir
      */
     override fun downloadFromUrl(url: String, outputDir: File): File? {
         val urlPrefix = File(System.getenv("CDN_BASE_URL"))
