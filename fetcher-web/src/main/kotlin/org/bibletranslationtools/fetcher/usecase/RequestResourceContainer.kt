@@ -1,6 +1,7 @@
 package org.bibletranslationtools.fetcher.usecase
 
 import java.io.File
+import org.bibletranslationtools.fetcher.config.CDN_BASE_RC_URL
 import org.bibletranslationtools.fetcher.data.Deliverable
 import org.bibletranslationtools.fetcher.data.RCDeliverable
 import org.bibletranslationtools.fetcher.impl.repository.RCUtils
@@ -68,9 +69,8 @@ class RequestResourceContainer(
     }
 
     private fun formatDownloadUrl(file: File): String {
-        val baseUrl = System.getenv("CDN_BASE_RC_URL")
         val relativePath = file.parentFile.name + File.separator + file.name
-        return "$baseUrl/$relativePath"
+        return "$CDN_BASE_RC_URL/$relativePath"
     }
 
     companion object {
