@@ -21,6 +21,9 @@ class ChapterCatalogImpl : ChapterCatalog {
         val id: String,
         val lastvs: String
     ) {
+        // e.g. "id": "04-06", then chapter number is 04
+        val chapterNumber: Int = id.split('-').first().toInt()
+
         fun getChapter(): Int = id.split("-")[0].toInt()
     }
 
@@ -58,7 +61,7 @@ class ChapterCatalogImpl : ChapterCatalog {
     }
 
     private fun getLastChunk(chunkList: MutableList<Chunk>): Chunk {
-        chunkList.sortBy { it.id }
+        chunkList.sortBy { it.chapterNumber }
         return chunkList.last()
     }
 }
