@@ -1,8 +1,8 @@
 package org.bibletranslationtools.fetcher.io
 
+import java.io.File
 import org.bibletranslationtools.fetcher.config.CDN_BASE_URL
 import org.bibletranslationtools.fetcher.config.CONTENT_ROOT_DIR
-import java.io.File
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
 /**
