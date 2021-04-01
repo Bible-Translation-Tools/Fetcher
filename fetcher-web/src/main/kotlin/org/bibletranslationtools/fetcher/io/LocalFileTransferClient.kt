@@ -1,5 +1,7 @@
 package org.bibletranslationtools.fetcher.io
 
+import org.bibletranslationtools.fetcher.config.CDN_BASE_URL
+import org.bibletranslationtools.fetcher.config.CONTENT_ROOT_DIR
 import java.io.File
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
@@ -17,12 +19,10 @@ class LocalFileTransferClient : IDownloadClient {
      * into a local path on the system, then copies it to outputDir
      */
     override fun downloadFromUrl(url: String, outputDir: File): File? {
-        val urlPrefix = File(System.getenv("CDN_BASE_URL"))
-        val relativePath = File(url).relativeTo(urlPrefix)
+        val relativePath = File(url).relativeTo(File(CDN_BASE_URL))
 
         // map to local path
-        val contentDir = System.getenv("CONTENT_ROOT")
-        val sourceFile = File(contentDir).resolve(relativePath)
+        val sourceFile = File(CONTENT_ROOT_DIR).resolve(relativePath)
 
         return if (sourceFile.exists()) {
             val targetFile = outputDir.resolve(File(url).name)

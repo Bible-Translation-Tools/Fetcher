@@ -15,6 +15,7 @@ import io.ktor.routing.Routing
 import io.ktor.routing.routing
 import java.util.Locale
 import kotlin.concurrent.thread
+import org.bibletranslationtools.fetcher.config.CACHE_REFRESH_HOURS
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.web.controllers.bookController
 import org.bibletranslationtools.fetcher.web.controllers.chapterController
@@ -68,7 +69,7 @@ fun Application.appModule() {
 
 private fun scheduleCacheUpdate() {
     thread(start = true, isDaemon = true) {
-        val hours = System.getenv("CACHE_REFRESH_TIME_HRS").toLong()
+        val hours = CACHE_REFRESH_HOURS.toLong()
         while (true) {
             Thread.sleep(CACHE_REFRESH_RATE_PER_HOUR * hours)
             DependencyResolver.contentCache.update()
