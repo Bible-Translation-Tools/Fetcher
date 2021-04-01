@@ -23,8 +23,6 @@ class ChapterCatalogImpl : ChapterCatalog {
     ) {
         // e.g. "id": "04-06", then chapter number is 04
         val chapterNumber: Int = id.split('-').first().toInt()
-
-        fun getChapter(): Int = id.split("-")[0].toInt()
     }
 
     @Throws(IOException::class)
@@ -46,7 +44,7 @@ class ChapterCatalogImpl : ChapterCatalog {
 
         val mapper = ObjectMapper().registerModule(KotlinModule())
         val chunkList: MutableList<Chunk> = mapper.readValue(response)
-        val totalChapters = getLastChunk(chunkList).getChapter()
+        val totalChapters = getLastChunk(chunkList).chapterNumber
 
         val chapterList = mutableListOf<Chapter>()
         for (chapterNum in 1..totalChapters) {
