@@ -27,7 +27,7 @@ class LocalFileTransferClient : IDownloadClient {
         return if (sourceFile.exists()) {
             val targetFile = outputDir.resolve(File(url).name)
             sourceFile.copyTo(targetFile, true)
-            sourceFile
+            targetFile
         } else {
             null
         }
