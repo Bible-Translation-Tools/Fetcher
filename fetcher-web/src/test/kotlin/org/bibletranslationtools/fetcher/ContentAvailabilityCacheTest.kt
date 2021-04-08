@@ -74,22 +74,17 @@ class ContentAvailabilityCacheTest {
             listOf(Chapter(chapterNumber))
         )
 
-        val cacheBuilder = ContentAvailabilityCacheBuilder(
-            mockLanguageCatalog,
-            mockChapterCatalog,
-            bookRepository,
-            mockStorageAccess,
-            mockRCRepository
-        )
         withEnvironmentVariable("CONTENT_ROOT", tempDir.path)
             .and("CDN_BASE_URL", "https://audio-content.bibleineverylanguage.org/content")
-            .and("CDN_BASE_RC_URL", "unused")
-            .and("CACHE_REFRESH_TIME_HRS", "unused")
-            .and("ORATURE_REPO_DIR", "unused")
-            .and("RC_TEMP_DIR", "unused")
             .execute {
+                val cacheBuilder = ContentAvailabilityCacheBuilder(
+                    mockLanguageCatalog,
+                    mockChapterCatalog,
+                    bookRepository,
+                    mockStorageAccess,
+                    mockRCRepository
+                )
                 val cache = AvailabilityCacheAccessor(cacheBuilder)
-
                 assertTrue(cache.isLanguageAvailable(languageCode))
                 assertTrue(cache.isBookAvailable(`2peter`, languageCode, "orature"))
                 assertNotNull(cache.getChapterUrl(chapterNumber, `2peter`, languageCode, "mp3"))

@@ -1,6 +1,7 @@
 package org.bibletranslationtools.fetcher.usecase
 
 import java.io.File
+import org.bibletranslationtools.fetcher.config.CDN_BASE_URL
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.data.Product
@@ -132,6 +133,6 @@ class FetchBookViewData(
 
     private fun formatBookDownloadUrl(bookFile: File): String {
         val relativePath = bookFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
-        return "${System.getenv("CDN_BASE_URL")}/$relativePath"
+        return "$CDN_BASE_URL/$relativePath"
     }
 }

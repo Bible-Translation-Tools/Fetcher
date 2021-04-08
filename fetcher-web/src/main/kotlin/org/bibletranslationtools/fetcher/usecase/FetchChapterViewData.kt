@@ -2,6 +2,7 @@ package org.bibletranslationtools.fetcher.usecase
 
 import io.ktor.client.features.ClientRequestException
 import java.io.File
+import org.bibletranslationtools.fetcher.config.CDN_BASE_URL
 import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.data.Language
@@ -113,6 +114,6 @@ class FetchChapterViewData(
 
     private fun formatChapterDownloadUrl(chapterFile: File): String {
         val relativeChapterPath = chapterFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
-        return "${System.getenv("CDN_BASE_URL")}/$relativeChapterPath"
+        return "$CDN_BASE_URL/$relativeChapterPath"
     }
 }

@@ -1,8 +1,6 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import java.io.File
-import org.bibletranslationtools.fetcher.config.CDN_BASE_URL
-import org.bibletranslationtools.fetcher.config.CONTENT_ROOT_DIR
 import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.data.Product
@@ -30,6 +28,8 @@ class ContentAvailabilityCacheBuilder(
     private val rcRepo: ResourceContainerRepository
 ) {
     private val resourceId = "ulb"
+    private val cdnUrl = System.getenv("CDN_BASE_URL")
+    private val pathPrefix = System.getenv("CONTENT_ROOT")
 
     @Synchronized
     fun build(): AvailabilityCache {
@@ -136,10 +136,10 @@ class ContentAvailabilityCacheBuilder(
 
     private fun fetchChaptersFromMediaUrl(url: String, chapterList: List<ChapterCache>) {
         for (chapter in chapterList) {
-            val relativePath = File(url).relativeTo(File(CDN_BASE_URL))
+            val relativePath = File(url).relativeTo(File(cdnUrl))
                 .path.replace("{chapter}", chapter.number.toString())
 
-            val chapterFile = File(CONTENT_ROOT_DIR).resolve(relativePath)
+            val chapterFile = File(pathPrefix).resolve(relativePath)
             chapter.availability = chapterFile.exists()
 
             if (chapter.availability) chapter.url = "#"
