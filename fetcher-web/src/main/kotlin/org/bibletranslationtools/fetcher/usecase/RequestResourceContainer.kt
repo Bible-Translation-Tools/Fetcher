@@ -1,7 +1,7 @@
 package org.bibletranslationtools.fetcher.usecase
 
 import java.io.File
-import org.bibletranslationtools.fetcher.config.CDN_BASE_RC_URL
+import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.data.Deliverable
 import org.bibletranslationtools.fetcher.data.RCDeliverable
 import org.bibletranslationtools.fetcher.impl.repository.RCUtils
@@ -14,10 +14,13 @@ import org.wycliffeassociates.rcmediadownloader.data.MediaUrlParameter
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
 class RequestResourceContainer(
+    envConfig: EnvironmentConfig,
     private val rcRepository: ResourceContainerRepository,
     private val storageAccess: StorageAccess,
     private val downloadClient: IDownloadClient
 ) {
+    private val baseRCUrl = envConfig.CDN_BASE_RC_URL
+
     fun getResourceContainer(
         deliverable: Deliverable
     ): RCDeliverable? {
@@ -70,7 +73,7 @@ class RequestResourceContainer(
 
     private fun formatDownloadUrl(file: File): String {
         val relativePath = file.parentFile.name + File.separator + file.name
-        return "$CDN_BASE_RC_URL/$relativePath"
+        return "$baseRCUrl/$relativePath"
     }
 
     companion object {

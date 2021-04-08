@@ -1,7 +1,7 @@
 package org.bibletranslationtools.fetcher.usecase
 
 import java.io.File
-import org.bibletranslationtools.fetcher.config.CDN_BASE_URL
+import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.data.Product
@@ -12,6 +12,7 @@ import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 
 class FetchBookViewData(
+    environmentConfig: EnvironmentConfig,
     private val bookRepo: BookRepository,
     private val storage: StorageAccess,
     private val language: Language,
@@ -19,6 +20,7 @@ class FetchBookViewData(
 ) {
     private val resourceId = "ulb"
     private val productExtension = ProductFileExtension.getType(product.slug)!!
+    private val baseUrl = environmentConfig.CDN_BASE_URL
 
     private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
 
@@ -133,6 +135,6 @@ class FetchBookViewData(
 
     private fun formatBookDownloadUrl(bookFile: File): String {
         val relativePath = bookFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
-        return "$CDN_BASE_URL/$relativePath"
+        return "$baseUrl/$relativePath"
     }
 }

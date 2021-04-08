@@ -3,6 +3,7 @@ package org.bibletranslationtools.fetcher
 import com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable
 import java.io.File
 import java.io.FileNotFoundException
+import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.impl.repository.AvailabilityCacheAccessor
@@ -82,6 +83,7 @@ class ContentAvailabilityCacheTest {
             .and("RC_TEMP_DIR", "unused")
             .execute {
                 val cacheBuilder = ContentAvailabilityCacheBuilder(
+                    EnvironmentConfig(),
                     mockLanguageCatalog,
                     mockChapterCatalog,
                     bookRepository,

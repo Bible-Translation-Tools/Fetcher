@@ -1,6 +1,7 @@
 package org.bibletranslationtools.fetcher
 
 import com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable
+import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.io.LocalFileTransferClient
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -32,7 +33,7 @@ class LocalFileTransferClientTest {
             .and("ORATURE_REPO_DIR", "unused")
             .and("RC_TEMP_DIR", "unused")
             .execute {
-                val downloadClient: IDownloadClient = LocalFileTransferClient()
+                val downloadClient: IDownloadClient = LocalFileTransferClient(EnvironmentConfig())
                 val file = downloadClient.downloadFromUrl(url, outputDir)
                 assertNotNull("Transfer unsuccessful from $url", file)
                 assertTrue(file!!.exists())

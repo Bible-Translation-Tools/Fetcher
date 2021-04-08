@@ -1,6 +1,7 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import java.io.File
+import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.data.Product
@@ -21,6 +22,7 @@ import org.bibletranslationtools.fetcher.usecase.cache.ProductCache
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
 class ContentAvailabilityCacheBuilder(
+    private val envConfig: EnvironmentConfig,
     private val languageCatalog: LanguageCatalog,
     private val chapterCatalog: ChapterCatalog,
     private val bookRepository: BookRepository,
@@ -28,8 +30,6 @@ class ContentAvailabilityCacheBuilder(
     private val rcRepo: ResourceContainerRepository
 ) {
     private val resourceId = "ulb"
-    private val cdnUrl = System.getenv("CDN_BASE_URL")
-    private val pathPrefix = System.getenv("CONTENT_ROOT")
 
     @Synchronized
     fun build(): AvailabilityCache {
@@ -68,6 +68,7 @@ class ContentAvailabilityCacheBuilder(
                 ProductFileExtension.ORATURE -> if (isAvailable) "#" else null
                 else ->
                     FetchBookViewData(
+                        envConfig,
                         bookRepository,
                         storageAccess,
                         language,
@@ -121,6 +122,7 @@ class ContentAvailabilityCacheBuilder(
         book: Book
     ): List<ChapterCache> {
         val chaptersFromDirectory = FetchChapterViewData(
+            envConfig,
             chapterCatalog,
             storageAccess,
             language,
@@ -136,10 +138,10 @@ class ContentAvailabilityCacheBuilder(
 
     private fun fetchChaptersFromMediaUrl(url: String, chapterList: List<ChapterCache>) {
         for (chapter in chapterList) {
-            val relativePath = File(url).relativeTo(File(cdnUrl))
+            val relativePath = File(url).relativeTo(File(envConfig.CDN_BASE_URL))
                 .path.replace("{chapter}", chapter.number.toString())
 
-            val chapterFile = File(pathPrefix).resolve(relativePath)
+            val chapterFile = File(envConfig.CONTENT_ROOT_DIR).resolve(relativePath)
             chapter.availability = chapterFile.exists()
 
             if (chapter.availability) chapter.url = "#"

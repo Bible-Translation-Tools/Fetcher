@@ -56,6 +56,7 @@ private fun booksView(
     val product = resolver.productCatalog.getProduct(params.productSlug)!!
 
     val bookViewData = FetchBookViewData(
+        resolver.environmentConfig,
         resolver.bookRepository,
         resolver.storageAccess,
         language,

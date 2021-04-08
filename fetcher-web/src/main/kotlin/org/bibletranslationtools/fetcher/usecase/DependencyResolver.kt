@@ -1,5 +1,6 @@
 package org.bibletranslationtools.fetcher.usecase
 
+import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.impl.repository.AvailabilityCacheAccessor
 import org.bibletranslationtools.fetcher.impl.repository.BookCatalogImpl
 import org.bibletranslationtools.fetcher.impl.repository.BookRepositoryImpl
@@ -25,7 +26,8 @@ import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
 object DependencyResolver {
-    private val directoryProvider: DirectoryProvider = DirectoryProviderImpl()
+    val environmentConfig = EnvironmentConfig()
+    private val directoryProvider: DirectoryProvider = DirectoryProviderImpl(environmentConfig)
     private val gatewayLanguageCatalog: LanguageCatalog = PortGatewayLanguageCatalog()
     private val heartLanguageCatalog: LanguageCatalog = UnfoldingWordHeartLanguagesCatalog()
     val chapterCatalog: ChapterCatalog = ChapterCatalogImpl()
@@ -40,9 +42,10 @@ object DependencyResolver {
         bookCatalog = BookCatalogImpl()
     )
 
-    val downloadClient: IDownloadClient = LocalFileTransferClient()
+    val downloadClient: IDownloadClient = LocalFileTransferClient(environmentConfig)
     val rcRepository: ResourceContainerRepository = RCRepositoryImpl(storageAccess)
     private val cacheBuilder = ContentAvailabilityCacheBuilder(
+        environmentConfig,
         gatewayLanguageCatalog,
         chapterCatalog,
         bookRepository,
