@@ -52,9 +52,10 @@ val appDependencyModule = module(createdAtStart = true) {
     single {
         ContentAvailabilityCacheBuilder(
             envConfig = get(),
-            bookRepository = get(),
-            chapterCatalog = get(),
             languageCatalog = get(named("GL")),
+            productCatalog = get(),
+            chapterCatalog = get(),
+            bookRepository = get(),
             rcRepo = get(),
             storageAccess = get()
         )
