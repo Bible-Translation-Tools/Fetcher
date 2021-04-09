@@ -9,7 +9,6 @@ import java.util.ResourceBundle
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
-import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.koin.java.KoinJavaComponent.get
 import org.slf4j.LoggerFactory
 
@@ -22,7 +21,7 @@ val validator = RoutingValidator(
 
 fun normalizeUrl(path: String): String = java.io.File(path).invariantSeparatorsPath
 
-fun getLanguageName(languageCode: String, resolver: DependencyResolver): String {
+fun getLanguageName(languageCode: String): String {
     return get(LanguageRepository::class.java).getLanguage(languageCode)?.localizedName ?: ""
 }
 

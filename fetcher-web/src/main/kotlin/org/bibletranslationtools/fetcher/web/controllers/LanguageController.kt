@@ -10,9 +10,9 @@ import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
 import java.lang.NumberFormatException
+import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
-import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchLanguageViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
@@ -20,30 +20,27 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocal
 import org.bibletranslationtools.fetcher.web.controllers.utils.normalizeUrl
 import org.koin.java.KoinJavaComponent.get
 
-fun Routing.languageController(resolver: DependencyResolver) {
+fun Routing.languageController() {
     route(GL_ROUTE) {
         get {
             // languages page
             val path = normalizeUrl(call.request.path())
             call.respond(
-                languagesView(
-                    path,
-                    resolver
-                )
+                languagesView(path)
             )
         }
     }
     route("$GL_ROUTE/filter") {
         // Async request from client script
-        searchFilter(resolver)
+        searchFilter()
     }
     route("$GL_ROUTE/load-more") {
         // Async request from client script
-        loadMoreLanguages(resolver)
+        loadMoreLanguages()
     }
 }
 
-private fun Route.searchFilter(resolver: DependencyResolver) {
+private fun Route.searchFilter() {
     get {
         val path = "/$GL_ROUTE"
         val searchQuery = call.request.queryParameters["keyword"]
@@ -55,10 +52,10 @@ private fun Route.searchFilter(resolver: DependencyResolver) {
 
         return@get when {
             !searchQuery.isNullOrEmpty() && index != null -> {
-                call.respond(filterLanguages(searchQuery, path, resolver, index))
+                call.respond(filterLanguages(searchQuery, path, index))
             }
             !searchQuery.isNullOrEmpty() -> {
-                call.respond(filterLanguages(searchQuery, path, resolver))
+                call.respond(filterLanguages(searchQuery, path))
             }
             else -> {
                 call.respond(HttpStatusCode.BadRequest)
@@ -67,7 +64,7 @@ private fun Route.searchFilter(resolver: DependencyResolver) {
     }
 }
 
-private fun Route.loadMoreLanguages(resolver: DependencyResolver) {
+private fun Route.loadMoreLanguages() {
     get {
         val path = "/$GL_ROUTE"
         val index = try {
@@ -79,18 +76,17 @@ private fun Route.loadMoreLanguages(resolver: DependencyResolver) {
         if (index == null) {
             call.respond(HttpStatusCode.BadRequest)
         } else {
-            call.respond(loadMore(index, path, resolver))
+            call.respond(loadMore(index, path))
         }
     }
 }
 
 private fun languagesView(
-    path: String,
-    resolver: DependencyResolver
+    path: String
 ): ThymeleafContent {
     val languageList = FetchLanguageViewData(
         get(LanguageRepository::class.java),
-        resolver.contentCache,
+        get(ContentCacheAccessor::class.java),
         get(StorageAccess::class.java)
     ).getViewDataList(path)
 
@@ -108,12 +104,11 @@ private fun languagesView(
 private fun filterLanguages(
     query: String,
     currentPath: String,
-    resolver: DependencyResolver,
     currentIndex: Int = 0
 ): ThymeleafContent {
     val resultLanguages = FetchLanguageViewData(
         get(LanguageRepository::class.java),
-        resolver.contentCache,
+        get(ContentCacheAccessor::class.java),
         get(StorageAccess::class.java)
     ).filterLanguages(query, currentPath, currentIndex)
 
@@ -130,12 +125,11 @@ private fun filterLanguages(
 
 private fun loadMore(
     currentIndex: Int,
-    path: String,
-    resolver: DependencyResolver
+    path: String
 ): ThymeleafContent {
     val moreLanguages = FetchLanguageViewData(
         get(LanguageRepository::class.java),
-        resolver.contentCache,
+        get(ContentCacheAccessor::class.java),
         get(StorageAccess::class.java)
     ).loadMoreLanguages(path, currentIndex)
 

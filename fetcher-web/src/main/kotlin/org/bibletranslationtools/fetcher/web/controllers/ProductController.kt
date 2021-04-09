@@ -8,9 +8,9 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
+import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
-import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
@@ -22,7 +22,7 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.normalizeUrl
 import org.bibletranslationtools.fetcher.web.controllers.utils.validator
 import org.koin.java.KoinJavaComponent.get
 
-fun Routing.productController(resolver: DependencyResolver) {
+fun Routing.productController() {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}") {
 //        val productCatalog by inject<ProductCatalog>()
         get {
@@ -32,7 +32,7 @@ fun Routing.productController(resolver: DependencyResolver) {
                 languageCode = call.parameters[LANGUAGE_PARAM_KEY]
             )
             call.respond(
-                productsView(params.languageCode, path, resolver)
+                productsView(params.languageCode, path)
             )
         }
     }
@@ -40,8 +40,7 @@ fun Routing.productController(resolver: DependencyResolver) {
 
 private fun productsView(
     languageCode: String,
-    path: String,
-    resolver: DependencyResolver
+    path: String
 ): ThymeleafContent {
     if (!validator.isLanguageCodeValid(languageCode)) {
         return errorPage(
@@ -52,11 +51,11 @@ private fun productsView(
     }
 
     val language = get(LanguageRepository::class.java).getLanguage(languageCode)!!
-
+    val contentCache = get(ContentCacheAccessor::class.java)
     val productList = FetchProductViewData(
         get(ProductCatalog::class.java),
         languageCode
-    ).getListViewData(path, resolver.contentCache, language.isGateway)
+    ).getListViewData(path, contentCache, language.isGateway)
 
     return ThymeleafContent(
         template = "products",

@@ -10,10 +10,10 @@ import io.ktor.routing.get
 import io.ktor.routing.route
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.repository.BookRepository
+import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.repository.StorageAccess
-import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
@@ -26,7 +26,7 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.normalizeUrl
 import org.bibletranslationtools.fetcher.web.controllers.utils.validator
 import org.koin.java.KoinJavaComponent.get
 
-fun Routing.bookController(resolver: DependencyResolver) {
+fun Routing.bookController() {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}") {
         get {
             // books page
@@ -37,7 +37,7 @@ fun Routing.bookController(resolver: DependencyResolver) {
             )
 
             call.respond(
-                booksView(params, path, resolver)
+                booksView(params, path)
             )
         }
     }
@@ -45,8 +45,7 @@ fun Routing.bookController(resolver: DependencyResolver) {
 
 private fun booksView(
     params: UrlParameters,
-    path: String,
-    resolver: DependencyResolver
+    path: String
 ): ThymeleafContent {
     if (
         !validator.isLanguageCodeValid(params.languageCode) ||
@@ -60,14 +59,14 @@ private fun booksView(
     }
     val language = get(LanguageRepository::class.java).getLanguage(params.languageCode)!!
     val product = get(ProductCatalog::class.java).getProduct(params.productSlug)!!
-
+    val contentCache = get(ContentCacheAccessor::class.java)
     val bookViewData = FetchBookViewData(
         get(EnvironmentConfig::class.java),
         get(BookRepository::class.java),
         get(StorageAccess::class.java),
         language,
         product
-    ).getViewDataList(path, resolver.contentCache, language.isGateway)
+    ).getViewDataList(path, contentCache, language.isGateway)
 
     return ThymeleafContent(
         template = "books",

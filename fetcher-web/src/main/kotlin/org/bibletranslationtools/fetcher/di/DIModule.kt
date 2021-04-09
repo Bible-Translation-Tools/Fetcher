@@ -1,9 +1,11 @@
 package org.bibletranslationtools.fetcher.di
 
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
+import org.bibletranslationtools.fetcher.impl.repository.AvailabilityCacheAccessor
 import org.bibletranslationtools.fetcher.impl.repository.BookCatalogImpl
 import org.bibletranslationtools.fetcher.impl.repository.BookRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.ChapterCatalogImpl
+import org.bibletranslationtools.fetcher.impl.repository.ContentAvailabilityCacheBuilder
 import org.bibletranslationtools.fetcher.impl.repository.DirectoryProviderImpl
 import org.bibletranslationtools.fetcher.impl.repository.LanguageRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.PortGatewayLanguageCatalog
@@ -15,6 +17,7 @@ import org.bibletranslationtools.fetcher.io.LocalFileTransferClient
 import org.bibletranslationtools.fetcher.repository.BookCatalog
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
+import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
@@ -29,6 +32,7 @@ val appDependencyModule = module(createdAtStart = true) {
     single { EnvironmentConfig() }
     single<DirectoryProvider> { DirectoryProviderImpl(get()) }
     single<StorageAccess> { StorageAccessImpl(get()) }
+
     single<ChapterCatalog> { ChapterCatalogImpl() }
     single<LanguageCatalog>(named("GL")) { PortGatewayLanguageCatalog() }
     single<LanguageCatalog>(named("HL")) { UnfoldingWordHeartLanguagesCatalog() }
@@ -38,9 +42,22 @@ val appDependencyModule = module(createdAtStart = true) {
             get(named("HL"))
         )
     }
-    single<BookCatalog> { BookCatalogImpl() }
     single<ProductCatalog> { ProductCatalogImpl() }
+    single<BookCatalog> { BookCatalogImpl() }
     single<BookRepository> { BookRepositoryImpl(get()) }
     single<ResourceContainerRepository> { RCRepositoryImpl(get()) }
+
     single<IDownloadClient> { LocalFileTransferClient(get()) }
+
+    single {
+        ContentAvailabilityCacheBuilder(
+            envConfig = get(),
+            bookRepository = get(),
+            chapterCatalog = get(),
+            languageCatalog = get(named("GL")),
+            rcRepo = get(),
+            storageAccess = get()
+        )
+    }
+    single<ContentCacheAccessor> { AvailabilityCacheAccessor(get()) }
 }

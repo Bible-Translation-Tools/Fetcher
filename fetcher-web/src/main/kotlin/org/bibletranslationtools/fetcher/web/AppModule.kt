@@ -18,7 +18,6 @@ import kotlin.concurrent.thread
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.di.appDependencyModule
 import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
-import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.web.controllers.bookController
 import org.bibletranslationtools.fetcher.web.controllers.chapterController
 import org.bibletranslationtools.fetcher.web.controllers.homeController
@@ -46,7 +45,6 @@ fun Application.appModule() {
         modules(appDependencyModule)
     }
     install(Routing) {
-        val resolver = DependencyResolver
         scheduleCacheUpdate(get<EnvironmentConfig>())
         routing {
             // Static contents declared here
@@ -67,10 +65,10 @@ fun Application.appModule() {
             }
             // Application Routes - Controllers
             homeController()
-            languageController(resolver)
-            productController(resolver)
-            bookController(resolver)
-            chapterController(resolver)
+            languageController()
+            productController()
+            bookController()
+            chapterController()
         }
     }
 }
