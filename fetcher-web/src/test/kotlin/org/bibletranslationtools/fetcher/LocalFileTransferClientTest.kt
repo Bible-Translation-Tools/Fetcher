@@ -15,16 +15,14 @@ class LocalFileTransferClientTest {
         val mockCDN = "https://test_domain.org"
         val relativePath = "en/ulb/tit/1/CONTENTS/mp3/hi/chapter"
         val fileName = "en_ulb_tit_c1.txt"
-
         val url = "$mockCDN/$relativePath/$fileName"
 
+        val outputDir = createTempDir("fetcher_test")
         val mockContentDir = createTempDir("fetcher_test")
         val srcFile = mockContentDir.resolve(relativePath)
             .apply { mkdirs() }
             .resolve(fileName)
         srcFile.writeText("test content")
-
-        val outputDir = createTempDir("fetcher_test")
 
         withEnvironmentVariable("CONTENT_ROOT", mockContentDir.path)
             .and("CDN_BASE_URL", mockCDN)
