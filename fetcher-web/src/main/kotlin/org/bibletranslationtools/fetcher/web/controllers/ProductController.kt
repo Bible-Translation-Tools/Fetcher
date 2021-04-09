@@ -8,6 +8,8 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
+import org.bibletranslationtools.fetcher.repository.LanguageRepository
+import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
@@ -18,9 +20,11 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
 import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
 import org.bibletranslationtools.fetcher.web.controllers.utils.normalizeUrl
 import org.bibletranslationtools.fetcher.web.controllers.utils.validator
+import org.koin.java.KoinJavaComponent.get
 
 fun Routing.productController(resolver: DependencyResolver) {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}") {
+//        val productCatalog by inject<ProductCatalog>()
         get {
             // products page
             val path = normalizeUrl(call.request.path())
@@ -47,9 +51,11 @@ private fun productsView(
         )
     }
 
-    val language = resolver.languageRepository.getLanguage(languageCode)!!
+    val language = get(LanguageRepository::class.java).getLanguage(languageCode)!!
+
     val productList = FetchProductViewData(
-        resolver.productCatalog, languageCode
+        get(ProductCatalog::class.java),
+        languageCode
     ).getListViewData(path, resolver.contentCache, language.isGateway)
 
     return ThymeleafContent(

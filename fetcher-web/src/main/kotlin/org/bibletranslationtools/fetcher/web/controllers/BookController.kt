@@ -8,6 +8,11 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
+import org.bibletranslationtools.fetcher.config.EnvironmentConfig
+import org.bibletranslationtools.fetcher.repository.BookRepository
+import org.bibletranslationtools.fetcher.repository.LanguageRepository
+import org.bibletranslationtools.fetcher.repository.ProductCatalog
+import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
@@ -19,6 +24,7 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
 import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
 import org.bibletranslationtools.fetcher.web.controllers.utils.normalizeUrl
 import org.bibletranslationtools.fetcher.web.controllers.utils.validator
+import org.koin.java.KoinJavaComponent.get
 
 fun Routing.bookController(resolver: DependencyResolver) {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}") {
@@ -52,13 +58,13 @@ private fun booksView(
             HttpStatusCode.NotFound
         )
     }
-    val language = resolver.languageRepository.getLanguage(params.languageCode)!!
-    val product = resolver.productCatalog.getProduct(params.productSlug)!!
+    val language = get(LanguageRepository::class.java).getLanguage(params.languageCode)!!
+    val product = get(ProductCatalog::class.java).getProduct(params.productSlug)!!
 
     val bookViewData = FetchBookViewData(
-        resolver.environmentConfig,
-        resolver.bookRepository,
-        resolver.storageAccess,
+        get(EnvironmentConfig::class.java),
+        get(BookRepository::class.java),
+        get(StorageAccess::class.java),
         language,
         product
     ).getViewDataList(path, resolver.contentCache, language.isGateway)
