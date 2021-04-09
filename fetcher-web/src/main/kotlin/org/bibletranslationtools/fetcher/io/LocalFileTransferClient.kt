@@ -16,8 +16,6 @@ class LocalFileTransferClient(
     private val envVars: EnvironmentConfig
 ) : IDownloadClient {
 
-//    private val urlPrefix = System.getenv("CDN_BASE_URL")
-//    private val pathPrefix = System.getenv("CONTENT_ROOT")
     /**
      * This method automatically converts the requested url
      * into a local path on the system, then copies it to outputDir
