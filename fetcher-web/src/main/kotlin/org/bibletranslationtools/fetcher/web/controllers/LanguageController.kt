@@ -10,6 +10,7 @@ import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
 import java.lang.NumberFormatException
+import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
 import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
@@ -18,7 +19,6 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
 import org.bibletranslationtools.fetcher.web.controllers.utils.normalizeUrl
-import org.koin.java.KoinJavaComponent.get
 
 fun Routing.languageController() {
     route(GL_ROUTE) {
@@ -85,9 +85,9 @@ private fun languagesView(
     path: String
 ): ThymeleafContent {
     val languageList = FetchLanguageViewData(
-        get(LanguageRepository::class.java),
-        get(ContentCacheAccessor::class.java),
-        get(StorageAccess::class.java)
+        get<LanguageRepository>(),
+        get<ContentCacheAccessor>(),
+        get<StorageAccess>()
     ).getViewDataList(path)
 
     return ThymeleafContent(
@@ -107,9 +107,9 @@ private fun filterLanguages(
     currentIndex: Int = 0
 ): ThymeleafContent {
     val resultLanguages = FetchLanguageViewData(
-        get(LanguageRepository::class.java),
-        get(ContentCacheAccessor::class.java),
-        get(StorageAccess::class.java)
+        get<LanguageRepository>(),
+        get<ContentCacheAccessor>(),
+        get<StorageAccess>()
     ).filterLanguages(query, currentPath, currentIndex)
 
     val isLastResult = resultLanguages.size < FetchLanguageViewData.DISPLAY_ITEMS_LIMIT
@@ -128,9 +128,9 @@ private fun loadMore(
     path: String
 ): ThymeleafContent {
     val moreLanguages = FetchLanguageViewData(
-        get(LanguageRepository::class.java),
-        get(ContentCacheAccessor::class.java),
-        get(StorageAccess::class.java)
+        get<LanguageRepository>(),
+        get<ContentCacheAccessor>(),
+        get<StorageAccess>()
     ).loadMoreLanguages(path, currentIndex)
 
     val isLastResult = moreLanguages.size < FetchLanguageViewData.DISPLAY_ITEMS_LIMIT

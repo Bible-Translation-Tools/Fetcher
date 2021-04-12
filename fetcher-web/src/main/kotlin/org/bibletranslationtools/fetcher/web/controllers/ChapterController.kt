@@ -11,6 +11,7 @@ import io.ktor.routing.get
 import io.ktor.routing.route
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.data.Deliverable
+import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
@@ -35,7 +36,6 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
 import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
 import org.bibletranslationtools.fetcher.web.controllers.utils.validator
-import org.koin.java.KoinJavaComponent.get
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
 fun Routing.chapterController() {
@@ -60,9 +60,9 @@ fun Routing.chapterController() {
             }
 
             val paramObjects = DeliverableBuilder(
-                get(LanguageRepository::class.java),
-                get(ProductCatalog::class.java),
-                get(BookRepository::class.java)
+                get<LanguageRepository>(),
+                get<ProductCatalog>(),
+                get<BookRepository>()
             ).build(params)
 
             call.respond(chaptersView(paramObjects))
@@ -109,20 +109,23 @@ private fun chaptersView(
     paramObjects: Deliverable
 ): ThymeleafContent {
     val isGateway = paramObjects.language.isGateway
-    val contentCache = get(ContentCacheAccessor::class.java)
+    val envConfig = get<EnvironmentConfig>()
+    val contentCache = get<ContentCacheAccessor>()
+    val storageAccess = get<StorageAccess>()
+
     val bookViewData: BookViewData? = FetchBookViewData(
-        get(EnvironmentConfig::class.java),
-        get(BookRepository::class.java),
-        get(StorageAccess::class.java),
+        envConfig,
+        get<BookRepository>(),
+        storageAccess,
         paramObjects.language,
         paramObjects.product
     ).getViewData(paramObjects.book.slug, contentCache, isGateway)
 
     val chapterViewDataList: List<ChapterViewData>? = try {
         FetchChapterViewData(
-            get(EnvironmentConfig::class.java),
-            get(ChapterCatalog::class.java),
-            get(StorageAccess::class.java),
+            envConfig,
+            get<ChapterCatalog>(),
+            storageAccess,
             paramObjects.language,
             paramObjects.product,
             paramObjects.book
@@ -174,15 +177,15 @@ private fun oratureFileDownload(
     params: UrlParameters
 ): String? {
     val deliverable = DeliverableBuilder(
-        get(LanguageRepository::class.java),
-        get(ProductCatalog::class.java),
-        get(BookRepository::class.java)
+        get<LanguageRepository>(),
+        get<ProductCatalog>(),
+        get<BookRepository>()
     ).build(params)
 
     return RequestResourceContainer(
-        get(EnvironmentConfig::class.java),
-        get(ResourceContainerRepository::class.java),
-        get(StorageAccess::class.java),
-        get(IDownloadClient::class.java)
+        get<EnvironmentConfig>(),
+        get<ResourceContainerRepository>(),
+        get<StorageAccess>(),
+        get<IDownloadClient>()
     ).getResourceContainer(deliverable)?.url
 }

@@ -9,6 +9,7 @@ import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
+import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
@@ -24,7 +25,6 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
 import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
 import org.bibletranslationtools.fetcher.web.controllers.utils.normalizeUrl
 import org.bibletranslationtools.fetcher.web.controllers.utils.validator
-import org.koin.java.KoinJavaComponent.get
 
 fun Routing.bookController() {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}") {
@@ -35,6 +35,19 @@ fun Routing.bookController() {
                 languageCode = call.parameters[LANGUAGE_PARAM_KEY],
                 productSlug = call.parameters[PRODUCT_PARAM_KEY]
             )
+            if (
+                !validator.isLanguageCodeValid(params.languageCode) ||
+                !validator.isProductSlugValid(params.productSlug)
+            ) {
+                call.respond(
+                    errorPage(
+                        "invalid_route_parameter",
+                        "invalid_route_parameter_message",
+                        HttpStatusCode.NotFound
+                    )
+                )
+                return@get
+            }
 
             call.respond(
                 booksView(params, path)
@@ -47,23 +60,14 @@ private fun booksView(
     params: UrlParameters,
     path: String
 ): ThymeleafContent {
-    if (
-        !validator.isLanguageCodeValid(params.languageCode) ||
-        !validator.isProductSlugValid(params.productSlug)
-    ) {
-        return errorPage(
-            "invalid_route_parameter",
-            "invalid_route_parameter_message",
-            HttpStatusCode.NotFound
-        )
-    }
-    val language = get(LanguageRepository::class.java).getLanguage(params.languageCode)!!
-    val product = get(ProductCatalog::class.java).getProduct(params.productSlug)!!
-    val contentCache = get(ContentCacheAccessor::class.java)
+    val contentCache = get<ContentCacheAccessor>()
+    val language = get<LanguageRepository>().getLanguage(params.languageCode)!!
+    val product = get<ProductCatalog>().getProduct(params.productSlug)!!
+
     val bookViewData = FetchBookViewData(
-        get(EnvironmentConfig::class.java),
-        get(BookRepository::class.java),
-        get(StorageAccess::class.java),
+        get<EnvironmentConfig>(),
+        get<BookRepository>(),
+        get<StorageAccess>(),
         language,
         product
     ).getViewDataList(path, contentCache, language.isGateway)

@@ -8,6 +8,7 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
+import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
 import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
@@ -20,17 +21,27 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
 import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
 import org.bibletranslationtools.fetcher.web.controllers.utils.normalizeUrl
 import org.bibletranslationtools.fetcher.web.controllers.utils.validator
-import org.koin.java.KoinJavaComponent.get
 
 fun Routing.productController() {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}") {
-//        val productCatalog by inject<ProductCatalog>()
         get {
             // products page
             val path = normalizeUrl(call.request.path())
             val params = UrlParameters(
                 languageCode = call.parameters[LANGUAGE_PARAM_KEY]
             )
+
+            if (!validator.isLanguageCodeValid(params.languageCode)) {
+                call.respond(
+                    errorPage(
+                        "invalid_route_parameter",
+                        "invalid_route_parameter_message",
+                        HttpStatusCode.NotFound
+                    )
+                )
+                return@get
+            }
+
             call.respond(
                 productsView(params.languageCode, path)
             )
@@ -42,19 +53,12 @@ private fun productsView(
     languageCode: String,
     path: String
 ): ThymeleafContent {
-    if (!validator.isLanguageCodeValid(languageCode)) {
-        return errorPage(
-            "invalid_route_parameter",
-            "invalid_route_parameter_message",
-            HttpStatusCode.NotFound
-        )
-    }
+    val language = get<LanguageRepository>().getLanguage(languageCode)!!
+    val contentCache = get<ContentCacheAccessor>()
 
-    val language = get(LanguageRepository::class.java).getLanguage(languageCode)!!
-    val contentCache = get(ContentCacheAccessor::class.java)
     val productList = FetchProductViewData(
-        get(ProductCatalog::class.java),
-        languageCode
+        get<ProductCatalog>(),
+        language.code
     ).getListViewData(path, contentCache, language.isGateway)
 
     return ThymeleafContent(
