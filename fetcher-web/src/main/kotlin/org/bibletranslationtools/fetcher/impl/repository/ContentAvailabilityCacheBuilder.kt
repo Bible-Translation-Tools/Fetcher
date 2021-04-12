@@ -8,6 +8,7 @@ import org.bibletranslationtools.fetcher.data.Product
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
+import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
@@ -24,6 +25,7 @@ import org.wycliffeassociates.resourcecontainer.ResourceContainer
 class ContentAvailabilityCacheBuilder(
     private val envConfig: EnvironmentConfig,
     private val languageCatalog: LanguageCatalog,
+    private val productCatalog: ProductCatalog,
     private val chapterCatalog: ChapterCatalog,
     private val bookRepository: BookRepository,
     private val storageAccess: StorageAccess,
@@ -46,7 +48,7 @@ class ContentAvailabilityCacheBuilder(
     }
 
     private fun cacheProducts(language: Language): List<ProductCache> {
-        val productList = ProductCatalogImpl().getAll()
+        val productList = productCatalog.getAll()
         return productList.map { prod ->
             val books = cacheBooks(language, prod)
             val isAvailable = books.any { it.availability }

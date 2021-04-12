@@ -7,6 +7,7 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_ver"
         classpath "org.jlleitschuh.gradle:ktlint-gradle:$ktlint_ver"
+        classpath "io.insert-koin:koin-gradle-plugin:$koin_ver"
     }
 }
 
@@ -53,6 +54,7 @@ dependencies {
     implementation "org.wycliffeassociates:rcmediadownloader:$rc_media_downloader_ver"
     implementation "com.squareup.retrofit2:retrofit:$retrofit_ver"
     implementation "me.xdrop:fuzzywuzzy:$fuzzy_wuzzy_ver"
+    implementation "io.insert-koin:koin-ktor:$koin_ver"
 
     detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_ver"
 }

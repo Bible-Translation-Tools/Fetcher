@@ -10,6 +10,7 @@ import org.bibletranslationtools.fetcher.impl.repository.AvailabilityCacheAccess
 import org.bibletranslationtools.fetcher.impl.repository.BookCatalogImpl
 import org.bibletranslationtools.fetcher.impl.repository.BookRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.ContentAvailabilityCacheBuilder
+import org.bibletranslationtools.fetcher.impl.repository.ProductCatalogImpl
 import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
@@ -53,7 +54,6 @@ class ContentAvailabilityCacheTest {
         val mockChapterCatalog = mock(ChapterCatalog::class.java)
         val mockDirectoryProvider = mock(DirectoryProvider::class.java)
         val mockStorageAccess: StorageAccess = StorageAccessImpl(mockDirectoryProvider)
-        val bookRepository = BookRepositoryImpl(BookCatalogImpl())
         val mockRCRepository = mock(ResourceContainerRepository::class.java)
 
         `when`(mockDirectoryProvider.getRCRepositoriesDir()).thenReturn(tempDir)
@@ -85,8 +85,9 @@ class ContentAvailabilityCacheTest {
                 val cacheBuilder = ContentAvailabilityCacheBuilder(
                     EnvironmentConfig(),
                     mockLanguageCatalog,
+                    ProductCatalogImpl(),
                     mockChapterCatalog,
-                    bookRepository,
+                    BookRepositoryImpl(BookCatalogImpl()),
                     mockStorageAccess,
                     mockRCRepository
                 )

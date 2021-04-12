@@ -6,20 +6,23 @@ import java.lang.IllegalArgumentException
 import java.util.Locale
 import java.util.MissingResourceException
 import java.util.ResourceBundle
-import org.bibletranslationtools.fetcher.usecase.DependencyResolver
+import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
+import org.bibletranslationtools.fetcher.repository.BookRepository
+import org.bibletranslationtools.fetcher.repository.LanguageRepository
+import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.slf4j.LoggerFactory
 
 var contentLanguage = listOf<Locale.LanguageRange>()
 val validator = RoutingValidator(
-    DependencyResolver.languageRepository,
-    DependencyResolver.productCatalog,
-    DependencyResolver.bookRepository
+    get<LanguageRepository>(),
+    get<ProductCatalog>(),
+    get<BookRepository>()
 )
 
 fun normalizeUrl(path: String): String = java.io.File(path).invariantSeparatorsPath
 
-fun getLanguageName(languageCode: String, resolver: DependencyResolver): String {
-    return resolver.languageRepository.getLanguage(languageCode)?.localizedName ?: ""
+fun getLanguageName(languageCode: String): String {
+    return get<LanguageRepository>().getLanguage(languageCode)?.localizedName ?: ""
 }
 
 fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templateName: String): Locale {

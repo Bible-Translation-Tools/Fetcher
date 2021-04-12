@@ -8,7 +8,10 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
-import org.bibletranslationtools.fetcher.usecase.DependencyResolver
+import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
+import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
+import org.bibletranslationtools.fetcher.repository.LanguageRepository
+import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
@@ -19,7 +22,7 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocal
 import org.bibletranslationtools.fetcher.web.controllers.utils.normalizeUrl
 import org.bibletranslationtools.fetcher.web.controllers.utils.validator
 
-fun Routing.productController(resolver: DependencyResolver) {
+fun Routing.productController() {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}") {
         get {
             // products page
@@ -27,8 +30,20 @@ fun Routing.productController(resolver: DependencyResolver) {
             val params = UrlParameters(
                 languageCode = call.parameters[LANGUAGE_PARAM_KEY]
             )
+
+            if (!validator.isLanguageCodeValid(params.languageCode)) {
+                call.respond(
+                    errorPage(
+                        "invalid_route_parameter",
+                        "invalid_route_parameter_message",
+                        HttpStatusCode.NotFound
+                    )
+                )
+                return@get
+            }
+
             call.respond(
-                productsView(params.languageCode, path, resolver)
+                productsView(params.languageCode, path)
             )
         }
     }
@@ -36,21 +51,15 @@ fun Routing.productController(resolver: DependencyResolver) {
 
 private fun productsView(
     languageCode: String,
-    path: String,
-    resolver: DependencyResolver
+    path: String
 ): ThymeleafContent {
-    if (!validator.isLanguageCodeValid(languageCode)) {
-        return errorPage(
-            "invalid_route_parameter",
-            "invalid_route_parameter_message",
-            HttpStatusCode.NotFound
-        )
-    }
+    val language = get<LanguageRepository>().getLanguage(languageCode)!!
+    val contentCache = get<ContentCacheAccessor>()
 
-    val language = resolver.languageRepository.getLanguage(languageCode)!!
     val productList = FetchProductViewData(
-        resolver.productCatalog, languageCode
-    ).getListViewData(path, resolver.contentCache, language.isGateway)
+        get<ProductCatalog>(),
+        language.code
+    ).getListViewData(path, contentCache, language.isGateway)
 
     return ThymeleafContent(
         template = "products",
