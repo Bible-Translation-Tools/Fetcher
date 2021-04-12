@@ -1,9 +1,7 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
-import io.ktor.http.HttpStatusCode
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
+import java.io.File
+import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.data.Product
@@ -24,6 +22,7 @@ import org.bibletranslationtools.fetcher.usecase.cache.ProductCache
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
 class ContentAvailabilityCacheBuilder(
+    private val envConfig: EnvironmentConfig,
     private val languageCatalog: LanguageCatalog,
     private val chapterCatalog: ChapterCatalog,
     private val bookRepository: BookRepository,
@@ -69,6 +68,7 @@ class ContentAvailabilityCacheBuilder(
                 ProductFileExtension.ORATURE -> if (isAvailable) "#" else null
                 else ->
                     FetchBookViewData(
+                        envConfig,
                         bookRepository,
                         storageAccess,
                         language,
@@ -122,6 +122,7 @@ class ContentAvailabilityCacheBuilder(
         book: Book
     ): List<ChapterCache> {
         val chaptersFromDirectory = FetchChapterViewData(
+            envConfig,
             chapterCatalog,
             storageAccess,
             language,
@@ -137,17 +138,12 @@ class ContentAvailabilityCacheBuilder(
 
     private fun fetchChaptersFromMediaUrl(url: String, chapterList: List<ChapterCache>) {
         for (chapter in chapterList) {
-            val url = URL(url.replace("{chapter}", chapter.number.toString()))
+            val relativePath = File(url).relativeTo(File(envConfig.CDN_BASE_URL))
+                .path.replace("{chapter}", chapter.number.toString())
 
-            // check if remote content is available
-            try {
-                val conn = url.openConnection() as HttpURLConnection
-                conn.requestMethod = "HEAD"
-                chapter.availability = conn.responseCode == HttpStatusCode.OK.value
-                conn.disconnect()
-            } catch (ex: IOException) {
-                chapter.availability = false
-            }
+            val chapterFile = File(envConfig.CONTENT_ROOT_DIR).resolve(relativePath)
+            chapter.availability = chapterFile.exists()
+
             if (chapter.availability) chapter.url = "#"
         }
     }

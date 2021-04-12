@@ -102,6 +102,7 @@ private fun chaptersView(
 ): ThymeleafContent {
     val isGateway = paramObjects.language.isGateway
     val bookViewData: BookViewData? = FetchBookViewData(
+        resolver.environmentConfig,
         resolver.bookRepository,
         resolver.storageAccess,
         paramObjects.language,
@@ -110,6 +111,7 @@ private fun chaptersView(
 
     val chapterViewDataList: List<ChapterViewData>? = try {
         FetchChapterViewData(
+            resolver.environmentConfig,
             resolver.chapterCatalog,
             resolver.storageAccess,
             paramObjects.language,
@@ -170,6 +172,7 @@ private fun oratureFileDownload(
     ).build(params)
 
     return RequestResourceContainer(
+        resolver.environmentConfig,
         resolver.rcRepository,
         resolver.storageAccess,
         resolver.downloadClient

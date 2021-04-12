@@ -1,11 +1,12 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import java.io.File
+import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 
-class DirectoryProviderImpl : DirectoryProvider {
+class DirectoryProviderImpl(private val env: EnvironmentConfig) : DirectoryProvider {
     override fun getContentRoot(): File {
-        return File(System.getenv("CONTENT_ROOT"))
+        return File(env.CONTENT_ROOT_DIR)
     }
 
     override fun getProjectsDir(languageCode: String, resourceId: String): File {
@@ -17,10 +18,10 @@ class DirectoryProviderImpl : DirectoryProvider {
     }
 
     override fun getRCExportDir(): File {
-        return File(System.getenv("RC_TEMP_DIR")).apply { mkdirs() }
+        return File(env.RC_OUTPUT_DIR).apply { mkdirs() }
     }
 
     override fun getRCRepositoriesDir(): File {
-        return File(System.getenv("ORATURE_REPO_DIR"))
+        return File(env.ORATURE_REPO_DIR)
     }
 }
