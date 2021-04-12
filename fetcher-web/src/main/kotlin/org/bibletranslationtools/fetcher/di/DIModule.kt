@@ -1,5 +1,6 @@
 package org.bibletranslationtools.fetcher.di
 
+import org.bibletranslationtools.fetcher.config.DevEnvironmentConfig
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.impl.repository.AvailabilityCacheAccessor
 import org.bibletranslationtools.fetcher.impl.repository.BookCatalogImpl
@@ -29,7 +30,14 @@ import org.koin.dsl.module
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
 val appDependencyModule = module(createdAtStart = true) {
-    single { EnvironmentConfig() }
+    val envConfig: EnvironmentConfig = when(System.getenv("ENVIRONMENT")) {
+        "PRODUCTION" -> EnvironmentConfig()
+        "DEVELOPMENT" -> DevEnvironmentConfig()
+        else -> throw ExceptionInInitializerError("Environment type is not defined.")
+    }
+    single {
+        envConfig
+    }
     single<DirectoryProvider> { DirectoryProviderImpl(get()) }
     single<StorageAccess> { StorageAccessImpl(get()) }
 
