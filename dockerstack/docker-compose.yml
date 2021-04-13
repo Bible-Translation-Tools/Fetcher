@@ -19,6 +19,7 @@ services:
       CDN_BASE_URL: ${CDN_BASE_URL}
       CDN_BASE_RC_URL: ${CDN_BASE_RC_URL}
       RC_TEMP_DIR: ${RC_TEMP_DIR}
+      CACHE_REFRESH_TIME_HRS: ${CACHE_REFRESH_TIME_HRS}
     volumes:
       - fetcher-content:/content
       - fetcher-rc:${RC_TEMP_DIR}
