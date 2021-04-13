@@ -30,10 +30,10 @@ import org.koin.dsl.module
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
 val appDependencyModule = module(createdAtStart = true) {
-    val envConfig: EnvironmentConfig = when(System.getenv("ENVIRONMENT")) {
+    val envConfig: EnvironmentConfig = when(System.getenv("ENVIRONMENT").toUpperCase()) {
         "PRODUCTION" -> EnvironmentConfig()
         "DEVELOPMENT" -> DevEnvironmentConfig()
-        else -> throw ExceptionInInitializerError("Environment type is not defined.")
+        else -> throw ExceptionInInitializerError("Environment type is not defined or invalid.")
     }
     single {
         envConfig
