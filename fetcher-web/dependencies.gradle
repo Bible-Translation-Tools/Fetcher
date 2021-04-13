@@ -1,6 +1,7 @@
 ext {
     // Plugins
-    detekt_ver = '1.10.0-RC1'
+    detekt_ver = '1.16.0'
+    kotlinx_html_ver='0.7.2' // detekt report
     ktlint_ver = '9.2.1'
     shadowjar_ver = '5.2.0'
 

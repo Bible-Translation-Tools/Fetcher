@@ -29,6 +29,7 @@ sourceCompatibility = 11
 repositories {
     mavenCentral()
     maven { url "https://nexus-registry.walink.org/repository/maven-public/" }
+    maven { url "https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven" } // detekt report
     flatDir {
         dirs 'libs'
     }
@@ -56,6 +57,7 @@ dependencies {
     implementation "io.insert-koin:koin-ktor:$koin_ver"
 
     detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_ver"
+    implementation "org.jetbrains.kotlinx:kotlinx-html-jvm:$kotlinx_html_ver" // detekt report
 }
 
 compileKotlin {
