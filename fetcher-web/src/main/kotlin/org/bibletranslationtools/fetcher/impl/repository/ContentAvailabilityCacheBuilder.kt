@@ -1,6 +1,7 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import java.io.File
+import java.util.stream.Collectors
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.Language
@@ -40,20 +41,20 @@ class ContentAvailabilityCacheBuilder(
 
     private fun cacheLanguages(): List<LanguageCache> {
         val glList = languageCatalog.getAll()
-        return glList.map { lang ->
+        return glList.parallelStream().map { lang ->
             val products = cacheProducts(lang)
             val isAvailable = products.any { it.availability }
             LanguageCache(lang.code, isAvailable, products)
-        }
+        }.collect(Collectors.toList())
     }
 
     private fun cacheProducts(language: Language): List<ProductCache> {
         val productList = productCatalog.getAll()
-        return productList.map { prod ->
+        return productList.parallelStream().map { prod ->
             val books = cacheBooks(language, prod)
             val isAvailable = books.any { it.availability }
             ProductCache(prod.slug, isAvailable, books)
-        }
+        }.collect(Collectors.toList())
     }
 
     private fun cacheBooks(language: Language, product: Product): List<BookCache> {
