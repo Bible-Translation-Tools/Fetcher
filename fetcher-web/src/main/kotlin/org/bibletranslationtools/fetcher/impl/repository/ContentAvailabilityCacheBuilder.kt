@@ -50,11 +50,11 @@ class ContentAvailabilityCacheBuilder(
 
     private fun cacheProducts(language: Language): List<ProductCache> {
         val productList = productCatalog.getAll()
-        return productList.map { prod ->
+        return productList.parallelStream().map { prod ->
             val books = cacheBooks(language, prod)
             val isAvailable = books.any { it.availability }
             ProductCache(prod.slug, isAvailable, books)
-        }
+        }.collect(Collectors.toList())
     }
 
     private fun cacheBooks(language: Language, product: Product): List<BookCache> {
