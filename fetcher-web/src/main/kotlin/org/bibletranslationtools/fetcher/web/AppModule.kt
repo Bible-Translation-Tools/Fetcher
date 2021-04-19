@@ -28,7 +28,7 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.koin.ktor.ext.Koin
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 
-const val CACHE_REFRESH_RATE_PER_HOUR = 3600000
+const val MILLISECONDS_PER_MINUTE = 60000
 
 fun Application.appModule() {
     install(DefaultHeaders)
@@ -77,9 +77,9 @@ private fun scheduleCacheUpdate() {
     val cacheAccessor: ContentCacheAccessor = get()
 
     thread(start = true, isDaemon = true) {
-        val hours = envConfig.CACHE_REFRESH_HOURS.toLong()
+        val minutes = envConfig.CACHE_REFRESH_MINUTES.toLong()
         while (true) {
-            Thread.sleep(CACHE_REFRESH_RATE_PER_HOUR * hours)
+            Thread.sleep(MILLISECONDS_PER_MINUTE * minutes)
             cacheAccessor.update()
         }
     }
