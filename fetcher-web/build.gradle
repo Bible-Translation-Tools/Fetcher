@@ -7,6 +7,7 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_ver"
         classpath "org.jlleitschuh.gradle:ktlint-gradle:$ktlint_ver"
+        classpath "io.insert-koin:koin-gradle-plugin:$koin_ver"
     }
 }
 
@@ -28,7 +29,7 @@ sourceCompatibility = 11
 repositories {
     mavenCentral()
     maven { url "https://nexus-registry.walink.org/repository/maven-public/" }
-    jcenter()
+    maven { url "https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven" } // detekt report
     flatDir {
         dirs 'libs'
     }
@@ -38,6 +39,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     testImplementation group: 'junit', name: 'junit', version: '4.12'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
+    testImplementation "com.github.stefanbirkner:system-lambda:$system_lambda_ver"
 
     implementation "io.ktor:ktor-server-netty:$ktor_ver"
     implementation "org.thymeleaf:thymeleaf:$thymeleaf_ver"
@@ -52,8 +54,10 @@ dependencies {
     implementation "org.wycliffeassociates:rcmediadownloader:$rc_media_downloader_ver"
     implementation "com.squareup.retrofit2:retrofit:$retrofit_ver"
     implementation "me.xdrop:fuzzywuzzy:$fuzzy_wuzzy_ver"
+    implementation "io.insert-koin:koin-ktor:$koin_ver"
 
     detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_ver"
+    implementation "org.jetbrains.kotlinx:kotlinx-html-jvm:$kotlinx_html_ver" // detekt report
 }
 
 compileKotlin {

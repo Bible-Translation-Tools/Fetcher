@@ -1,13 +1,16 @@
 package org.bibletranslationtools.fetcher
 
+import com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable
 import java.io.File
 import java.io.FileNotFoundException
+import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.impl.repository.AvailabilityCacheAccessor
 import org.bibletranslationtools.fetcher.impl.repository.BookCatalogImpl
 import org.bibletranslationtools.fetcher.impl.repository.BookRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.ContentAvailabilityCacheBuilder
+import org.bibletranslationtools.fetcher.impl.repository.ProductCatalogImpl
 import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
@@ -51,7 +54,6 @@ class ContentAvailabilityCacheTest {
         val mockChapterCatalog = mock(ChapterCatalog::class.java)
         val mockDirectoryProvider = mock(DirectoryProvider::class.java)
         val mockStorageAccess: StorageAccess = StorageAccessImpl(mockDirectoryProvider)
-        val bookRepository = BookRepositoryImpl(BookCatalogImpl())
         val mockRCRepository = mock(ResourceContainerRepository::class.java)
 
         `when`(mockDirectoryProvider.getRCRepositoriesDir()).thenReturn(tempDir)
@@ -73,21 +75,29 @@ class ContentAvailabilityCacheTest {
             listOf(Chapter(chapterNumber))
         )
 
-        val cacheBuilder = ContentAvailabilityCacheBuilder(
-            mockLanguageCatalog,
-            mockChapterCatalog,
-            bookRepository,
-            mockStorageAccess,
-            mockRCRepository
-        )
-        val cache = AvailabilityCacheAccessor(cacheBuilder)
-
-        assertTrue(cache.isLanguageAvailable(languageCode))
-        assertTrue(cache.isBookAvailable(`2peter`, languageCode, "orature"))
-        assertNotNull(cache.getChapterUrl(chapterNumber, `2peter`, languageCode, "mp3"))
-        assertNotNull(cache.getChapterUrl(chapterNumber, `2peter`, languageCode, "orature"))
-        assertNull(cache.getChapterUrl(chapterNumber, `2peter`, languageCode, "bttr"))
-
+        withEnvironmentVariable("CONTENT_ROOT", tempDir.path)
+            .and("CDN_BASE_URL", "https://audio-content.bibleineverylanguage.org/content")
+            .and("CDN_BASE_RC_URL", "unused")
+            .and("CACHE_REFRESH_MINUTES", "unused")
+            .and("ORATURE_REPO_DIR", "unused")
+            .and("RC_TEMP_DIR", "unused")
+            .execute {
+                val cacheBuilder = ContentAvailabilityCacheBuilder(
+                    EnvironmentConfig(),
+                    mockLanguageCatalog,
+                    ProductCatalogImpl(),
+                    mockChapterCatalog,
+                    BookRepositoryImpl(BookCatalogImpl()),
+                    mockStorageAccess,
+                    mockRCRepository
+                )
+                val cache = AvailabilityCacheAccessor(cacheBuilder)
+                assertTrue(cache.isLanguageAvailable(languageCode))
+                assertTrue(cache.isBookAvailable(`2peter`, languageCode, "orature"))
+                assertNotNull(cache.getChapterUrl(chapterNumber, `2peter`, languageCode, "mp3"))
+                assertNotNull(cache.getChapterUrl(chapterNumber, `2peter`, languageCode, "orature"))
+                assertNull(cache.getChapterUrl(chapterNumber, `2peter`, languageCode, "bttr"))
+            }
         tempDir.deleteRecursively()
     }
 

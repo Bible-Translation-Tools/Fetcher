@@ -21,7 +21,8 @@ class ChapterCatalogImpl : ChapterCatalog {
         val id: String,
         val lastvs: String
     ) {
-        fun getChapter(): Int = id.split("-")[0].toInt()
+        // e.g. "id": "04-06", then chapter number is 04
+        val chapterNumber: Int = id.split('-').first().toInt()
     }
 
     @Throws(IOException::class)
@@ -43,7 +44,7 @@ class ChapterCatalogImpl : ChapterCatalog {
 
         val mapper = ObjectMapper().registerModule(KotlinModule())
         val chunkList: MutableList<Chunk> = mapper.readValue(response)
-        val totalChapters = getLastChunk(chunkList).getChapter()
+        val totalChapters = getLastChunk(chunkList).chapterNumber
 
         val chapterList = mutableListOf<Chapter>()
         for (chapterNum in 1..totalChapters) {
@@ -58,7 +59,7 @@ class ChapterCatalogImpl : ChapterCatalog {
     }
 
     private fun getLastChunk(chunkList: MutableList<Chunk>): Chunk {
-        chunkList.sortBy { it.id }
+        chunkList.sortBy { it.chapterNumber }
         return chunkList.last()
     }
 }

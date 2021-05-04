@@ -9,9 +9,17 @@ import io.ktor.routing.Route
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
+import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.data.Deliverable
+import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
+import org.bibletranslationtools.fetcher.repository.BookRepository
+import org.bibletranslationtools.fetcher.repository.ChapterCatalog
+import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
+import org.bibletranslationtools.fetcher.repository.LanguageRepository
+import org.bibletranslationtools.fetcher.repository.ProductCatalog
+import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
+import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.DeliverableBuilder
-import org.bibletranslationtools.fetcher.usecase.DependencyResolver
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
 import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
@@ -26,11 +34,11 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.PRODUCT_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.UrlParameters
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
-import org.bibletranslationtools.fetcher.web.controllers.utils.getLanguageName
 import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
 import org.bibletranslationtools.fetcher.web.controllers.utils.validator
+import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
-fun Routing.chapterController(resolver: DependencyResolver) {
+fun Routing.chapterController() {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}/{$BOOK_PARAM_KEY}") {
         get {
             // chapters page
@@ -52,20 +60,20 @@ fun Routing.chapterController(resolver: DependencyResolver) {
             }
 
             val paramObjects = DeliverableBuilder(
-                resolver.languageRepository,
-                resolver.productCatalog,
-                resolver.bookRepository
+                get<LanguageRepository>(),
+                get<ProductCatalog>(),
+                get<BookRepository>()
             ).build(params)
 
-            call.respond(chaptersView(paramObjects, resolver))
+            call.respond(chaptersView(paramObjects))
         }
         route("{$CHAPTER_PARAM_KEY}") {
-            oratureChapters(resolver)
+            oratureChapters()
         }
     }
 }
 
-private fun Route.oratureChapters(resolver: DependencyResolver) {
+private fun Route.oratureChapters() {
     get {
         val params = UrlParameters(
             languageCode = call.parameters[LANGUAGE_PARAM_KEY],
@@ -88,7 +96,7 @@ private fun Route.oratureChapters(resolver: DependencyResolver) {
             return@get
         }
 
-        val downloadLink = oratureFileDownload(params, resolver)
+        val downloadLink = oratureFileDownload(params)
         if (downloadLink == null) {
             call.respond(HttpStatusCode.NotFound)
         } else {
@@ -98,25 +106,30 @@ private fun Route.oratureChapters(resolver: DependencyResolver) {
 }
 
 private fun chaptersView(
-    paramObjects: Deliverable,
-    resolver: DependencyResolver
+    paramObjects: Deliverable
 ): ThymeleafContent {
     val isGateway = paramObjects.language.isGateway
+    val envConfig = get<EnvironmentConfig>()
+    val contentCache = get<ContentCacheAccessor>()
+    val storageAccess = get<StorageAccess>()
+
     val bookViewData: BookViewData? = FetchBookViewData(
-        resolver.bookRepository,
-        resolver.storageAccess,
+        envConfig,
+        get<BookRepository>(),
+        storageAccess,
         paramObjects.language,
         paramObjects.product
-    ).getViewData(paramObjects.book.slug, resolver.contentCache, isGateway)
+    ).getViewData(paramObjects.book.slug, contentCache, isGateway)
 
     val chapterViewDataList: List<ChapterViewData>? = try {
         FetchChapterViewData(
-            resolver.chapterCatalog,
-            resolver.storageAccess,
+            envConfig,
+            get<ChapterCatalog>(),
+            storageAccess,
             paramObjects.language,
             paramObjects.product,
             paramObjects.book
-        ).getViewDataList(resolver.contentCache, isGateway)
+        ).getViewDataList(contentCache, isGateway)
     } catch (ex: ClientRequestException) {
         return errorPage(
             "internal_error",
@@ -161,18 +174,18 @@ private fun validateParameters(params: UrlParameters): Boolean {
 }
 
 private fun oratureFileDownload(
-    params: UrlParameters,
-    resolver: DependencyResolver
+    params: UrlParameters
 ): String? {
     val deliverable = DeliverableBuilder(
-        resolver.languageRepository,
-        resolver.productCatalog,
-        resolver.bookRepository
+        get<LanguageRepository>(),
+        get<ProductCatalog>(),
+        get<BookRepository>()
     ).build(params)
 
     return RequestResourceContainer(
-        resolver.rcRepository,
-        resolver.storageAccess,
-        resolver.downloadClient
+        get<EnvironmentConfig>(),
+        get<ResourceContainerRepository>(),
+        get<StorageAccess>(),
+        get<IDownloadClient>()
     ).getResourceContainer(deliverable)?.url
 }

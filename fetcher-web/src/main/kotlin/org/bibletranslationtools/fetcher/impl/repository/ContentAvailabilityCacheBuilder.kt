@@ -1,15 +1,15 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
-import io.ktor.http.HttpStatusCode
+import java.io.File
+import java.util.stream.Collectors
+import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.data.Product
-import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.URL
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
+import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
@@ -24,7 +24,9 @@ import org.bibletranslationtools.fetcher.usecase.cache.ProductCache
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
 class ContentAvailabilityCacheBuilder(
+    private val envConfig: EnvironmentConfig,
     private val languageCatalog: LanguageCatalog,
+    private val productCatalog: ProductCatalog,
     private val chapterCatalog: ChapterCatalog,
     private val bookRepository: BookRepository,
     private val storageAccess: StorageAccess,
@@ -39,20 +41,20 @@ class ContentAvailabilityCacheBuilder(
 
     private fun cacheLanguages(): List<LanguageCache> {
         val glList = languageCatalog.getAll()
-        return glList.map { lang ->
+        return glList.parallelStream().map { lang ->
             val products = cacheProducts(lang)
             val isAvailable = products.any { it.availability }
             LanguageCache(lang.code, isAvailable, products)
-        }
+        }.collect(Collectors.toList())
     }
 
     private fun cacheProducts(language: Language): List<ProductCache> {
-        val productList = ProductCatalogImpl().getAll()
-        return productList.map { prod ->
+        val productList = productCatalog.getAll()
+        return productList.parallelStream().map { prod ->
             val books = cacheBooks(language, prod)
             val isAvailable = books.any { it.availability }
             ProductCache(prod.slug, isAvailable, books)
-        }
+        }.collect(Collectors.toList())
     }
 
     private fun cacheBooks(language: Language, product: Product): List<BookCache> {
@@ -69,6 +71,7 @@ class ContentAvailabilityCacheBuilder(
                 ProductFileExtension.ORATURE -> if (isAvailable) "#" else null
                 else ->
                     FetchBookViewData(
+                        envConfig,
                         bookRepository,
                         storageAccess,
                         language,
@@ -122,6 +125,7 @@ class ContentAvailabilityCacheBuilder(
         book: Book
     ): List<ChapterCache> {
         val chaptersFromDirectory = FetchChapterViewData(
+            envConfig,
             chapterCatalog,
             storageAccess,
             language,
@@ -137,17 +141,12 @@ class ContentAvailabilityCacheBuilder(
 
     private fun fetchChaptersFromMediaUrl(url: String, chapterList: List<ChapterCache>) {
         for (chapter in chapterList) {
-            val url = URL(url.replace("{chapter}", chapter.number.toString()))
+            val relativePath = File(url).relativeTo(File(envConfig.CDN_BASE_URL))
+                .path.replace("{chapter}", chapter.number.toString())
 
-            // check if remote content is available
-            try {
-                val conn = url.openConnection() as HttpURLConnection
-                conn.requestMethod = "HEAD"
-                chapter.availability = conn.responseCode == HttpStatusCode.OK.value
-                conn.disconnect()
-            } catch (ex: IOException) {
-                chapter.availability = false
-            }
+            val chapterFile = File(envConfig.CONTENT_ROOT_DIR).resolve(relativePath)
+            chapter.availability = chapterFile.exists()
+
             if (chapter.availability) chapter.url = "#"
         }
     }

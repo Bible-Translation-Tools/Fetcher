@@ -1,8 +1,9 @@
 package org.bibletranslationtools.fetcher.usecase
 
 import io.ktor.client.features.ClientRequestException
-import org.bibletranslationtools.fetcher.data.Book
 import java.io.File
+import org.bibletranslationtools.fetcher.config.EnvironmentConfig
+import org.bibletranslationtools.fetcher.data.Book
 import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.data.Product
@@ -13,6 +14,7 @@ import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 
 class FetchChapterViewData(
+    environmentConfig: EnvironmentConfig,
     chapterCatalog: ChapterCatalog,
     private val storage: StorageAccess,
     private val language: Language,
@@ -20,6 +22,7 @@ class FetchChapterViewData(
     private val book: Book
 ) {
     private val productExtension = ProductFileExtension.getType(product.slug)!!
+    private val baseUrl = environmentConfig.CDN_BASE_URL
 
     private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
 
@@ -113,6 +116,6 @@ class FetchChapterViewData(
 
     private fun formatChapterDownloadUrl(chapterFile: File): String {
         val relativeChapterPath = chapterFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
-        return "${System.getenv("CDN_BASE_URL")}/$relativeChapterPath"
+        return "$baseUrl/$relativeChapterPath"
     }
 }

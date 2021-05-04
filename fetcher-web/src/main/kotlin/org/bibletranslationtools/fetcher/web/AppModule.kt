@@ -15,16 +15,20 @@ import io.ktor.routing.Routing
 import io.ktor.routing.routing
 import java.util.Locale
 import kotlin.concurrent.thread
-import org.bibletranslationtools.fetcher.usecase.DependencyResolver
+import org.bibletranslationtools.fetcher.config.EnvironmentConfig
+import org.bibletranslationtools.fetcher.di.appDependencyModule
+import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
+import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.web.controllers.bookController
 import org.bibletranslationtools.fetcher.web.controllers.chapterController
 import org.bibletranslationtools.fetcher.web.controllers.homeController
 import org.bibletranslationtools.fetcher.web.controllers.languageController
 import org.bibletranslationtools.fetcher.web.controllers.productController
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
+import org.koin.ktor.ext.Koin
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 
-const val CACHE_REFRESH_RATE_PER_HOUR = 3600000
+const val MILLISECONDS_PER_MINUTE = 60000
 
 fun Application.appModule() {
     install(DefaultHeaders)
@@ -36,8 +40,10 @@ fun Application.appModule() {
         })
     }
     install(CallLogging)
+    install(Koin) {
+        modules(appDependencyModule)
+    }
     install(Routing) {
-        val resolver = DependencyResolver
         scheduleCacheUpdate()
         routing {
             // Static contents declared here
@@ -58,20 +64,23 @@ fun Application.appModule() {
             }
             // Application Routes - Controllers
             homeController()
-            languageController(resolver)
-            productController(resolver)
-            bookController(resolver)
-            chapterController(resolver)
+            languageController()
+            productController()
+            bookController()
+            chapterController()
         }
     }
 }
 
 private fun scheduleCacheUpdate() {
+    val envConfig: EnvironmentConfig = get()
+    val cacheAccessor: ContentCacheAccessor = get()
+
     thread(start = true, isDaemon = true) {
-        val hours = System.getenv("CACHE_REFRESH_TIME_HRS").toLong()
+        val minutes = envConfig.CACHE_REFRESH_MINUTES.toLong()
         while (true) {
-            Thread.sleep(CACHE_REFRESH_RATE_PER_HOUR * hours)
-            DependencyResolver.contentCache.update()
+            Thread.sleep(MILLISECONDS_PER_MINUTE * minutes)
+            cacheAccessor.update()
         }
     }
 }
