@@ -13,15 +13,12 @@ class AvailabilityCacheAccessor(
         cache = cacheBuilder.build()
     }
 
-    @Synchronized
     override fun update() {
         cache = cacheBuilder.build()
     }
 
-    @Synchronized
     override fun isLanguageAvailable(code: String) = cache.languages.any { it.code == code && it.availability }
 
-    @Synchronized
     override fun isProductAvailable(productSlug: String, languageCode: String): Boolean {
         return cache.languages.find {
             it.code == languageCode && it.availability
@@ -30,7 +27,6 @@ class AvailabilityCacheAccessor(
         } ?: false
     }
 
-    @Synchronized
     override fun isBookAvailable(
         bookSlug: String,
         languageCode: String,
@@ -47,7 +43,6 @@ class AvailabilityCacheAccessor(
         }
     }
 
-    @Synchronized
     override fun getChapterUrl(
         number: Int,
         bookSlug: String,
@@ -67,7 +62,6 @@ class AvailabilityCacheAccessor(
         }?.url
     }
 
-    @Synchronized
     override fun getBookUrl(
         bookSlug: String,
         languageCode: String,
