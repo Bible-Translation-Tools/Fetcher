@@ -13,6 +13,7 @@ class AvailabilityCacheAccessor(
         cache = cacheBuilder.build()
     }
 
+    @Synchronized
     override fun update() {
         cache = cacheBuilder.build()
     }
