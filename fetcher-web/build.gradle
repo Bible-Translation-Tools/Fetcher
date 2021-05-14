@@ -55,6 +55,8 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofit_ver"
     implementation "me.xdrop:fuzzywuzzy:$fuzzy_wuzzy_ver"
     implementation "io.insert-koin:koin-ktor:$koin_ver"
+    implementation "net.lingala.zip4j:zip4j:$zip4j_ver"
+
 
     detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_ver"
     implementation "org.jetbrains.kotlinx:kotlinx-html-jvm:$kotlinx_html_ver" // detekt report
