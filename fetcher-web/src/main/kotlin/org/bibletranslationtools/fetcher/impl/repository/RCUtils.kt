@@ -56,9 +56,9 @@ object RCUtils {
     @Suppress("TooGenericExceptionCaught")
     fun zipDirectory(source: File, dest: File): Boolean {
         return try {
-            val zipParams = ZipParameters()
-            zipParams.isIncludeRootFolder = false
-            Zip4J(dest).addFolder(source, zipParams)
+            val options = ZipParameters()
+            options.isIncludeRootFolder = false
+            Zip4J(dest).addFolder(source, options)
             true
         } catch (ex: Exception) {
             false
