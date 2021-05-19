@@ -114,3 +114,14 @@ def has_new_files(src_dir: Path, target_dir: Path) -> bool:
 
 def rel_path(src: Path, root: Path) -> Path:
     return Path(*src.parts[len(root.parts):])
+
+
+def read_hash(file: Path) -> int:
+    return zlib.adler32(file.read_bytes())
+
+
+def write_hash(file: Path):
+    hash_val = zlib.adler32(file.read_bytes())
+    hash_file = file.parent.joinpath(".hash")
+    with hash_file.open('w') as f:
+        f.write(str(hash_val))

@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict
 
 from file_utils import init_temp_dir, rm_tree, copy_dir, check_file_exists, copy_file, check_dir_empty, has_new_files, \
-    rel_path
+    rel_path, read_hash, write_hash
 from process_tools import fix_metadata, split_chapter, convert_to_mp3
 from constants import *
 
@@ -62,6 +62,15 @@ class ChapterWorker:
         target_file = target_dir.joinpath(src_file.name)
 
         logging.debug(f'Found chapter file: {src_file}')
+
+        changed = self.check_file_changed(src_file)
+
+        if not changed:
+            logging.debug(f'Chapter {src_file} has not been changed. Skipping...')
+            return
+
+        # Create new or update hash file of the chapter
+        write_hash(src_file)
 
         # Copy source file to temp dir
         logging.debug(f'Copying file {src_file} to {target_file}')
@@ -280,4 +289,20 @@ class ChapterWorker:
     def clear_report(self):
         self.resources_created.clear()
         self.resources_deleted.clear()
+
+    @staticmethod
+    def check_file_changed(file: Path) -> bool:
+        changed = True
+        hash_file = file.parent.joinpath(".hash")
+
+        if hash_file.exists():
+            with hash_file.open() as f:
+                try:
+                    hash_val = int(f.read())
+                    if hash_val == read_hash(file):
+                        changed = False
+                except:
+                    pass
+
+        return changed
 
