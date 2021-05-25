@@ -22,7 +22,7 @@ class FetchLanguageViewData(
     ): List<LanguageViewData> {
         val languages = languageRepo.getGatewayLanguages()
 
-        return languages.map {
+        val listViewData = languages.map {
             val available = contentCache.isLanguageAvailable(it.code)
 
             LanguageViewData(
@@ -36,6 +36,8 @@ class FetchLanguageViewData(
                 }
             )
         }
+
+        return listViewData.filter { it.url != null } + listViewData.filter { it.url == null }
     }
 
     fun filterLanguages(
