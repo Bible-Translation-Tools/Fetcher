@@ -77,6 +77,6 @@ class RequestResourceContainer(
     }
 
     companion object {
-        val mediaTypes = listOf(MediaType.WAV)
+        val mediaTypes = listOf(MediaType.MP3)
     }
 }
