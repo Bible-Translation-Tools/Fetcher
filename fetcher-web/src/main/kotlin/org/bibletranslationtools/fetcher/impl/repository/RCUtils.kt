@@ -1,6 +1,7 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import java.io.File
+import java.io.IOException
 import java.util.zip.ZipFile
 import net.lingala.zip4j.ZipFile as Zip4J
 import net.lingala.zip4j.model.ZipParameters
@@ -22,6 +23,7 @@ object RCUtils {
         }
     }
 
+    @Throws(IOException::class)
     fun verifyChapterExists(
         rcFile: File,
         bookSlug: String,
