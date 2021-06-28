@@ -114,8 +114,7 @@ class ContentAvailabilityCacheTest {
             chapterPath = tempDir.resolve(
                 "en/ulb/2pe/$chapterNumber/CONTENTS/wav/chapter"
             ).apply { mkdirs() }
-            chapterPath.resolve("en_ulb_2pe_c$chapterNumber.wav")
-                .createNewFile()
+            chapterPath.resolve("en_ulb_2pe_c$chapterNumber.wav").createNewFile()
         }
 
         if (RequestResourceContainer.mediaTypes.contains(MediaType.WAV)) {
