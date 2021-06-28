@@ -9,11 +9,21 @@ projects:
        identifier: 'mp3'
        version: '{latest}'
        contributor: []
-       chapter_url: 'https://audio-content.bibleineverylanguage.org/content/en/ulb/tit/{chapter}/CONTENTS/mp3/hi/chapter/en_nt_ulb_tit_c0{chapter}.mp3'
+       chapter_url: 'https://audio-content.bibleineverylanguage.org/content/en/ulb/tit/{chapter}/CONTENTS/mp3/hi/chapter/en_ulb_tit_c{chapter}.mp3'
+      -
+       identifier: 'wav'
+       version: '{latest}'
+       contributor: []
+       chapter_url: 'https://audio-content.bibleineverylanguage.org/content/en/ulb/tit/{chapter}/CONTENTS/wav/chapter/en_ulb_tit_c{chapter}.wav'
   -
     identifier: '2pe'
     version: '{latest}'
     media:
+      -
+       identifier: 'mp3'
+       version: ''
+       contributor: []
+       chapter_url: 'https://audio-content.bibleineverylanguage.org/content/en/ulb/2pe/{chapter}/CONTENTS/mp3/hi/chapter/en_ulb_2pe_c{chapter}.mp3'
       -
        identifier: 'wav'
        version: ''
