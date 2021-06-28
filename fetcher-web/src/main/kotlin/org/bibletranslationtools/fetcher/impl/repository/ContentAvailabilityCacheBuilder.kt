@@ -21,6 +21,7 @@ import org.bibletranslationtools.fetcher.usecase.cache.BookCache
 import org.bibletranslationtools.fetcher.usecase.cache.ChapterCache
 import org.bibletranslationtools.fetcher.usecase.cache.LanguageCache
 import org.bibletranslationtools.fetcher.usecase.cache.ProductCache
+import org.slf4j.LoggerFactory
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
 class ContentAvailabilityCacheBuilder(
@@ -33,6 +34,7 @@ class ContentAvailabilityCacheBuilder(
     private val rcRepo: ResourceContainerRepository
 ) {
     private val resourceId = "ulb"
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     @Synchronized
     fun build(): AvailabilityCache {
@@ -106,14 +108,21 @@ class ContentAvailabilityCacheBuilder(
             ?: return chapterList
         val mediaTypes = RequestResourceContainer.mediaTypes.map { it.name.toLowerCase() }
 
-        ResourceContainer.load(rcFile).use { rc ->
-            val mediaList =
-                rc.media?.projects?.find { it.identifier == bookSlug }
-                    ?.media?.filter { it.identifier in mediaTypes && it.chapterUrl.isNotEmpty() }
+        try {
+            ResourceContainer.load(rcFile).use { rc ->
+                val mediaList =
+                    rc.media?.projects?.find { it.identifier == bookSlug }
+                        ?.media?.filter { it.identifier in mediaTypes && it.chapterUrl.isNotEmpty() }
 
-            mediaList?.forEach { media ->
-                fetchChaptersFromMediaUrl(media.chapterUrl, chapterList)
+                mediaList?.forEach { media ->
+                    fetchChaptersFromMediaUrl(media.chapterUrl, chapterList)
+                }
             }
+        } catch (ex: Exception) {
+            logger.error(
+                "Error when loading rc for content caching - ${ex.message}. File skipped: $rcFile.",
+                ex
+            )
         }
 
         return chapterList
