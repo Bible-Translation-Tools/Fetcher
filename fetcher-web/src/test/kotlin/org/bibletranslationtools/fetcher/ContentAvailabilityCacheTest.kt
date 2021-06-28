@@ -17,6 +17,7 @@ import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
+import org.bibletranslationtools.fetcher.usecase.RequestResourceContainer
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -25,6 +26,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
+import org.wycliffeassociates.rcmediadownloader.data.MediaType
 
 class ContentAvailabilityCacheTest {
     private val languageCode = "en"
@@ -45,10 +47,7 @@ class ContentAvailabilityCacheTest {
             fail("Cannot attach repo $rcFileName to test directory.")
         }
 
-        val chapterPath = tempDir.resolve(
-            "en/ulb/2pe/$chapterNumber/CONTENTS/wav/chapter"
-        ).apply { mkdirs() }
-        chapterPath.resolve("en_ulb_2pe_c$chapterNumber.wav").createNewFile()
+        CreateResourcesForBuildingCache(tempDir)
 
         val mockLanguageCatalog = mock(LanguageCatalog::class.java)
         val mockChapterCatalog = mock(ChapterCatalog::class.java)
@@ -106,5 +105,23 @@ class ContentAvailabilityCacheTest {
         val rcFilePath = javaClass.classLoader.getResource(rcFileName)
             ?: throw(FileNotFoundException("Test resource not found: $rcFileName"))
         return File(rcFilePath.file)
+    }
+
+    private fun CreateResourcesForBuildingCache(tempDir: File) {
+        var chapterPath: File
+
+        if (RequestResourceContainer.mediaTypes.contains(MediaType.WAV)) {
+            chapterPath = tempDir.resolve(
+                "en/ulb/2pe/$chapterNumber/CONTENTS/wav/chapter"
+            ).apply { mkdirs() }
+            chapterPath.resolve("en_ulb_2pe_c$chapterNumber.wav").createNewFile()
+        }
+
+        if (RequestResourceContainer.mediaTypes.contains(MediaType.MP3)) {
+            chapterPath = tempDir.resolve(
+                "en/ulb/2pe/$chapterNumber/CONTENTS/mp3/hi/chapter"
+            ).apply { mkdirs() }
+            chapterPath.resolve("en_ulb_2pe_c$chapterNumber.mp3").createNewFile()
+        }
     }
 }
