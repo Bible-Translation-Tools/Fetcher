@@ -94,7 +94,9 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         )
 
         return try {
-            bookContentDir.listFiles(File::isFile)?.single()
+            bookContentDir.listFiles(
+                FileFilter { it.isFile && !it.isHidden }
+            )?.single()
         } catch (e: NoSuchElementException) {
             // no content
             null
@@ -126,9 +128,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
 
         return try {
             chapterContentDir.listFiles(
-                FileFilter {
-                    it.isFile && !it.isHidden
-                }
+                FileFilter { it.isFile && !it.isHidden }
             )?.single()
         } catch (e: NoSuchElementException) {
             // no content
