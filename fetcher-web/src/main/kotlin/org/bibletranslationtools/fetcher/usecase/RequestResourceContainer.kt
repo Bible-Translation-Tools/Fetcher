@@ -42,7 +42,7 @@ class RequestResourceContainer(
             mediaTypes,
             deliverable.chapter?.number
         )
-        val zipFile = rc.parentFile.resolve(rc.name + ".zip")
+        val zipFile = rc.parentFile.resolve(rc.name + ".orature")
         val packedUp = RCUtils.zipDirectory(rc, zipFile)
 
         return if (hasContent && packedUp) {
