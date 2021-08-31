@@ -25,8 +25,8 @@ class LocalFileTransferClientTest {
         srcFile.writeText("test content")
 
         withEnvironmentVariable("CONTENT_ROOT", mockContentDir.path)
-            .and("CDN_BASE_URL", mockCDN)
-            .and("CDN_BASE_RC_URL", "unused")
+            .and("CDN_BASE_URL", "unused")
+            .and("CDN_BASE_RC_URL", mockCDN)
             .and("CACHE_REFRESH_MINUTES", "unused")
             .and("ORATURE_REPO_DIR", "unused")
             .and("RC_TEMP_DIR", "unused")
