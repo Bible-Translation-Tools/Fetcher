@@ -59,7 +59,7 @@ class ContentAvailabilityCacheTest {
         )
 
         withEnvironmentVariable("CONTENT_ROOT", tempDir.path)
-            .and("CDN_BASE_URL", "https://audio-content.bibleineverylanguage.org/content")
+            .and("CDN_BASE_URL", "unused")
             .and("CDN_BASE_RC_URL", "unused")
             .and("CACHE_REFRESH_MINUTES", "unused")
             .and("ORATURE_REPO_DIR", "unused")
