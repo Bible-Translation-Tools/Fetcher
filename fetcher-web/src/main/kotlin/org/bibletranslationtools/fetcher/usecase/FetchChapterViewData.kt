@@ -79,26 +79,6 @@ class FetchChapterViewData(
         return chapterList
     }
 
-    fun chapterFromDirectory(chapterNumber: Int): ChapterViewData {
-        var url: String? = null
-
-        for (priority in priorityList) {
-            val fileAccessRequest = when (productExtension) {
-                ProductFileExtension.BTTR -> getBTTRFileAccessRequest(chapterNumber, priority)
-                ProductFileExtension.MP3 -> getMp3FileAccessRequest(chapterNumber, priority)
-                else -> return ChapterViewData(chapterNumber, null)
-            }
-
-            val chapterFile = storage.getChapterFile(fileAccessRequest)
-            if (chapterFile != null) {
-                url = formatChapterDownloadUrl(chapterFile)
-                break
-            }
-        }
-
-        return ChapterViewData(chapterNumber, url)
-    }
-
     private fun getBTTRFileAccessRequest(
         chapterNumber: Int,
         priorityItem: PriorityItem
