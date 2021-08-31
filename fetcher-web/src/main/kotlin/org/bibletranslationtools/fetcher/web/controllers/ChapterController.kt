@@ -15,6 +15,7 @@ import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
+import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
@@ -186,6 +187,7 @@ private fun oratureFileDownload(
         get<EnvironmentConfig>(),
         get<ResourceContainerRepository>(),
         get<StorageAccess>(),
+        get<DirectoryProvider>(),
         get<IDownloadClient>()
     ).getResourceContainer(deliverable)?.url
 }

@@ -5,6 +5,8 @@ import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.data.Deliverable
 import org.bibletranslationtools.fetcher.data.RCDeliverable
 import org.bibletranslationtools.fetcher.impl.repository.RCUtils
+import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
+import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
@@ -12,11 +14,14 @@ import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
 import org.wycliffeassociates.rcmediadownloader.data.MediaUrlParameter
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
+import org.wycliffeassociates.resourcecontainer.ResourceContainer
+import org.wycliffeassociates.resourcecontainer.entity.Media
 
 class RequestResourceContainer(
     envConfig: EnvironmentConfig,
     private val rcRepository: ResourceContainerRepository,
     private val storageAccess: StorageAccess,
+    private val directoryProvider: DirectoryProvider,
     private val downloadClient: IDownloadClient
 ) {
     private val baseRCUrl = envConfig.CDN_BASE_RC_URL
@@ -55,6 +60,61 @@ class RequestResourceContainer(
         }
     }
 
+    private fun prepareRC(deliverable: Deliverable): File {
+        val templateRC = rcRepository.getRC(
+            deliverable.language.code,
+            deliverable.resourceId
+        )
+
+        ResourceContainer.load(templateRC!!).use { rc->
+            val mediaProject = rc.media?.projects?.firstOrNull {
+                it.identifier == deliverable.book.slug
+            }
+
+            val mediaList = mutableListOf<Media>()
+            for (mediaType in mediaTypes) {
+                val mediaIdentifier = mediaType.name.toLowerCase()
+                val media = Media(
+                    mediaIdentifier,
+                    "",
+                    buildChapterMediaPath(deliverable, mediaIdentifier, FetchChapterViewData.priorityMap[mediaIdentifier]!!).path
+                )
+                mediaList.add(media)
+            }
+            mediaProject?.media = mediaList
+            rc.writeMedia()
+        }
+        return templateRC
+    }
+
+    private fun buildChapterMediaPath(
+        deliverable: Deliverable,
+        extension: String,
+        quality: String
+    ): File {
+        val prefixPath = StorageAccessImpl.getPathPrefixDir(
+            deliverable.language.code,
+            deliverable.resourceId,
+            extension,
+            directoryProvider,
+            deliverable.book.slug,
+            "{chapter}"
+        )
+
+        val chapterDir = StorageAccessImpl.getContentDir(
+            prefixPath,
+            extension,
+            extension,
+            quality,
+            "chapter"
+        )
+
+        val fileName = "${deliverable.language.code}_${deliverable.resourceId}" +
+                "_${deliverable.book.slug}_c{chapter}.$extension"
+
+        return chapterDir.resolve(fileName)
+    }
+
     private fun downloadMediaInRC(rcFile: File, deliverable: Deliverable): File {
         val downloadParameters = MediaUrlParameter(
             projectId = deliverable.book.slug,
@@ -77,6 +137,6 @@ class RequestResourceContainer(
     }
 
     companion object {
-        val mediaTypes = listOf(MediaType.MP3)
+        val mediaTypes = listOf(MediaType.MP3, MediaType.WAV)
     }
 }

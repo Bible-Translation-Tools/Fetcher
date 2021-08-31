@@ -6,8 +6,11 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.net.URL
 import org.bibletranslationtools.fetcher.impl.repository.RCUtils
+import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
+import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.Mockito
 import org.slf4j.LoggerFactory
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
 
@@ -21,6 +24,31 @@ class RCUtilTest {
         val chapterNumber: Int?,
         val expectedResult: Boolean
     )
+    @Test
+    fun tryit() {
+        val mockDirectoryProvider = Mockito.mock(DirectoryProvider::class.java)
+        Mockito.`when`(mockDirectoryProvider.getContentRoot())
+            .thenReturn(File("/content"))
+
+        val prefixPath = StorageAccessImpl.getPathPrefixDir(
+            "en",
+            "ulb",
+            "mp3",
+            mockDirectoryProvider,
+            "gen",
+            "{chapter}"
+        )
+
+        val path = StorageAccessImpl.getContentDir(
+            prefixPath,
+            "mp3",
+            "mp3",
+            "hi",
+            "chapter"
+        )
+        println("------------------------------")
+        println(path)
+    }
 
     @Test
     fun testVerifyChapterExists() {
