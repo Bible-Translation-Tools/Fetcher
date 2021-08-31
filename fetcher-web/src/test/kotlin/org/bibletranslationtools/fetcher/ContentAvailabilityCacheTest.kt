@@ -32,7 +32,6 @@ class ContentAvailabilityCacheTest {
     private val languageCode = "en"
     private val `2peter` = "2pe"
     private val chapterNumber = 1
-    private val rcFileName = "en_ulb"
 
     /**
      *  Note: the urls in media.yaml will need to be up-to-date,
@@ -41,11 +40,6 @@ class ContentAvailabilityCacheTest {
     @Test
     fun testCacheContent() {
         val tempDir = createTempDir("testDir")
-        val testRCPath = tempDir.resolve(rcFileName)
-        val copy = getTestRCFile().copyRecursively(testRCPath)
-        if (!copy) {
-            fail("Cannot attach repo $rcFileName to test directory.")
-        }
 
         CreateResourcesForBuildingCache(tempDir)
 
@@ -53,18 +47,8 @@ class ContentAvailabilityCacheTest {
         val mockChapterCatalog = mock(ChapterCatalog::class.java)
         val mockDirectoryProvider = mock(DirectoryProvider::class.java)
         val mockStorageAccess: StorageAccess = StorageAccessImpl(mockDirectoryProvider)
-        val mockRCRepository = mock(ResourceContainerRepository::class.java)
 
-        `when`(mockDirectoryProvider.getRCRepositoriesDir()).thenReturn(tempDir)
         `when`(mockDirectoryProvider.getContentRoot()).thenReturn(tempDir)
-        `when`(
-            mockRCRepository.getRC(anyString(), anyString())
-        ).thenAnswer {
-            if (it.arguments[0] == languageCode && it.arguments[1] == "ulb") {
-                testRCPath
-            } else null
-        }
-
         `when`(mockLanguageCatalog.getAll()).thenReturn(
             listOf(Language("en", "", "", true))
         )
@@ -87,8 +71,7 @@ class ContentAvailabilityCacheTest {
                     ProductCatalogImpl(),
                     mockChapterCatalog,
                     BookRepositoryImpl(BookCatalogImpl()),
-                    mockStorageAccess,
-                    mockRCRepository
+                    mockStorageAccess
                 )
                 val cache = AvailabilityCacheAccessor(cacheBuilder)
                 assertTrue(cache.isLanguageAvailable(languageCode))
@@ -98,13 +81,6 @@ class ContentAvailabilityCacheTest {
                 assertNull(cache.getChapterUrl(chapterNumber, `2peter`, languageCode, "bttr"))
             }
         tempDir.deleteRecursively()
-    }
-
-    @Throws(FileNotFoundException::class)
-    private fun getTestRCFile(): File {
-        val rcFilePath = javaClass.classLoader.getResource(rcFileName)
-            ?: throw(FileNotFoundException("Test resource not found: $rcFileName"))
-        return File(rcFilePath.file)
     }
 
     private fun CreateResourcesForBuildingCache(tempDir: File) {
