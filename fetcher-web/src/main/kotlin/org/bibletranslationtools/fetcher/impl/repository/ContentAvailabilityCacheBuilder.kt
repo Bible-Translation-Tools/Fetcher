@@ -30,8 +30,7 @@ class ContentAvailabilityCacheBuilder(
     private val productCatalog: ProductCatalog,
     private val chapterCatalog: ChapterCatalog,
     private val bookRepository: BookRepository,
-    private val storageAccess: StorageAccess,
-    private val rcRepo: ResourceContainerRepository
+    private val storageAccess: StorageAccess
 ) {
     private val resourceId = "ulb"
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -92,40 +91,22 @@ class ContentAvailabilityCacheBuilder(
     ): List<ChapterCache> {
         return when (ProductFileExtension.getType(product.slug)) {
             ProductFileExtension.ORATURE ->
-                oratureChapters(language.code, book.slug)
+                oratureChapters(language, book)
             else ->
                 audioChapters(language, product, book)
         }
     }
 
     private fun oratureChapters(
-        languageCode: String,
-        bookSlug: String
+        language: Language,
+        book: Book
     ): List<ChapterCache> {
-        val chapters = chapterCatalog.getAll(languageCode, bookSlug)
-        val chapterList = chapters.map { ChapterCache(it.number) }
-        val rcFile = rcRepo.getRC(languageCode, resourceId)
-            ?: return chapterList
-        val mediaTypes = RequestResourceContainer.mediaTypes.map { it.name.toLowerCase() }
-
-        try {
-            ResourceContainer.load(rcFile).use { rc ->
-                val mediaList =
-                    rc.media?.projects?.find { it.identifier == bookSlug }
-                        ?.media?.filter { it.identifier in mediaTypes && it.chapterUrl.isNotEmpty() }
-
-                mediaList?.forEach { media ->
-                    fetchChaptersFromMediaUrl(media.chapterUrl, chapterList)
-                }
-            }
-        } catch (ex: Exception) {
-            logger.error(
-                "Error when loading rc for content caching - ${ex.message}. File skipped: $rcFile.",
-                ex
-            )
+        val product = productCatalog.getProduct(ProductFileExtension.MP3.fileType)!!
+        val chapters = audioChapters(language, product, book)
+        chapters.forEach {
+            it.url = if (it.availability) "#" else null
         }
-
-        return chapterList
+        return chapters
     }
 
     private fun audioChapters(
@@ -145,18 +126,6 @@ class ContentAvailabilityCacheBuilder(
         return chaptersFromDirectory.map {
             val isAvailable = it.url != null
             ChapterCache(it.chapterNumber, isAvailable, it.url)
-        }
-    }
-
-    private fun fetchChaptersFromMediaUrl(url: String, chapterList: List<ChapterCache>) {
-        for (chapter in chapterList) {
-            val relativePath = File(url).relativeTo(File(envConfig.CDN_BASE_URL))
-                .path.replace("{chapter}", chapter.number.toString())
-
-            val chapterFile = File(envConfig.CONTENT_ROOT_DIR).resolve(relativePath)
-            chapter.availability = chapterFile.exists()
-
-            if (chapter.availability) chapter.url = "#"
         }
     }
 }
