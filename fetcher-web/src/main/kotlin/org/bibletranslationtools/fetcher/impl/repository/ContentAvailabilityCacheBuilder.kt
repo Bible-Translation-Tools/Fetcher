@@ -1,6 +1,5 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
-import java.io.File
 import java.util.stream.Collectors
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.data.Book
@@ -10,19 +9,16 @@ import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
-import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
 import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
-import org.bibletranslationtools.fetcher.usecase.RequestResourceContainer
 import org.bibletranslationtools.fetcher.usecase.cache.AvailabilityCache
 import org.bibletranslationtools.fetcher.usecase.cache.BookCache
 import org.bibletranslationtools.fetcher.usecase.cache.ChapterCache
 import org.bibletranslationtools.fetcher.usecase.cache.LanguageCache
 import org.bibletranslationtools.fetcher.usecase.cache.ProductCache
 import org.slf4j.LoggerFactory
-import org.wycliffeassociates.resourcecontainer.ResourceContainer
 
 class ContentAvailabilityCacheBuilder(
     private val envConfig: EnvironmentConfig,

@@ -63,7 +63,7 @@ class RequestResourceContainer(
         val rcFile = storageAccess.allocateRCFileLocation(rcName)
         templateRC.copyRecursively(rcFile)
 
-        ResourceContainer.load(rcFile).use { rc->
+        ResourceContainer.load(rcFile).use { rc ->
             val mediaProject = rc.media?.projects?.firstOrNull {
                 it.identifier == deliverable.book.slug
             }
