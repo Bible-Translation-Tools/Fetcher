@@ -24,7 +24,13 @@ class FetchChapterViewData(
     private val productExtension = ProductFileExtension.getType(product.slug)!!
     private val baseUrl = environmentConfig.CDN_BASE_URL
 
-    data class PriorityItem(val fileExtension: String, val mediaQuality: String)
+    private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
+
+    private val priorityList = listOf(
+        PriorityItem("mp3", "hi"),
+        PriorityItem("mp3", "low"),
+        PriorityItem("wav", "")
+    )
 
     private val chapters: List<Chapter> = try {
         chapterCatalog.getAll(
@@ -94,7 +100,7 @@ class FetchChapterViewData(
         )
     }
 
-    fun getMp3FileAccessRequest(
+    private fun getMp3FileAccessRequest(
         chapterNumber: Int,
         priorityItem: PriorityItem
     ): FileAccessRequest {
@@ -111,13 +117,5 @@ class FetchChapterViewData(
     private fun formatChapterDownloadUrl(chapterFile: File): String {
         val relativeChapterPath = chapterFile.relativeTo(storage.getContentRoot()).invariantSeparatorsPath
         return "$baseUrl/$relativeChapterPath"
-    }
-
-    companion object {
-        val priorityList = listOf(
-            PriorityItem("mp3", "hi"),
-            PriorityItem("mp3", "low"),
-            PriorityItem("wav", "")
-        )
     }
 }

@@ -97,6 +97,7 @@ class ContentAvailabilityCacheBuilder(
         language: Language,
         book: Book
     ): List<ChapterCache> {
+        // if there content in mp3, then Orature content should be available
         val product = productCatalog.getProduct(ProductFileExtension.MP3.fileType)!!
         val chapters = audioChapters(language, product, book)
         chapters.forEach {

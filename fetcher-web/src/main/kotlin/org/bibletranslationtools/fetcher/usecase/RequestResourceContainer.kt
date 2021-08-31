@@ -62,7 +62,12 @@ class RequestResourceContainer(
         val rcName = RCUtils.createRCFileName(deliverable, "")
         val rcFile = storageAccess.allocateRCFileLocation(rcName)
         templateRC.copyRecursively(rcFile)
+        overwriteRCMediaManifest(rcFile, deliverable)
 
+        return rcFile
+    }
+
+    private fun overwriteRCMediaManifest(rcFile: File, deliverable: Deliverable) {
         ResourceContainer.load(rcFile).use { rc ->
             val mediaProject = rc.media?.projects?.firstOrNull {
                 it.identifier == deliverable.book.slug
@@ -71,7 +76,7 @@ class RequestResourceContainer(
             val mediaList = mutableListOf<Media>()
             for (mediaType in mediaTypes) {
                 val mediaIdentifier = mediaType.name.toLowerCase()
-                val chapterUrl = buildChapterMediaPath(
+                val chapterUrl = buildChapterMediaUrl(
                     deliverable,
                     mediaIdentifier,
                     mediaQualityMap[mediaIdentifier]!!
@@ -88,11 +93,9 @@ class RequestResourceContainer(
             mediaProject?.media = mediaList
             rc.writeMedia()
         }
-
-        return rcFile
     }
 
-    private fun buildChapterMediaPath(
+    private fun buildChapterMediaUrl(
         deliverable: Deliverable,
         extension: String,
         quality: String
