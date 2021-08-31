@@ -74,7 +74,8 @@ class RequestResourceContainer(
                 val chapterUrl = buildChapterMediaPath(
                     deliverable,
                     mediaIdentifier,
-                    mediaQualityMap[mediaIdentifier]!!)
+                    mediaQualityMap[mediaIdentifier]!!
+                )
                 val newMediaEntry = Media(
                     mediaIdentifier,
                     "",
