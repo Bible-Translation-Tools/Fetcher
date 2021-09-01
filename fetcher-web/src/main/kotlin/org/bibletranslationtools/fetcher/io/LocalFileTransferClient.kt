@@ -21,7 +21,7 @@ class LocalFileTransferClient(
      * into a local path on the system, then copies it to outputDir
      */
     override fun downloadFromUrl(url: String, outputDir: File): File? {
-        val relativePath = File(url).relativeTo(File(envVars.CDN_BASE_URL))
+        val relativePath = File(url).relativeTo(File(envVars.CDN_BASE_RC_URL))
 
         // map to local path
         val sourceFile = File(envVars.CONTENT_ROOT_DIR).resolve(relativePath)

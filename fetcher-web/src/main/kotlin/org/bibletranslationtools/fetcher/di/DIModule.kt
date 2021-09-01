@@ -64,7 +64,6 @@ val appDependencyModule = module(createdAtStart = true) {
             productCatalog = get(),
             chapterCatalog = get(),
             bookRepository = get(),
-            rcRepo = get(),
             storageAccess = get()
         )
     }

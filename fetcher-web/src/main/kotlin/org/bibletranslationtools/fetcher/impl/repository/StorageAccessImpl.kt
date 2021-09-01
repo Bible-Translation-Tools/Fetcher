@@ -23,18 +23,35 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
             bookSlug: String = "",
             chapter: String = ""
         ): File {
+            return getPathPrefixDir(
+                directoryProvider.getContentRoot(),
+                languageCode,
+                resourceId,
+                fileExtension,
+                bookSlug,
+                chapter
+            )
+        }
+
+        fun getPathPrefixDir(
+            root: File,
+            languageCode: String,
+            resourceId: String,
+            fileExtension: String,
+            bookSlug: String = "",
+            chapter: String = ""
+        ): File {
             val trimmedChapter = chapter.trimStart('0')
-            val sourceContentRootDir = directoryProvider.getContentRoot()
 
             return when {
                 bookSlug.isNotEmpty() && trimmedChapter.isNotEmpty() ->
-                    sourceContentRootDir.resolve(
+                    root.resolve(
                         "$languageCode/$resourceId/$bookSlug/$trimmedChapter/CONTENTS/$fileExtension"
                     )
-                bookSlug.isNotEmpty() -> sourceContentRootDir.resolve(
+                bookSlug.isNotEmpty() -> root.resolve(
                     "$languageCode/$resourceId/$bookSlug/CONTENTS/$fileExtension"
                 )
-                else -> sourceContentRootDir.resolve(
+                else -> root.resolve(
                     "$languageCode/$resourceId/CONTENTS/$fileExtension"
                 )
             }
