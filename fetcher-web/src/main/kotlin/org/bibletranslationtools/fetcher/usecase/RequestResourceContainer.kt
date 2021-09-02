@@ -149,9 +149,9 @@ class RequestResourceContainer(
         val mediaTypes = listOf(MediaType.MP3, MediaType.CUE)
 
         private val mediaQualityMap = mapOf(
-            "mp3" to "hi",
-            "wav" to "",
-            "cue" to ""
+            MediaType.MP3.toString() to "hi",
+            MediaType.WAV.toString() to "",
+            MediaType.CUE.toString() to ""
         )
     }
 }
