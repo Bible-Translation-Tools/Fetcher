@@ -40,7 +40,7 @@ object RCUtils {
 
             for (mediaType in mediaTypes) {
                 val media = mediaProject?.media?.firstOrNull {
-                    it.identifier == mediaType.name.toLowerCase()
+                    it.identifier == mediaType.toString()
                 }
                 val pathInRC = media?.chapterUrl ?: continue
                 val chapterPath = pathInRC.replace("{chapter}", chapterNumberPattern)

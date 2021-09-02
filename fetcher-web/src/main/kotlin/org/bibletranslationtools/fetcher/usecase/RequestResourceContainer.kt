@@ -75,7 +75,7 @@ class RequestResourceContainer(
 
             val mediaList = mutableListOf<Media>()
             for (mediaType in mediaTypes) {
-                val mediaIdentifier = mediaType.name.toLowerCase()
+                val mediaIdentifier = mediaType.toString()
                 val chapterUrl = buildChapterMediaUrl(
                     deliverable,
                     mediaIdentifier,
@@ -146,11 +146,12 @@ class RequestResourceContainer(
     }
 
     companion object {
-        val mediaTypes = listOf(MediaType.MP3)
+        val mediaTypes = listOf(MediaType.MP3, MediaType.CUE)
 
         private val mediaQualityMap = mapOf(
-            "mp3" to "hi",
-            "wav" to ""
+            MediaType.MP3.toString() to "hi",
+            MediaType.WAV.toString() to "",
+            MediaType.CUE.toString() to ""
         )
     }
 }
