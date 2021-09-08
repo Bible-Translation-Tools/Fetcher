@@ -75,7 +75,6 @@ class RequestResourceContainer(
                 rc.media = MediaManifest().apply {
                     projects = listOf(MediaProject(identifier = deliverable.book.slug))
                 }
-                rc.writeMedia()
             }
 
             var mediaProject = rc.media?.projects?.firstOrNull {
