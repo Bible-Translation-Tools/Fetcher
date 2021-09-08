@@ -72,9 +72,9 @@ class RequestResourceContainer(
     private fun overwriteRCMediaManifest(rcFile: File, deliverable: Deliverable) {
         ResourceContainer.load(rcFile).use { rc ->
             if (rc.media == null) {
-                val mediaManifest = MediaManifest()
-                mediaManifest.projects = listOf(MediaProject(identifier = deliverable.book.slug))
-                rc.media = mediaManifest
+                rc.media = MediaManifest().apply {
+                    projects = listOf(MediaProject(identifier = deliverable.book.slug))
+                }
                 rc.writeMedia()
             }
 
