@@ -15,6 +15,8 @@ import org.wycliffeassociates.rcmediadownloader.data.MediaUrlParameter
 import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import org.wycliffeassociates.resourcecontainer.entity.Media
+import org.wycliffeassociates.resourcecontainer.entity.MediaManifest
+import org.wycliffeassociates.resourcecontainer.entity.MediaProject
 
 class RequestResourceContainer(
     envConfig: EnvironmentConfig,
@@ -69,7 +71,13 @@ class RequestResourceContainer(
 
     private fun overwriteRCMediaManifest(rcFile: File, deliverable: Deliverable) {
         ResourceContainer.load(rcFile).use { rc ->
-            val mediaProject = rc.media?.projects?.firstOrNull {
+            if (rc.media == null) {
+                rc.media = MediaManifest().apply {
+                    projects = listOf(MediaProject(identifier = deliverable.book.slug))
+                }
+            }
+
+            var mediaProject = rc.media?.projects?.firstOrNull {
                 it.identifier == deliverable.book.slug
             }
 
