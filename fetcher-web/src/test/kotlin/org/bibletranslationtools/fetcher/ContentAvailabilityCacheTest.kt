@@ -100,4 +100,22 @@ class ContentAvailabilityCacheTest {
             chapterPath.resolve("en_ulb_2pe_c$chapterNumber.mp3").createNewFile()
         }
     }
+
+    private fun CreateResourcesForBuildingCache(tempDir: File) {
+        var chapterPath: File
+
+        if (RequestResourceContainer.mediaTypes.contains(MediaType.WAV)) {
+            chapterPath = tempDir.resolve(
+                "en/ulb/2pe/$chapterNumber/CONTENTS/wav/chapter"
+            ).apply { mkdirs() }
+            chapterPath.resolve("en_ulb_2pe_c$chapterNumber.wav").createNewFile()
+        }
+
+        if (RequestResourceContainer.mediaTypes.contains(MediaType.MP3)) {
+            chapterPath = tempDir.resolve(
+                "en/ulb/2pe/$chapterNumber/CONTENTS/mp3/hi/chapter"
+            ).apply { mkdirs() }
+            chapterPath.resolve("en_ulb_2pe_c$chapterNumber.mp3").createNewFile()
+        }
+    }
 }
