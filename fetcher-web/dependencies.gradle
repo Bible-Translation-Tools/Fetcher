@@ -17,7 +17,7 @@ ext {
     ktor_client_ver = '1.5.2'
     retrofit_ver='2.9.0'
     resource_container_ver='0.8.0'
-    rc_media_downloader_ver='1.1.3'
+    rc_media_downloader_ver='1.2.0'
     fuzzy_wuzzy_ver='1.3.1'
     koin_ver='3.0.1-beta-2'
     zip4j_ver='2.7.0'
