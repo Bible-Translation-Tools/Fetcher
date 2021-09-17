@@ -4,14 +4,6 @@ from pathlib import Path
 from string import Template
 
 
-def fix_metadata(input_file, verbose=False):
-    run_process(
-        f'java -jar tools/bttConverter.jar -f $input_file -m chunk',
-        input_file,
-        verbose
-    )
-
-
 def split_chapter(input_file, output_dir, verbose=False):
     run_process(
         f'java -jar tools/tr-chunk-browser-cli.jar -s -f $input_file -o {output_dir}',
