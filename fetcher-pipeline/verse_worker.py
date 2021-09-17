@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict
 
 from file_utils import init_temp_dir, rm_tree, copy_file, check_file_exists, rel_path
-from process_tools import fix_metadata, convert_to_mp3
+from process_tools import convert_to_mp3
 from constants import *
 
 
@@ -73,10 +73,6 @@ class VerseWorker:
         # Copy source file to temp dir
         logging.debug(f'Copying file {src_file} to {target_file}')
         target_file.write_bytes(src_file.read_bytes())
-
-        # Try to fix wav metadata
-        logging.debug(f'Fixing metadata: {target_file}')
-        fix_metadata(target_file, self.verbose)
 
         # Convert verse into mp3
         self.convert_verse_wav(target_file, remote_dir, grouping, 'hi')

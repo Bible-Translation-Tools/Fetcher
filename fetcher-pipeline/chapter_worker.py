@@ -5,7 +5,7 @@ from typing import Dict
 
 from file_utils import init_temp_dir, rm_tree, copy_dir, check_file_exists, copy_file, check_dir_empty, has_new_files, \
     rel_path, read_hash, write_hash
-from process_tools import fix_metadata, split_chapter, convert_to_mp3
+from process_tools import split_chapter, convert_to_mp3
 from constants import *
 
 
@@ -75,10 +75,6 @@ class ChapterWorker:
         # Copy source file to temp dir
         logging.debug(f'Copying file {src_file} to {target_file}')
         target_file.write_bytes(src_file.read_bytes())
-
-        # Try to fix wav metadata
-        logging.debug(f'Fixing metadata: {target_file}')
-        fix_metadata(target_file, self.verbose)
 
         # Split chapter files into verses
         logging.debug(f'Splitting chapter {target_file} into {verses_dir}')
