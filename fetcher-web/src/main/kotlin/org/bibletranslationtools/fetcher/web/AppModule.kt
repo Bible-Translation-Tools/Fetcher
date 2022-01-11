@@ -59,7 +59,7 @@ fun Application.appModule() {
             }
             intercept(ApplicationCallPipeline.Setup) {
                 if (!call.request.uri.startsWith("/static")) {
-                    contentLanguage = Locale.LanguageRange.parse(call.request.acceptLanguage())
+                    contentLanguage = Locale.LanguageRange.parse(call.request.acceptLanguage() ?: "en")
                 }
             }
             // Application Routes - Controllers
