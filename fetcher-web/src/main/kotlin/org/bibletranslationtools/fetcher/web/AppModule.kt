@@ -26,9 +26,13 @@ import org.bibletranslationtools.fetcher.web.controllers.languageController
 import org.bibletranslationtools.fetcher.web.controllers.productController
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.koin.ktor.ext.Koin
+import org.slf4j.LoggerFactory
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
+import java.lang.IllegalArgumentException
 
 const val MILLISECONDS_PER_MINUTE = 60000
+
+private val logger = LoggerFactory.getLogger(Application::appModule::class.java)
 
 fun Application.appModule() {
     install(DefaultHeaders)
@@ -59,7 +63,12 @@ fun Application.appModule() {
             }
             intercept(ApplicationCallPipeline.Setup) {
                 if (!call.request.uri.startsWith("/static")) {
-                    contentLanguage = Locale.LanguageRange.parse(call.request.acceptLanguage() ?: "en")
+                    contentLanguage = try {
+                        Locale.LanguageRange.parse(call.request.acceptLanguage() ?: "en")
+                    } catch (ex: IllegalArgumentException) {
+                        logger.warn("Invalid accept language header: ${call.request.acceptLanguage()}")
+                        listOf(Locale.LanguageRange("en"))
+                    }
                 }
             }
             // Application Routes - Controllers
@@ -76,11 +85,13 @@ private fun scheduleCacheUpdate() {
     val envConfig: EnvironmentConfig = get()
     val cacheAccessor: ContentCacheAccessor = get()
 
-    thread(start = true, isDaemon = true) {
+    thread(start = true, isDaemon = true, name = "cache-update") { 
         val minutes = envConfig.CACHE_REFRESH_MINUTES.toLong()
         while (true) {
             Thread.sleep(MILLISECONDS_PER_MINUTE * minutes)
+            logger.info("Preparing content cache...")
             cacheAccessor.update()
+            logger.info("Cache updated!")
         }
     }
 }
