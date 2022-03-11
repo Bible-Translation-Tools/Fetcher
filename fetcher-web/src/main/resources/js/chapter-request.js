@@ -75,6 +75,7 @@ function renderSuccess(data, card) {
     ).forEach(item => {
         item.classList.remove("hidden")
     })
+    card.click()
 }
 
 function renderError(card) {
@@ -143,6 +144,7 @@ function renderBookSuccess(element) {
     ).forEach(item => {
         item.classList.remove("hidden")
     })
+    element.click()
 }
 
 function renderBookError(element) {
