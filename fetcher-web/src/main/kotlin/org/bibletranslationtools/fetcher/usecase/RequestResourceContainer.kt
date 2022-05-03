@@ -64,6 +64,10 @@ class RequestResourceContainer(
         val rcName = RCUtils.createRCFileName(deliverable, "")
         val rcFile = storageAccess.allocateRCFileLocation(rcName)
         templateRC.copyRecursively(rcFile)
+        templateRC.walk().filter {
+            it.isDirectory && it.name.startsWith(".git")
+        }.forEach { it.deleteRecursively() }
+
         overwriteRCMediaManifest(rcFile, deliverable)
 
         return rcFile
