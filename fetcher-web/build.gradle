@@ -17,7 +17,6 @@ plugins {
     id 'io.gitlab.arturbosch.detekt' version "$detekt_ver"
     id 'org.jlleitschuh.gradle.ktlint' version "$ktlint_ver"
     id 'com.github.johnrengelman.shadow' version "$shadowjar_ver"
-    id "org.sonarqube" version "$sonarqubePluginVer"
     id 'jacoco'
 }
 
@@ -88,13 +87,6 @@ detekt {
 
 ktlint {
     ignoreFailures = true
-}
-
-sonarqube {
-    properties {
-        property "sonar.sourceEncoding", "UTF-8"
-        property "sonar.coverage.jacoco.xmlReportPaths", "**/build/reports/jacoco/test/jacocoTestReport.xml"
-    }
 }
 
 application {
