@@ -18,7 +18,7 @@ jobs:
       
       - name: Build the web jar
         shell: bash
-        run: cd fetcher-web && ./gradlew check build && cd ..
+        run: cd fetcher-web && ./gradlew check build jacocoTestReport && cd ..
 
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
