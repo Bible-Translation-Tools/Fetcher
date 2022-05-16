@@ -58,10 +58,10 @@ class RequestResourceContainer(
                 // If a chapter has been changed and rebuilt, remove corresponding book file
                 // The book file will be rebuilt on the next book request
                 deliverable.chapter?.number?.let {
-                    if (hasUpdatedFiles) {
-                        val bookName = rcName.replace("_c$it", "")
-                        val bookFile = File("$outputDir/$bookName.orature")
-                        if (bookFile.exists()) bookFile.delete()
+                    val bookName = rcName.replace("_c$it", "")
+                    val bookFile = File("$outputDir/$bookName.orature")
+                    if (hasUpdatedFiles && bookFile.exists()) {
+                        bookFile.delete()
                     }
                 }
 

@@ -102,7 +102,7 @@ function renderChapterError(card) {
     error.classList.remove("hidden")
 }
 
-function retryChapterDownload() {
+function retryChapterDownload(event) {
     event.preventDefault()
 
     let error = this.closest(".chapter-card-error")
