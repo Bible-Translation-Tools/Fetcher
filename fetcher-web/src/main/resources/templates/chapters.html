@@ -35,16 +35,21 @@
         <em class="material-icons chaptercard__icon">get_app</em>
         <img class="chaptercard__spinner hidden" alt="Spinner Icon" height="24" width="24" src="/static/img/spinner_icon.gif" />
 
-        <p th:text="#{download_book}"
-           th:classappend="${isRequestLink}? 'hidden' : ''" name="download-text">Download Book</p>
+        <p th:text="#{download_book}" name="download-text">Download Book</p>
 
-        <p th:text="#{request_book}"
-           th:classappend="${isRequestLink}? '' : 'hidden'" name="request-text">Request Book</p>
-
-        <p th:text="#{requesting}" class="hidden" name="requesting-text">Requesting</p>
+        <p th:text="#{requesting}" class="hidden" name="requesting-text">Gathering files</p>
 
         <p th:text="#{unavailable}" class="hidden" name="unavailable-text">Unavailable</p>
     </a>
+    <div class="book-card-error chapter-download__error hidden">
+        <em class="material-icons chaptercard__icon">error</em>
+        <p th:utext="#{download_failed(
+            '<a href=\'https://bibleineverylanguage.org/support\' target=\'_blank\'>'+#{contact_support}+'</a>',
+            '<a class=\'try_again\' href=\'#\'>'+#{try_again}+'</a>'
+            )}">
+            Download failed
+        </p>
+    </div>
 </div>
 
 <div class="l-list-container">
