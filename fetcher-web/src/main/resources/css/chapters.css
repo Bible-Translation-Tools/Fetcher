@@ -131,6 +131,7 @@
     color: white;
     display: flex;
     gap: 5px;
+    padding: 0 15px;
 }
 .chapter-download__error p {
     display: inline;
@@ -172,6 +173,12 @@ and (max-device-width: 1200px) {
     .chapter-download-card {
         width: 608px;
         height: 152px;
+    }
+    .chapter-card-error.chapter-download__error {
+        max-width: 608px;
+    }
+    .chapter-download__error-message {
+        max-width: 300px;
     }
 }
 /* --mobile layout for phones  */
@@ -222,5 +229,19 @@ and (min-device-width: 320px) {
     }
     .request-unavailable * {
         color: #dc0000e6 !important;
+    }
+    .chapter-card-error.chapter-download__error {
+        padding: 15px 0px;
+    }
+    .chapter-download__error-message {
+        max-width: 150px;
+    }
+    .chaptercard__download {
+        padding: 0;
+        flex: 0.2;
+    }
+    .chaptercard__download-target {
+        height: 42px;
+        width: 100%;
     }
 }

@@ -23,10 +23,10 @@
                 <p class="chaptercard__download-text hidden" name="requesting-text" th:text="#{requesting}">Gathering files</p>
                 <p class="chaptercard__download-text hidden" name="unavailable-text" th:text="#{unavailable}">Unavailable</p>
             </div>
-        </div>
-        <div class="chaptercard__download-target" th:unless="${isRequestLink}" th:classappend="${url == null}? 'unavailable'">
-            <em class="material-icons chaptercard__icon" th:classappend="${url == null}? 'unavailable'">get_app</em>
-            <p class="chaptercard__download-text" th:text="#{download}">Download</p>
+            <div class="chaptercard__download-target" th:unless="${isRequestLink}" th:classappend="${url == null}? 'unavailable'">
+                <em class="material-icons chaptercard__icon" th:classappend="${url == null}? 'unavailable'">get_app</em>
+                <p class="chaptercard__download-text" th:text="#{download}">Download</p>
+            </div>
         </div>
     </a>
     <div class="chapter-card-error chapter-download__error hidden" th:data-chapter-id="${index}">
