@@ -1,4 +1,5 @@
-.chaptercard {
+.chaptercard,
+.chapter-card-error {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -149,22 +150,19 @@
     gap: 5px;
 }
 
-.chapter-card-error.chapter-download__error {
+.chapter-card-error {
     color: black;
-    justify-content: space-between;
-    width: 98vw;
-    max-width: 753px;
     padding: 15px 8px;
-    box-sizing: border-box;
-    border-top: 1px solid #111A3133 !important;
 }
 
 /* --layout for tablets  */
 @media only  screen
 and (max-device-width: 1200px) {
-    .chaptercard {
+    .chaptercard,
+    .chapter-card-error {
         justify-content: space-between;
         max-width: 608px;
+        max-height: unset;
     }
     .chaptercard__title {
         text-align: left;
@@ -174,11 +172,8 @@ and (max-device-width: 1200px) {
         width: 608px;
         height: 152px;
     }
-    .chapter-card-error.chapter-download__error {
-        max-width: 608px;
-    }
     .chapter-download__error-message {
-        max-width: 300px;
+        max-width: 50%;
     }
 }
 /* --mobile layout for phones  */
@@ -187,6 +182,9 @@ and (max-device-width: 767px)
 and (min-device-width: 320px) {
     .chaptercard {
         box-sizing: content-box;
+    }
+    .chapter-card-error {
+        padding: 15px 0px;
     }
     .hero__page-title {
         margin-bottom: 20px;
@@ -230,12 +228,7 @@ and (min-device-width: 320px) {
     .request-unavailable * {
         color: #dc0000e6 !important;
     }
-    .chapter-card-error.chapter-download__error {
-        padding: 15px 0px;
-    }
-    .chapter-download__error-message {
-        max-width: 150px;
-    }
+
     .chaptercard__download-target {
         height: 42px;
         width: 100%;
