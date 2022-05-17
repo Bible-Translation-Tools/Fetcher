@@ -206,9 +206,9 @@ and (min-device-width: 320px) {
         border-radius: 8px;
     }
     .chaptercard__download {
-        padding: 0 8px;
+        padding: 0;
         margin: 0 16px;
-        flex: 0.1;
+        flex: 0.2;
         border: 1px solid lightgray;
         height: 40px;
         width: 40px;
@@ -235,10 +235,6 @@ and (min-device-width: 320px) {
     }
     .chapter-download__error-message {
         max-width: 150px;
-    }
-    .chaptercard__download {
-        padding: 0;
-        flex: 0.2;
     }
     .chaptercard__download-target {
         height: 42px;
