@@ -17,6 +17,7 @@ import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import org.wycliffeassociates.resourcecontainer.entity.Media
 import org.wycliffeassociates.resourcecontainer.entity.MediaManifest
 import org.wycliffeassociates.resourcecontainer.entity.MediaProject
+import java.util.zip.Adler32
 
 class RequestResourceContainer(
     envConfig: EnvironmentConfig,
@@ -25,44 +26,113 @@ class RequestResourceContainer(
     private val downloadClient: IDownloadClient
 ) {
     private val baseRCUrl = envConfig.CDN_BASE_RC_URL
+    private val baseContentUrl = envConfig.CONTENT_ROOT_DIR
+    private val outputDir = envConfig.RC_OUTPUT_DIR
 
     fun getResourceContainer(
         deliverable: Deliverable
     ): RCDeliverable? {
-        val rc = prepareRC(deliverable) ?: return null
-        downloadMediaInRC(rc, deliverable)
+        val rcName = RCUtils.createRCFileName(deliverable, "")
+        val zipFile = File("$outputDir/$rcName.orature")
 
-        val hasContent = RCUtils.verifyChapterExists(
-            rc,
-            deliverable.book.slug,
-            mediaTypes,
-            deliverable.chapter?.number
-        )
-        val zipFile = rc.parentFile.resolve(rc.name + ".orature")
-        val packedUp = RCUtils.zipDirectory(rc, zipFile)
+        val chapterFiles = getChapterFiles(deliverable)
+        val hasUpdatedFiles = checkHasUpdatedFiles(chapterFiles)
 
-        return if (hasContent && packedUp) {
-            rc.deleteRecursively()
-            val url = formatDownloadUrl(zipFile)
-            RCDeliverable(deliverable, url)
+        if (hasUpdatedFiles || !zipFile.exists()) {
+            val rc = prepareRC(deliverable, rcName) ?: return null
+            val tempZipFile = rc.parentFile.resolve(zipFile.name)
+            downloadMediaInRC(rc, deliverable)
+
+            val hasContent = RCUtils.verifyChapterExists(
+                rc,
+                deliverable.book.slug,
+                mediaTypes,
+                deliverable.chapter?.number
+            )
+            val packedUp = RCUtils.zipDirectory(rc, tempZipFile)
+            if (packedUp) tempZipFile.copyTo(zipFile, true)
+
+            rc.parentFile.deleteRecursively()
+
+            return if (hasContent && packedUp) {
+                // If a chapter has been changed and rebuilt, remove corresponding book file
+                // The book file will be rebuilt on the next book request
+                deliverable.chapter?.number?.let {
+                    val bookName = rcName.replace("_c$it", "")
+                    val bookFile = File("$outputDir/$bookName.orature")
+                    if (hasUpdatedFiles && bookFile.exists()) {
+                        bookFile.delete()
+                    }
+                }
+
+                val url =  "$baseRCUrl/${zipFile.name}"
+                RCDeliverable(deliverable, url)
+            } else null
         } else {
-            zipFile.parentFile.deleteRecursively()
-            null
+            val url = "$baseRCUrl/${zipFile.name}"
+            return RCDeliverable(deliverable, url)
         }
     }
 
-    private fun prepareRC(deliverable: Deliverable): File? {
-        val templateRC = rcRepository.getRC(
-            deliverable.language.code,
-            deliverable.resourceId
-        )
-        if (templateRC == null || !templateRC.exists()) {
-            return null
+    private fun getChapterFiles(deliverable: Deliverable): List<File> {
+        val templateRC = getTemplateRC(deliverable) ?: return listOf()
+
+        val manifest = ResourceContainer.load(templateRC).use { rc ->
+            buildMedia(rc, deliverable, baseContentUrl)
         }
 
-        // allocate rc to delivery location
-        val rcName = RCUtils.createRCFileName(deliverable, "")
+        val project = manifest.projects
+            .singleOrNull {
+                it.identifier == deliverable.book.slug
+            } ?: return listOf()
+
+        val chapterFilesList = mutableListOf<File>()
+        for (media in project.media) {
+            val possibleChapterRange = 200
+            val templateUrl = media.chapterUrl
+
+            for (chapterNumber in 1..possibleChapterRange) {
+                if (deliverable.chapter?.number == chapterNumber || deliverable.chapter?.number == null) {
+                    val chapterUrl = templateUrl.replace("{chapter}", chapterNumber.toString())
+                    val chapterFile = File(chapterUrl)
+                    if (chapterFile.exists()) {
+                        chapterFilesList.add(chapterFile)
+                    }
+                }
+            }
+        }
+
+        return chapterFilesList
+    }
+
+    private fun checkHasUpdatedFiles(files: List<File>): Boolean {
+        var hasUpdated = false
+
+        for (file in files) {
+            val hashFile = file.parentFile.resolve(".hash")
+            val crc = Adler32().apply {
+                update(file.readBytes())
+            }
+
+            val oldHash = if (hashFile.exists()) {
+                hashFile.readLines().first().toLong()
+            } else 0
+            val newHash = crc.value
+
+            if (newHash != oldHash) {
+                hasUpdated = true
+                hashFile.writeText(newHash.toString())
+            }
+        }
+
+        return hasUpdated
+    }
+
+    private fun prepareRC(deliverable: Deliverable, rcName: String): File? {
         val rcFile = storageAccess.allocateRCFileLocation(rcName)
+        val templateRC = getTemplateRC(deliverable) ?: return null
+
+        // allocate rc to delivery location
         templateRC.copyRecursively(rcFile)
         templateRC.walk().filter {
             it.isDirectory && it.name.startsWith(".git")
@@ -73,46 +143,67 @@ class RequestResourceContainer(
         return rcFile
     }
 
+    private fun getTemplateRC(deliverable: Deliverable): File? {
+        val templateRC = rcRepository.getRC(
+            deliverable.language.code,
+            deliverable.resourceId
+        )
+
+        return if (templateRC != null && templateRC.exists()) {
+            templateRC
+        } else null
+    }
+
     private fun overwriteRCMediaManifest(rcFile: File, deliverable: Deliverable) {
         ResourceContainer.load(rcFile).use { rc ->
-            if (rc.media == null) {
-                rc.media = MediaManifest().apply {
-                    projects = listOf(MediaProject(identifier = deliverable.book.slug))
-                }
-            }
-
-            var mediaProject = rc.media?.projects?.firstOrNull {
-                it.identifier == deliverable.book.slug
-            }
-
-            val mediaList = mutableListOf<Media>()
-            for (mediaType in mediaTypes) {
-                val mediaIdentifier = mediaType.toString()
-                val chapterUrl = buildChapterMediaUrl(
-                    deliverable,
-                    mediaIdentifier,
-                    mediaQualityMap[mediaIdentifier]!!
-                )
-                val newMediaEntry = Media(
-                    mediaIdentifier,
-                    "",
-                    "",
-                    listOf(),
-                    chapterUrl.invariantSeparatorsPath
-                )
-                mediaList.add(newMediaEntry)
-            }
-            mediaProject?.media = mediaList
+            rc.media = buildMedia(rc, deliverable, baseRCUrl)
             rc.writeMedia()
         }
+    }
+
+    private fun buildMedia(rc: ResourceContainer, deliverable: Deliverable, baseUrl: String): MediaManifest {
+        var manifest = rc.media
+
+        if (manifest == null) {
+            manifest = MediaManifest().apply {
+                projects = listOf(MediaProject(identifier = deliverable.book.slug))
+            }
+        }
+
+        var mediaProject = manifest.projects.firstOrNull {
+            it.identifier == deliverable.book.slug
+        }
+
+        val mediaList = mutableListOf<Media>()
+        for (mediaType in mediaTypes) {
+            val mediaIdentifier = mediaType.toString()
+            val chapterUrl = buildChapterMediaUrl(
+                deliverable,
+                mediaIdentifier,
+                mediaQualityMap[mediaIdentifier]!!,
+                baseUrl
+            )
+            val newMediaEntry = Media(
+                mediaIdentifier,
+                "",
+                "",
+                listOf(),
+                chapterUrl.invariantSeparatorsPath
+            )
+            mediaList.add(newMediaEntry)
+        }
+        mediaProject?.media = mediaList
+
+        return manifest
     }
 
     private fun buildChapterMediaUrl(
         deliverable: Deliverable,
         extension: String,
-        quality: String
+        quality: String,
+        baseUrl: String
     ): File {
-        val root = File(baseRCUrl)
+        val root = File(baseUrl)
         val prefixPath = StorageAccessImpl.getPathPrefixDir(
             root,
             deliverable.language.code,
@@ -150,11 +241,6 @@ class RequestResourceContainer(
             singleProject = true,
             overwrite = true
         )
-    }
-
-    private fun formatDownloadUrl(file: File): String {
-        val relativePath = file.parentFile.name + File.separator + file.name
-        return "$baseRCUrl/$relativePath"
     }
 
     companion object {
