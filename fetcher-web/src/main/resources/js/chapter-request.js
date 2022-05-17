@@ -7,7 +7,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         card.addEventListener('click', retryChapterDownload)
     })
 
-    document.querySelector(".chapter-download-card__button").addEventListener(
+    document.querySelector(".book-download-card__button").addEventListener(
         'click', requestBookHandler
     )
 
@@ -194,7 +194,7 @@ function retryBookDownload(event) {
     let error = this.closest(".book-card-error")
     error.classList.add("hidden")
 
-    let bookCard = document.querySelector(".chapter-download-card__button")
+    let bookCard = document.querySelector(".book-download-card__button")
     bookCard.classList.remove("hidden")
 
     bookCard.click()

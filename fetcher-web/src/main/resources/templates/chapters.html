@@ -23,10 +23,10 @@
 
 <div th:insert="fragments/searchbar :: searchbar"></div>
 
-<div class="chapter-download-card">
-    <h2 class="chapter-download-card__book-name"
+<div class="book-download-card">
+    <h2 class="book-download-card__book-name"
         th:text="${book.anglicizedName}">{Book Name}</h2>
-    <a class="chapter-download-card__button"
+    <a class="book-download-card__button"
        th:classappend="${book.url == null}? 'unavailable'"
        th:href="${book.url == null}? 'javascript:void(0)' : ${book.url}"
        th:data-chapter-id="${isRequestLink}? 'all' : ''"

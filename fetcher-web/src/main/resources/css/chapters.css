@@ -57,7 +57,7 @@
 .chaptercard__download-target.unavailable {
     display: none;
 }
-.chapter-download-card {
+.book-download-card {
     background: #0A3373;
     display: flex;
     flex-direction: column;
@@ -68,11 +68,11 @@
     height: 152px;
     margin: 16px auto 16px auto;
 }
-.chapter-download-card__book-name {
+.book-download-card__book-name {
     font-size: 26px;
     color: white;
 }
-.chapter-download-card__button {
+.book-download-card__button {
     width: 184px;
     height: 40px;
     background: #FFB100;
@@ -84,7 +84,7 @@
     border: none;
     gap: 5px;
 }
-.chapter-download-card__button:hover {
+.book-download-card__button:hover {
     background: #c58b07;
 }
 .request-book {
@@ -170,7 +170,7 @@ and (max-device-width: 1200px) {
         text-align: left;
         margin: 0 16px;
     }
-    .chapter-download-card {
+    .book-download-card {
         width: 608px;
         height: 152px;
     }
@@ -200,7 +200,7 @@ and (min-device-width: 320px) {
     .chaptercard__download-text {
         display: none;
     }
-    .chapter-download-card {
+    .book-download-card {
         width: 312.5px;
         height: 152px;
         border-radius: 8px;
