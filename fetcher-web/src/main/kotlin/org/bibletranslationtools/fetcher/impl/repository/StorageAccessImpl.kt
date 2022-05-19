@@ -145,7 +145,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
 
         return try {
             chapterContentDir.listFiles(
-                FileFilter { it.isFile && !it.isHidden }
+                FileFilter { it.isFile && !it.name.startsWith(".") } // non-hidden files
             )?.single()
         } catch (e: NoSuchElementException) {
             // no content
