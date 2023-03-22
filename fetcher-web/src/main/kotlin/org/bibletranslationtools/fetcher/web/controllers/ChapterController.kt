@@ -43,9 +43,9 @@ fun Routing.chapterController() {
         get {
             // chapters page
             val params = UrlParameters(
-                languageCode = call.parameters[LANGUAGE_PARAM_KEY],
-                productSlug = call.parameters[PRODUCT_PARAM_KEY],
-                bookSlug = call.parameters[BOOK_PARAM_KEY]
+                languageCode = call.parameters[LANGUAGE_PARAM_KEY] ?: "",
+                productSlug = call.parameters[PRODUCT_PARAM_KEY] ?: "",
+                bookSlug = call.parameters[BOOK_PARAM_KEY] ?: ""
             )
 
             if (!validateParameters(params)) {
@@ -76,9 +76,9 @@ fun Routing.chapterController() {
 private fun Route.oratureChapters() {
     get {
         val params = UrlParameters(
-            languageCode = call.parameters[LANGUAGE_PARAM_KEY],
-            productSlug = call.parameters[PRODUCT_PARAM_KEY],
-            bookSlug = call.parameters[BOOK_PARAM_KEY],
+            languageCode = call.parameters[LANGUAGE_PARAM_KEY] ?: "",
+            productSlug = call.parameters[PRODUCT_PARAM_KEY] ?: "",
+            bookSlug = call.parameters[BOOK_PARAM_KEY] ?: "",
             chapter = call.parameters[CHAPTER_PARAM_KEY]
         )
 

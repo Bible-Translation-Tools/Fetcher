@@ -28,7 +28,7 @@ fun Routing.productController() {
             // products page
             val path = normalizeUrl(call.request.path())
             val params = UrlParameters(
-                languageCode = call.parameters[LANGUAGE_PARAM_KEY]
+                languageCode = call.parameters[LANGUAGE_PARAM_KEY] ?: ""
             )
 
             if (!validator.isLanguageCodeValid(params.languageCode)) {
