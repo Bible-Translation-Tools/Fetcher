@@ -91,7 +91,7 @@ class FetchChapterViewData(
     ): FileAccessRequest {
         return FileAccessRequest(
             languageCode = language.code,
-            resourceId = "ulb",
+            resourceId = resourceIdByLanguage(language.code),
             fileExtension = "tr",
             bookSlug = book.slug,
             chapter = chapterNumber.toString(),
@@ -106,7 +106,7 @@ class FetchChapterViewData(
     ): FileAccessRequest {
         return FileAccessRequest(
             languageCode = language.code,
-            resourceId = "ulb",
+            resourceId = resourceIdByLanguage(language.code),
             fileExtension = priorityItem.fileExtension,
             bookSlug = book.slug,
             chapter = chapterNumber.toString(),

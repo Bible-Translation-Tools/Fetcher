@@ -18,6 +18,7 @@ import org.bibletranslationtools.fetcher.usecase.cache.BookCache
 import org.bibletranslationtools.fetcher.usecase.cache.ChapterCache
 import org.bibletranslationtools.fetcher.usecase.cache.LanguageCache
 import org.bibletranslationtools.fetcher.usecase.cache.ProductCache
+import org.bibletranslationtools.fetcher.usecase.resourceIdByLanguage
 import org.slf4j.LoggerFactory
 
 class ContentAvailabilityCacheBuilder(
@@ -28,7 +29,6 @@ class ContentAvailabilityCacheBuilder(
     private val bookRepository: BookRepository,
     private val storageAccess: StorageAccess
 ) {
-    private val resourceId = "ulb"
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Synchronized
@@ -56,6 +56,7 @@ class ContentAvailabilityCacheBuilder(
 
     private fun cacheBooks(language: Language, product: Product): List<BookCache> {
         val productExtension = ProductFileExtension.getType(product.slug)!!
+        val resourceId = resourceIdByLanguage(language.code)
         val bookList = bookRepository.getBooks(resourceId)
 
         return bookList.map { book ->
