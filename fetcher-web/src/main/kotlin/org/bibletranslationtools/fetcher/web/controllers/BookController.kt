@@ -16,6 +16,7 @@ import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
+import org.bibletranslationtools.fetcher.usecase.resourceIdByLanguage
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.PRODUCT_PARAM_KEY
@@ -26,14 +27,14 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocal
 import org.bibletranslationtools.fetcher.web.controllers.utils.normalizeUrl
 import org.bibletranslationtools.fetcher.web.controllers.utils.validator
 
+// books page
 fun Routing.bookController() {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}") {
         get {
-            // books page
             val path = normalizeUrl(call.request.path())
             val params = UrlParameters(
-                languageCode = call.parameters[LANGUAGE_PARAM_KEY],
-                productSlug = call.parameters[PRODUCT_PARAM_KEY]
+                languageCode = call.parameters[LANGUAGE_PARAM_KEY] ?: "",
+                productSlug = call.parameters[PRODUCT_PARAM_KEY] ?: ""
             )
             if (
                 !validator.isLanguageCodeValid(params.languageCode) ||
