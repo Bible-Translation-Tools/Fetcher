@@ -35,8 +35,7 @@ fun getPreferredLocale(languageRanges: List<Locale.LanguageRange>, templateName:
             ResourceBundle.getBundle("templates/$templateName", locale, noFallbackController)
             return locale
         } catch (ex: MissingResourceException) {
-            // locale not supported, use default
-            return Locale.getDefault()
+            // locale not supported, fallback to default
         } catch (ex: IllegalArgumentException) {
             ex.printStackTrace()
         }
