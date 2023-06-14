@@ -28,6 +28,7 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.koin.ktor.ext.Koin
 import org.slf4j.LoggerFactory
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
+import java.lang.Exception
 import java.lang.IllegalArgumentException
 
 const val MILLISECONDS_PER_MINUTE = 60000
@@ -89,9 +90,13 @@ private fun scheduleCacheUpdate() {
         val minutes = envConfig.CACHE_REFRESH_MINUTES.toLong()
         while (true) {
             Thread.sleep(MILLISECONDS_PER_MINUTE * minutes)
-            logger.info("Preparing content cache...")
-            cacheAccessor.update()
-            logger.info("Cache updated!")
+            logger.info("Updating cache...")
+            try {
+                cacheAccessor.update()
+                logger.info("Cache updated!")
+            } catch (e: Exception) {
+                logger.error("An error occurred while updating the content cache.", e)
+            }
         }
     }
 }
