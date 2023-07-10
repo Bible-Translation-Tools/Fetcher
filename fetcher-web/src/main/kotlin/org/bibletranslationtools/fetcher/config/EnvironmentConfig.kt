@@ -7,5 +7,4 @@ open class EnvironmentConfig {
     open val CACHE_REFRESH_MINUTES: String = System.getenv("CACHE_REFRESH_MINUTES")
     open val ORATURE_REPO_DIR: String = System.getenv("ORATURE_REPO_DIR")
     open val RC_OUTPUT_DIR: String = System.getenv("RC_TEMP_DIR")
-    open val RUNTIME_CONFIG_PROPERTIES: String = System.getenv("RUNTIME_CONFIG_PROPERTIES")
 }
