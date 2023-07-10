@@ -11,6 +11,7 @@ fun fuzzyMatching(keyword: String, choices: List<String>, take: Int = 10): List<
 fun resourceIdByLanguage(languageId: String): String {
     return when(languageId) {
         "id" -> "ayt"
+        "arb" -> "avd"
         else -> "ulb"
     }
 }
