@@ -19,7 +19,7 @@ private const val ANGLICIZED_NAME_ID = "ang"
 private const val LOCALIZED_NAME_ID = "ln"
 private const val IS_GATEWAY = "gw"
 
-class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
+class UnfoldingWordHeartLanguagesCatalog(envConfig: EnvironmentConfig) : LanguageCatalog {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private data class UnfoldingWordHeartLanguage(
@@ -30,7 +30,6 @@ class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
     )
 
     private val logger = LoggerFactory.getLogger(javaClass)
-    private val envConfig: EnvironmentConfig = get()
     private val languageCatalogUrl = envConfig.LANG_NAMES_URL
     private val languageList: List<Language> = parseCatalog()
 

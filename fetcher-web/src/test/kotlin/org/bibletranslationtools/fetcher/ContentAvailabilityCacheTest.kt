@@ -64,6 +64,7 @@ class ContentAvailabilityCacheTest {
             .and("CACHE_REFRESH_MINUTES", "unused")
             .and("ORATURE_REPO_DIR", "unused")
             .and("RC_TEMP_DIR", "unused")
+            .and("LANG_NAMES_URL", "unused")
             .execute {
                 val cacheBuilder = ContentAvailabilityCacheBuilder(
                     EnvironmentConfig(),

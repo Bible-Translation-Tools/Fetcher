@@ -1,5 +1,7 @@
 package org.bibletranslationtools.fetcher
 
+import com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable
+import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.impl.repository.PortGatewayLanguageCatalog
 import org.bibletranslationtools.fetcher.impl.repository.UnfoldingWordHeartLanguagesCatalog
 import org.junit.Assert.assertEquals
@@ -30,12 +32,21 @@ class LanguageCatalogsTest {
 
     @Test
     fun testHLsParse() {
-        val hls = UnfoldingWordHeartLanguagesCatalog().getAll()
+        withEnvironmentVariable("CONTENT_ROOT", "unused")
+            .and("CDN_BASE_URL", "unused")
+            .and("CDN_BASE_RC_URL", "unused")
+            .and("CACHE_REFRESH_MINUTES", "unused")
+            .and("ORATURE_REPO_DIR", "unused")
+            .and("RC_TEMP_DIR", "unused")
+            .and("LANG_NAMES_URL", "https://langnames-temp.walink.org/langnames.json")
+            .execute {
+                val hls = UnfoldingWordHeartLanguagesCatalog(EnvironmentConfig()).getAll()
 
-        assertNotEquals(hls.size, 0)
-        hls.forEach {
-            assertFalse(it.code.isEmpty())
-            assertFalse(it.anglicizedName.isEmpty() && it.localizedName.isEmpty())
-        }
+                assertNotEquals(0, hls.size)
+                hls.forEach {
+                    assertFalse(it.code.isEmpty())
+                    assertFalse(it.anglicizedName.isEmpty() && it.localizedName.isEmpty())
+                }
+            }
     }
 }
