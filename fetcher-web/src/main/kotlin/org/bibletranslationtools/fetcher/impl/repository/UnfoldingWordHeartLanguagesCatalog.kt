@@ -4,13 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 import org.bibletranslationtools.fetcher.data.Language
+import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.slf4j.LoggerFactory
+import java.io.File
+import java.util.*
 
 private const val LANGUAGE_CODE_ID = "lc"
 private const val ANGLICIZED_NAME_ID = "ang"
@@ -28,7 +32,8 @@ class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
     )
 
     private val logger = LoggerFactory.getLogger(javaClass)
-    private val languageCatalogUrl = "https://langnames-temp.walink.org/langnames.json"
+    private val environmentConfig: EnvironmentConfig = CommonKoinExt.get()
+    private val configFile = environmentConfig.RUNTIME_CONFIG_PROPERTIES
     private val languageList: List<Language> = parseCatalog()
 
     override fun getAll(): List<Language> = this.languageList
@@ -37,7 +42,9 @@ class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
 
     @Throws(FileNotFoundException::class)
     private fun parseCatalog(): List<Language> {
-        val jsonCatalog = getLanguageCatalogContent()
+        val properties = Properties().apply { load(File(configFile).inputStream()) }
+        val languageCatalogUrl = properties.getProperty("resource.languagesURL")
+        val jsonCatalog = getLanguageCatalogContent(languageCatalogUrl)
         val languages: List<UnfoldingWordHeartLanguage> =
             jacksonObjectMapper().readValue(jsonCatalog)
 
@@ -51,18 +58,18 @@ class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
     }
 
     @Throws(FileNotFoundException::class)
-    private fun getLanguageCatalogContent(): String {
+    private fun getLanguageCatalogContent(url: String): String {
         var response = ""
 
         try {
-            val conn = (URL(languageCatalogUrl).openConnection() as HttpURLConnection)
+            val conn = (URL(url).openConnection() as HttpURLConnection)
             conn.requestMethod = "GET"
             conn.inputStream.reader().use {
                 response = it.readText()
             }
             conn.disconnect()
         } catch (ex: IOException) {
-            logger.error("An error occurred when requesting language catalog from $languageCatalogUrl", ex)
+            logger.error("An error occurred when requesting language catalog from $url", ex)
             throw ex
         }
 
