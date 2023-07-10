@@ -28,7 +28,7 @@ class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
     )
 
     private val logger = LoggerFactory.getLogger(javaClass)
-    private val languageCatalogUrl = "http://td.unfoldingword.org/exports/langnames.json"
+    private val languageCatalogUrl = "https://langnames-temp.walink.org/langnames.json"
     private val languageList: List<Language> = parseCatalog()
 
     override fun getAll(): List<Language> = this.languageList
