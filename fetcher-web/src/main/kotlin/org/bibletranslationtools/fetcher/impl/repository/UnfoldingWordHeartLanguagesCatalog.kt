@@ -34,10 +34,11 @@ class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
     private val logger = LoggerFactory.getLogger(javaClass)
     private val environmentConfig: EnvironmentConfig = CommonKoinExt.get()
     private val configFile = environmentConfig.RUNTIME_CONFIG_PROPERTIES
+    private val languageList: List<Language> = parseCatalog()
 
-    override fun getAll(): List<Language> = parseCatalog()
+    override fun getAll(): List<Language> = this.languageList
 
-    override fun getLanguage(code: String): Language? = parseCatalog().firstOrNull { it.code == code }
+    override fun getLanguage(code: String): Language? = this.languageList.firstOrNull { it.code == code }
 
     @Throws(FileNotFoundException::class)
     private fun parseCatalog(): List<Language> {
