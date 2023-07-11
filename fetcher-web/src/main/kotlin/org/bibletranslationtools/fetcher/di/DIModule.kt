@@ -43,7 +43,7 @@ val appDependencyModule = module(createdAtStart = true) {
 
     single<ChapterCatalog> { ChapterCatalogImpl() }
     single<LanguageCatalog>(named("GL")) { PortGatewayLanguageCatalog() }
-    single<LanguageCatalog>(named("HL")) { UnfoldingWordHeartLanguagesCatalog() }
+    single<LanguageCatalog>(named("HL")) { UnfoldingWordHeartLanguagesCatalog(get()) }
     single<LanguageRepository> {
         LanguageRepositoryImpl(
             get(named("GL")),

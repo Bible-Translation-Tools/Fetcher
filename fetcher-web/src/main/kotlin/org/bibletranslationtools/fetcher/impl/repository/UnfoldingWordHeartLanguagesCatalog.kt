@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 import org.bibletranslationtools.fetcher.data.Language
+import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.slf4j.LoggerFactory
 
@@ -17,7 +19,7 @@ private const val ANGLICIZED_NAME_ID = "ang"
 private const val LOCALIZED_NAME_ID = "ln"
 private const val IS_GATEWAY = "gw"
 
-class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
+class UnfoldingWordHeartLanguagesCatalog(envConfig: EnvironmentConfig) : LanguageCatalog {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private data class UnfoldingWordHeartLanguage(
@@ -28,7 +30,7 @@ class UnfoldingWordHeartLanguagesCatalog : LanguageCatalog {
     )
 
     private val logger = LoggerFactory.getLogger(javaClass)
-    private val languageCatalogUrl = "http://td.unfoldingword.org/exports/langnames.json"
+    private val languageCatalogUrl = envConfig.LANG_NAMES_URL
     private val languageList: List<Language> = parseCatalog()
 
     override fun getAll(): List<Language> = this.languageList

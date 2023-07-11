@@ -30,6 +30,7 @@ class LocalFileTransferClientTest {
             .and("CACHE_REFRESH_MINUTES", "unused")
             .and("ORATURE_REPO_DIR", "unused")
             .and("RC_TEMP_DIR", "unused")
+            .and("LANG_NAMES_URL", "unused")
             .execute {
                 val downloadClient: IDownloadClient = LocalFileTransferClient(EnvironmentConfig())
                 val file = downloadClient.downloadFromUrl(url, outputDir)
