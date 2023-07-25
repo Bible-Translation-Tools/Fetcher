@@ -38,7 +38,7 @@ class LanguageCatalogsTest {
             .and("CACHE_REFRESH_MINUTES", "unused")
             .and("ORATURE_REPO_DIR", "unused")
             .and("RC_TEMP_DIR", "unused")
-            .and("LANG_NAMES_URL", "https://langnames-temp.walink.org/langnames.json")
+            .and("LANG_NAMES_URL", "https://langnames.bibleineverylanguage.org/langnames.json")
             .execute {
                 val hls = UnfoldingWordHeartLanguagesCatalog(EnvironmentConfig()).getAll()
 
