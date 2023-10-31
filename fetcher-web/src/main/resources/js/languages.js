@@ -18,7 +18,7 @@ function loadMore() {
     let index = listContainer.children.length - listContainer.dataset.offsetCount
     if (index < 0) return
 
-    let url = window.location.href + "/load-more?index=" + index
+    let url = `${window.location.origin}${window.location.pathname}/load-more?index=${index}`
     fetch(url).then(response => {
         if (!response.ok) {
             throw new Error('An error occurred when requesting ' + url);
