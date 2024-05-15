@@ -2,8 +2,9 @@ package org.bibletranslationtools.fetcher
 
 import com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
+import org.bibletranslationtools.fetcher.impl.repository.LangType
 import org.bibletranslationtools.fetcher.impl.repository.PortGatewayLanguageCatalog
-import org.bibletranslationtools.fetcher.impl.repository.UnfoldingWordHeartLanguagesCatalog
+import org.bibletranslationtools.fetcher.impl.repository.UnfoldingWordLanguagesCatalog
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -40,7 +41,7 @@ class LanguageCatalogsTest {
             .and("RC_TEMP_DIR", "unused")
             .and("LANG_NAMES_URL", "https://langnames.bibleineverylanguage.org/langnames.json")
             .execute {
-                val hls = UnfoldingWordHeartLanguagesCatalog(EnvironmentConfig()).getAll()
+                val hls = UnfoldingWordLanguagesCatalog(EnvironmentConfig(), LangType.ALL).getAll()
 
                 assertNotEquals(0, hls.size)
                 hls.forEach {

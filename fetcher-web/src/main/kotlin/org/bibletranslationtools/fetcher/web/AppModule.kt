@@ -49,7 +49,7 @@ fun Application.appModule() {
         modules(appDependencyModule)
     }
     install(Routing) {
-        scheduleCacheUpdate()
+        //scheduleCacheUpdate()
         routing {
             // Static contents declared here
             static("static") {
@@ -86,7 +86,7 @@ private fun scheduleCacheUpdate() {
     val envConfig: EnvironmentConfig = get()
     val cacheAccessor: ContentCacheAccessor = get()
 
-    thread(start = true, isDaemon = true, name = "cache-update") { 
+    thread(start = true, isDaemon = true, name = "cache-update") {
         val minutes = envConfig.CACHE_REFRESH_MINUTES.toLong()
         while (true) {
             Thread.sleep(MILLISECONDS_PER_MINUTE * minutes)

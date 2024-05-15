@@ -16,7 +16,6 @@ import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
-import org.bibletranslationtools.fetcher.usecase.resourceIdByLanguage
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
 import org.bibletranslationtools.fetcher.web.controllers.utils.PRODUCT_PARAM_KEY
@@ -61,7 +60,6 @@ private fun booksView(
     params: UrlParameters,
     path: String
 ): ThymeleafContent {
-    val contentCache = get<ContentCacheAccessor>()
     val language = get<LanguageRepository>().getLanguage(params.languageCode)!!
     val product = get<ProductCatalog>().getProduct(params.productSlug)!!
 
@@ -71,7 +69,7 @@ private fun booksView(
         get<StorageAccess>(),
         language,
         product
-    ).getViewDataList(path, contentCache, language.isGateway)
+    ).getViewDataList(path)
 
     return ThymeleafContent(
         template = "books",

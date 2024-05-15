@@ -50,7 +50,7 @@ class ContentAvailabilityCacheTest {
 
         `when`(mockDirectoryProvider.getContentRoot()).thenReturn(tempDir)
         `when`(mockLanguageCatalog.getAll()).thenReturn(
-            listOf(Language("en", "", "", true))
+            listOf(Language("en", "", "", true, "ltr"))
         )
         `when`(
             mockChapterCatalog.getAll(anyString(), anyString())

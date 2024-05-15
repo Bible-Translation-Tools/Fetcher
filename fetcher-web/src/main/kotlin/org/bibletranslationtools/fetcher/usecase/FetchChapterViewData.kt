@@ -8,7 +8,6 @@ import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.data.Product
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
-import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
@@ -41,23 +40,8 @@ class FetchChapterViewData(
         throw ex
     }
 
-    fun getViewDataList(
-        contentCache: ContentCacheAccessor,
-        isGateway: Boolean
-    ): List<ChapterViewData> {
-        return if (isGateway) {
-            chapters.map {
-                val requestUrl = contentCache.getChapterUrl(
-                    number = it.number,
-                    bookSlug = book.slug,
-                    languageCode = language.code,
-                    productSlug = product.slug
-                )
-                ChapterViewData(it.number, url = requestUrl)
-            }
-        } else {
-            chaptersFromDirectory()
-        }
+    fun getViewDataList(): List<ChapterViewData> {
+        return chaptersFromDirectory()
     }
 
     fun chaptersFromDirectory(): List<ChapterViewData> {

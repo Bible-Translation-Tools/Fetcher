@@ -2,23 +2,11 @@ package org.bibletranslationtools.fetcher.di
 
 import org.bibletranslationtools.fetcher.config.DevEnvironmentConfig
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
-import org.bibletranslationtools.fetcher.impl.repository.AvailabilityCacheAccessor
-import org.bibletranslationtools.fetcher.impl.repository.BookCatalogImpl
-import org.bibletranslationtools.fetcher.impl.repository.BookRepositoryImpl
-import org.bibletranslationtools.fetcher.impl.repository.ChapterCatalogImpl
-import org.bibletranslationtools.fetcher.impl.repository.ContentAvailabilityCacheBuilder
-import org.bibletranslationtools.fetcher.impl.repository.DirectoryProviderImpl
-import org.bibletranslationtools.fetcher.impl.repository.LanguageRepositoryImpl
-import org.bibletranslationtools.fetcher.impl.repository.PortGatewayLanguageCatalog
-import org.bibletranslationtools.fetcher.impl.repository.ProductCatalogImpl
-import org.bibletranslationtools.fetcher.impl.repository.RCRepositoryImpl
-import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
-import org.bibletranslationtools.fetcher.impl.repository.UnfoldingWordHeartLanguagesCatalog
+import org.bibletranslationtools.fetcher.impl.repository.*
 import org.bibletranslationtools.fetcher.io.LocalFileTransferClient
 import org.bibletranslationtools.fetcher.repository.BookCatalog
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
-import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
@@ -42,12 +30,13 @@ val appDependencyModule = module(createdAtStart = true) {
     single<StorageAccess> { StorageAccessImpl(get()) }
 
     single<ChapterCatalog> { ChapterCatalogImpl() }
-    single<LanguageCatalog>(named("GL")) { PortGatewayLanguageCatalog() }
-    single<LanguageCatalog>(named("HL")) { UnfoldingWordHeartLanguagesCatalog(get()) }
+    single<LanguageCatalog>(named(LangType.GL.name)) { UnfoldingWordLanguagesCatalog(get(), LangType.GL) }
+    single<LanguageCatalog>(named(LangType.HL.name)) { UnfoldingWordLanguagesCatalog(get(), LangType.HL) }
+    single<LanguageCatalog>(named(LangType.ALL.name)) { UnfoldingWordLanguagesCatalog(get(), LangType.ALL) }
     single<LanguageRepository> {
         LanguageRepositoryImpl(
-            get(named("GL")),
-            get(named("HL"))
+            get(named(LangType.GL.name)),
+            get(named(LangType.HL.name))
         )
     }
     single<ProductCatalog> { ProductCatalogImpl() }
@@ -56,16 +45,4 @@ val appDependencyModule = module(createdAtStart = true) {
     single<ResourceContainerRepository> { RCRepositoryImpl(get()) }
 
     single<IDownloadClient> { LocalFileTransferClient(get()) }
-
-    single {
-        ContentAvailabilityCacheBuilder(
-            envConfig = get(),
-            languageCatalog = get(named("GL")),
-            productCatalog = get(),
-            chapterCatalog = get(),
-            bookRepository = get(),
-            storageAccess = get()
-        )
-    }
-    single<ContentCacheAccessor> { AvailabilityCacheAccessor(get()) }
 }

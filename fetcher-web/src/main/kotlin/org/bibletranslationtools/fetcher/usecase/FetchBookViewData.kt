@@ -6,7 +6,6 @@ import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.data.Product
 import org.bibletranslationtools.fetcher.repository.BookRepository
-import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
@@ -37,23 +36,15 @@ class FetchBookViewData(
         PriorityItem("wav", "")
     )
 
-    fun getViewDataList(
-        currentPath: String,
-        cacheAccessor: ContentCacheAccessor,
-        isGateway: Boolean = true
-    ): List<BookViewData> {
+    fun getViewDataList(currentPath: String): List<BookViewData> {
         val books = bookRepo.getBooks(resourceId = resourceId, languageCode = language.code)
         return books.map { book ->
-            book.availability = if (isGateway) {
-                cacheAccessor.isBookAvailable(book.slug, language.code, product.slug)
-            } else {
-                storage.hasBookContent(
-                    language.code,
-                    resourceId,
-                    book.slug,
-                    fileExtensionList
-                )
-            }
+            book.availability = storage.hasBookContent(
+                language.code,
+                resourceId,
+                book.slug,
+                fileExtensionList
+            )
 
             BookViewData(
                 index = book.index,
@@ -65,17 +56,9 @@ class FetchBookViewData(
         }
     }
 
-    fun getViewData(
-        bookSlug: String,
-        cacheAccessor: ContentCacheAccessor,
-        isGateway: Boolean = true
-    ): BookViewData? {
+    fun getViewData(bookSlug: String): BookViewData? {
         val book = bookRepo.getBook(bookSlug)
-        val url = if (isGateway) {
-            cacheAccessor.getBookUrl(bookSlug, language.code, product.slug)
-        } else {
-            getBookDownloadUrl(bookSlug)
-        }
+        val url = getBookDownloadUrl(bookSlug)
 
         return if (book != null) BookViewData(
             index = book.index,

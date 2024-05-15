@@ -14,7 +14,6 @@ import org.bibletranslationtools.fetcher.data.Deliverable
 import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
 import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
-import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
@@ -105,12 +104,8 @@ private fun Route.oratureChapters() {
     }
 }
 
-private fun chaptersView(
-    paramObjects: Deliverable
-): ThymeleafContent {
-    val isGateway = paramObjects.language.isGateway
+private fun chaptersView(paramObjects: Deliverable): ThymeleafContent {
     val envConfig = get<EnvironmentConfig>()
-    val contentCache = get<ContentCacheAccessor>()
     val storageAccess = get<StorageAccess>()
 
     val bookViewData: BookViewData? = FetchBookViewData(
@@ -119,7 +114,7 @@ private fun chaptersView(
         storageAccess,
         paramObjects.language,
         paramObjects.product
-    ).getViewData(paramObjects.book.slug, contentCache, isGateway)
+    ).getViewData(paramObjects.book.slug)
 
     val chapterViewDataList: List<ChapterViewData>? = try {
         FetchChapterViewData(
@@ -129,7 +124,7 @@ private fun chaptersView(
             paramObjects.language,
             paramObjects.product,
             paramObjects.book
-        ).getViewDataList(contentCache, isGateway)
+        ).getViewDataList()
     } catch (ex: ClientRequestException) {
         return errorPage(
             "internal_error",
