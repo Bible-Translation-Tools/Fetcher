@@ -11,7 +11,6 @@ import io.ktor.routing.route
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
 import org.bibletranslationtools.fetcher.repository.BookRepository
-import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.repository.StorageAccess
@@ -79,7 +78,7 @@ private fun booksView(
             "languagesNavUrl" to "/$GL_ROUTE",
             "fileTypesNavTitle" to product.titleKey,
             "fileTypesNavUrl" to "/$GL_ROUTE/${params.languageCode}",
-            "booksNavUrl" to "#"
+            "booksNavUrl" to "javascript:void(0)"
         ),
         locale = getPreferredLocale(contentLanguage, "books")
     )
