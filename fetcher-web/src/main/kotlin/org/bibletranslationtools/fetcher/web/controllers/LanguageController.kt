@@ -92,7 +92,7 @@ private fun languagesView(
         template = "languages",
         model = mapOf(
             "languageList" to languageList,
-            "languagesNavUrl" to "javascript:void(0)",
+            "languagesNavUrl" to "",
             "gatewayCount" to languageList.size
         ),
         locale = getPreferredLocale(contentLanguage, "languages")

@@ -78,7 +78,7 @@ private fun booksView(
             "languagesNavUrl" to "/$GL_ROUTE",
             "fileTypesNavTitle" to product.titleKey,
             "fileTypesNavUrl" to "/$GL_ROUTE/${params.languageCode}",
-            "booksNavUrl" to "javascript:void(0)"
+            "booksNavUrl" to ""
         ),
         locale = getPreferredLocale(contentLanguage, "books")
     )

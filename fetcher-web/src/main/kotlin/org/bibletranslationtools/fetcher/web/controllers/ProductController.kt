@@ -67,7 +67,7 @@ private fun productsView(
             "productList" to productList,
             "languagesNavTitle" to language.localizedName,
             "languagesNavUrl" to "/$GL_ROUTE",
-            "fileTypesNavUrl" to "javascript:void(0)"
+            "fileTypesNavUrl" to ""
         ),
         locale = getPreferredLocale(contentLanguage, "products")
     )
