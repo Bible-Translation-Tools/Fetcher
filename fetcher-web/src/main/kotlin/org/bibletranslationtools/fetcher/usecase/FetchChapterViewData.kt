@@ -26,9 +26,9 @@ class FetchChapterViewData(
     private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
 
     private val priorityList = listOf(
-        PriorityItem("mp3", "hi"),
-        PriorityItem("mp3", "low"),
-        PriorityItem("wav", "")
+        PriorityItem(ProductFileExtension.MP3.fileType, ProductFileQuality.HI.quality),
+        PriorityItem(ProductFileExtension.MP3.fileType, ProductFileQuality.LOW.quality),
+        PriorityItem(ProductFileExtension.WAV.fileType, "")
     )
 
     private val chapters: List<Chapter> = try {
@@ -76,7 +76,7 @@ class FetchChapterViewData(
         return FileAccessRequest(
             languageCode = language.code,
             resourceId = resourceIdByLanguage(language.code),
-            fileExtension = "tr",
+            fileExtension = ProductFileExtension.BTTR.fileType,
             bookSlug = book.slug,
             chapter = chapterNumber.toString(),
             mediaExtension = priorityItem.fileExtension,

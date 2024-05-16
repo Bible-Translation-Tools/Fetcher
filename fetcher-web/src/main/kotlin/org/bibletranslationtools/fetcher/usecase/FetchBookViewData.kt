@@ -25,15 +25,15 @@ class FetchBookViewData(
 
     private val fileExtensionList =
         if (ContainerExtensions.isSupported(productExtension.fileType)) {
-            listOf("tr")
+            listOf(ProductFileExtension.BTTR.fileType)
         } else {
-            listOf("wav", "mp3")
+            listOf(ProductFileExtension.MP3.fileType, ProductFileExtension.WAV.fileType)
         }
 
     private val priorityList = listOf(
-        PriorityItem("mp3", "hi"),
-        PriorityItem("mp3", "low"),
-        PriorityItem("wav", "")
+        PriorityItem(ProductFileExtension.MP3.fileType, ProductFileQuality.HI.quality),
+        PriorityItem(ProductFileExtension.MP3.fileType, ProductFileQuality.LOW.quality),
+        PriorityItem(ProductFileExtension.WAV.fileType, "")
     )
 
     fun getViewDataList(currentPath: String): List<BookViewData> {
@@ -75,9 +75,10 @@ class FetchBookViewData(
         var url: String? = null
         for (priority in priorityList) {
             val fileAccessRequest = when (productExtension) {
-                ProductFileExtension.ORATURE -> return "#"
+                ProductFileExtension.ORATURE -> return "javascript:void(0)"
                 ProductFileExtension.BTTR -> getBTTRFileAccessRequest(bookSlug, priority)
                 ProductFileExtension.MP3 -> getMp3FileAccessRequest(bookSlug, priority)
+                else -> return ""
             }
 
             val bookFile = storage.getBookFile(fileAccessRequest)
@@ -96,7 +97,7 @@ class FetchBookViewData(
         return FileAccessRequest(
             languageCode = language.code,
             resourceId = resourceId,
-            fileExtension = "tr",
+            fileExtension = ProductFileExtension.BTTR.fileType,
             bookSlug = bookSlug,
             mediaExtension = priorityItem.fileExtension,
             mediaQuality = priorityItem.mediaQuality

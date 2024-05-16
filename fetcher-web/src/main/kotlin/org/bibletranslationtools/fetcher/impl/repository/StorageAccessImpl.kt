@@ -10,6 +10,7 @@ import org.bibletranslationtools.fetcher.data.Division
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
+import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
 import org.bibletranslationtools.fetcher.usecase.resourceIdByLanguage
 import org.slf4j.LoggerFactory
 
@@ -241,7 +242,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
 
     private fun getGrouping(ext: String, division: Division): String {
         return when {
-            ext == "tr" -> "verse"
+            ext == ProductFileExtension.BTTR.fileType -> "verse"
             else -> division.name.toLowerCase()
         }
     }
