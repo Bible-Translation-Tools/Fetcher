@@ -2,7 +2,16 @@ package org.bibletranslationtools.fetcher.di
 
 import org.bibletranslationtools.fetcher.config.DevEnvironmentConfig
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
-import org.bibletranslationtools.fetcher.impl.repository.*
+import org.bibletranslationtools.fetcher.impl.repository.BookCatalogImpl
+import org.bibletranslationtools.fetcher.impl.repository.BookRepositoryImpl
+import org.bibletranslationtools.fetcher.impl.repository.ChapterCatalogImpl
+import org.bibletranslationtools.fetcher.impl.repository.DirectoryProviderImpl
+import org.bibletranslationtools.fetcher.impl.repository.LangType
+import org.bibletranslationtools.fetcher.impl.repository.LanguageRepositoryImpl
+import org.bibletranslationtools.fetcher.impl.repository.ProductCatalogImpl
+import org.bibletranslationtools.fetcher.impl.repository.RCRepositoryImpl
+import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
+import org.bibletranslationtools.fetcher.impl.repository.UnfoldingWordLanguagesCatalog
 import org.bibletranslationtools.fetcher.io.LocalFileTransferClient
 import org.bibletranslationtools.fetcher.repository.BookCatalog
 import org.bibletranslationtools.fetcher.repository.BookRepository

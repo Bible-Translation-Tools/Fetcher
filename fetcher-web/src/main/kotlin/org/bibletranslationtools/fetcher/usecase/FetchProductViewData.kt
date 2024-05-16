@@ -19,9 +19,9 @@ class FetchProductViewData(
         return products.map {
             val productExtension = ProductFileExtension.getType(it.slug)!!
             val fileExtensions = if (ContainerExtensions.isSupported(productExtension.fileType)) {
-                    listOf("tr")
+                    listOf(ProductFileExtension.BTTR.fileType)
                 } else {
-                    listOf("mp3", "wav")
+                    listOf(ProductFileExtension.MP3.fileType)
                 }
 
             val isAvailable = storage.hasProductContent(languageCode, fileExtensions)
