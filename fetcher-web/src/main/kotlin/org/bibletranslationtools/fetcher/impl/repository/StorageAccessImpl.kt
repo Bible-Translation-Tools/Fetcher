@@ -10,51 +10,32 @@ import org.bibletranslationtools.fetcher.data.Division
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
+import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
+import org.bibletranslationtools.fetcher.usecase.resourceIdByLanguage
 import org.slf4j.LoggerFactory
 
 class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : StorageAccess {
 
     companion object {
         fun getPathPrefixDir(
-            languageCode: String,
-            resourceId: String,
-            fileExtension: String,
-            directoryProvider: DirectoryProvider,
-            bookSlug: String = "",
-            chapter: String = ""
-        ): File {
-            return getPathPrefixDir(
-                directoryProvider.getContentRoot(),
-                languageCode,
-                resourceId,
-                fileExtension,
-                bookSlug,
-                chapter
-            )
-        }
-
-        fun getPathPrefixDir(
             root: File,
             languageCode: String,
             resourceId: String,
-            fileExtension: String,
-            bookSlug: String = "",
-            chapter: String = ""
+            fileExtension: String? = null,
+            bookSlug: String? = null,
+            chapter: String? = null
         ): File {
-            val trimmedChapter = chapter.trimStart('0')
+            val trimmedChapter = chapter?.trimStart('0')
 
-            return when {
-                bookSlug.isNotEmpty() && trimmedChapter.isNotEmpty() ->
-                    root.resolve(
-                        "$languageCode/$resourceId/$bookSlug/$trimmedChapter/CONTENTS/$fileExtension"
-                    )
-                bookSlug.isNotEmpty() -> root.resolve(
-                    "$languageCode/$resourceId/$bookSlug/CONTENTS/$fileExtension"
-                )
-                else -> root.resolve(
-                    "$languageCode/$resourceId/CONTENTS/$fileExtension"
-                )
-            }
+            val languagePart = languageCode
+            val resourcePart = "/$resourceId"
+            val bookPart = if (!bookSlug.isNullOrEmpty()) "/$bookSlug" else ""
+            val chapterPart = if (!trimmedChapter.isNullOrEmpty()) "/$trimmedChapter" else ""
+            val extensionPart = if (!fileExtension.isNullOrEmpty()) "/CONTENTS/$fileExtension" else ""
+
+            return root.resolve(
+                "$languagePart$resourcePart$bookPart$chapterPart$extensionPart"
+            )
         }
 
         fun getContentDir(
@@ -85,20 +66,43 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         return directoryProvider.getContentRoot()
     }
 
-    override fun getLanguageCodes(): List<String> {
+    override fun hasLanguageContent(languageCode: String): Boolean {
         val sourceFileRootDir = directoryProvider.getContentRoot()
         val dirs = sourceFileRootDir.listFiles(File::isDirectory)
 
-        return if (dirs.isNullOrEmpty()) listOf() else dirs.map { it.name }
+        return dirs?.any { it.name == languageCode } ?: false
+    }
+
+    override fun hasProductContent(languageCode: String, fileExtensions: List<String>): Boolean {
+        val resourceId = resourceIdByLanguage(languageCode)
+        val booksDir = getPathPrefixDir(
+            directoryProvider.getContentRoot(),
+            languageCode,
+            resourceId
+        )
+
+        return booksDir.listFiles(File::isDirectory)?.any { bookDir ->
+            val bookSlug = bookDir.name
+            fileExtensions.any { ext ->
+                val dir = getPathPrefixDir(
+                    directoryProvider.getContentRoot(),
+                    languageCode,
+                    resourceId,
+                    ext,
+                    bookSlug
+                )
+                dir.exists()
+            }
+        } ?: false
     }
 
     override fun getBookFile(request: FileAccessRequest): File? {
         val bookPrefixDir = getPathPrefixDir(
+            directoryProvider.getContentRoot(),
             languageCode = request.languageCode,
             resourceId = request.resourceId,
             bookSlug = request.bookSlug,
-            fileExtension = request.fileExtension,
-            directoryProvider = directoryProvider
+            fileExtension = request.fileExtension
         )
 
         val grouping = getGrouping(request.fileExtension, Division.BOOK)
@@ -126,12 +130,12 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
 
     override fun getChapterFile(request: FileAccessRequest): File? {
         val chapterPrefixDir = getPathPrefixDir(
+            directoryProvider.getContentRoot(),
             languageCode = request.languageCode,
             resourceId = request.resourceId,
             bookSlug = request.bookSlug,
             fileExtension = request.fileExtension,
-            chapter = request.chapter,
-            directoryProvider = directoryProvider
+            chapter = request.chapter
         )
 
         val grouping = getGrouping(request.fileExtension, Division.CHAPTER)
@@ -188,11 +192,11 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
     ): Boolean {
         for (ext in fileExtensionList) {
             val bookPrefixDir = getPathPrefixDir(
+                directoryProvider.getContentRoot(),
                 languageCode = languageCode,
                 resourceId = resourceId,
                 bookSlug = bookSlug,
-                fileExtension = ext,
-                directoryProvider = directoryProvider
+                fileExtension = ext
             )
             val walkBookDir = bookPrefixDir.walk()
             val grouping = getGrouping(ext, Division.BOOK)
@@ -238,7 +242,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
 
     private fun getGrouping(ext: String, division: Division): String {
         return when {
-            ext == "tr" -> "verse"
+            ext == ProductFileExtension.BTTR.fileType -> "verse"
             else -> division.name.toLowerCase()
         }
     }
