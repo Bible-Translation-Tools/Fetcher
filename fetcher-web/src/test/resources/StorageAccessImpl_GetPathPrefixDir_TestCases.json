@@ -9,8 +9,8 @@
   {
     "languageCode": "en",
     "resourceId": "ulb",
-    "fileExtension": "wav",
-    "expectedResult": "en/ulb/CONTENTS/wav"
+    "fileExtension": null,
+    "expectedResult": "en/ulb"
   },
   {
     "languageCode": "en",

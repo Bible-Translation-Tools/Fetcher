@@ -9,9 +9,9 @@ import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.route
 import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
-import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
+import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.LANGUAGE_PARAM_KEY
@@ -54,12 +54,12 @@ private fun productsView(
     path: String
 ): ThymeleafContent {
     val language = get<LanguageRepository>().getLanguage(languageCode)!!
-    val contentCache = get<ContentCacheAccessor>()
 
     val productList = FetchProductViewData(
         get<ProductCatalog>(),
+        get<StorageAccess>(),
         language.code
-    ).getListViewData(path, contentCache, language.isGateway)
+    ).getListViewData(path)
 
     return ThymeleafContent(
         template = "products",
@@ -67,7 +67,7 @@ private fun productsView(
             "productList" to productList,
             "languagesNavTitle" to language.localizedName,
             "languagesNavUrl" to "/$GL_ROUTE",
-            "fileTypesNavUrl" to "#"
+            "fileTypesNavUrl" to ""
         ),
         locale = getPreferredLocale(contentLanguage, "products")
     )

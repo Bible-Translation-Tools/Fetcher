@@ -5,25 +5,25 @@
 </head>
 <body>
 <div th:fragment="navbar(languagesNavUrl, fileTypesNavUrl, booksNavUrl)" class="navbar">
-    <a class="navbar__item" href="#"
-       th:classappend="${languagesNavUrl == null}? 'unavailable' : (${languagesNavUrl == #strings.toString('#')}? 'navbar\_\_item--active' : 'navbar\_\_item--available')"
-       th:href="${languagesNavUrl != null}? ${languagesNavUrl} : '#'">
+    <a class="navbar__item" href=""
+       th:classappend="${languagesNavUrl == null}? 'unavailable' : (${languagesNavUrl == #strings.toString('')}? 'navbar\_\_item--active' : 'navbar\_\_item--available')"
+       th:href="${languagesNavUrl != null}? ${languagesNavUrl != '' ? languagesNavUrl : 'javascript:void(0)' } : 'javascript:void(0)'">
         <em class="material-icons">translate </em>
         <span th:if="${languagesNavTitle == null}" th:text="#{languages}">Language</span>
         <span th:unless="${languagesNavTitle == null}" th:text="${languagesNavTitle}">Selected Language</span>
     </a>
 
     <a class="navbar__item" href="#"
-       th:classappend="${fileTypesNavUrl == null}? 'unavailable' : (${fileTypesNavUrl == #strings.toString('#')}? 'navbar\_\_item--active' : 'navbar\_\_item--available')"
-       th:href="${fileTypesNavUrl != null}? ${fileTypesNavUrl} : '#'">
+       th:classappend="${fileTypesNavUrl == null}? 'unavailable' : (${fileTypesNavUrl == #strings.toString('')}? 'navbar\_\_item--active' : 'navbar\_\_item--available')"
+       th:href="${fileTypesNavUrl != null}? ${fileTypesNavUrl != '' ? fileTypesNavUrl : 'javascript:void(0)' } : 'javascript:void(0)'">
         <em class="material-icons">apps </em>
         <span th:if="${fileTypesNavTitle == null}" th:text="#{file_types}">File Types</span>
         <span th:unless="${fileTypesNavTitle == null}" th:text="#{${fileTypesNavTitle}}">Selected Tool</span>
     </a>
 
     <a class="navbar__item"
-       th:classappend="${booksNavUrl == null}? 'unavailable' : (${booksNavUrl == #strings.toString('#')}? 'navbar\_\_item--active' : 'navbar\_\_item--available')"
-       th:href="${booksNavUrl != null}? ${booksNavUrl} : '#'">
+       th:classappend="${booksNavUrl == null}? 'unavailable' : (${booksNavUrl == #strings.toString('')}? 'navbar\_\_item--active' : 'navbar\_\_item--available')"
+       th:href="${booksNavUrl != null}? ${booksNavUrl != '' ? booksNavUrl : 'javascript:void(0)' } : 'javascript:void(0)'">
         <em class="material-icons">book </em>
         <span th:if="${booksNavTitle == null}" th:text="#{books}">Books</span>
         <span th:unless="${booksNavTitle == null}" th:text="${booksNavTitle}">Selected Book</span>

@@ -3,8 +3,6 @@ package org.bibletranslationtools.fetcher.impl.repository
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.ktor.client.request.get
-import io.ktor.util.error
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL

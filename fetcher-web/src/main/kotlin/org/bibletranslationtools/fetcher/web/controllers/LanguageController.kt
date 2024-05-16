@@ -11,7 +11,6 @@ import io.ktor.routing.get
 import io.ktor.routing.route
 import java.lang.NumberFormatException
 import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
-import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.FetchLanguageViewData
@@ -86,7 +85,6 @@ private fun languagesView(
 ): ThymeleafContent {
     val languageList = FetchLanguageViewData(
         get<LanguageRepository>(),
-        get<ContentCacheAccessor>(),
         get<StorageAccess>()
     ).getViewDataList(path)
 
@@ -94,7 +92,7 @@ private fun languagesView(
         template = "languages",
         model = mapOf(
             "languageList" to languageList,
-            "languagesNavUrl" to "#",
+            "languagesNavUrl" to "",
             "gatewayCount" to languageList.size
         ),
         locale = getPreferredLocale(contentLanguage, "languages")
@@ -108,7 +106,6 @@ private fun filterLanguages(
 ): ThymeleafContent {
     val resultLanguages = FetchLanguageViewData(
         get<LanguageRepository>(),
-        get<ContentCacheAccessor>(),
         get<StorageAccess>()
     ).filterLanguages(query, currentPath, currentIndex)
 
@@ -129,7 +126,6 @@ private fun loadMore(
 ): ThymeleafContent {
     val moreLanguages = FetchLanguageViewData(
         get<LanguageRepository>(),
-        get<ContentCacheAccessor>(),
         get<StorageAccess>()
     ).loadMoreLanguages(path, currentIndex)
 
