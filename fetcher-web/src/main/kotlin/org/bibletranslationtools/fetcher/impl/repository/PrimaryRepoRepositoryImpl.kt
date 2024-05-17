@@ -12,8 +12,8 @@ class PrimaryRepoRepositoryImpl : PrimaryRepoRepository {
             .build()
 
         return runBlocking {
-            val query = client.query(GetPrimaryRepoQuery(lang = languageCode, resType = resourceType))
-            val response = query.execute()
+            val query = GetPrimaryRepoQuery(lang = languageCode, resType = resourceType)
+            val response = client.query(query).execute()
             response.data?.git_repo?.singleOrNull()?.repo_url
         }
     }
