@@ -1,4 +1,4 @@
-FROM gradle:6.9-jdk11 AS builder
+FROM gradle:7.6-jdk11 AS builder
 COPY . /fetcher-web
 WORKDIR /fetcher-web
 RUN gradle build
