@@ -75,7 +75,7 @@ class FetchBookViewData(
         var url: String? = null
         for (priority in priorityList) {
             val fileAccessRequest = when (productExtension) {
-                ProductFileExtension.ORATURE -> return "javascript:void(0)"
+                ProductFileExtension.ORATURE -> return "#"
                 ProductFileExtension.BTTR -> getBTTRFileAccessRequest(bookSlug, priority)
                 ProductFileExtension.MP3 -> getMp3FileAccessRequest(bookSlug, priority)
                 else -> return ""
