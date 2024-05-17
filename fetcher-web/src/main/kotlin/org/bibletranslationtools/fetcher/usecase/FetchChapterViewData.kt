@@ -53,13 +53,18 @@ class FetchChapterViewData(
             for (priority in priorityList) {
                 val fileAccessRequest = when (productExtension) {
                     ProductFileExtension.BTTR -> getBTTRFileAccessRequest(chapterNumber, priority)
-                    ProductFileExtension.MP3 -> getMp3FileAccessRequest(chapterNumber, priority)
+                    ProductFileExtension.MP3, ProductFileExtension.ORATURE -> {
+                        getMp3FileAccessRequest(chapterNumber, priority)
+                    }
                     else -> return listOf()
                 }
 
                 val chapterFile = storage.getChapterFile(fileAccessRequest)
                 if (chapterFile != null) {
-                    url = formatChapterDownloadUrl(chapterFile)
+                    url = when (productExtension) {
+                        ProductFileExtension.ORATURE -> "#"
+                        else -> formatChapterDownloadUrl(chapterFile)
+                    }
                     break
                 }
             }
