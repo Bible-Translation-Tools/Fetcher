@@ -25,7 +25,7 @@ class RCRepositoryImpl(
         languageCode: String,
         resourceId: String
     ): File? {
-        return primaryRepoRepository.fetch(
+        return primaryRepoRepository.getRepoUrl(
             languageCode,
             resourceId
         )?.let { repoUrl ->

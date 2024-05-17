@@ -61,7 +61,7 @@ class FetchProductViewData(
 
         return when {
             requestRC.getResourceContainer(languageCode, resourceId) != null -> true
-            primaryRepoRepository.fetch(languageCode, resourceId) != null -> true
+            primaryRepoRepository.getRepoUrl(languageCode, resourceId) != null -> true
             else -> false
         }
     }

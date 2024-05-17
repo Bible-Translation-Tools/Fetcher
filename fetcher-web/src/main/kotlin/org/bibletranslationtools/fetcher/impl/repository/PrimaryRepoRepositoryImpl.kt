@@ -6,7 +6,7 @@ import org.bibletranslationtools.fetcher.graphql.generated.GetPrimaryRepoQuery
 import org.bibletranslationtools.fetcher.repository.PrimaryRepoRepository
 
 class PrimaryRepoRepositoryImpl : PrimaryRepoRepository {
-    override fun fetch(languageCode: String, resourceType: String): String? {
+    override fun getRepoUrl(languageCode: String, resourceType: String): String? {
         val client = ApolloClient.Builder()
             .serverUrl("https://api-biel-dev.walink.org/v1/graphql")
             .build()
