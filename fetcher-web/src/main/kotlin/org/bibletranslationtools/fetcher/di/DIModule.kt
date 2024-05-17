@@ -10,6 +10,7 @@ import org.bibletranslationtools.fetcher.impl.repository.LangType
 import org.bibletranslationtools.fetcher.impl.repository.LanguageRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.PrimaryRepoRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.ProductCatalogImpl
+import org.bibletranslationtools.fetcher.impl.repository.RequestResourceContainerImpl
 import org.bibletranslationtools.fetcher.impl.repository.RCRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
 import org.bibletranslationtools.fetcher.impl.repository.UnfoldingWordLanguagesCatalog
@@ -22,6 +23,7 @@ import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.PrimaryRepoRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
+import org.bibletranslationtools.fetcher.repository.RequestResourceContainer
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.koin.core.qualifier.named
