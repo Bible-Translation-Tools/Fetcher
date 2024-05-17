@@ -1,13 +1,13 @@
-package org.bibletranslationtools.fetcher.usecase
+package org.bibletranslationtools.fetcher.impl.repository
 
 import java.io.File
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.data.Deliverable
 import org.bibletranslationtools.fetcher.data.RCDeliverable
-import org.bibletranslationtools.fetcher.impl.repository.RCUtils
-import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
+import org.bibletranslationtools.fetcher.repository.RequestResourceContainer
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
+import org.bibletranslationtools.fetcher.usecase.ProductFileQuality
 import org.wycliffeassociates.rcmediadownloader.RCMediaDownloader
 import org.wycliffeassociates.rcmediadownloader.data.MediaDivision
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
@@ -19,17 +19,17 @@ import org.wycliffeassociates.resourcecontainer.entity.MediaManifest
 import org.wycliffeassociates.resourcecontainer.entity.MediaProject
 import java.util.zip.Adler32
 
-class RequestResourceContainer(
+class RequestResourceContainerImpl(
     envConfig: EnvironmentConfig,
     private val rcRepository: ResourceContainerRepository,
     private val storageAccess: StorageAccess,
     private val downloadClient: IDownloadClient
-) {
+) : RequestResourceContainer {
     private val baseRCUrl = envConfig.CDN_BASE_RC_URL
     private val baseContentUrl = envConfig.CONTENT_ROOT_DIR
     private val outputDir = envConfig.RC_OUTPUT_DIR
 
-    fun getResourceContainer(
+    override fun getResourceContainer(
         deliverable: Deliverable
     ): RCDeliverable? {
         val rcName = RCUtils.createRCFileName(deliverable, "")
@@ -74,7 +74,7 @@ class RequestResourceContainer(
         }
     }
 
-    fun getResourceContainer(languageCode: String, resourceId: String): File? {
+    override fun getResourceContainer(languageCode: String, resourceId: String): File? {
         return rcRepository.getRC(languageCode, resourceId)
     }
 

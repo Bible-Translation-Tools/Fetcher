@@ -12,6 +12,7 @@ import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.PrimaryRepoRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
+import org.bibletranslationtools.fetcher.repository.RequestResourceContainer
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
@@ -60,6 +61,7 @@ private fun productsView(
         get<ProductCatalog>(),
         get<StorageAccess>(),
         get<PrimaryRepoRepository>(),
+        get<RequestResourceContainer>(),
         language.code
     ).getListViewData(path)
 

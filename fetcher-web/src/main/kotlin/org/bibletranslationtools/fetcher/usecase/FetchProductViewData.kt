@@ -1,20 +1,18 @@
 package org.bibletranslationtools.fetcher.usecase
 
-import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.data.Product
-import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
 import org.bibletranslationtools.fetcher.repository.PrimaryRepoRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
-import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
+import org.bibletranslationtools.fetcher.repository.RequestResourceContainer
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.ProductViewData
-import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
 class FetchProductViewData(
     productCatalog: ProductCatalog,
     private val storage: StorageAccess,
     private val primaryRepoRepository: PrimaryRepoRepository,
+    private val requestResourceContainer: RequestResourceContainer,
     private val languageCode: String
 ) {
     private val products: List<Product> = productCatalog.getAll()
@@ -52,15 +50,9 @@ class FetchProductViewData(
 
     private fun hasSourceText(): Boolean {
         val resourceId = resourceIdByLanguage(languageCode)
-        val requestRC = RequestResourceContainer(
-            get<EnvironmentConfig>(),
-            get<ResourceContainerRepository>(),
-            get<StorageAccess>(),
-            get<IDownloadClient>()
-        )
 
         return when {
-            requestRC.getResourceContainer(languageCode, resourceId) != null -> true
+            requestResourceContainer.getResourceContainer(languageCode, resourceId) != null -> true
             primaryRepoRepository.getRepoUrl(languageCode, resourceId) != null -> true
             else -> false
         }

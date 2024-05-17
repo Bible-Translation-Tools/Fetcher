@@ -57,4 +57,5 @@ val appDependencyModule = module(createdAtStart = true) {
 
     single<IDownloadClient> { LocalFileTransferClient(get()) }
     single<PrimaryRepoRepository>{ PrimaryRepoRepositoryImpl() }
+    single<RequestResourceContainer> { RequestResourceContainerImpl(get(), get(), get(), get()) }
 }
