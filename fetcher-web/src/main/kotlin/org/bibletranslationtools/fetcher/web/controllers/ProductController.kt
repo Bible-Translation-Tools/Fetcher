@@ -10,6 +10,7 @@ import io.ktor.routing.get
 import io.ktor.routing.route
 import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
+import org.bibletranslationtools.fetcher.repository.PrimaryRepoRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
@@ -58,6 +59,7 @@ private fun productsView(
     val productList = FetchProductViewData(
         get<ProductCatalog>(),
         get<StorageAccess>(),
+        get<PrimaryRepoRepository>(),
         language.code
     ).getListViewData(path)
 

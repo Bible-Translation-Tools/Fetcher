@@ -74,6 +74,10 @@ class RequestResourceContainer(
         }
     }
 
+    fun getResourceContainer(languageCode: String, resourceId: String): File? {
+        return rcRepository.getRC(languageCode, resourceId)
+    }
+
     private fun getChapterFiles(deliverable: Deliverable): List<File> {
         val templateRC = getTemplateRC(deliverable) ?: return listOf()
 
