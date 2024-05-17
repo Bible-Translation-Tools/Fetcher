@@ -17,12 +17,13 @@ plugins {
     id 'io.gitlab.arturbosch.detekt' version "$detekt_ver"
     id 'org.jlleitschuh.gradle.ktlint' version "$ktlint_ver"
     id 'com.github.johnrengelman.shadow' version "$shadowjar_ver"
+    id 'com.apollographql.apollo3' version "$graphql_ver"
 }
 
 apply plugin: 'application'
 
 group 'org.bibletranslationtools'
-version '0.1.0'
+version '0.2.0'
 
 sourceCompatibility = 11
 
@@ -56,6 +57,7 @@ dependencies {
     implementation "me.xdrop:fuzzywuzzy:$fuzzy_wuzzy_ver"
     implementation "io.insert-koin:koin-ktor:$koin_ver"
     implementation "net.lingala.zip4j:zip4j:$zip4j_ver"
+    implementation "com.apollographql.apollo3:apollo-runtime:$graphql_ver"
 
     detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:$detekt_ver"
     implementation "org.jetbrains.kotlinx:kotlinx-html-jvm:$kotlinx_html_ver" // detekt report
@@ -89,5 +91,11 @@ shadowJar {
         attributes(
             'Main-Class': "org.bibletranslationtools.fetcher.web.MainKt"
         )
+    }
+}
+
+apollo {
+    service("service") {
+        packageName.set("org.bibletranslationtools.fetcher.graphql.generated")
     }
 }

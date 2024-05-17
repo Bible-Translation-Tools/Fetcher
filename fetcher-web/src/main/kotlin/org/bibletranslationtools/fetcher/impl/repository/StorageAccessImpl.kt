@@ -66,6 +66,10 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         return directoryProvider.getContentRoot()
     }
 
+    override fun getReposRoot(): File {
+        return directoryProvider.getRCRepositoriesDir()
+    }
+
     override fun hasLanguageContent(languageCode: String): Boolean {
         val sourceFileRootDir = directoryProvider.getContentRoot()
         val dirs = sourceFileRootDir.listFiles(File::isDirectory)

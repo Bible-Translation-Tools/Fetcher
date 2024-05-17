@@ -1,0 +1,23 @@
+query GetPrimaryRepoQuery($lang: String!, $resType: String!) {
+  git_repo(
+    where: {
+      content: {
+        language: {
+          ietf_code: {
+            _eq: $lang
+          }
+        },
+        resource_type: {
+          _eq: $resType
+        },
+        wa_content_metadata: {
+          status: {
+            _eq: "Primary"
+          }
+        }
+      }
+    }
+  ) {
+    repo_url
+  }
+}

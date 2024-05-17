@@ -1,11 +1,15 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
-import java.io.File
+import org.bibletranslationtools.fetcher.repository.PrimaryRepoRepository
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
+import org.bibletranslationtools.fetcher.usecase.CloneRemoteRepo
+import java.io.File
+
 
 class RCRepositoryImpl(
-    private val storageAccess: StorageAccess
+    private val storageAccess: StorageAccess,
+    private val primaryRepoRepository: PrimaryRepoRepository
 ) : ResourceContainerRepository {
     private val rcTemplateName = "%s_%s"
 
@@ -15,5 +19,22 @@ class RCRepositoryImpl(
     ): File? {
         val repoName = String.format(rcTemplateName, languageCode, resourceId)
         return storageAccess.getRepoFromFileSystem(repoName)
+    }
+
+    override fun downloadRC(
+        languageCode: String,
+        resourceId: String
+    ): File? {
+        return primaryRepoRepository.fetch(
+            languageCode,
+            resourceId
+        )?.let { repoUrl ->
+            val repoName = "${languageCode}_$resourceId"
+
+            CloneRemoteRepo(storageAccess)
+                .cloneRepo(repoName, repoUrl)
+
+            storageAccess.getRepoFromFileSystem(repoName)
+        }
     }
 }
