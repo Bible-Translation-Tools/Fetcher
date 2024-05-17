@@ -3,7 +3,7 @@ ext {
     detekt_ver = '1.16.0'
     kotlinx_html_ver='0.7.2' // detekt report
     ktlint_ver = '9.2.1'
-    shadowjar_ver = '5.2.0'
+    shadowjar_ver = '7.1.2'
 
     // Libraries
     kotlin_ver = '1.6.0'
