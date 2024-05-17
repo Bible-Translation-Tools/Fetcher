@@ -8,6 +8,7 @@ import org.bibletranslationtools.fetcher.impl.repository.ChapterCatalogImpl
 import org.bibletranslationtools.fetcher.impl.repository.DirectoryProviderImpl
 import org.bibletranslationtools.fetcher.impl.repository.LangType
 import org.bibletranslationtools.fetcher.impl.repository.LanguageRepositoryImpl
+import org.bibletranslationtools.fetcher.impl.repository.PrimaryRepoRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.ProductCatalogImpl
 import org.bibletranslationtools.fetcher.impl.repository.RCRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
@@ -19,6 +20,7 @@ import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
+import org.bibletranslationtools.fetcher.repository.PrimaryRepoRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
@@ -51,7 +53,8 @@ val appDependencyModule = module(createdAtStart = true) {
     single<ProductCatalog> { ProductCatalogImpl() }
     single<BookCatalog> { BookCatalogImpl() }
     single<BookRepository> { BookRepositoryImpl(get()) }
-    single<ResourceContainerRepository> { RCRepositoryImpl(get()) }
+    single<ResourceContainerRepository> { RCRepositoryImpl(get(), get()) }
 
     single<IDownloadClient> { LocalFileTransferClient(get()) }
+    single<PrimaryRepoRepository>{ PrimaryRepoRepositoryImpl() }
 }

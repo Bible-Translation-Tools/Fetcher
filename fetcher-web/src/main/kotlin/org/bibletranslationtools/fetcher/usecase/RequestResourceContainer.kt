@@ -147,6 +147,9 @@ class RequestResourceContainer(
         val templateRC = rcRepository.getRC(
             deliverable.language.code,
             deliverable.resourceId
+        ) ?: rcRepository.downloadRC(
+            deliverable.language.code,
+            deliverable.resourceId
         )
 
         return if (templateRC != null && templateRC.exists()) {
