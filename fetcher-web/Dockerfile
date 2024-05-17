@@ -5,6 +5,8 @@ RUN gradle build
 
 FROM openjdk:11-jre-slim
 
+RUN apt update && apt install git -y
+
 RUN mkdir /app
 
 COPY --from=builder /fetcher-web/build/libs/bible-translation-tools_fetcher.jar /app/fetcher.jar
