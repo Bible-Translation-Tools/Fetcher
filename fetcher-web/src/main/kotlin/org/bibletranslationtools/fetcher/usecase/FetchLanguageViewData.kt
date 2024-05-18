@@ -48,10 +48,6 @@ class FetchLanguageViewData(
         currentIndex: Int = 0
     ): List<LanguageViewData> {
         val result = getMatchingLanguages(query, languageRepo.getAll().sortedBy { it.isGateway })
-
-        return result
-            .drop(currentIndex)
-            .take(DISPLAY_ITEMS_LIMIT)
             .map {
                 val available = storage.hasLanguageContent(it.code)
 
@@ -66,6 +62,15 @@ class FetchLanguageViewData(
                     }
                 )
             }
+
+        val availableLanguages = result.filter { it.url != null }
+        val unavailableLanguages = result.filter { it.url == null }
+
+        val allLanguages = availableLanguages + unavailableLanguages
+
+        return allLanguages
+            .drop(currentIndex)
+            .take(DISPLAY_ITEMS_LIMIT)
     }
 
     fun loadMoreLanguages(
@@ -74,25 +79,29 @@ class FetchLanguageViewData(
     ): List<LanguageViewData> {
         if (currentIndex < 0) return listOf()
 
-        // load more (default) is only applied to HL
-        val languages = languageRepo.getAll().sortedBy { it.isGateway }
+        val listViewData = languageRepo.getAll().sortedBy { it.isGateway }.map {
+            val available = storage.hasLanguageContent(it.code)
 
-        return languages
-            .drop(currentIndex + DISPLAY_ITEMS_LIMIT - 1)
+            LanguageViewData(
+                code = it.code,
+                anglicizedName = it.anglicizedName,
+                localizedName = it.localizedName,
+                url = if (available) {
+                    "$currentPath/${it.code}"
+                } else {
+                    null
+                }
+            )
+        }
+
+        val availableLanguages = listViewData.filter { it.url != null }
+        val unavailableLanguages = listViewData.filter { it.url == null }
+
+        val allLanguages = availableLanguages + unavailableLanguages
+
+        return allLanguages
+            .drop(currentIndex + DISPLAY_ITEMS_LIMIT)
             .take(DISPLAY_ITEMS_LIMIT)
-            .map {
-                val available = storage.hasLanguageContent(it.code)
-                LanguageViewData(
-                    code = it.code,
-                    anglicizedName = it.anglicizedName,
-                    localizedName = it.localizedName,
-                    url = if (available) {
-                        "$currentPath/${it.code}"
-                    } else {
-                        null
-                    }
-                )
-            }
     }
 
     private fun getMatchingLanguages(
