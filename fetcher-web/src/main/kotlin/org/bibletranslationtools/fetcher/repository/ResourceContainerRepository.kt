@@ -7,4 +7,9 @@ interface ResourceContainerRepository {
         languageCode: String,
         resourceId: String
     ): File?
+
+    fun downloadRC(
+        languageCode: String,
+        resourceId: String
+    ): File?
 }
