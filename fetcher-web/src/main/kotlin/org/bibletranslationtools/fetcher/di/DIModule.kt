@@ -11,8 +11,7 @@ import org.bibletranslationtools.fetcher.impl.repository.LanguageRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.ProductCatalogImpl
 import org.bibletranslationtools.fetcher.impl.repository.RequestResourceContainerImpl
 import org.bibletranslationtools.fetcher.impl.repository.RCRepositoryImpl
-import org.bibletranslationtools.fetcher.impl.repository.SourceAvailabilityCacheAccessor
-import org.bibletranslationtools.fetcher.impl.repository.SourceAvailabilityCacheBuilder
+import org.bibletranslationtools.fetcher.impl.repository.SourceTextAccessor
 import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
 import org.bibletranslationtools.fetcher.impl.repository.UnfoldingWordLanguagesCatalog
 import org.bibletranslationtools.fetcher.io.LocalFileTransferClient
@@ -62,5 +61,5 @@ val appDependencyModule = module(createdAtStart = true) {
     single<RequestResourceContainer> { RequestResourceContainerImpl(get(), get(), get(), get()) }
 
     single { SourceAvailabilityCacheBuilder() }
-    single<SourceCacheAccessor> { SourceAvailabilityCacheAccessor(get(), get()) }
+    single<SourceCacheAccessor> { SourceTextAccessor(get()) }
 }
