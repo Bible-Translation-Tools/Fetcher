@@ -60,6 +60,5 @@ val appDependencyModule = module(createdAtStart = true) {
     single<IDownloadClient> { LocalFileTransferClient(get()) }
     single<RequestResourceContainer> { RequestResourceContainerImpl(get(), get(), get(), get()) }
 
-    single { SourceAvailabilityCacheBuilder() }
-    single<SourceCacheAccessor> { SourceTextAccessor(get()) }
+    single<SourceCacheAccessor> { SourceTextAccessor() }
 }
