@@ -66,7 +66,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         return directoryProvider.getContentRoot()
     }
 
-    override fun getReposRoot(): File {
+    override fun getReposDir(): File {
         return directoryProvider.getRCRepositoriesDir()
     }
 

@@ -2,16 +2,13 @@ package org.bibletranslationtools.fetcher.usecase
 
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.data.Product
-import org.bibletranslationtools.fetcher.repository.PrimaryRepoRepository
-import org.bibletranslationtools.fetcher.repository.ProductCatalog
-import org.bibletranslationtools.fetcher.repository.RequestResourceContainer
-import org.bibletranslationtools.fetcher.repository.StorageAccess
+import org.bibletranslationtools.fetcher.repository.*
 import org.bibletranslationtools.fetcher.usecase.viewdata.ProductViewData
 
 class FetchProductViewData(
     productCatalog: ProductCatalog,
     private val storage: StorageAccess,
-    private val primaryRepoRepository: PrimaryRepoRepository,
+    private val sourceCacheAccessor: SourceCacheAccessor,
     private val requestResourceContainer: RequestResourceContainer,
     private val languageCode: String
 ) {
@@ -53,7 +50,7 @@ class FetchProductViewData(
 
         return when {
             requestResourceContainer.getResourceContainer(languageCode, resourceId) != null -> true
-            primaryRepoRepository.getRepoUrl(languageCode, resourceId) != null -> true
+            sourceCacheAccessor.getRepoUrl(languageCode, resourceId) != null -> true
             else -> false
         }
     }

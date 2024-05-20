@@ -4,7 +4,7 @@ import java.io.File
 
 interface StorageAccess {
     fun getContentRoot(): File
-    fun getReposRoot(): File
+    fun getReposDir(): File
     fun hasLanguageContent(languageCode: String): Boolean
     fun hasProductContent(languageCode: String, fileExtensions: List<String>): Boolean
     fun getBookFile(request: FileAccessRequest): File?
