@@ -11,7 +11,7 @@ import org.bibletranslationtools.fetcher.impl.repository.LanguageRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.ProductCatalogImpl
 import org.bibletranslationtools.fetcher.impl.repository.RequestResourceContainerImpl
 import org.bibletranslationtools.fetcher.impl.repository.RCRepositoryImpl
-import org.bibletranslationtools.fetcher.impl.repository.SourceTextAccessor
+import org.bibletranslationtools.fetcher.impl.repository.SourceTextAccessorImpl
 import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
 import org.bibletranslationtools.fetcher.impl.repository.UnfoldingWordLanguagesCatalog
 import org.bibletranslationtools.fetcher.io.LocalFileTransferClient
@@ -24,7 +24,7 @@ import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.repository.RequestResourceContainer
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
-import org.bibletranslationtools.fetcher.repository.SourceCacheAccessor
+import org.bibletranslationtools.fetcher.repository.SourceTextAccessor
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -60,5 +60,5 @@ val appDependencyModule = module(createdAtStart = true) {
     single<IDownloadClient> { LocalFileTransferClient(get()) }
     single<RequestResourceContainer> { RequestResourceContainerImpl(get(), get(), get(), get()) }
 
-    single<SourceCacheAccessor> { SourceTextAccessor() }
+    single<SourceTextAccessor> { SourceTextAccessorImpl() }
 }

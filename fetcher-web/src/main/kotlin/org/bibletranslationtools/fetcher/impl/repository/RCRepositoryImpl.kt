@@ -1,7 +1,7 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
 import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
-import org.bibletranslationtools.fetcher.repository.SourceCacheAccessor
+import org.bibletranslationtools.fetcher.repository.SourceTextAccessor
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -9,7 +9,7 @@ import java.io.File
 
 class RCRepositoryImpl(
     private val storageAccess: StorageAccess,
-    private val sourceCacheAccessor: SourceCacheAccessor
+    private val sourceTextAccessor: SourceTextAccessor
 ) : ResourceContainerRepository {
     private val logger = LoggerFactory.getLogger(javaClass)
     private val rcTemplateName = "%s_%s"
@@ -26,7 +26,7 @@ class RCRepositoryImpl(
         languageCode: String,
         resourceId: String
     ): File? {
-        return sourceCacheAccessor.getRepoUrl(
+        return sourceTextAccessor.getRepoUrl(
             languageCode,
             resourceId
         )?.let { repoUrl ->

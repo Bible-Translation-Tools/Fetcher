@@ -3,9 +3,9 @@ package org.bibletranslationtools.fetcher.impl.repository
 import com.apollographql.apollo3.ApolloClient
 import kotlinx.coroutines.runBlocking
 import org.bibletranslationtools.fetcher.graphql.generated.GetPrimaryReposQuery
-import org.bibletranslationtools.fetcher.repository.SourceCacheAccessor
+import org.bibletranslationtools.fetcher.repository.SourceTextAccessor
 
-class SourceTextAccessor : SourceCacheAccessor {
+class SourceTextAccessorImpl : SourceTextAccessor {
     private var cache: List<GetPrimaryReposQuery.GitRepo> = listOf()
 
     init {

@@ -8,7 +8,7 @@ import org.bibletranslationtools.fetcher.usecase.viewdata.ProductViewData
 class FetchProductViewData(
     productCatalog: ProductCatalog,
     private val storage: StorageAccess,
-    private val sourceCacheAccessor: SourceCacheAccessor,
+    private val sourceTextAccessor: SourceTextAccessor,
     private val requestResourceContainer: RequestResourceContainer,
     private val languageCode: String
 ) {
@@ -50,7 +50,7 @@ class FetchProductViewData(
 
         return when {
             requestResourceContainer.getResourceContainer(languageCode, resourceId) != null -> true
-            sourceCacheAccessor.getRepoUrl(languageCode, resourceId) != null -> true
+            sourceTextAccessor.getRepoUrl(languageCode, resourceId) != null -> true
             else -> false
         }
     }

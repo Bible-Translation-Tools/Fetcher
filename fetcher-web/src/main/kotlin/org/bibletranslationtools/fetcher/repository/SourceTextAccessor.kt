@@ -1,6 +1,6 @@
 package org.bibletranslationtools.fetcher.repository
 
-interface SourceCacheAccessor {
+interface SourceTextAccessor {
     fun update()
     fun getRepoUrl(languageCode: String, resourceId: String): String?
 }

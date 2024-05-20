@@ -12,7 +12,7 @@ import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
 import org.bibletranslationtools.fetcher.repository.RequestResourceContainer
-import org.bibletranslationtools.fetcher.repository.SourceCacheAccessor
+import org.bibletranslationtools.fetcher.repository.SourceTextAccessor
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.FetchProductViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
@@ -60,7 +60,7 @@ private fun productsView(
     val productList = FetchProductViewData(
         get<ProductCatalog>(),
         get<StorageAccess>(),
-        get<SourceCacheAccessor>(),
+        get<SourceTextAccessor>(),
         get<RequestResourceContainer>(),
         language.code
     ).getListViewData(path)
