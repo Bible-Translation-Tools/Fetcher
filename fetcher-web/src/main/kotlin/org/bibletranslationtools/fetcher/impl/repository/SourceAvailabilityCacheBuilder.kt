@@ -5,6 +5,8 @@ import kotlinx.coroutines.runBlocking
 import org.bibletranslationtools.fetcher.graphql.generated.GetPrimaryReposQuery
 
 class SourceAvailabilityCacheBuilder {
+
+    @Synchronized
     fun build(): List<GetPrimaryReposQuery.GitRepo> {
         val client = ApolloClient.Builder()
             .serverUrl("https://api-biel-dev.walink.org/v1/graphql")
