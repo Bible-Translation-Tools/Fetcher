@@ -16,12 +16,13 @@ import org.bibletranslationtools.fetcher.repository.BookRepository
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.ProductCatalog
-import org.bibletranslationtools.fetcher.repository.RequestResourceContainer
+import org.bibletranslationtools.fetcher.repository.ResourceContainerRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.DeliverableBuilder
 import org.bibletranslationtools.fetcher.usecase.FetchBookViewData
 import org.bibletranslationtools.fetcher.usecase.FetchChapterViewData
 import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
+import org.bibletranslationtools.fetcher.usecase.RequestResourceContainer
 import org.bibletranslationtools.fetcher.usecase.viewdata.BookViewData
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
 import org.bibletranslationtools.fetcher.web.controllers.utils.BOOK_PARAM_KEY
@@ -34,6 +35,7 @@ import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.bibletranslationtools.fetcher.web.controllers.utils.errorPage
 import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale
 import org.bibletranslationtools.fetcher.web.controllers.utils.validator
+import org.wycliffeassociates.rcmediadownloader.io.IDownloadClient
 
 fun Routing.chapterController() {
     route("/$GL_ROUTE/{$LANGUAGE_PARAM_KEY}/{$PRODUCT_PARAM_KEY}/{$BOOK_PARAM_KEY}") {
@@ -175,6 +177,10 @@ private fun oratureFileDownload(
         get<BookRepository>()
     ).build(params)
 
-    return get<RequestResourceContainer>()
-        .getResourceContainer(deliverable)?.url
+    return RequestResourceContainer(
+        get<EnvironmentConfig>(),
+        get<ResourceContainerRepository>(),
+        get<StorageAccess>(),
+        get<IDownloadClient>()
+    ).getResourceContainer(deliverable)?.url
 }
