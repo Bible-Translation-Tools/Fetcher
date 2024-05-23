@@ -1,11 +1,9 @@
-FROM gradle:7.6-jdk11 AS builder
+FROM gradle:6.9-jdk11 AS builder
 COPY . /fetcher-web
 WORKDIR /fetcher-web
 RUN gradle build
 
 FROM openjdk:11-jre-slim
-
-RUN apt update && apt install git -y
 
 RUN mkdir /app
 

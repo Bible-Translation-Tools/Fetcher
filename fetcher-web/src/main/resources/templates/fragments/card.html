@@ -15,7 +15,7 @@
     </div>
     <div class="def-card__main-text"
          th:classappend="${url == null}? 'unavailable' ">
-        <p th:text="${localizedText}" class="def-card__text"
+        <p th:text="${localizedText}"class="def-card__text"
            th:classappend="${url == null}? 'unavailable' ">አማርኛ</p>
         <p th:text="${anglicizedText}" class="def-card__anglicized-text"
            th:classappend="${url == null}? 'unavailable' "><span>Amharic</span></p>
