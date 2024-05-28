@@ -18,7 +18,7 @@ import kotlin.concurrent.thread
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.di.appDependencyModule
 import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
-import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
+import org.bibletranslationtools.fetcher.repository.SourceTextAccessor
 import org.bibletranslationtools.fetcher.web.controllers.bookController
 import org.bibletranslationtools.fetcher.web.controllers.chapterController
 import org.bibletranslationtools.fetcher.web.controllers.homeController
@@ -84,15 +84,15 @@ fun Application.appModule() {
 
 private fun scheduleCacheUpdate() {
     val envConfig: EnvironmentConfig = get()
-    val cacheAccessor: ContentCacheAccessor = get()
+    val sourceTextAccessor: SourceTextAccessor = get()
 
-    thread(start = true, isDaemon = true, name = "cache-update") { 
+    thread(start = true, isDaemon = true, name = "cache-update") {
         val minutes = envConfig.CACHE_REFRESH_MINUTES.toLong()
         while (true) {
             Thread.sleep(MILLISECONDS_PER_MINUTE * minutes)
             logger.info("Updating cache...")
             try {
-                cacheAccessor.update()
+                sourceTextAccessor.update()
                 logger.info("Cache updated!")
             } catch (e: Exception) {
                 logger.error("An error occurred while updating the content cache.", e)

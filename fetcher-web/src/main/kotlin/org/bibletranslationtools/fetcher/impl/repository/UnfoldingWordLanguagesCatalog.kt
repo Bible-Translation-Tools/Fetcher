@@ -10,7 +10,6 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 import org.bibletranslationtools.fetcher.data.Language
-import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.slf4j.LoggerFactory
 
@@ -18,8 +17,18 @@ private const val LANGUAGE_CODE_ID = "lc"
 private const val ANGLICIZED_NAME_ID = "ang"
 private const val LOCALIZED_NAME_ID = "ln"
 private const val IS_GATEWAY = "gw"
+private const val DIRECTION = "ld"
 
-class UnfoldingWordHeartLanguagesCatalog(envConfig: EnvironmentConfig) : LanguageCatalog {
+enum class LangType {
+    GL,
+    HL,
+    ALL
+}
+
+class UnfoldingWordLanguagesCatalog(
+    envConfig: EnvironmentConfig,
+    private val langType: LangType
+) : LanguageCatalog {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private data class UnfoldingWordHeartLanguage(
@@ -45,7 +54,11 @@ class UnfoldingWordHeartLanguagesCatalog(envConfig: EnvironmentConfig) : Languag
 
         return languages
             .filter {
-                !it.isGateway
+                when (langType) {
+                    LangType.GL -> it.isGateway
+                    LangType.HL -> !it.isGateway
+                    LangType.ALL -> true
+                }
             }
             .map {
                 Language(it.code, it.anglicizedName, it.localizedName, isGateway = false)

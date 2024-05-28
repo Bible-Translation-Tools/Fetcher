@@ -1,0 +1,21 @@
+query GetPrimaryReposQuery {
+  GitRepos: git_repo(
+    where: {
+      content: {
+        wa_content_metadata: {
+          status: {
+            _eq: "Primary"
+          }
+        }
+      }
+    }
+  ) {
+    repoUrl: repo_url
+    content {
+      resourceType: resource_type
+      language {
+        languageCode: ietf_code
+      }
+    }
+  }
+}

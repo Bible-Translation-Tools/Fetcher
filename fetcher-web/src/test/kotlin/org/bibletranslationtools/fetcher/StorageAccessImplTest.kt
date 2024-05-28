@@ -3,7 +3,6 @@ package org.bibletranslationtools.fetcher
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import java.io.File
-import java.io.FileFilter
 import java.net.URL
 import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
@@ -13,6 +12,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.slf4j.LoggerFactory
+import java.io.FileFilter
 
 class StorageAccessImplTest {
 
@@ -24,10 +24,10 @@ class StorageAccessImplTest {
     data class GetPathPrefixDirTestCase(
         val languageCode: String,
         val resourceId: String,
-        val fileExtension: String,
+        val fileExtension: String?,
         val expectedResult: String,
-        val bookSlug: String = "",
-        val chapter: String = ""
+        val bookSlug: String? = null,
+        val chapter: String? = null
     )
 
     data class GetContentDirTestCase(
@@ -52,9 +52,10 @@ class StorageAccessImplTest {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Test
-    fun testGetLanguageCodes() {
+    fun testHasLanguageContent() {
         val mockDirectoryProvider = mock(DirectoryProvider::class.java)
         val mockFile = mock(File::class.java)
+        val nonExistentLanguage = "ru"
 
         for (testCase in retrieveGetLanguageCodeTestCases()) {
             `when`(mockFile.listFiles(any(FileFilter::class.java)))
@@ -66,10 +67,12 @@ class StorageAccessImplTest {
                 StorageAccessImpl(
                     mockDirectoryProvider
                 )
-            assertEquals(
-                testCase.expectedResult,
-                storageAccessImpl.getLanguageCodes().toSet()
-            )
+
+            for (languageDir in testCase.mockFileDirs) {
+                assertEquals(true, storageAccessImpl.hasLanguageContent(languageDir.name))
+            }
+
+            assertEquals(false, storageAccessImpl.hasLanguageContent(nonExistentLanguage))
         }
     }
 
@@ -98,10 +101,10 @@ class StorageAccessImplTest {
             assertEquals(
                 File("/mock/${testCase.expectedResult}").path,
                 StorageAccessImpl.getPathPrefixDir(
+                    mockDirectoryProvider.getContentRoot(),
                     testCase.languageCode,
                     testCase.resourceId,
                     testCase.fileExtension,
-                    mockDirectoryProvider,
                     testCase.bookSlug,
                     testCase.chapter
                 ).path

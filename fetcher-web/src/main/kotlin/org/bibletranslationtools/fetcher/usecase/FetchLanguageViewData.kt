@@ -1,66 +1,36 @@
 package org.bibletranslationtools.fetcher.usecase
 
 import org.bibletranslationtools.fetcher.data.Language
-import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.LanguageViewData
 
 class FetchLanguageViewData(
     private val languageRepo: LanguageRepository,
-    private val contentCache: ContentCacheAccessor,
-    storage: StorageAccess
+    private val storage: StorageAccess
 ) {
     companion object {
         const val DISPLAY_ITEMS_LIMIT = 30
         private const val MATCHING_RESULT_TAKE = 20
     }
-    private val languageCodesFromStorage = storage.getLanguageCodes()
+
+    private val comparator = compareBy(LanguageViewData::isGateway)
+        .then(compareByDescending { it.url != null })
 
     fun getViewDataList(
         currentPath: String
     ): List<LanguageViewData> {
-        val languages = languageRepo.getGatewayLanguages()
+        val languages = languageRepo.getAll()
 
-        val listViewData = languages.map {
-            val available = contentCache.isLanguageAvailable(it.code)
-
-            LanguageViewData(
-                code = it.code,
-                anglicizedName = it.anglicizedName,
-                localizedName = it.localizedName,
-                url = if (available) {
-                    "$currentPath/${it.code}"
-                } else {
-                    null
-                }
-            )
-        }
-
-        return listViewData.filter { it.url != null } + listViewData.filter { it.url == null }
-    }
-
-    fun filterLanguages(
-        query: String,
-        currentPath: String,
-        currentIndex: Int = 0
-    ): List<LanguageViewData> {
-        val result = getMatchingLanguages(query, languageRepo.getAll())
-
-        return result
-            .drop(currentIndex)
-            .take(DISPLAY_ITEMS_LIMIT)
+        return languages
             .map {
-                val available = if (it.isGateway) {
-                    contentCache.isLanguageAvailable(it.code)
-                } else {
-                    it.code in languageCodesFromStorage
-                }
+                val available = storage.hasLanguageContent(it.code)
 
                 LanguageViewData(
                     code = it.code,
                     anglicizedName = it.anglicizedName,
                     localizedName = it.localizedName,
+                    isGateway = it.isGateway,
                     url = if (available) {
                         "$currentPath/${it.code}"
                     } else {
@@ -68,6 +38,34 @@ class FetchLanguageViewData(
                     }
                 )
             }
+            .sortedWith(comparator)
+            .take(DISPLAY_ITEMS_LIMIT)
+    }
+
+    fun filterLanguages(
+        query: String,
+        currentPath: String,
+        currentIndex: Int = 0
+    ): List<LanguageViewData> {
+        return getMatchingLanguages(query, languageRepo.getAll())
+            .map {
+                val available = storage.hasLanguageContent(it.code)
+
+                LanguageViewData(
+                    code = it.code,
+                    anglicizedName = it.anglicizedName,
+                    localizedName = it.localizedName,
+                    isGateway = it.isGateway,
+                    url = if (available) {
+                        "$currentPath/${it.code}"
+                    } else {
+                        null
+                    }
+                )
+            }
+            .sortedWith(comparator)
+            .drop(currentIndex)
+            .take(DISPLAY_ITEMS_LIMIT)
     }
 
     fun loadMoreLanguages(
@@ -76,18 +74,15 @@ class FetchLanguageViewData(
     ): List<LanguageViewData> {
         if (currentIndex < 0) return listOf()
 
-        // load more (default) is only applied to HL
-        val languages = languageRepo.getHeartLanguages()
-
-        return languages
-            .drop(currentIndex)
-            .take(DISPLAY_ITEMS_LIMIT)
+        return languageRepo.getAll()
             .map {
-                val available = it.code in languageCodesFromStorage
+                val available = storage.hasLanguageContent(it.code)
+
                 LanguageViewData(
                     code = it.code,
                     anglicizedName = it.anglicizedName,
                     localizedName = it.localizedName,
+                    isGateway = it.isGateway,
                     url = if (available) {
                         "$currentPath/${it.code}"
                     } else {
@@ -95,6 +90,9 @@ class FetchLanguageViewData(
                     }
                 )
             }
+            .sortedWith(comparator)
+            .drop(currentIndex + DISPLAY_ITEMS_LIMIT)
+            .take(DISPLAY_ITEMS_LIMIT)
     }
 
     private fun getMatchingLanguages(
