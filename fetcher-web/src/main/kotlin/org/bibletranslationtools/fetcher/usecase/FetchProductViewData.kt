@@ -1,26 +1,38 @@
 package org.bibletranslationtools.fetcher.usecase
 
+import org.bibletranslationtools.fetcher.data.ContainerExtensions
 import org.bibletranslationtools.fetcher.data.Product
-import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
-import org.bibletranslationtools.fetcher.repository.ProductCatalog
+import org.bibletranslationtools.fetcher.repository.*
 import org.bibletranslationtools.fetcher.usecase.viewdata.ProductViewData
 
 class FetchProductViewData(
     productCatalog: ProductCatalog,
+    private val storage: StorageAccess,
+    private val sourceTextAccessor: SourceTextAccessor,
+    private val requestResourceContainer: RequestResourceContainer,
     private val languageCode: String
 ) {
     private val products: List<Product> = productCatalog.getAll()
 
     fun getListViewData(
-        currentPath: String,
-        cacheAccessor: ContentCacheAccessor,
-        isGateway: Boolean
+        currentPath: String
     ): List<ProductViewData> {
         return products.map {
-            val isAvailable = if (isGateway) {
-                cacheAccessor.isProductAvailable(it.slug, languageCode)
-            } else {
-                it.slug == ProductFileExtension.MP3.name.toLowerCase()
+            val productExtension = ProductFileExtension.getType(it.slug)!!
+            val fileExtensions = if (ContainerExtensions.isSupported(productExtension.fileType)) {
+                    listOf(ProductFileExtension.BTTR.fileType)
+                } else {
+                    listOf(ProductFileExtension.MP3.fileType, ProductFileExtension.WAV.fileType)
+                }
+
+            val hasAudioContent = storage.hasProductContent(languageCode, fileExtensions)
+
+            val isAvailable = when (productExtension) {
+                ProductFileExtension.ORATURE -> {
+                    val hasSourceText = hasSourceText()
+                    hasAudioContent && hasSourceText
+                }
+                else -> hasAudioContent
             }
 
             ProductViewData(
@@ -30,6 +42,16 @@ class FetchProductViewData(
                 iconUrl = it.iconUrl,
                 url = if (isAvailable) "$currentPath/${it.slug}" else null
             )
+        }
+    }
+
+    private fun hasSourceText(): Boolean {
+        val resourceId = resourceIdByLanguage(languageCode)
+
+        return when {
+            requestResourceContainer.getResourceContainer(languageCode, resourceId) != null -> true
+            sourceTextAccessor.getRepoUrl(languageCode, resourceId) != null -> true
+            else -> false
         }
     }
 }

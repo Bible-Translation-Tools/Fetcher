@@ -8,7 +8,6 @@ import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.data.Product
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
-import org.bibletranslationtools.fetcher.repository.ContentCacheAccessor
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.viewdata.ChapterViewData
@@ -27,9 +26,9 @@ class FetchChapterViewData(
     private data class PriorityItem(val fileExtension: String, val mediaQuality: String)
 
     private val priorityList = listOf(
-        PriorityItem("mp3", "hi"),
-        PriorityItem("mp3", "low"),
-        PriorityItem("wav", "")
+        PriorityItem(ProductFileExtension.MP3.fileType, ProductFileQuality.HI.quality),
+        PriorityItem(ProductFileExtension.MP3.fileType, ProductFileQuality.LOW.quality),
+        PriorityItem(ProductFileExtension.WAV.fileType, "")
     )
 
     private val chapters: List<Chapter> = try {
@@ -41,23 +40,8 @@ class FetchChapterViewData(
         throw ex
     }
 
-    fun getViewDataList(
-        contentCache: ContentCacheAccessor,
-        isGateway: Boolean
-    ): List<ChapterViewData> {
-        return if (isGateway) {
-            chapters.map {
-                val requestUrl = contentCache.getChapterUrl(
-                    number = it.number,
-                    bookSlug = book.slug,
-                    languageCode = language.code,
-                    productSlug = product.slug
-                )
-                ChapterViewData(it.number, url = requestUrl)
-            }
-        } else {
-            chaptersFromDirectory()
-        }
+    fun getViewDataList(): List<ChapterViewData> {
+        return chaptersFromDirectory()
     }
 
     fun chaptersFromDirectory(): List<ChapterViewData> {
@@ -69,13 +53,18 @@ class FetchChapterViewData(
             for (priority in priorityList) {
                 val fileAccessRequest = when (productExtension) {
                     ProductFileExtension.BTTR -> getBTTRFileAccessRequest(chapterNumber, priority)
-                    ProductFileExtension.MP3 -> getMp3FileAccessRequest(chapterNumber, priority)
+                    ProductFileExtension.MP3, ProductFileExtension.ORATURE -> {
+                        getMp3FileAccessRequest(chapterNumber, priority)
+                    }
                     else -> return listOf()
                 }
 
                 val chapterFile = storage.getChapterFile(fileAccessRequest)
                 if (chapterFile != null) {
-                    url = formatChapterDownloadUrl(chapterFile)
+                    url = when (productExtension) {
+                        ProductFileExtension.ORATURE -> "#"
+                        else -> formatChapterDownloadUrl(chapterFile)
+                    }
                     break
                 }
             }
@@ -92,7 +81,7 @@ class FetchChapterViewData(
         return FileAccessRequest(
             languageCode = language.code,
             resourceId = resourceIdByLanguage(language.code),
-            fileExtension = "tr",
+            fileExtension = ProductFileExtension.BTTR.fileType,
             bookSlug = book.slug,
             chapter = chapterNumber.toString(),
             mediaExtension = priorityItem.fileExtension,
