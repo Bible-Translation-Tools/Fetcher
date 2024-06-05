@@ -48,28 +48,6 @@ class Parts(BaseModel):
 app = FastAPI()
 
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/receive_messages")
-async def get_message():
-    async with ServiceBusClient.from_connection_string(
-        conn_str=NAMESPACE_CONNECTION_STR,
-        logging_enable=True
-    ) as service_bus_client:
-        # if a client doesn't want to talk to bus directly, can consume through this endpoint to get messages as http. 
-        async with service_bus_client:
-            receiver = service_bus_client.get_queue_receiver(queue_name=QUEUE_NAME)
-            messages = await receiver.receive_messages(max_wait_time=5, max_message_count=20)
-            final = []
-            for message in messages:
-                obj = json.loads(str(message))
-                final.append(obj)
-                await receiver.complete_message(message)
-
-            return final
 
 
 @app.post("/send_messages")
@@ -162,7 +140,6 @@ async def read_content(content_filter: Filter):
     if message is not None:
         # chunks are done in about this size because azure service bus has a 256kb  size limit, and unchunked a nt in all file types and qualities is 3000+ files, would be over limit. Some prelim testing saw this number of urls consistently come in around 225 kb give or take a little. 
         chunks = split_array(items, 800)
-        print(len(chunks))
         for chunk in chunks:
             chunk_message = message.copy()
             chunk_message["files"] = chunk
@@ -216,4 +193,4 @@ async def send_messages(messages):
                 except ValueError:
                     break
 
-                await sender.send_messages(batch_message)
+            await sender.send_messages(batch_message)
