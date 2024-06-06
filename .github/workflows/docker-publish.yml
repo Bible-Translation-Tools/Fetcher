@@ -63,6 +63,10 @@ jobs:
         shell: bash
         run: docker build -t bibletranslationtools/fetcher-pipeline:$GITHUB_SHA -t bibletranslationtools/fetcher-pipeline:$GITHUB_REF_NAME -t bibletranslationtools/fetcher-pipeline:latest ./fetcher-pipeline
 
+      - name: Build api image
+        shell: bash
+        run: docker build -t bibletranslationtools/fetcher-pipeline-api:$GITHUB_SHA -t bibletranslationtools/fetcher-pipeline-api:$GITHUB_REF_NAME -t bibletranslationtools/fetcher-pipeline-api:latest ./fetcher-pipeline-api
+
       - name: Log into registry
         shell: bash
         env:

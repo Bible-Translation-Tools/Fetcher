@@ -53,6 +53,15 @@ services:
       - fetcher-content:/content
       - fetcher-rc:${RC_TEMP_DIR}
       - fetcher-repos:${ORATURE_REPO_DIR}
+  api:
+    image: bibletranslationtools/fetcher-pipeline-api:${FETCHER_IMAGE_TAG}
+    environment:
+      NAMESPACE_CONNECTION_STR: ${NAMESPACE_CONNECTION_STR}
+      QUEUE_NAME: ${QUEUE_NAME}
+      CONTENT_URL: ${CONTENT_URL}
+      CONTENT_DIR: ${CONTENT_DIR}
+    volumes:
+      - fetcher-content:/content
 
 volumes:
   fetcher-content:
