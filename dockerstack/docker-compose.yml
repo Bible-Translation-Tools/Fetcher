@@ -9,7 +9,7 @@ services:
       - fetcher-rc:/srv/rc
     restart: unless-stopped
   fetcher-app:
-  # for local development, tag your image with "local" e.g. `docker build -t bibletranslationtools/fetcher:local .`
+    # for local development, tag your image with "local" e.g. `docker build -t bibletranslationtools/fetcher:local .`
     image: bibletranslationtools/fetcher:${FETCHER_IMAGE_TAG}
     ports:
       - "8080:8080"
@@ -49,6 +49,10 @@ services:
       PM2_SECRET_KEY: ${PM2_SECRET_KEY}
       RC_TEMP_DIR: ${RC_TEMP_DIR}
       ORATURE_REPO_DIR: ${ORATURE_REPO_DIR}
+      CDN_BASE_URL: ${CDN_BASE_URL}
+      TOPIC_NAME: ${TOPIC_NAME}
+      SERVICE_BUS_CONNECTION_STRING: ${SERVICE_BUS_CONNECTION_STRING}
+      QUEUE_EXCLUDE_ARGS: ${QUEUE_EXCLUDE_ARGS}
     volumes:
       - fetcher-content:/content
       - fetcher-rc:${RC_TEMP_DIR}
