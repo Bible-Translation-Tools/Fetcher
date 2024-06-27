@@ -3,6 +3,8 @@ import re
 import zlib
 from pathlib import Path
 from tempfile import mkdtemp
+from hashlib import md5
+from mmap import mmap, ACCESS_READ
 
 
 def init_temp_dir(prefix: str) -> Path:
@@ -125,3 +127,10 @@ def write_hash(file: Path):
     hash_file = file.parent.joinpath(".hash")
     with hash_file.open('w') as f:
         f.write(str(hash_val))
+
+def calc_md5_hash(file_path) -> str:
+    try:
+        with open(file_path, "rb") as file, mmap(file.fileno(), 0, access=ACCESS_READ) as file:
+            return md5(file).hexdigest()
+    except ValueError:
+        return ""

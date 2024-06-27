@@ -1,13 +1,18 @@
 import argparse
+import json
 import logging
 import os
 from argparse import Namespace
 from pathlib import Path
+import re
 from time import sleep
 from typing import Tuple, List
 from datetime import datetime
-
+from urllib.parse import urljoin
+from file_utils import calc_md5_hash
 import sentry_sdk
+from azure.servicebus.aio import ServiceBusClient
+from azure.servicebus import ServiceBusMessage
 
 from chapter_worker import ChapterWorker
 from tr_worker import TrWorker
@@ -17,11 +22,14 @@ from book_worker import BookWorker
 
 class App:
 
-    def __init__(self, input_dir: Path, verbose=False, hour=1, minute=0):
+    def __init__(self, input_dir: Path, verbose=False, hour=1, minute=0, message_queue_exclude=[], bus_connection_string="", bus_topic=""):
         self.__ftp_dir = input_dir
         self.verbose = verbose
         self.hour = hour
         self.minute = minute
+        self.message_queue_exclude_args = message_queue_exclude
+        self.BUS_CONNECTION_STRING = bus_connection_string
+        self.BUS_TOPIC = bus_topic
 
     def start(self):
         """ Start app """
@@ -55,6 +63,7 @@ class App:
                 time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 logging.error(f"Fetcher Pipeline Report {time}", extra=report)
 
+            self.send_messages_to_queue(self.message_queue_exclude_args)
             sleep(wait_timer)
 
     @staticmethod
@@ -74,10 +83,98 @@ class App:
             return report
 
         return None
+    
+    def send_messages_to_queue(self, exclude_args:List):
+        """ Send messages to queue """
+        cdn_url = os.getenv('CDN_BASE_URL')
+        bus_messages = []
+        def chunk_array(in_array, size):
+            return [in_array[i:i + size] for i in range(0, len(in_array), size)]
+
+        with open("./book_catalog.json", "r") as json_file:
+            books = json.load(json_file)
 
 
+        # iterate through each language
+        for language_dir in self.__ftp_dir.iterdir():
+            if language_dir.is_dir() or "analysis" not in language_dir:
+                for project_dir in language_dir.iterdir():
+                    if project_dir.is_dir():
+                        # Common data for each lang/project
+                        common_message_data = None
+                        unique_message_data= []
+                        for file_path in project_dir.rglob ('*'):
+                            # For each lang/project, get all files, and filter out dirs and excluded args
+                            if file_path.is_dir():
+                                continue
+                            for arg in exclude_args:
+                              if arg.startswith("."):
+                                if file_path.suffix == arg: continue
+                              elif f"/{arg}/" in file_path.name: continue
+                            
+                            # given path of /content/etc;
+                            root_parts = self.__ftp_dir.parts
+                            # exclude the common prefix of content directory and just get lang/proj/book/chap/etc;
+                            parts = file_path.parts[len(root_parts):]
+                            lang = parts[0]
+                            resource = parts[1]
+                            book_slug = parts[2]
+                            chapter = parts[3] or None
+                            if common_message_data is None:
+                                common_message_data = {
+                                    "languageIetf": lang,
+                                    "name": f"{lang}_{resource}",
+                                    "type": "audio",
+                                    "domain": "scripture",
+                                    "resourceType": "bible",
+                                    "namespace": "audio_biel",
+                                    "files": [],
+                                    # The session identifier of the message for a sessionful entity. The creates FIFO behavior for subscriptions on azure service bus
+                                    "session_id": f"audio_biel_{lang}_{resource}"
+                                }
+                            item = {
+                                "size": file_path.stat().st_size,
+                                "url": urljoin(cdn_url, file_path),
+                                "fileType": file_path.suffix[1:],
+                                "hash": calc_md5_hash(file_path),
+                                "isWholeBook": chapter is None,
+                                "isWholeProject": False, #no whole projects on the cdn, i.e. no audio bible of entire ulb. 
+                                "bookName": next((sub for sub in books if sub["slug"] == book_slug), None) or book_slug.capitalize(),
+                                "bookSlug": book_slug.capitalize(),
+                                "chapter": book_slug
+                            }
+                            unique_message_data.append(item)
+                            # For each lang/project, get all files, and filter out dirs and excluded args
+                            if common_message_data is not None:
+                                chunks = chunk_array(unique_message_data, 800)
+                                for chunk in chunks:
+                                    chunk_message = common_message_data.copy()
+                                    chunk_message["files"] = chunk
+                                    bus_messages.append(chunk_message)
+        self.send_messages(bus_messages)
+    async def send_messages(self, messages):
+        async with ServiceBusClient.from_connection_string(
+            conn_str=self.BUS_CONNECTION_STRING,
+            logging_enable=True
+        ) as service_bus_client:
+            sender = service_bus_client.get_topic_sender(topic_name=self.BUS_TOPIC)
+            async with sender:
+                batch_message = await sender.create_message_batch()
+                for message in messages:
+                    try:
+                        bus_message = ServiceBusMessage(
+                            json.dumps(message), 
+                            session_id=message["session_id"]
+                            );
+                        batch_message.add_message(bus_message)
+                    except ValueError:
+                        break
+
+                await sender.send_messages(batch_message)   
 def get_arguments() -> Tuple[Namespace, List[str]]:
     """ Parse command line arguments """
+
+    exclude_args_choices = ["verse", "chapter", "book", "hi", "low", ".mp3", ".wav", ".cue", ".tr"]
 
     parser = argparse.ArgumentParser(description='Split and convert chapter files to mp3')
     parser.add_argument('-i', '--input-dir', type=lambda p: Path(p).absolute(), help='Input directory')
@@ -85,6 +182,7 @@ def get_arguments() -> Tuple[Namespace, List[str]]:
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable logs from subprocess")
     parser.add_argument("-hr", "--hour", type=int, default=1, help="Frequency of executing workers in hours")
     parser.add_argument("-mn", "--minute", type=int, default=0, help="Frequency of executing workers in minutes")
+    parser.add_argument("-mqe", "--queue_exclude", nargs="*", help=f"Exclude files from passing to queue. Options: {exclude_args_choices}", choices=exclude_args_choices)
 
     return parser.parse_known_args()
 
@@ -105,8 +203,15 @@ def main():
         os.getenv("SENTRY_DSN"),
         traces_sample_rate=0.0
     )
-
-    app = App(args.input_dir, args.verbose, args.hour, args.minute)
+    BUS_CONNECTION_STR = os.getenv("SERVICE_BUS_CONNECTION_STRING")
+    TOPIC_NAME = os.getenv("SERVICE_BUS_TOPIC_NAME")
+    if os.getenv('CDN_BASE_URL') is None:
+        raise Exception("CDN_BASE_URL for bus queue is not set")
+    if BUS_CONNECTION_STR is None:
+        raise Exception("SERVICE_BUS_CONNECTION_STRING is not set")
+    if TOPIC_NAME is None:
+        raise Exception("SERVICE_BUS_TOPIC_NAME is not set")
+    app = App(args.input_dir, args.verbose, args.hour, args.minute, args.queue_exclude, BUS_CONNECTION_STR, TOPIC_NAME)
     app.start()
 
 
