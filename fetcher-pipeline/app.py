@@ -86,72 +86,76 @@ class App:
     
     def send_messages_to_queue(self, exclude_args:List):
         """ Send messages to queue """
-        cdn_url = os.getenv('CDN_BASE_URL')
-        bus_messages = []
-        def chunk_array(in_array, size):
-            return [in_array[i:i + size] for i in range(0, len(in_array), size)]
+        print("Sending messages to queue")
+        try: 
+            cdn_url = os.getenv('CDN_BASE_URL')
+            bus_messages = []
+            def chunk_array(in_array, size):
+                return [in_array[i:i + size] for i in range(0, len(in_array), size)]
 
-        with open("./book_catalog.json", "r") as json_file:
-            books = json.load(json_file)
+            with open("./book_catalog.json", "r") as json_file:
+                books = json.load(json_file)
 
 
-        # iterate through each language
-        for language_dir in self.__ftp_dir.iterdir():
-            if language_dir.is_dir() or "analysis" not in language_dir:
-                for project_dir in language_dir.iterdir():
-                    if project_dir.is_dir():
-                        # Common data for each lang/project
-                        common_message_data = None
-                        unique_message_data= []
-                        for file_path in project_dir.rglob ('*'):
-                            # For each lang/project, get all files, and filter out dirs and excluded args
-                            if file_path.is_dir():
-                                continue
-                            for arg in exclude_args:
-                              if arg.startswith("."):
-                                if file_path.suffix == arg: continue
-                              elif f"/{arg}/" in file_path.name: continue
-                            
-                            # given path of /content/etc;
-                            root_parts = self.__ftp_dir.parts
-                            # exclude the common prefix of content directory and just get lang/proj/book/chap/etc;
-                            parts = file_path.parts[len(root_parts):]
-                            lang = parts[0]
-                            resource = parts[1]
-                            book_slug = parts[2]
-                            chapter = parts[3] or None
-                            if common_message_data is None:
-                                common_message_data = {
-                                    "languageIetf": lang,
-                                    "name": f"{lang}_{resource}",
-                                    "type": "audio",
-                                    "domain": "scripture",
-                                    "resourceType": "bible",
-                                    "namespace": "audio_biel",
-                                    "files": [],
-                                    # The session identifier of the message for a sessionful entity. The creates FIFO behavior for subscriptions on azure service bus
-                                    "session_id": f"audio_biel_{lang}_{resource}"
+            # iterate through each language
+            for language_dir in self.__ftp_dir.iterdir():
+                if language_dir.is_dir() or "analysis" not in language_dir:
+                    for project_dir in language_dir.iterdir():
+                        if project_dir.is_dir():
+                            # Common data for each lang/project
+                            common_message_data = None
+                            unique_message_data= []
+                            for file_path in project_dir.rglob ('*'):
+                                # For each lang/project, get all files, and filter out dirs and excluded args
+                                if file_path.is_dir():
+                                    continue
+                                for arg in exclude_args:
+                                if arg.startswith("."):
+                                    if file_path.suffix == arg: continue
+                                elif f"/{arg}/" in file_path.name: continue
+                                
+                                # given path of /content/etc;
+                                root_parts = self.__ftp_dir.parts
+                                # exclude the common prefix of content directory and just get lang/proj/book/chap/etc;
+                                parts = file_path.parts[len(root_parts):]
+                                lang = parts[0]
+                                resource = parts[1]
+                                book_slug = parts[2]
+                                chapter = parts[3] or None
+                                if common_message_data is None:
+                                    common_message_data = {
+                                        "languageIetf": lang,
+                                        "name": f"{lang}_{resource}",
+                                        "type": "audio",
+                                        "domain": "scripture",
+                                        "resourceType": "bible",
+                                        "namespace": "audio_biel",
+                                        "files": [],
+                                        # The session identifier of the message for a sessionful entity. The creates FIFO behavior for subscriptions on azure service bus
+                                        "session_id": f"audio_biel_{lang}_{resource}"
+                                    }
+                                item = {
+                                    "size": file_path.stat().st_size,
+                                    "url": urljoin(cdn_url, file_path),
+                                    "fileType": file_path.suffix[1:],
+                                    "hash": calc_md5_hash(file_path),
+                                    "isWholeBook": chapter is None,
+                                    "isWholeProject": False, #no whole projects on the cdn, i.e. no audio bible of entire ulb. 
+                                    "bookName": next((sub for sub in books if sub["slug"] == book_slug), None) or book_slug.capitalize(),
+                                    "bookSlug": book_slug.capitalize(),
+                                    "chapter": book_slug
                                 }
-                            item = {
-                                "size": file_path.stat().st_size,
-                                "url": urljoin(cdn_url, file_path),
-                                "fileType": file_path.suffix[1:],
-                                "hash": calc_md5_hash(file_path),
-                                "isWholeBook": chapter is None,
-                                "isWholeProject": False, #no whole projects on the cdn, i.e. no audio bible of entire ulb. 
-                                "bookName": next((sub for sub in books if sub["slug"] == book_slug), None) or book_slug.capitalize(),
-                                "bookSlug": book_slug.capitalize(),
-                                "chapter": book_slug
-                            }
-                            unique_message_data.append(item)
-                            # For each lang/project, get all files, and filter out dirs and excluded args
-                            if common_message_data is not None:
-                                chunks = chunk_array(unique_message_data, 800)
-                                for chunk in chunks:
-                                    chunk_message = common_message_data.copy()
-                                    chunk_message["files"] = chunk
-                                    bus_messages.append(chunk_message)
-        self.send_messages(bus_messages)
+                                unique_message_data.append(item)
+                                # For each lang/project, get all files, and filter out dirs and excluded args
+                                if common_message_data is not None:
+                                    chunks = chunk_array(unique_message_data, 800)
+                                    for chunk in chunks:
+                                        chunk_message = common_message_data.copy()
+                                        chunk_message["files"] = chunk
+                                        bus_messages.append(chunk_message)
+            self.send_messages(bus_messages)
+        except Exception as e:
+            print(f"Error sending messages to queue: {e.with_traceback()} {e}")
     async def send_messages(self, messages):
         async with ServiceBusClient.from_connection_string(
             conn_str=self.BUS_CONNECTION_STRING,
@@ -170,7 +174,8 @@ class App:
                     except ValueError:
                         break
 
-                await sender.send_messages(batch_message)   
+                await sender.send_messages(batch_message)
+                print(f"Done sending messages to queue. Sent {len(messages)} messages.")   
 def get_arguments() -> Tuple[Namespace, List[str]]:
     """ Parse command line arguments """
 
