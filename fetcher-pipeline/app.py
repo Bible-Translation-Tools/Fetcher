@@ -110,9 +110,9 @@ class App:
                                 if file_path.is_dir():
                                     continue
                                 for arg in exclude_args:
-                                if arg.startswith("."):
-                                    if file_path.suffix == arg: continue
-                                elif f"/{arg}/" in file_path.name: continue
+                                    if arg.startswith("."):
+                                        if file_path.suffix == arg: continue
+                                    elif f"/{arg}/" in file_path.name: continue
                                 
                                 # given path of /content/etc;
                                 root_parts = self.__ftp_dir.parts
