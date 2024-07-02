@@ -17,9 +17,10 @@ alias op="docker run --rm -e OP_SERVICE_ACCOUNT_TOKEN 1password/op:2 op"
 
 export OP_SERVICE_ACCOUNT_TOKEN=$OP_SERVICE_ACCOUNT_TOKEN
 export SERVICE_BUS_CONNECTION_STRING=$(op read "op://AppDev Scripture Accessibility/languageapi-bus-send-connstring/$DEPLOY_ENV/conn_string")
-docker compose down
-docker compose up
-docker compose down
+docker-compose down
+docker-compose build fileserver
+docker-compose pull fetcher-app pipeline
+docker-compose up
 
 
 
