@@ -136,7 +136,7 @@ class App:
                                     }
                                 item = {
                                     "size": file_path.stat().st_size,
-                                    "url": urljoin(cdn_url, file_path),
+                                    "url": urljoin(cdn_url, str(file_path)),
                                     "fileType": file_path.suffix[1:],
                                     "hash": calc_md5_hash(file_path),
                                     "isWholeBook": chapter is None,
