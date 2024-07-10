@@ -149,9 +149,9 @@ class App:
                                 }
                                 unique_message_data.append(item)
                                 # For each lang/project, get all files, and filter out dirs and excluded args
-                            # Now that we have file info for each, genearte final messages by merging common and unique properties into a single message of common + files of batch size N. Part of the for project_dir in language_dir loop. 
+                            # Now that we have file info for each, genearte final messages by merging common and unique properties into a single message of common + files of batch size N. Part of the for project_dir in language_dir loop. 500 is an arbitrary number that eems to given enough padding to not go over the 256 limit. 
                             if common_message_data is not None:
-                                chunks = chunk_array(unique_message_data, 800)
+                                chunks = chunk_array(unique_message_data, 500)
                                 for chunk in chunks:
                                     chunk_message = common_message_data.copy()
                                     chunk_message["files"] = chunk
