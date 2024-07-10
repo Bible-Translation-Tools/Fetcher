@@ -172,18 +172,20 @@ class App:
         ) as service_bus_client:
             sender = service_bus_client.get_topic_sender(topic_name=self.BUS_TOPIC)
             async with sender:
-                batch_message = await sender.create_message_batch()
+                # batch_message = await sender.create_message_batch()
+                # sender.
                 for message in messages:
                     try:
                         bus_message = ServiceBusMessage(
                             json.dumps(message), 
                             session_id=message["session_id"]
                             );
-                        batch_message.add_message(bus_message)
+                        await sender.send_messages(bus_message)
+                        # batch_message.add_message(bus_message)
                     except Exception as e:
                         logging.error(e)
                         
-                await sender.send_messages(batch_message)
+               
                 logging.debug(f"Done sending messages to queue. Sent {len(messages)} messages.")   
 def get_arguments() -> Tuple[Namespace, List[str]]:
     """ Parse command line arguments """
