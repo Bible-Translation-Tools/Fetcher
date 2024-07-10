@@ -1,10 +1,10 @@
 import argparse
+import asyncio
 import json
 import logging
 import os
 from argparse import Namespace
 from pathlib import Path
-import re
 from time import sleep
 from typing import Tuple, List
 from datetime import datetime
@@ -106,6 +106,7 @@ class App:
                             # Common data for each lang/project
                             common_message_data = None
                             unique_message_data= []
+                            # Generate message for each file
                             for file_path in project_dir.rglob ('*'):
                                 # For each lang/project, get all files, and filter out dirs and excluded args
                                 if file_path.is_dir():
@@ -126,7 +127,7 @@ class App:
                                 if common_message_data is None:
                                     common_message_data = {
                                         "languageIetf": lang,
-                                        "name": f"{lang}_{resource}",
+                                        "name": f"{lang}/{resource}",
                                         "type": "audio",
                                         "domain": "scripture",
                                         "resourceType": "bible",
@@ -148,19 +149,22 @@ class App:
                                 }
                                 unique_message_data.append(item)
                                 # For each lang/project, get all files, and filter out dirs and excluded args
-                                if common_message_data is not None:
-                                    chunks = chunk_array(unique_message_data, 800)
-                                    for chunk in chunks:
-                                        chunk_message = common_message_data.copy()
-                                        chunk_message["files"] = chunk
-                                        bus_messages.append(chunk_message)
+                            # Now that we have file info for each, genearte final messages by merging common and unique properties into a single message of common + files of batch size N. Part of the for project_dir in language_dir loop. 
+                            if common_message_data is not None:
+                                chunks = chunk_array(unique_message_data, 800)
+                                for chunk in chunks:
+                                    chunk_message = common_message_data.copy()
+                                    chunk_message["files"] = chunk
+                                    bus_messages.append(chunk_message)
             logging.debug(f"Sending {len(bus_messages)} messages to queue")
             if len(bus_messages) > 0:
-                self.send_messages(bus_messages)
+                # The whole loop isn't managed by asyncio, but we can run just this one coroutine with it. it'll set up and tear down an event loop as needed.  
+                asyncio.run(self.send_messages(bus_messages))
+                # self.send_messages(bus_messages)
             else:
                 logging.debug("No messages to send")
         except Exception as e:
-            logging.error("Sending messages to queue")(f"Error sending messages to queue: {e.with_traceback()} {e}")
+            logging.error(f"Error sending messages to queue: {e.with_traceback()} {e}")
     async def send_messages(self, messages):
         async with ServiceBusClient.from_connection_string(
             conn_str=self.BUS_CONNECTION_STRING,
@@ -176,9 +180,9 @@ class App:
                             session_id=message["session_id"]
                             );
                         batch_message.add_message(bus_message)
-                    except ValueError:
-                        break
-
+                    except Exception as e:
+                        logging.error(e)
+                        
                 await sender.send_messages(batch_message)
                 logging.debug(f"Done sending messages to queue. Sent {len(messages)} messages.")   
 def get_arguments() -> Tuple[Namespace, List[str]]:
