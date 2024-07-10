@@ -46,11 +46,11 @@ class App:
             exit(0)
 
         while True:
+            self.send_messages_to_queue(self.message_queue_exclude_args)
             chapter_worker.execute()
             verse_worker.execute()
             tr_worker.execute()
             book_worker.execute()
-
             report = self.get_report(
                 (
                     chapter_worker.get_report(),
@@ -62,8 +62,6 @@ class App:
             if report is not None:
                 time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 logging.error(f"Fetcher Pipeline Report {time}", extra=report)
-
-            self.send_messages_to_queue(self.message_queue_exclude_args)
             sleep(wait_timer)
 
     @staticmethod
@@ -86,7 +84,7 @@ class App:
     
     def send_messages_to_queue(self, exclude_args:List):
         """ Send messages to queue """
-        print("Sending messages to queue")
+        logging.debug("Sending messages to queue")
         try: 
             cdn_url = os.getenv('CDN_BASE_URL')
             bus_messages = []
@@ -98,10 +96,13 @@ class App:
 
 
             # iterate through each language
+            logging.debug(f"iterating through {self.__ftp_dir}")
             for language_dir in self.__ftp_dir.iterdir():
                 if language_dir.is_dir() or "analysis" not in language_dir:
+                    logging.debug(f"doing {language_dir}")
                     for project_dir in language_dir.iterdir():
                         if project_dir.is_dir():
+                            logging.debug(f"doing {project_dir}")
                             # Common data for each lang/project
                             common_message_data = None
                             unique_message_data= []
@@ -153,9 +154,13 @@ class App:
                                         chunk_message = common_message_data.copy()
                                         chunk_message["files"] = chunk
                                         bus_messages.append(chunk_message)
-            self.send_messages(bus_messages)
+            logging.debug(f"Sending {len(bus_messages)} messages to queue")
+            if len(bus_messages) > 0:
+                self.send_messages(bus_messages)
+            else:
+                logging.debug("No messages to send")
         except Exception as e:
-            print(f"Error sending messages to queue: {e.with_traceback()} {e}")
+            logging.error("Sending messages to queue")(f"Error sending messages to queue: {e.with_traceback()} {e}")
     async def send_messages(self, messages):
         async with ServiceBusClient.from_connection_string(
             conn_str=self.BUS_CONNECTION_STRING,
@@ -175,7 +180,7 @@ class App:
                         break
 
                 await sender.send_messages(batch_message)
-                print(f"Done sending messages to queue. Sent {len(messages)} messages.")   
+                logging.debug(f"Done sending messages to queue. Sent {len(messages)} messages.")   
 def get_arguments() -> Tuple[Namespace, List[str]]:
     """ Parse command line arguments """
 
@@ -210,6 +215,7 @@ def main():
     )
     BUS_CONNECTION_STR = os.getenv("SERVICE_BUS_CONNECTION_STRING")
     TOPIC_NAME = os.getenv("SERVICE_BUS_TOPIC_NAME")
+    
     if os.getenv('CDN_BASE_URL') is None:
         raise Exception("CDN_BASE_URL for bus queue is not set")
     if BUS_CONNECTION_STR is None:
