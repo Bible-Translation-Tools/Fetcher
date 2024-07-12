@@ -5,6 +5,7 @@ import logging
 import os
 from argparse import Namespace
 from pathlib import Path
+import sys
 from time import sleep
 from typing import Tuple, List
 from datetime import datetime
@@ -115,10 +116,8 @@ class App:
                                 for arg in exclude_args:
                                     if arg.startswith("."):
                                         if file_path.suffix == arg:
-                                            logging.debug(f"Skipping {file_path} due to excluded arg {arg}")
                                             continue
                                     elif f"/{arg}/" in file_path.name:
-                                        logging.debug(f"Skipping {file_path.name} due to excluded arg {arg} in name") 
                                         continue
                                 
                                 # given path of /content/etc;
@@ -178,7 +177,9 @@ class App:
             else:
                 logging.debug("No messages to send")
         except Exception as e:
-            logging.error(f"Error sending messages to queue: {e.with_traceback()} {e}")
+            logging.critical(f"Error sending messages to queue: {e.with_traceback()} {e}")
+            # blow up. If we can't send messages to bus, data not made availble in api. 
+            sys.exit(1)
     async def send_messages(self, messages):
         async with ServiceBusClient.from_connection_string(
             conn_str=self.BUS_CONNECTION_STRING,
@@ -198,6 +199,8 @@ class App:
                         # batch_message.add_message(bus_message)
                     except Exception as e:
                         logging.error(e)
+                        logging.critical("Error sending messages to queue. Exiting since data won't make it to the api.")
+                        sys.exit(1)
                         
                
                 logging.debug(f"Done sending messages to queue. Sent {len(messages)} messages.")   
