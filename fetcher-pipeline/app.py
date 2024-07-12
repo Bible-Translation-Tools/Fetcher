@@ -117,7 +117,8 @@ class App:
                                     if arg.startswith("."):
                                         if file_path.suffix == arg:
                                             continue
-                                    elif f"/{arg}/" in file_path.name:
+                                    # given /content/hi/ulb/gal/4/CONTENTS/cue/verse/hi_ulb_b49_gal_c04_v18.cue.. Parts is /, content, hi, ulb:   Args start filtering after the project name. at 
+                                    elif f"/{arg}/" in "/".join(file_path.parts[4:]):
                                         continue
                                 
                                 # given path of /content/etc;
