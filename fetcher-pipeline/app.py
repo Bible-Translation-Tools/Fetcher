@@ -114,13 +114,12 @@ class App:
                                 if file_path.is_dir():
                                     continue
                                 for arg in exclude_args:
-                                    # todo: remobe for debuggin, but I just can't this filter right. And then delete the 173 buss messages handing out waiting. 
-                                    print(file_path.parts)
                                     if arg.startswith("."):
                                         if file_path.suffix == arg:
                                             continue
-                                    # given /ulb/gal/4/CONTENTS/cue/verse/hi_ulb_b49_gal_c04_v18.cue.. Parts is /, content, hi, ulb:   Args start filtering after the project name
-                                    elif f"/{arg}/" in "/".join(file_path.parts):
+                                    # The parts look like ('/', 'content', 'hi', 'ulb', 'eph', '2', 'CONTENTS', 'tr', 'mp3', 'hi', 'verse', 'hi_ulb_eph_c2.tr')... We don't want to include "/", "content", "lang", or "ulb (project type) in the filter" So, slice to get "eph/2/CONTENTS/tr/mp3/hi/verse/hi_ulb_eph_c2.tr" for example
+                                    elif f"/{arg}/" in "/".join(file_path.parts[4:]):
+                                        logging.debug(f"Excluding {file_path}")
                                         continue
                                 
                                 # given path of /content/etc;
