@@ -154,7 +154,7 @@ class App:
                                     "isWholeProject": False, #no whole projects on the cdn, i.e. no audio bible of entire ulb. 
                                     "bookName": next((sub.get("name") for sub in books if sub["slug"] == book_slug), None) or book_slug.capitalize(),
                                     "bookSlug": book_slug.capitalize(),
-                                    "chapter": book_slug
+                                    "chapter": chapter
                                 }
                                 unique_message_data.append(item)
                                 # For each lang/project, get all files, and filter out dirs and excluded args
@@ -210,6 +210,8 @@ class App:
                     should_skip = True
                 # The parts look like ('/', 'content', 'hi', 'ulb', 'eph', '2', 'CONTENTS', 'tr', 'mp3', 'hi', 'verse', 'hi_ulb_eph_c2.tr')... We don't want to include "/", "content", "lang", or "ulb (project type) in the filter" So, slice to get "eph/2/CONTENTS/tr/mp3/hi/verse/hi_ulb_eph_c2.tr" for example
             elif f"/{arg}/" in "/".join(file_path.parts[4:]):
+                should_skip = True
+            elif ".hash" == file_path.name:
                 should_skip = True
         return should_skip
 
