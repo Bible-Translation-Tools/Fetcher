@@ -113,14 +113,8 @@ class App:
                                 # For each lang/project, get all files, and filter out dirs and excluded args
                                 if file_path.is_dir():
                                     continue
-                                for arg in exclude_args:
-                                    if arg.startswith("."):
-                                        if file_path.suffix == arg:
-                                            continue
-                                    # The parts look like ('/', 'content', 'hi', 'ulb', 'eph', '2', 'CONTENTS', 'tr', 'mp3', 'hi', 'verse', 'hi_ulb_eph_c2.tr')... We don't want to include "/", "content", "lang", or "ulb (project type) in the filter" So, slice to get "eph/2/CONTENTS/tr/mp3/hi/verse/hi_ulb_eph_c2.tr" for example
-                                    elif f"/{arg}/" in "/".join(file_path.parts[4:]):
-                                        logging.debug(f"Excluding {file_path}")
-                                        continue
+                                if (self.should_skip_file(file_path, exclude_args)):
+                                    continue
                                 
                                 # given path of /content/etc;
                                 root_parts = self.__ftp_dir.parts
@@ -205,7 +199,21 @@ class App:
                         sys.exit(1)
                         
                
-                logging.debug(f"Done sending messages to queue. Sent {len(messages)} messages.")   
+                logging.debug(f"Done sending messages to queue. Sent {len(messages)} messages.")
+    
+    @staticmethod
+    def should_skip_file(file_path: Path, exlude_args: List[str]) -> bool:
+        should_skip = False
+        for arg in exlude_args:
+            if arg.startswith("."):
+                if file_path.suffix == arg:
+                    should_skip = True
+                # The parts look like ('/', 'content', 'hi', 'ulb', 'eph', '2', 'CONTENTS', 'tr', 'mp3', 'hi', 'verse', 'hi_ulb_eph_c2.tr')... We don't want to include "/", "content", "lang", or "ulb (project type) in the filter" So, slice to get "eph/2/CONTENTS/tr/mp3/hi/verse/hi_ulb_eph_c2.tr" for example
+                elif f"/{arg}/" in "/".join(file_path.parts[4:]):
+                    should_skip = True
+        return should_skip
+
+               
 def get_arguments() -> Tuple[Namespace, List[str]]:
     """ Parse command line arguments """
 

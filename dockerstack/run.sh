@@ -20,7 +20,7 @@ export SERVICE_BUS_CONNECTION_STRING=$(op read "op://AppDev Scripture Accessibil
 docker-compose down
 docker-compose build fileserver
 docker-compose pull fetcher-app pipeline
-docker-compose up
+docker-compose up -d
 
 
 
