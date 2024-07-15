@@ -114,11 +114,13 @@ class App:
                                 if file_path.is_dir():
                                     continue
                                 for arg in exclude_args:
+                                    # todo: remobe for debuggin, but I just can't this filter right. And then delete the 173 buss messages handing out waiting. 
+                                    print(file_path.parts)
                                     if arg.startswith("."):
                                         if file_path.suffix == arg:
                                             continue
-                                    # given /content/hi/ulb/gal/4/CONTENTS/cue/verse/hi_ulb_b49_gal_c04_v18.cue.. Parts is /, content, hi, ulb:   Args start filtering after the project name. at 
-                                    elif f"/{arg}/" in "/".join(file_path.parts[4:]):
+                                    # given /ulb/gal/4/CONTENTS/cue/verse/hi_ulb_b49_gal_c04_v18.cue.. Parts is /, content, hi, ulb:   Args start filtering after the project name
+                                    elif f"/{arg}/" in "/".join(file_path.parts):
                                         continue
                                 
                                 # given path of /content/etc;
