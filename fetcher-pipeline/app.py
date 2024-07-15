@@ -209,8 +209,8 @@ class App:
                 if file_path.suffix == arg:
                     should_skip = True
                 # The parts look like ('/', 'content', 'hi', 'ulb', 'eph', '2', 'CONTENTS', 'tr', 'mp3', 'hi', 'verse', 'hi_ulb_eph_c2.tr')... We don't want to include "/", "content", "lang", or "ulb (project type) in the filter" So, slice to get "eph/2/CONTENTS/tr/mp3/hi/verse/hi_ulb_eph_c2.tr" for example
-                elif f"/{arg}/" in "/".join(file_path.parts[4:]):
-                    should_skip = True
+            elif f"/{arg}/" in "/".join(file_path.parts[4:]):
+                should_skip = True
         return should_skip
 
                
