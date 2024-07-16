@@ -31,7 +31,6 @@ class App:
         self.message_queue_exclude_args = message_queue_exclude
         self.BUS_CONNECTION_STRING = bus_connection_string
         self.BUS_TOPIC = bus_topic
-        self.queue_cache_memory = {}
 
     def start(self):
         """ Start app """
@@ -48,7 +47,7 @@ class App:
             exit(0)
 
         while True:
-            self.send_messages_to_queue(self.message_queue_exclude_args, self.queue_cache_memory)
+            self.send_messages_to_queue(self.message_queue_exclude_args)
             chapter_worker.execute()
             verse_worker.execute()
             tr_worker.execute()
@@ -84,7 +83,7 @@ class App:
 
         return None
     
-    def send_messages_to_queue(self, exclude_args:List, queue_cache_memory):
+    def send_messages_to_queue(self, exclude_args:List):
         """ Send messages to queue """
         logging.debug("Sending messages to queue")
         try: 
@@ -136,15 +135,7 @@ class App:
                                         # The session identifier of the message for a sessionful entity. The creates FIFO behavior for subscriptions on azure service bus
                                         "session_id": f"audio_biel_{lang}_{resource}"
                                     }
-                                    
-                                item_hash = calc_md5_hash(file_path); 
-                                url_path = urljoin(cdn_url, str(file_path))
-                                if queue_cache_memory.get(url_path) == item_hash: 
-                                    logging.debug(f"Already processed {url_path}. Hash hasn't changed")
-                                    continue
-                                if not queue_cache_memory.get(url_path):
-                                    queue_cache_memory[url_path] = item_hash
-                                    
+
                                 item = {
                                     "size": file_path.stat().st_size,
                                     "url": urljoin(cdn_url, str(file_path)),
