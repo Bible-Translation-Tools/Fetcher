@@ -47,7 +47,6 @@ class App:
             exit(0)
 
         while True:
-            self.send_messages_to_queue(self.message_queue_exclude_args)
             chapter_worker.execute()
             verse_worker.execute()
             tr_worker.execute()
@@ -63,6 +62,7 @@ class App:
             if report is not None:
                 time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 logging.error(f"Fetcher Pipeline Report {time}", extra=report)
+            self.send_messages_to_queue(self.message_queue_exclude_args)
             sleep(wait_timer)
 
     @staticmethod
