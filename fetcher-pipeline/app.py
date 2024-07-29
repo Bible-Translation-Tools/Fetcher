@@ -99,63 +99,65 @@ class App:
             # iterate through each language
             logging.debug(f"iterating through {self.__ftp_dir}")
             for language_dir in self.__ftp_dir.iterdir():
-                if language_dir.is_dir() or "analysis" not in language_dir:
-                    logging.debug(f"doing {language_dir}")
-                    for project_dir in language_dir.iterdir():
-                        if project_dir.is_dir():
-                            logging.debug(f"doing {project_dir}")
-                            # Common data for each lang/project
-                            common_message_data = None
-                            unique_message_data= []
-                            # Generate message for each file
-                            for file_path in project_dir.rglob ('*'):
-                                # For each lang/project, get all files, and filter out dirs and excluded args
-                                if file_path.is_dir():
-                                    continue
-                                if (self.should_skip_file(file_path, exclude_args)):
-                                    continue
-                                
-                                # given path of /content/etc;
-                                root_parts = self.__ftp_dir.parts
-                                # exclude the common prefix of content directory and just get lang/proj/book/chap/etc;
-                                parts = file_path.parts[len(root_parts):]
-                                lang = parts[0]
-                                resource = parts[1]
-                                book_slug = parts[2]
-                                chapter = parts[3] or None
-                                if common_message_data is None:
-                                    common_message_data = {
-                                        "languageIetf": lang,
-                                        "name": f"{lang}/{resource}",
-                                        "type": "audio",
-                                        "domain": "scripture",
-                                        "resourceType": "bible",
-                                        "namespace": "audio_biel",
-                                        "files": [],
-                                        # The session identifier of the message for a sessionful entity. The creates FIFO behavior for subscriptions on azure service bus
-                                        "session_id": f"audio_biel_{lang}_{resource}"
-                                    }
+                if not (language_dir.is_dir() and "analysis" in language_dir.name):
+                    continue
+                logging.debug(f"doing {language_dir}")
+                for project_dir in language_dir.iterdir():
+                    if not project_dir.is_dir():
+                        continue
+                    logging.debug(f"doing {project_dir}")
+                    # Common data for each lang/project
+                    common_message_data = None
+                    unique_message_data= []
+                    # Generate message for each file
+                    for file_path in project_dir.rglob ('*'):
+                        # For each lang/project, get all files, and filter out dirs and excluded args
+                        if file_path.is_dir():
+                            continue
+                        if (self.should_skip_file(file_path, exclude_args)):
+                            continue
+                        
+                        # given path of /content/etc;
+                        root_parts = self.__ftp_dir.parts
+                        # exclude the common prefix of content directory and just get lang/proj/book/chap/etc;
+                        parts = file_path.parts[len(root_parts):]
+                        lang = parts[0]
+                        resource = parts[1]
+                        book_slug = parts[2]
+                        chapter = parts[3] or None
+                        if common_message_data is None:
+                            common_message_data = {
+                                "languageIetf": lang,
+                                "name": f"{lang}/{resource}",
+                                "type": "audio",
+                                "domain": "scripture",
+                                "resourceType": "bible",
+                                "namespace": "audio_biel",
+                                "files": [],
+                                # The session identifier of the message for a sessionful entity. The creates FIFO behavior for subscriptions on azure service bus
+                                "session_id": f"audio_biel_{lang}_{resource}"
+                            }
 
-                                item = {
-                                    "size": file_path.stat().st_size,
-                                    "url": urljoin(cdn_url, str(file_path)),
-                                    "fileType": file_path.suffix[1:],
-                                    "hash": calc_md5_hash(file_path),
-                                    "isWholeBook": chapter is None,
-                                    "isWholeProject": False, #no whole projects on the cdn, i.e. no audio bible of entire ulb. 
-                                    "bookName": next((sub.get("name") for sub in books if sub["slug"] == book_slug), None) or book_slug.capitalize(),
-                                    "bookSlug": book_slug.capitalize(),
-                                    "chapter": chapter
-                                }
-                                unique_message_data.append(item)
-                                # For each lang/project, get all files, and filter out dirs and excluded args
-                            # Now that we have file info for each, genearte final messages by merging common and unique properties into a single message of common + files of batch size N. Part of the for project_dir in language_dir loop. 500 is an arbitrary number that eems to given enough padding to not go over the 256 limit. 
-                            if common_message_data is not None:
-                                chunks = chunk_array(unique_message_data, 500)
-                                for chunk in chunks:
-                                    chunk_message = common_message_data.copy()
-                                    chunk_message["files"] = chunk
-                                    bus_messages.append(chunk_message)
+                        item = {
+                            "size": file_path.stat().st_size,
+                            "url": urljoin(cdn_url, str(file_path)),
+                            "fileType": file_path.suffix[1:],
+                            "hash": calc_md5_hash(file_path),
+                            "isWholeBook": chapter is None,
+                            "isWholeProject": False, #no whole projects on the cdn, i.e. no audio bible of entire ulb. 
+                            "bookName": next((sub.get("name") for sub in books if sub["slug"] == book_slug), None) or book_slug.capitalize(),
+                            "bookSlug": book_slug.capitalize(),
+                            "chapter": chapter
+                        }
+                        unique_message_data.append(item)
+                        # For each lang/project, get all files, and filter out dirs and excluded args
+                    # Now that we have file info for each, genearte final messages by merging common and unique properties into a single message of common + files of batch size N. Part of the for project_dir in language_dir loop. 500 is an arbitrary number that eems to given enough padding to not go over the 256 limit. 
+                    if common_message_data is not None:
+                        chunks = chunk_array(unique_message_data, 500)
+                        for chunk in chunks:
+                            chunk_message = common_message_data.copy()
+                            chunk_message["files"] = chunk
+                            bus_messages.append(chunk_message)
             logging.debug(f"Sending {len(bus_messages)} messages to queue")
             if len(bus_messages) > 0:
                 # The whole loop isn't managed by asyncio, but we can run just this one coroutine with it. it'll set up and tear down an event loop as needed.  
@@ -194,17 +196,16 @@ class App:
     
     @staticmethod
     def should_skip_file(file_path: Path, exlude_args: List[str]) -> bool:
-        should_skip = False
         for arg in exlude_args:
             if arg.startswith("."):
                 if file_path.suffix == arg:
-                    should_skip = True
+                   return True
                 # The parts look like ('/', 'content', 'hi', 'ulb', 'eph', '2', 'CONTENTS', 'tr', 'mp3', 'hi', 'verse', 'hi_ulb_eph_c2.tr')... We don't want to include "/", "content", "lang", or "ulb (project type) in the filter" So, slice to get "eph/2/CONTENTS/tr/mp3/hi/verse/hi_ulb_eph_c2.tr" for example
             elif f"/{arg}/" in "/".join(file_path.parts[4:]):
-                should_skip = True
+               return True
             elif ".hash" == file_path.name:
-                should_skip = True
-        return should_skip
+               return True
+        return False
 
                
 def get_arguments() -> Tuple[Namespace, List[str]]:
