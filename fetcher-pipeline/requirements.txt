@@ -1,3 +1,13 @@
-sentry_sdk~=0.18.0
-requests~=2.25.0
-pydub~=0.24.0
+azure-core==1.30.2
+azure-servicebus==7.12.2
+certifi==2024.6.2
+chardet==4.0.0
+idna==2.10
+isodate==0.6.1
+packaging==24.1
+pydub==0.24.1
+requests==2.25.1
+sentry-sdk==0.18.0
+six==1.16.0
+typing_extensions==4.12.2
+urllib3==1.26.19
