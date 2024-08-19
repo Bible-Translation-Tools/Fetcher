@@ -19,7 +19,7 @@ RUN curl -O https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.2_linux-x
 
 WORKDIR /fetcher-pipeline
 COPY requirements.txt /fetcher-pipeline
-RUN pip3.8 install -r requirements.txt
+RUN pip3.12 install -r requirements.txt
 COPY . /fetcher-pipeline
 
 
