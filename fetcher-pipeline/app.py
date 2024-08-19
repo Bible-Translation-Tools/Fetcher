@@ -6,7 +6,7 @@ import os
 from argparse import Namespace
 from pathlib import Path
 import sys
-from time import sleep
+from time import sleep, time
 from typing import Tuple, List
 from datetime import datetime
 from urllib.parse import urljoin
@@ -19,6 +19,7 @@ from chapter_worker import ChapterWorker
 from tr_worker import TrWorker
 from verse_worker import VerseWorker
 from book_worker import BookWorker
+
 
 
 class App:
@@ -47,10 +48,13 @@ class App:
             exit(0)
 
         while True:
-            chapter_worker.execute()
-            verse_worker.execute()
-            tr_worker.execute()
-            book_worker.execute()
+            # Set will be shared amongst workers mutably to avoid multiple rglobs. Yes, this does read into memory, but you can't rewind an rglob generator, and some of the workers need more than a single file at a time, so this saves any nested glob looksups as well.  Ad hoc testing suggests paths of this size, can fit about 50 million into 2gigs of memory, and this should be fewer than that. As for speed, more ad hoc testing showed It taking about 1 or 2 minutes to glob 250,000 files.  If this chokes, should probably looking to getting "all_files" by iter_dir each language I think, and then aggregating or just spawning workers for each language.
+            all_files = self.glob_all_into_set(); 
+            # Each worker mutates the set of all_files for any created/deleted files. 
+            chapter_worker.execute(all_files)
+            verse_worker.execute(all_files)
+            tr_worker.execute(all_files)
+            book_worker.execute(all_files)
             report = self.get_report(
                 (
                     chapter_worker.get_report(),
@@ -63,8 +67,20 @@ class App:
                 time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 logging.error(f"Fetcher Pipeline Report {time}", extra=report)
             self.send_messages_to_queue(self.message_queue_exclude_args)
+            # free all_files from memory while sleeping for next run; 
+            all_files.clear()
             sleep(wait_timer)
 
+    def glob_all_into_set(self):
+        """ Glob all files into a set """
+        start_time = time();
+        all_files = set(self.__ftp_dir.rglob('*'))
+        end_time = time();
+        logging.info(f"Elapsed time to glob all into a set files: {end_time - start_time}")
+        logging.info(f"Total number of files: {len(all_files)}")
+        logging.info(f"Size in memory: {sys.getsizeof(all_files)} bytes")
+        return all_files
+    
     @staticmethod
     def get_report(reports):
         """ Generate workers report """
@@ -85,8 +101,9 @@ class App:
     
     def send_messages_to_queue(self, exclude_args:List):
         """ Send messages to queue """
-        logging.debug("Sending messages to queue")
-        try: 
+        logging.info("Sending messages to queue")
+        try:
+            queue_start_time = time() 
             cdn_url = os.getenv('CDN_BASE_URL')
             bus_messages = []
             def chunk_array(in_array, size):
@@ -97,11 +114,11 @@ class App:
 
 
             # iterate through each language
-            logging.debug(f"iterating through {self.__ftp_dir}")
+            logging.info(f"iterating through {self.__ftp_dir}")
             for language_dir in self.__ftp_dir.iterdir():
                 if not (language_dir.is_dir() and "analysis" in language_dir.name):
                     continue
-                logging.debug(f"doing {language_dir}")
+                logging.info(f"doing {language_dir}")
                 for project_dir in language_dir.iterdir():
                     if not project_dir.is_dir():
                         continue
@@ -158,13 +175,15 @@ class App:
                             chunk_message = common_message_data.copy()
                             chunk_message["files"] = chunk
                             bus_messages.append(chunk_message)
-            logging.debug(f"Sending {len(bus_messages)} messages to queue")
+            logging.info(f"Sending {len(bus_messages)} messages to queue")
             if len(bus_messages) > 0:
                 # The whole loop isn't managed by asyncio, but we can run just this one coroutine with it. it'll set up and tear down an event loop as needed.  
                 asyncio.run(self.send_messages(bus_messages))
+                queue_end_time = time()
+                logging.info(f"Queue finished in {queue_end_time - queue_start_time} seconds!")
                 # self.send_messages(bus_messages)
             else:
-                logging.debug("No messages to send")
+                logging.info("No messages to send")
         except Exception as e:
             logging.critical(f"Error sending messages to queue: {e.with_traceback()} {e}")
             # blow up. If we can't send messages to bus, data not made availble in api. 
@@ -212,10 +231,11 @@ def get_arguments() -> Tuple[Namespace, List[str]]:
     """ Parse command line arguments """
 
     exclude_args_choices = ["verse", "chapter", "book", "hi", "low", ".mp3", ".wav", ".cue", ".tr"]
+    log_level_choices = ["debug", "info", "warning", "error", "critical"]
 
     parser = argparse.ArgumentParser(description='Split and convert chapter files to mp3')
     parser.add_argument('-i', '--input-dir', type=lambda p: Path(p).absolute(), help='Input directory')
-    parser.add_argument("-t", "--trace", action="store_true", help="Enable tracing output")
+    parser.add_argument("-l", "--log_level", choices=log_level_choices, default="info", action="store_true", help="Set logging level")
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable logs from subprocess")
     parser.add_argument("-hr", "--hour", type=int, default=1, help="Frequency of executing workers in hours")
     parser.add_argument("-mn", "--minute", type=int, default=0, help="Frequency of executing workers in minutes")
@@ -229,11 +249,14 @@ def main():
 
     args, unknown = get_arguments()
 
-    if args.trace:
-        log_level = logging.DEBUG
-    else:
-        log_level = logging.WARNING
-
+    log_level = {
+        "debug": logging.DEBUG,
+        "info": logging.INFO,
+        "warning": logging.WARNING,
+        "error": logging.ERROR,
+        "critical": logging.CRITICAL
+    }.get(args.log_level, logging.INFO)
+    
     logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s', level=log_level)
 
     sentry_sdk.init(
