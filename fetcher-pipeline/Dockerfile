@@ -1,4 +1,4 @@
-FROM nikolaik/python-nodejs:python3.8-nodejs14-slim
+FROM nikolaik/python-nodejs:python3.12-nodejs22-slim
 
 RUN npm install pm2 -g
 RUN pm2 install pm2-logrotate
