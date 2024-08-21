@@ -103,6 +103,8 @@ class TrWorker:
         existent_tr = []
         verse_files = []
         verse_media = ['wav', 'mp3/hi', 'mp3/low']
+        # matches_glob = all_files
+
         for src_file in all_files:
             # gather verse files: 
             for m in verse_media:
@@ -111,8 +113,10 @@ class TrWorker:
                 if not re.search(self.__verse_regex, str(src_file)):
                     continue
                 if f'{m}/verse/' in str(src_file):
-                    verse_files.append(src_file)
-            # Gather existing tr files
+                    verse_files.append(src_file) 
+            do_include_regex = rf'tr/{m}/verse/.*.tr$$'
+            if not re.search(do_include_regex, str(src_file)):
+                continue
             match = re.match(self.__tr_regex, str(src_file))
             if match.group(1) is not None:
                 logging.debug(f'Found existent CHAPTER TR file: {src_file}')
