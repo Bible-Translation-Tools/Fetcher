@@ -116,10 +116,12 @@ class App:
             # iterate through each language
             logging.info(f"iterating through {self.__ftp_dir}")
             for language_dir in self.__ftp_dir.iterdir():
-                if not (language_dir.is_dir() and "analysis" in language_dir.name):
+                # don't process stray files at this level, only lang dirs.  e.g. en/
+                if not language_dir.is_dir() or "analysis" in language_dir.name:
                     continue
                 logging.info(f"doing {language_dir}")
                 for project_dir in language_dir.iterdir():
+                    # only en/ulb
                     if not project_dir.is_dir():
                         continue
                     logging.debug(f"doing {project_dir}")
