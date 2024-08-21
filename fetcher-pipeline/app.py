@@ -235,7 +235,7 @@ def get_arguments() -> Tuple[Namespace, List[str]]:
 
     parser = argparse.ArgumentParser(description='Split and convert chapter files to mp3')
     parser.add_argument('-i', '--input-dir', type=lambda p: Path(p).absolute(), help='Input directory')
-    parser.add_argument("-l", "--log_level", choices=log_level_choices, default="info", action="store_true", help="Set logging level")
+    parser.add_argument("-l", "--log_level", choices=log_level_choices, default="info", help="Set logging level")
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable logs from subprocess")
     parser.add_argument("-hr", "--hour", type=int, default=1, help="Frequency of executing workers in hours")
     parser.add_argument("-mn", "--minute", type=int, default=0, help="Frequency of executing workers in minutes")
@@ -246,7 +246,6 @@ def get_arguments() -> Tuple[Namespace, List[str]]:
 
 def main():
     """ Launch application """
-
     args, unknown = get_arguments()
 
     log_level = {
@@ -273,6 +272,7 @@ def main():
     if TOPIC_NAME is None:
         raise Exception("SERVICE_BUS_TOPIC_NAME is not set")
     app = App(args.input_dir, args.verbose, args.hour, args.minute, args.queue_exclude, BUS_CONNECTION_STR, TOPIC_NAME)
+    logging.info(f"Starting app with input of {args.input_dir}. Verbose: {args.verbose}. Hour: {args.hour}. Minute: {args.minute}. Queue exclude: {args.queue_exclude} and log level: {log_level}.")
     app.start()
 
 
