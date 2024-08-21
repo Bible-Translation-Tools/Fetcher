@@ -46,12 +46,12 @@ class ChapterWorker:
     def include_file(self, file:Path) -> bool:
         return re.search(self.__chapter_regex, str(file))
     
-    def process_chapter(self, src_file):
+    def process_chapter(self, src_file: Path):
         try:
             if not self.include_file(src_file):
                 return
+            
             changed = self.check_file_changed(src_file)
-
             if not changed:
                 logging.debug(f'Chapter {src_file} has not been changed. Skipping...')
                 return
@@ -82,7 +82,7 @@ class ChapterWorker:
             split_chapter(target_file, verses_dir, self.verbose)
 
             if check_dir_empty(verses_dir):
-                logging.warning(f'Could not split chapter file. Make sure file is importable.')
+                logging.warning(f'Could not split chapter file {target_file}. Verses dir is {verses_dir}. Make sure file is importable.')
                 return
 
             target_verse_dir = remote_dir.joinpath("wav", "verse")
@@ -118,7 +118,8 @@ class ChapterWorker:
                 self.convert_wav_to_mp3(f, remote_dir, 'verse', 'hi')
                 self.convert_wav_to_mp3(f, remote_dir, 'verse', 'low')
         except Exception as e:
-            logging.warning(str(e))
+            logging.warning(f"exception in chapter worker: {e.with_traceback()}")
+            
         # Process chapter files only
        
 

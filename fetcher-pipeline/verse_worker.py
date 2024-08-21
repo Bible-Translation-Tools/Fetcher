@@ -76,7 +76,7 @@ class VerseWorker:
             self.convert_verse_wav(target_file, remote_dir, grouping, 'hi')
             self.convert_verse_wav(target_file, remote_dir, grouping, 'low')
         except Exception as e:
-            logging.warning(str(e))
+            logging.warning(f"exception in verse_worker: {e.with_traceback()}")
         
 
     def convert_verse_wav(self, verse_file: Path, remote_dir: Path, grouping: str, quality: str):

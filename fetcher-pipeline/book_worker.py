@@ -55,7 +55,7 @@ class BookWorker:
                         book_groups[key] #iterable
                     )
                 except Exception as e:
-                    logging.warning(str(e))
+                    logging.warning(f"exception in book worker: {e.with_traceback()}")
             # Even though last worker, still update set in case order changes
             all_files.difference_update(set(self.resources_deleted))
             all_files.update(set(self.resources_created))

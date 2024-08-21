@@ -96,7 +96,7 @@ class TrWorker:
                     logging.debug(f'Verse file {src_file} is excluded: exists in CHAPTER TR: {tr}')
                     self.__chapter_tr_files.remove(src_file)
         except Exception as e:
-            logging.warning(str(e))
+            logging.warning(f"exception in tr_worker: {e.with_traceback()}")
         
     def get_existent_tr_and_verses_to_process(self, all_files: set[Path]) -> Tuple[List[Tuple[Group, Path]], List[Path]]:
         """ Find tr files that exist in the remote directory """
@@ -170,7 +170,7 @@ class TrWorker:
                     chapter_groups[key]
                 )
             except Exception as e:
-                logging.warning(str(e))
+                logging.warning(f"exception in tr_worker create_chapter_trs: {e.with_traceback()}")
 
     def create_book_trs(self):
         book_groups = self.group_files(self.__book_tr_files, Group.BOOK)
@@ -183,7 +183,7 @@ class TrWorker:
                     book_groups[key]
                 )
             except Exception as e:
-                logging.warning(str(e))
+                logging.warning(f"exception in tr_worker create_book_trs: {e.with_traceback()}")
 
     def create_tr_file(self, dic: str, files: List[Path]):
         """ Create tr file and copy it to the remote directory"""
