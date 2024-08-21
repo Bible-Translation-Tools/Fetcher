@@ -31,9 +31,11 @@ class VerseWorker:
         logging.info("Verse worker started!")
         self.clear_report()
         self.__temp_dir = init_temp_dir("verse_worker_")
-        self.thread_executor.map(self.process_verse, all_files)
+        files_to_process = {path for path in all_files if path.suffix == ".wav"}
+        self.thread_executor.map(self.process_verse, files_to_process)
         all_files.difference_update(set(self.resources_deleted))
         all_files.update(set(self.resources_created))
+        logging.info(f"removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files")
         logging.debug(f'Deleting temporary directory {self.__temp_dir}')
         rm_tree(self.__temp_dir)
         end_time = time()

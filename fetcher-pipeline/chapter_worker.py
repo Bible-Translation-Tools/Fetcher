@@ -31,7 +31,9 @@ class ChapterWorker:
         logging.info("Chapter worker started!")
         self.clear_report()
         self.__temp_dir = init_temp_dir("chapter_worker_")
-        self.thread_executor.map(self.process_chapter, all_files)
+        files_to_process = {path for path in all_files if path.suffix == ".wav"}
+        logging.info(f"starting process_chapter with {self.thread_executor._max_workers} max possible workers")
+        self.thread_executor.map(self.process_chapter, files_to_process)
 
         logging.debug(f'Deleting temporary directory {self.__temp_dir}')
         rm_tree(self.__temp_dir)
@@ -39,6 +41,7 @@ class ChapterWorker:
         all_files.difference_update(set(self.resources_deleted))
         # add anything new for subsequent workers to have in additional to initial fs read
         all_files.update(set(self.resources_created))
+        logging.info(f"removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files")
         end_time = time()
         logging.info(f"Chapter worker finished in {end_time - start_time} seconds!")
         return 
