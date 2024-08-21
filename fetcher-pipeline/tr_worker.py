@@ -7,6 +7,9 @@ from typing import List, Tuple, Dict
 
 from file_utils import init_temp_dir, rm_tree, copy_file, rel_path
 from process_tools import create_tr
+from concurrent.futures import ThreadPoolExecutor
+from time import time
+from functools import partial
 
 
 class Group(Enum):
@@ -30,86 +33,95 @@ class TrWorker:
 
         self.resources_created = []
         self.resources_deleted = []
+        self.thread_executor = ThreadPoolExecutor()
+        
 
-    def execute(self):
+    def execute(self, all_files: set[Path]):
         """ Execute worker """
-
-        logging.debug("TR worker started!")
-
+        start_time = time()
+        logging.info("TR worker started!")
         try:
             self.clear_report()
             self.clear_cache()
             self.__temp_dir = init_temp_dir("tr_worker_")
-
-            existent_tr = self.find_existent_tr()
-
-            media = ['wav', 'mp3/hi', 'mp3/low']
-            for m in media:
-                for src_file in self.__ftp_dir.rglob(f'{m}/verse/*.*'):
-                    if src_file.suffix == '.tr':
-                        continue
-
-                    # Process verse files only
-                    if not re.search(self.__verse_regex, str(src_file)):
-                        continue
-
-                    logging.debug(f'Found verse file: {src_file}')
-
-                    self.__book_tr_files.append(src_file)
-                    self.__chapter_tr_files.append(src_file)
-
-                    # Extract necessary path parts
-                    root_parts = self.__ftp_dir.parts
-                    parts = src_file.parts[len(root_parts):]
-
-                    lang = parts[0]
-                    resource = parts[1]
-                    book = parts[2]
-                    chapter = parts[3]
-                    media = parts[5]
-                    quality = parts[6] if media == 'mp3' else ''
-                    grouping = parts[7] if media == 'mp3' else parts[6]
-
-                    regex = fr'{lang}\/{resource}\/{book}(?:\/{chapter})?\/' \
-                            fr'CONTENTS\/tr\/{media}(?:\/{quality})?\/{grouping}'
-
-                    for group, tr in existent_tr:
-                        if not re.search(regex, str(tr)):
-                            continue
-
-                        if group == Group.BOOK and src_file in self.__book_tr_files:
-                            logging.debug(f'Verse file {src_file} is excluded: exists in BOOK TR: {tr}')
-                            self.__book_tr_files.remove(src_file)
-                        elif group == Group.CHAPTER and src_file in self.__chapter_tr_files:
-                            logging.debug(f'Verse file {src_file} is excluded: exists in CHAPTER TR: {tr}')
-                            self.__chapter_tr_files.remove(src_file)
-
+            
+            (existent_tr, verse_files) = self.get_existent_tr_and_verses_to_process(all_files)
+            # Partially apply the existent_tr argument so we can call fn sig of thread map of fn, iterable
+            set_tr_files_partial = partial(self.set_tr_files_to_process, existent_tr)
+            self.thread_executor.map(set_tr_files_partial, verse_files)
+             # Each of these calls the thread executor process trs
             self.create_chapter_trs()
             self.create_book_trs()
-        except Exception as e:
-            logging.warning(str(e))
+            all_files.difference_update(set(self.resources_deleted))
+            all_files.update(set(self.resources_created))
+            
+            
         finally:
             logging.debug(f'Deleting temporary directory {self.__temp_dir}')
             rm_tree(self.__temp_dir)
+            end_time = time()
+            logging.info(f"TR worker  finished in {end_time - start_time} seconds!")
 
-            logging.debug("TR worker finished!")
+    
+    def set_tr_files_to_process(self, src_file: Path, existent_tr: List[Tuple[Group, Path]]):
+        try:
+            logging.debug(f'Found verse file: {src_file}')
+            self.__book_tr_files.append(src_file)
+            self.__chapter_tr_files.append(src_file)
 
-    def find_existent_tr(self) -> List[Tuple[Group, Path]]:
+            # Extract necessary path parts
+            root_parts = self.__ftp_dir.parts
+            parts = src_file.parts[len(root_parts):]
+
+            lang = parts[0]
+            resource = parts[1]
+            book = parts[2]
+            chapter = parts[3]
+            media = parts[5]
+            quality = parts[6] if media == 'mp3' else ''
+            grouping = parts[7] if media == 'mp3' else parts[6]
+
+            regex = fr'{lang}\/{resource}\/{book}(?:\/{chapter})?\/' \
+                    fr'CONTENTS\/tr\/{media}(?:\/{quality})?\/{grouping}'
+
+            # Take out existing
+            for group, tr in existent_tr:
+                if not re.search(regex, str(tr)):
+                    continue
+
+                if group == Group.BOOK and src_file in self.__book_tr_files:
+                    logging.debug(f'Verse file {src_file} is excluded: exists in BOOK TR: {tr}')
+                    self.__book_tr_files.remove(src_file)
+                elif group == Group.CHAPTER and src_file in self.__chapter_tr_files:
+                    logging.debug(f'Verse file {src_file} is excluded: exists in CHAPTER TR: {tr}')
+                    self.__chapter_tr_files.remove(src_file)
+        except Exception as e:
+            logging.warning(str(e))
+        
+    def get_existent_tr_and_verses_to_process(self, all_files: set[Path]) -> Tuple[List[Tuple[Group, Path]], List[Path]]:
         """ Find tr files that exist in the remote directory """
-
         existent_tr = []
-        media = ['wav', 'mp3/hi', 'mp3/low']
-        for m in media:
-            for src_file in self.__ftp_dir.rglob(f'tr/{m}/verse/*.tr'):
-                match = re.match(self.__tr_regex, str(src_file))
-                if match.group(1) is not None:
-                    logging.debug(f'Found existent CHAPTER TR file: {src_file}')
-                    existent_tr.append((Group.CHAPTER, src_file))
-                else:
-                    logging.debug(f'Found existent BOOK TR file: {src_file}')
-                    existent_tr.append((Group.BOOK, src_file))
+        verse_files = []
+        verse_media = ['wav', 'mp3/hi', 'mp3/low']
+        for src_file in all_files:
+            # gather verse files: 
+            for m in verse_media:
+                if src_file.suffix == '.tr':
+                    continue
+                if not re.search(self.__verse_regex, str(src_file)):
+                    continue
+                if f'{m}/verse/' in str(src_file):
+                    verse_files.append(src_file)
+            # Gather existing tr files
+            match = re.match(self.__tr_regex, str(src_file))
+            if match.group(1) is not None:
+                logging.debug(f'Found existent CHAPTER TR file: {src_file}')
+                existent_tr.append((Group.CHAPTER, src_file))
+            else:
+                logging.debug(f'Found existent BOOK TR file: {src_file}')
+                existent_tr.append((Group.BOOK, src_file))
 
-        return existent_tr
+        return (existent_tr, verse_files)
 
     def group_files(self, files: List[Path], group: Group) -> Dict[str, List[Path]]:
         """ Group files into Book groups and Chapter groups """
@@ -150,17 +162,26 @@ class TrWorker:
 
     def create_chapter_trs(self):
         chapter_groups = self.group_files(self.__chapter_tr_files, Group.CHAPTER)
-        for key in chapter_groups:
+        for key in chapter_groups: 
             try:
-                self.create_tr_file(key, chapter_groups[key])
+                partial_create_tr = partial(self.create_tr_file, key)
+                self.thread_executor.map(
+                    partial_create_tr, 
+                    chapter_groups[key]
+                )
             except Exception as e:
                 logging.warning(str(e))
 
     def create_book_trs(self):
         book_groups = self.group_files(self.__book_tr_files, Group.BOOK)
+         # Spawn thread for each book; 
         for key in book_groups:
+            partial_create_tr = partial(self.create_tr_file, key)
             try:
-                self.create_tr_file(key, book_groups[key])
+                self.thread_executor.map(
+                    partial_create_tr,
+                    book_groups[key]
+                )
             except Exception as e:
                 logging.warning(str(e))
 

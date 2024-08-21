@@ -3,10 +3,14 @@ import logging
 import re
 from pydub import AudioSegment
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 from file_utils import init_temp_dir, rm_tree, copy_file, rel_path
 from constants import *
+from concurrent.futures import ThreadPoolExecutor
+from time import time
+from functools import partial
+
 
 
 class BookWorker:
@@ -21,81 +25,95 @@ class BookWorker:
 
         self.resources_created = []
         self.resources_deleted = []
+        self.thread_executor = ThreadPoolExecutor()
 
-    def execute(self):
+
+    def execute(self, all_files: set[Path]):
         """ Execute worker """
 
         logging.debug("Book worker started!")
 
+        start_time = time()
         try:
             self.clear_report()
             self.clear_cache()
             self.__temp_dir = init_temp_dir("book_worker_")
+            
+            (existent_books, verse_files) = self.find_existent_books_and_filter_to_verse_files(all_files)
 
-            existent_books = self.find_existent_books()
-
-            media = ['wav', 'mp3/hi', 'mp3/low']
-            for m in media:
-                for src_file in self.__ftp_dir.rglob(f'{m}/verse/*.*'):
-                    if src_file.suffix == '.tr':
-                        continue
-
-                    # Process verse files only
-                    if not re.search(self.__verse_regex, str(src_file)):
-                        continue
-
-                    logging.debug(f'Found verse file: {src_file}')
-
-                    self.__book_verse_files.append(src_file)
-
-                    # Extract necessary path parts
-                    root_parts = self.__ftp_dir.parts
-                    parts = src_file.parts[len(root_parts):]
-
-                    lang = parts[0]
-                    resource = parts[1]
-                    book = parts[2]
-                    media = parts[5]
-                    quality = parts[6] if media == 'mp3' else ''
-
-                    regex = fr'{lang}\/{resource}\/{book}\/' \
-                            fr'CONTENTS\/{media}(?:\/{quality})?\/book'
-
-                    for book in existent_books:
-                        if not re.search(regex, str(book)):
-                            continue
-
-                        if src_file in self.__book_verse_files:
-                            logging.debug(f'Verse file {src_file} is excluded: exists in BOOK: {book}')
-                            self.__book_verse_files.remove(src_file)
-
+            # Partially apply the existent_books argument to conform to fn siganture of thread executor map
+            set_book_files_partial = partial(self.populate_book_verse_files, existent_books)
+            self.thread_executor.map(set_book_files_partial, verse_files, existent_books)
+            
             # Create book files
             book_groups = self.group_book_files()
             for key in book_groups:
+                partial_create_book = partial(self.create_book_file, key)
                 try:
-                    self.create_book_file(key, book_groups[key])
+                    self.thread_executor.map(
+                        partial_create_book, #fn
+                        book_groups[key] #iterable
+                    )
                 except Exception as e:
                     logging.warning(str(e))
-        except Exception as e:
-            logging.warning(str(e))
+            # Even though last worker, still update set in case order changes
+            all_files.difference_update(set(self.resources_deleted))
+            all_files.update(set(self.resources_created))
         finally:
             logging.debug(f'Deleting temporary directory {self.__temp_dir}')
             rm_tree(self.__temp_dir)
+            end_time = time()
+            logging.info(f"Book worker  finished in {end_time - start_time} seconds!")
 
-            logging.debug("Book worker finished!")
-
-    def find_existent_books(self) -> List[Path]:
+    def find_existent_books_and_filter_to_verse_files(self, all_files: set[Path]) -> Tuple[List[Path], List[Path]]:
         """ Find book files that exist in the remote directory """
 
         existent_books = []
-        media = [('wav', 'wav'), ('mp3/hi', 'mp3'), ('mp3/low', 'mp3')]
-        for m, f in media:
-            for src_file in self.__ftp_dir.rglob(f'{m}/book/*.{f}'):
-                logging.debug(f'Found existent BOOK file: {src_file}')
-                existent_books.append(src_file)
+        verse_files = []
+        verse_media = ['wav', 'mp3/hi', 'mp3/low']
+        book_media = [('wav', 'wav'), ('mp3/hi', 'mp3'), ('mp3/low', 'mp3')]
+        for src_file in all_files:
+            # get verse files
+            for m in verse_media:
+                if not re.search(self.__verse_regex, str(src_file)):
+                    continue
+                if src_file.suffix == '.tr':
+                    continue
+                if f'{m}/verse/' in str(src_file):
+                    verse_files.append(src_file)
+            # check if matches book; 
+            for m, f in book_media:
+                if src_file.suffix == f'.{f}' and f'{m}/book/' in str(src_file):
+                    existent_books.append(src_file)
 
-        return existent_books
+        return (existent_books, verse_files)
 
+    def populate_book_verse_files(self, src_file: Path, existent_books: List[Path]):
+        logging.debug(f'Found verse file: {src_file}')
+
+        self.__book_verse_files.append(src_file)
+
+        # Extract necessary path parts
+        root_parts = self.__ftp_dir.parts
+        parts = src_file.parts[len(root_parts):]
+
+        lang = parts[0]
+        resource = parts[1]
+        book = parts[2]
+        media = parts[5]
+        quality = parts[6] if media == 'mp3' else ''
+
+        regex = fr'{lang}\/{resource}\/{book}\/' \
+                fr'CONTENTS\/{media}(?:\/{quality})?\/book'
+
+        for book in existent_books:
+            if not re.search(regex, str(book)):
+                continue
+
+            if src_file in self.__book_verse_files:
+                logging.debug(f'Verse file {src_file} is excluded: exists in BOOK: {book}')
+                self.__book_verse_files.remove(src_file)
+    
     def group_book_files(self) -> Dict[str, List[Path]]:
         """ Group files into book groups """
 
