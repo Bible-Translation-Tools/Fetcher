@@ -63,7 +63,7 @@ class TrWorker:
             logging.info(f"TR worker  finished in {end_time - start_time} seconds!")
 
     
-    def set_tr_files_to_process(self, src_file: Path, existent_tr: List[Tuple[Group, Path]]):
+    def set_tr_files_to_process(self, existent_tr: List[Tuple[Group, Path]], src_file: Path):
         try:
             logging.debug(f'Found verse file: {src_file}')
             self.__book_tr_files.append(src_file)
