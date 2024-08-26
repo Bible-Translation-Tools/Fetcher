@@ -12,7 +12,6 @@ from time import time
 from functools import partial
 
 
-
 class BookWorker:
 
     def __init__(self, input_dir: Path, verbose=False):
@@ -21,15 +20,14 @@ class BookWorker:
         self.verbose = verbose
 
         self.__book_verse_files = []
-        self.__verse_regex = r'_c[\d]+_v[\d]+(?:_t[\d]+)?\..*$'
+        self.__verse_regex = r"_c[\d]+_v[\d]+(?:_t[\d]+)?\..*$"
 
         self.resources_created = []
         self.resources_deleted = []
         self.thread_executor = ThreadPoolExecutor()
 
-
     def execute(self, all_files: set[Path]):
-        """ Execute worker """
+        """Execute worker"""
 
         logging.debug("Book worker started!")
 
@@ -38,21 +36,24 @@ class BookWorker:
             self.clear_report()
             self.clear_cache()
             self.__temp_dir = init_temp_dir("book_worker_")
-            
-            (existent_books, verse_files) = self.find_existent_books_and_filter_to_verse_files(all_files)
+
+            (existent_books, verse_files) = (
+                self.find_existent_books_and_filter_to_verse_files(all_files)
+            )
 
             # Partially apply the existent_books argument to conform to fn siganture of thread executor map
-            set_book_files_partial = partial(self.populate_book_verse_files, existent_books)
-            self.thread_executor.map(set_book_files_partial, verse_files, existent_books)
-            
+            set_book_files_partial = partial(
+                self.populate_book_verse_files, existent_books
+            )
+            self.thread_executor.map(set_book_files_partial, verse_files)
+
             # Create book files
             book_groups = self.group_book_files()
-            for key in book_groups:
-                partial_create_book = partial(self.create_book_file, key)
+            for dict_key in book_groups:
+                partial_create_book = partial(self.create_book_file, dict_key)
                 try:
                     self.thread_executor.map(
-                        partial_create_book, #fn
-                        book_groups[key] #iterable
+                        partial_create_book, book_groups[dict_key]  # fn  # iterable
                     )
                 except Exception as e:
                     logging.warning(f"exception in book worker: {e.with_traceback()}")
@@ -60,83 +61,88 @@ class BookWorker:
             all_files.difference_update(set(self.resources_deleted))
             all_files.update(set(self.resources_created))
         finally:
-            logging.debug(f'Deleting temporary directory {self.__temp_dir}')
+            logging.debug(f"Deleting temporary directory {self.__temp_dir}")
             rm_tree(self.__temp_dir)
             end_time = time()
             logging.info(f"Book worker  finished in {end_time - start_time} seconds!")
 
-    def find_existent_books_and_filter_to_verse_files(self, all_files: set[Path]) -> Tuple[List[Path], List[Path]]:
-        """ Find book files that exist in the remote directory """
+    def find_existent_books_and_filter_to_verse_files(
+        self, all_files: set[Path]
+    ) -> Tuple[List[Path], List[Path]]:
+        """Find book files that exist in the remote directory"""
 
         existent_books = []
         verse_files = []
-        verse_media = ['wav', 'mp3/hi', 'mp3/low']
-        book_media = [('wav', 'wav'), ('mp3/hi', 'mp3'), ('mp3/low', 'mp3')]
+        verse_media = ["wav", "mp3/hi", "mp3/low"]
+        book_media = [("wav", "wav"), ("mp3/hi", "mp3"), ("mp3/low", "mp3")]
         for src_file in all_files:
             # get verse files
             for m in verse_media:
                 if not re.search(self.__verse_regex, str(src_file)):
                     continue
-                if src_file.suffix == '.tr':
+                if src_file.suffix == ".tr":
                     continue
-                if f'{m}/verse/' in str(src_file):
+                if f"{m}/verse/" in str(src_file):
                     verse_files.append(src_file)
-            # check if matches book; 
+            # check if matches book;
             for m, f in book_media:
-                if src_file.suffix == f'.{f}' and f'{m}/book/' in str(src_file):
+                if src_file.suffix == f".{f}" and f"{m}/book/" in str(src_file):
                     existent_books.append(src_file)
 
         return (existent_books, verse_files)
 
-    def populate_book_verse_files(self, src_file: Path, existent_books: List[Path]):
-        logging.debug(f'Found verse file: {src_file}')
+    def populate_book_verse_files(self, existent_books: List[Path], src_file: Path):
+        logging.debug(f"Found verse file: {src_file}")
 
         self.__book_verse_files.append(src_file)
 
         # Extract necessary path parts
         root_parts = self.__ftp_dir.parts
-        parts = src_file.parts[len(root_parts):]
+        parts = src_file.parts[len(root_parts) :]
 
         lang = parts[0]
         resource = parts[1]
         book = parts[2]
         media = parts[5]
-        quality = parts[6] if media == 'mp3' else ''
+        quality = parts[6] if media == "mp3" else ""
 
-        regex = fr'{lang}\/{resource}\/{book}\/' \
-                fr'CONTENTS\/{media}(?:\/{quality})?\/book'
+        regex = (
+            rf"{lang}\/{resource}\/{book}\/" rf"CONTENTS\/{media}(?:\/{quality})?\/book"
+        )
 
         for book in existent_books:
             if not re.search(regex, str(book)):
                 continue
 
             if src_file in self.__book_verse_files:
-                logging.debug(f'Verse file {src_file} is excluded: exists in BOOK: {book}')
+                logging.debug(
+                    f"Verse file {src_file} is excluded: exists in BOOK: {book}"
+                )
                 self.__book_verse_files.remove(src_file)
-    
+
     def group_book_files(self) -> Dict[str, List[Path]]:
-        """ Group files into book groups """
+        """Group files into book groups"""
 
         dic = {}
         root_parts = self.__ftp_dir.parts
         for f in self.__book_verse_files:
             parent = f.parent
-            parts = parent.parts[len(root_parts):]
+            parts = parent.parts[len(root_parts) :]
 
             lang = parts[0]
             resource = parts[1]
             book = parts[2]
             media = parts[5]
-            quality = parts[6] if media == 'mp3' else ''
-            grouping = parts[7] if media == 'mp3' else parts[6]
+            quality = parts[6] if media == "mp3" else ""
+            grouping = parts[7] if media == "mp3" else parts[6]
 
             parts_dic = {
-                'lang': lang,
-                'resource': resource,
-                'book': book,
-                'media': media,
-                'quality': quality,
-                'grouping': grouping
+                "lang": lang,
+                "resource": resource,
+                "book": book,
+                "media": media,
+                "quality": quality,
+                "grouping": grouping,
             }
 
             key = json.dumps(parts_dic)
@@ -148,32 +154,32 @@ class BookWorker:
         return dic
 
     def create_book_file(self, dic: str, files: List[Path]):
-        """ Create book file and copy it to the remote directory"""
+        """Create book file and copy it to the remote directory"""
 
         parts = json.loads(dic)
 
-        lang = parts['lang']
-        resource = parts['resource']
-        book = parts['book']
-        media = parts['media']
-        quality = parts['quality']
+        lang = parts["lang"]
+        resource = parts["resource"]
+        book = parts["book"]
+        media = parts["media"]
+        quality = parts["quality"]
 
         remote_dir = self.__ftp_dir.joinpath(lang, resource, book, "CONTENTS")
 
         files.sort()
 
         # Create book file
-        logging.debug('Creating book file')
+        logging.debug("Creating book file")
 
-        book_name = f'{lang}_{resource}_{book}.{media}'
+        book_name = f"{lang}_{resource}_{book}.{media}"
         book = self.__temp_dir.joinpath(media, quality, book_name)
         book.parent.mkdir(parents=True, exist_ok=True)
 
         self.merge_audio(book, files, media, quality)
 
         # Copy book file to remote dir
-        logging.debug(f'Copying {book} to {remote_dir}')
-        t_file = copy_file(book, remote_dir, 'book', quality, media)
+        logging.debug(f"Copying {book} to {remote_dir}")
+        t_file = copy_file(book, remote_dir, "book", quality, media)
         self.resources_created.append(str(rel_path(t_file, self.__ftp_dir)))
 
         book.unlink()
@@ -186,13 +192,13 @@ class BookWorker:
             final_segment += file_segment
 
         # Bitrate values can be 64k, 128k, 320k, etc...
-        bitrate = f'{BITRATE_HIGH}k' if quality == 'hi' else f'{BITRATE_LOW}k'
+        bitrate = f"{BITRATE_HIGH}k" if quality == "hi" else f"{BITRATE_LOW}k"
         final_segment.export(target, media, bitrate=bitrate)
 
     def get_report(self) -> Dict[str, list]:
         report = {
             "resources_created": self.resources_created,
-            "resources_deleted": self.resources_deleted
+            "resources_deleted": self.resources_deleted,
         }
         return report
 
