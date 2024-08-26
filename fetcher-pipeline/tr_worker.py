@@ -120,7 +120,7 @@ class TrWorker:
             # gather verse, book and chapter files;
             for m in verse_media:
                 # check for verse regex and not .tr
-                if self.do_add_verse(self, m, src_file):
+                if self.do_add_verse(m, src_file):
                     verse_files.append(src_file)
                 #  check for
                 do_include_regex = rf"tr/{m}/verse/.*.tr"
