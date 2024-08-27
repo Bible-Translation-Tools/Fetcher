@@ -164,7 +164,7 @@ class BookWorker:
 
     def create_book_file(self, dic: str, files: List[Path]):
         """Create book file and copy it to the remote directory"""
-
+        logging.info(f"Book Worker: calling create_book_file with {dic}")
         parts = json.loads(dic)
 
         lang = parts["lang"]

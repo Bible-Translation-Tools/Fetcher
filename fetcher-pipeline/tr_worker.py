@@ -54,6 +54,7 @@ class TrWorker:
             # Partially apply the existent_tr argument so we can call fn sig of thread map of fn, iterable
             set_tr_files_partial = partial(self.set_tr_files_to_process, existent_tr)
             self.thread_executor.map(set_tr_files_partial, verse_files)
+
             # Each of these calls the thread executor process trs
             self.create_chapter_trs()
             self.create_book_trs()
@@ -148,7 +149,7 @@ class TrWorker:
         if (
             not src_file.suffix == ".tr"
             and not src_file.name == ".hash"
-            and not re.search(self.__verse_regex, str(src_file))
+            and re.search(self.__verse_regex, str(src_file))
             and f"{media}/verse/" in str(src_file)
         ):
             return True
