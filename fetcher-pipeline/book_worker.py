@@ -45,15 +45,18 @@ class BookWorker:
             set_book_files_partial = partial(
                 self.populate_book_verse_files, existent_books
             )
+             logging.info(
+                f"book_worker: Total num verse files: {len(self.__book_verse_files)}"
+            )
             self.thread_executor.map(set_book_files_partial, verse_files)
+            logging.info(
+                f"book_worker: Num verse files passed filters: {len(self.__book_verse_files)}.  "
+            )
 
             # Create book files
             book_groups = self.group_book_files()
-
+            logging.info(f"Book worker: Num book groups to create: {len(book_groups)}")
             for dict_key in book_groups:
-                logging.info(
-                    f"Book Worker: Creating books: Key: {dict_key}, Paths to create: {len(book_groups[dict_key])}"
-                )
                 partial_create_book = partial(self.create_book_file, dict_key)
                 try:
                     self.thread_executor.map(
@@ -133,7 +136,6 @@ class BookWorker:
 
         dic = {}
         root_parts = self.__ftp_dir.parts
-        logging.info(f"book worker: grouping {len(self.__book_verse_files)} files")
         for f in self.__book_verse_files:
             parent = f.parent
             parts = parent.parts[len(root_parts) :]
@@ -182,11 +184,10 @@ class BookWorker:
         book_name = f"{lang}_{resource}_{book}.{media}"
         book = self.__temp_dir.joinpath(media, quality, book_name)
         book.parent.mkdir(parents=True, exist_ok=True)
-
+        # Copy book file to remote dir
+        logging.info(f"Merging audio for {book}: Remote {remote_dir}")
         self.merge_audio(book, files, media, quality)
 
-        # Copy book file to remote dir
-        logging.info(f"Copying {book} to {remote_dir}")
         t_file = copy_file(book, remote_dir, "book", quality, media)
         self.resources_created.append(str(rel_path(t_file, self.__ftp_dir)))
 

@@ -190,10 +190,10 @@ class TrWorker:
 
     def create_chapter_trs(self):
         chapter_groups = self.group_files(self.__chapter_tr_files, Group.CHAPTER)
+        logging.info(
+            f"There are {self.__chapter_tr_files} chapter tr files which is {len(chapter_groups)} groups"
+        )
         for key in chapter_groups:
-            logging.info(
-                f"TR worker: key: {key}. create_chapter_trs to make: {len(chapter_groups[key])} "
-            )
             try:
                 partial_create_tr = partial(self.create_tr_file, key)
                 self.thread_executor.map(partial_create_tr, chapter_groups[key])
@@ -204,10 +204,10 @@ class TrWorker:
 
     def create_book_trs(self):
         book_groups = self.group_files(self.__book_tr_files, Group.BOOK)
+        logging.info(
+            f"There are {self.__book_tr_files} chapter tr files which is {len(book_groups)} groups"
+        )
         for key in book_groups:
-            logging.info(
-                f"TR worker: key: {key}. Num TR to make: {len(book_groups[key])} "
-            )
             partial_create_tr = partial(self.create_tr_file, key)
             try:
                 self.thread_executor.map(partial_create_tr, book_groups[key])
@@ -238,7 +238,6 @@ class TrWorker:
             )
         else:
             remote_dir = self.__ftp_dir.joinpath(lang, resource, book, "CONTENTS")
-
         for file in files:
             target_chapter = chapter
             if target_chapter is None:
@@ -259,7 +258,7 @@ class TrWorker:
             target_file.write_bytes(file.read_bytes())
 
         # Create TR file
-        logging.debug("Creating TR file")
+        logging.debug("Creating TR file at")
         create_tr(root_dir, self.verbose)
         tr = self.__temp_dir.joinpath("root.tr")
 
@@ -271,7 +270,7 @@ class TrWorker:
         tr.rename(new_tr)
 
         # Copy tr file to remote dir
-        logging.debug(f"Copying {new_tr} to {remote_dir}")
+        logging.info(f"Copying {new_tr} to {remote_dir}")
         t_file = copy_file(new_tr, remote_dir, grouping, quality, media)
         self.resources_created.append(str(rel_path(t_file, self.__ftp_dir)))
 
