@@ -50,6 +50,7 @@ class TrWorker:
             (existent_tr, verse_files) = self.get_existent_tr_and_verses_to_process(
                 all_files
             )
+            logging.info(f"existent tr are {existent_tr}")
             # Partially apply the existent_tr argument so we can call fn sig of thread map of fn, iterable
             set_tr_files_partial = partial(self.set_tr_files_to_process, existent_tr)
             self.thread_executor.map(set_tr_files_partial, verse_files)
@@ -146,6 +147,7 @@ class TrWorker:
     def do_add_verse(self, media: str, src_file: Path):
         if (
             not src_file.suffix == ".tr"
+            and not src_file.name == ".hash"
             and not re.search(self.__verse_regex, str(src_file))
             and f"{media}/verse/" in str(src_file)
         ):

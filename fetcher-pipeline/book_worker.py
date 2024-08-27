@@ -40,13 +40,11 @@ class BookWorker:
             (existent_books, verse_files) = (
                 self.find_existent_books_and_filter_to_verse_files(all_files)
             )
+            logging.info(f"existent books are {existent_books}")
 
             # Partially apply the existent_books argument to conform to fn siganture of thread executor map
             set_book_files_partial = partial(
                 self.populate_book_verse_files, existent_books
-            )
-            logging.info(
-                f"book_worker: Total num verse files: {len(self.__book_verse_files)}"
             )
             self.thread_executor.map(set_book_files_partial, verse_files)
             logging.info(
@@ -91,7 +89,7 @@ class BookWorker:
             for m in verse_media:
                 if not re.search(self.__verse_regex, str(src_file)):
                     continue
-                if src_file.suffix == ".tr":
+                if src_file.suffix == ".tr" or src_file.name == ".hash":
                     continue
                 if f"{m}/verse/" in str(src_file):
                     verse_files.append(src_file)
