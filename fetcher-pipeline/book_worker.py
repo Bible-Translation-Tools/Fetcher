@@ -45,7 +45,7 @@ class BookWorker:
             set_book_files_partial = partial(
                 self.populate_book_verse_files, existent_books
             )
-             logging.info(
+            logging.info(
                 f"book_worker: Total num verse files: {len(self.__book_verse_files)}"
             )
             self.thread_executor.map(set_book_files_partial, verse_files)
