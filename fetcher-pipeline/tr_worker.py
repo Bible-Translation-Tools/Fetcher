@@ -40,6 +40,7 @@ class TrWorker:
     def execute(self, all_files: set[Path]):
         """Execute worker"""
         start_time = time()
+        self.thread_executor = ThreadPoolExecutor()
         logging.info("TR worker started!")
         try:
             self.clear_report()
@@ -58,17 +59,21 @@ class TrWorker:
             all_files.difference_update(set(self.resources_deleted))
             all_files.update(set(self.resources_created))
 
+        except Exception as e:
+            logging.warning(f"exception in tr_worker: {e.with_traceback()}")
+
         finally:
             logging.debug(f"Deleting temporary directory {self.__temp_dir}")
             rm_tree(self.__temp_dir)
             end_time = time()
+            self.thread_executor.shutdown(wait=True)
             logging.info(f"TR worker  finished in {end_time - start_time} seconds!")
 
     def set_tr_files_to_process(
         self, existent_tr: List[Tuple[Group, Path]], src_file: Path
     ):
         try:
-            logging.debug(f"Found verse file: {src_file}")
+            logging.debug(f"TR Worker: Found verse file: {src_file}")
             self.__book_tr_files.append(src_file)
             self.__chapter_tr_files.append(src_file)
 
@@ -128,10 +133,12 @@ class TrWorker:
                     continue
                 match = re.match(self.__tr_regex, str(src_file))
                 if match.group(1) is not None:
-                    logging.debug(f"Found existent CHAPTER TR file: {src_file}")
+                    logging.debug(
+                        f"TR Worker: Found existent CHAPTER TR file: {src_file}"
+                    )
                     existent_tr.append((Group.CHAPTER, src_file))
                 else:
-                    logging.debug(f"Found existent BOOK TR file: {src_file}")
+                    logging.debug(f"TR Worker: Found existent BOOK TR file: {src_file}")
                     existent_tr.append((Group.BOOK, src_file))
 
         return (existent_tr, verse_files)

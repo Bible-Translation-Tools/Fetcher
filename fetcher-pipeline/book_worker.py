@@ -30,8 +30,8 @@ class BookWorker:
         """Execute worker"""
 
         logging.debug("Book worker started!")
-
         start_time = time()
+        self.thread_executor = ThreadPoolExecutor()
         try:
             self.clear_report()
             self.clear_cache()
@@ -60,10 +60,14 @@ class BookWorker:
             # Even though last worker, still update set in case order changes
             all_files.difference_update(set(self.resources_deleted))
             all_files.update(set(self.resources_created))
+
+        except Exception as e:
+            logging.warning(f"exception in book worker: {e.with_traceback()}")
         finally:
             logging.debug(f"Deleting temporary directory {self.__temp_dir}")
             rm_tree(self.__temp_dir)
             end_time = time()
+            self.thread_executor.shutdown(wait=True)
             logging.info(f"Book worker  finished in {end_time - start_time} seconds!")
 
     def find_existent_books_and_filter_to_verse_files(
@@ -92,7 +96,7 @@ class BookWorker:
         return (existent_books, verse_files)
 
     def populate_book_verse_files(self, existent_books: List[Path], src_file: Path):
-        logging.debug(f"Found verse file: {src_file}")
+        logging.debug(f"Book Worker: Found verse file: {src_file}")
 
         self.__book_verse_files.append(src_file)
 

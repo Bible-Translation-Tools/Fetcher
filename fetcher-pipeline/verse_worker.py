@@ -10,14 +10,13 @@ from time import time
 from concurrent.futures import ThreadPoolExecutor
 
 
-
 class VerseWorker:
 
     def __init__(self, input_dir: Path, verbose=False):
         self.__ftp_dir = input_dir
         self.__temp_dir = None
 
-        self.__verse_regex = r'_c[\d]+_v[\d]+(?:-[\d]+)?(?:_t[\d]+)?\..*$'
+        self.__verse_regex = r"_c[\d]+_v[\d]+(?:-[\d]+)?(?:_t[\d]+)?\..*$"
 
         self.verbose = verbose
 
@@ -26,85 +25,91 @@ class VerseWorker:
         self.thread_executor = ThreadPoolExecutor()
 
     def execute(self, all_files: set[Path]):
-        """ Execute worker """
+        """Execute worker"""
         start_time = time()
         logging.info("Verse worker started!")
+        self.thread_executor = ThreadPoolExecutor()
         self.clear_report()
         self.__temp_dir = init_temp_dir("verse_worker_")
         files_to_process = {path for path in all_files if path.suffix == ".wav"}
         self.thread_executor.map(self.process_verse, files_to_process)
         all_files.difference_update(set(self.resources_deleted))
         all_files.update(set(self.resources_created))
-        logging.info(f"removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files")
-        logging.debug(f'Deleting temporary directory {self.__temp_dir}')
+        logging.info(
+            f"removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files"
+        )
+        logging.debug(f"Deleting temporary directory {self.__temp_dir}")
         rm_tree(self.__temp_dir)
         end_time = time()
+        self.thread_executor.shutdown(wait=True)
         logging.info(f"Verse worker finished in {end_time - start_time} seconds!")
 
-    def include_file(self, file:Path) -> bool:
+    def include_file(self, file: Path) -> bool:
         return re.search(self.__verse_regex, str(file))
+
     def process_verse(self, src_file):
         try:
             if not self.include_file(src_file):
                 return
-            logging.debug(f'Found verse file: {src_file}')
-            remote_dir = self.__ftp_dir.joinpath(lang, resource, book, chapter, "CONTENTS")
-            mp3_exists = check_file_exists(src_file, remote_dir, 'mp3', grouping)
-            cue_exists = check_file_exists(src_file, remote_dir, 'cue', grouping)
+            logging.debug(f"Verse Worker: Found verse file: {src_file}")
+            remote_dir = self.__ftp_dir.joinpath(
+                lang, resource, book, chapter, "CONTENTS"
+            )
+            mp3_exists = check_file_exists(src_file, remote_dir, "mp3", grouping)
+            cue_exists = check_file_exists(src_file, remote_dir, "cue", grouping)
 
             if mp3_exists and cue_exists:
-                logging.debug(f'Files exist. Skipping...')
+                logging.debug(f"Files exist. Skipping...")
                 return
-            
+
             # Extract necessary path parts
             root_parts = self.__ftp_dir.parts
-            parts = src_file.parts[len(root_parts):]
+            parts = src_file.parts[len(root_parts) :]
             lang = parts[0]
             resource = parts[1]
             book = parts[2]
             chapter = parts[3]
             media = parts[5]
-            grouping = parts[7] if media == 'mp3' else parts[6]
+            grouping = parts[7] if media == "mp3" else parts[6]
 
-            target_dir = self.__temp_dir.joinpath(lang, resource, book, chapter, grouping)
+            target_dir = self.__temp_dir.joinpath(
+                lang, resource, book, chapter, grouping
+            )
             target_dir.mkdir(parents=True, exist_ok=True)
             target_file = target_dir.joinpath(src_file.name)
-            
+
             # Copy source file to temp dir
-            logging.debug(f'Copying file {src_file} to {target_file}')
+            logging.debug(f"Copying file {src_file} to {target_file}")
             target_file.write_bytes(src_file.read_bytes())
 
             # Convert verse into mp3
-            self.convert_verse_wav(target_file, remote_dir, grouping, 'hi')
-            self.convert_verse_wav(target_file, remote_dir, grouping, 'low')
+            self.convert_verse_wav(target_file, remote_dir, grouping, "hi")
+            self.convert_verse_wav(target_file, remote_dir, grouping, "low")
         except Exception as e:
             logging.warning(f"exception in verse_worker: {e.with_traceback()}")
-        
 
-    def convert_verse_wav(self, verse_file: Path, remote_dir: Path, grouping: str, quality: str):
-        """ Convert verse wav file and copy to remote directory """
+    def convert_verse_wav(
+        self, verse_file: Path, remote_dir: Path, grouping: str, quality: str
+    ):
+        """Convert verse wav file and copy to remote directory"""
 
-        if verse_file.suffix != '.wav':
+        if verse_file.suffix != ".wav":
             pass
 
-        bitrate = BITRATE_HIGH if quality == 'hi' else BITRATE_LOW
+        bitrate = BITRATE_HIGH if quality == "hi" else BITRATE_LOW
 
-        logging.debug(f'Converting verse: {verse_file}')
+        logging.debug(f"Converting verse: {verse_file}")
         convert_to_mp3(verse_file, bitrate, False, self.verbose)
 
         # Copy converted verse file (mp3 and cue)
-        mp3_file = verse_file.with_suffix('.mp3')
-        logging.debug(
-            f'Copying verse mp3 {mp3_file} into {remote_dir}'
-        )
+        mp3_file = verse_file.with_suffix(".mp3")
+        logging.debug(f"Copying verse mp3 {mp3_file} into {remote_dir}")
         if mp3_file.exists():
             m_file = copy_file(mp3_file, remote_dir, grouping, quality)
             self.resources_created.append(str(rel_path(m_file, self.__ftp_dir)))
 
-        cue_file = verse_file.with_suffix('.cue')
-        logging.debug(
-            f'Copying verse cue {cue_file} into {remote_dir}'
-        )
+        cue_file = verse_file.with_suffix(".cue")
+        logging.debug(f"Copying verse cue {cue_file} into {remote_dir}")
         if cue_file.exists():
             c_file = copy_file(cue_file, remote_dir, grouping)
             self.resources_created.append(str(rel_path(c_file, self.__ftp_dir)))
@@ -112,7 +117,7 @@ class VerseWorker:
     def get_report(self) -> Dict[str, list]:
         report = {
             "resources_created": self.resources_created,
-            "resources_deleted": self.resources_deleted
+            "resources_deleted": self.resources_deleted,
         }
         return report
 
