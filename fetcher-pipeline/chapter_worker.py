@@ -38,8 +38,8 @@ class ChapterWorker:
     def execute(self, all_files: set[Path]):
         """Execute worker"""
         # initialize a new one if needed due to explicit shutdowns
-        self.thread_executor = ThreadPoolExecutor()
         start_time = time()
+        self.thread_executor = ThreadPoolExecutor()
         logging.info("Chapter worker started!")
         self.clear_report()
         self.__temp_dir = init_temp_dir("chapter_worker_")

@@ -191,6 +191,9 @@ class TrWorker:
     def create_chapter_trs(self):
         chapter_groups = self.group_files(self.__chapter_tr_files, Group.CHAPTER)
         for key in chapter_groups:
+            logging.info(
+                f"TR worker: key: {key}. create_chapter_trs to make: {len(chapter_groups[key])} "
+            )
             try:
                 partial_create_tr = partial(self.create_tr_file, key)
                 self.thread_executor.map(partial_create_tr, chapter_groups[key])
@@ -201,8 +204,10 @@ class TrWorker:
 
     def create_book_trs(self):
         book_groups = self.group_files(self.__book_tr_files, Group.BOOK)
-        # Spawn thread for each book;
         for key in book_groups:
+            logging.info(
+                f"TR worker: key: {key}. Num TR to make: {len(book_groups[key])} "
+            )
             partial_create_tr = partial(self.create_tr_file, key)
             try:
                 self.thread_executor.map(partial_create_tr, book_groups[key])
