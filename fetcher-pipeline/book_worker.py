@@ -166,29 +166,38 @@ class BookWorker:
         """Create book file and copy it to the remote directory"""
         logging.info(f"Book Worker: calling create_book_file with {dic}")
         parts = json.loads(dic)
-
+        logging.info(f"loaded {parts}")
         lang = parts["lang"]
         resource = parts["resource"]
         book = parts["book"]
         media = parts["media"]
         quality = parts["quality"]
-
+        logging.info(f"parsed out {lang}, {resource}, {book}, {media}, {quality}, {media}  ")
         remote_dir = self.__ftp_dir.joinpath(lang, resource, book, "CONTENTS")
+        logging.info(f"remote dir is {remote_dir}")
+        logging.info(f"sorting the files")
 
         files.sort()
+        logging.info(f"files are sorted")
 
         # Create book file
 
         book_name = f"{lang}_{resource}_{book}.{media}"
+        logging.info(f"book name is {book_name}")
         book = self.__temp_dir.joinpath(media, quality, book_name)
+        logging.info(f"book path is {str(book)}")
         book.parent.mkdir(parents=True, exist_ok=True)
         # Copy book file to remote dir
         logging.info(f"Merging audio for {book}: Remote {remote_dir}")
         self.merge_audio(book, files, media, quality)
 
+        logging.info(f"audio has been merged")
         t_file = copy_file(book, remote_dir, "book", quality, media)
+
+        logging.info(f"t file is {t_file}")
         self.resources_created.append(str(rel_path(t_file, self.__ftp_dir)))
 
+        logging.info(f"unlinking the book")
         book.unlink()
 
     @staticmethod

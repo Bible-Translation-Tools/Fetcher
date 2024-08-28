@@ -194,7 +194,7 @@ class TrWorker:
     def create_chapter_trs(self):
         chapter_groups = self.group_files(self.__chapter_tr_files, Group.CHAPTER)
         logging.info(
-            f"There are {self.__chapter_tr_files} chapter tr files which is {len(chapter_groups)} groups"
+            f"There are {len(chapter_groups)} groups of tr files"
         )
         for key in chapter_groups:
             try:
@@ -222,8 +222,9 @@ class TrWorker:
     def create_tr_file(self, dic: str, files: List[Path]):
         """Create tr file and copy it to the remote directory"""
 
+        logging.info(f"Calling create tr file with {dic}")
         parts = json.loads(dic)
-
+        logging.info(f"Loaded the parts: {parts}")
         lang = parts["lang"]
         resource = parts["resource"]
         book = parts["book"]
@@ -231,16 +232,19 @@ class TrWorker:
         media = parts["media"]
         quality = parts["quality"]
         grouping = parts["grouping"]
-
+        logging.info(f"creating the root_dir")
         root_dir = self.__temp_dir.joinpath("root")
+        logging.info(f"creating the target dir")
         target_dir = root_dir.joinpath(lang, resource, book)
 
+        logging.info(f"target dir is {target_dir}")
         if chapter is not None:
             remote_dir = self.__ftp_dir.joinpath(
                 lang, resource, book, chapter, "CONTENTS"
             )
         else:
             remote_dir = self.__ftp_dir.joinpath(lang, resource, book, "CONTENTS")
+        logging.info(f"remote dir is {remote_dir}")
         for file in files:
             target_chapter = chapter
             if target_chapter is None:
@@ -252,15 +256,18 @@ class TrWorker:
             target_chapter_dir = target_dir.joinpath(
                 self.zero_pad_chapter(target_chapter, book)
             )
+            logging.info(f"tr_worker: target_chapter_dir is {target_chapter_dir}")
             target_chapter_dir.mkdir(parents=True, exist_ok=True)
 
             target_file = target_chapter_dir.joinpath(file.name)
-
+            logging.info(f"tr_worker: target_file is {target_file}")
             # Copy source file to temp dir
             logging.debug(f"Copying file {file} to {target_file}")
             target_file.write_bytes(file.read_bytes())
 
+
         # Create TR file
+        logging.info(f"tr_worker: creating tr file at {root_dir}")
         logging.debug("Creating TR file at")
         create_tr(root_dir, self.verbose)
         tr = self.__temp_dir.joinpath("root.tr")
