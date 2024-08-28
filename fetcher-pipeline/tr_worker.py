@@ -40,7 +40,8 @@ class TrWorker:
     def execute(self, all_files: set[Path]):
         """Execute worker"""
         start_time = time()
-        self.thread_executor = ThreadPoolExecutor()
+        # debugging, so just use one max worker
+        self.thread_executor = ThreadPoolExecutor(max_workers=1)
         logging.info("TR worker started!")
         try:
             self.clear_report()
@@ -50,7 +51,7 @@ class TrWorker:
             (existent_tr, verse_files) = self.get_existent_tr_and_verses_to_process(
                 all_files
             )
-            logging.info(f"existent tr are {existent_tr}")
+            logging.info(f"Existen TR length is  {len(existent_tr)}")
             # Partially apply the existent_tr argument so we can call fn sig of thread map of fn, iterable
             set_tr_files_partial = partial(self.set_tr_files_to_process, existent_tr)
             self.thread_executor.map(set_tr_files_partial, verse_files)
@@ -193,9 +194,7 @@ class TrWorker:
 
     def create_chapter_trs(self):
         chapter_groups = self.group_files(self.__chapter_tr_files, Group.CHAPTER)
-        logging.info(
-            f"There are {len(chapter_groups)} groups of tr files"
-        )
+        logging.info(f"There are {len(chapter_groups)} groups of tr files")
         for key in chapter_groups:
             try:
                 partial_create_tr = partial(self.create_tr_file, key)
@@ -232,19 +231,19 @@ class TrWorker:
         media = parts["media"]
         quality = parts["quality"]
         grouping = parts["grouping"]
-        logging.info(f"creating the root_dir")
+        logging.info(f"tr_worker_log: creating the root_dir")
         root_dir = self.__temp_dir.joinpath("root")
-        logging.info(f"creating the target dir")
+        logging.info(f"tr_worker_log: creating the target dir")
         target_dir = root_dir.joinpath(lang, resource, book)
 
-        logging.info(f"target dir is {target_dir}")
+        logging.info(f"tr_worker_log: target dir is {target_dir}")
         if chapter is not None:
             remote_dir = self.__ftp_dir.joinpath(
                 lang, resource, book, chapter, "CONTENTS"
             )
         else:
             remote_dir = self.__ftp_dir.joinpath(lang, resource, book, "CONTENTS")
-        logging.info(f"remote dir is {remote_dir}")
+        logging.info(f"tr_worker_log: remote dir is {remote_dir}")
         for file in files:
             target_chapter = chapter
             if target_chapter is None:
@@ -256,18 +255,17 @@ class TrWorker:
             target_chapter_dir = target_dir.joinpath(
                 self.zero_pad_chapter(target_chapter, book)
             )
-            logging.info(f"tr_worker: target_chapter_dir is {target_chapter_dir}")
+            logging.info(f"tr_worker_log: target_chapter_dir is {target_chapter_dir}")
             target_chapter_dir.mkdir(parents=True, exist_ok=True)
 
             target_file = target_chapter_dir.joinpath(file.name)
-            logging.info(f"tr_worker: target_file is {target_file}")
+            logging.info(f"tr_worker_log: target_file is {target_file}")
             # Copy source file to temp dir
-            logging.debug(f"Copying file {file} to {target_file}")
+            logging.debug(f"tr_worker_log: Copying file {file} to {target_file}")
             target_file.write_bytes(file.read_bytes())
 
-
         # Create TR file
-        logging.info(f"tr_worker: creating tr file at {root_dir}")
+        logging.info(f"tr_worker_log: creating tr file at {root_dir}")
         logging.debug("Creating TR file at")
         create_tr(root_dir, self.verbose)
         tr = self.__temp_dir.joinpath("root.tr")
@@ -285,6 +283,7 @@ class TrWorker:
         self.resources_created.append(str(rel_path(t_file, self.__ftp_dir)))
 
         rm_tree(root_dir)
+        logging.info(f"Deleting {new_tr}")
         new_tr.unlink()
 
     @staticmethod

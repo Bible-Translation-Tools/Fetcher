@@ -24,7 +24,8 @@ class BookWorker:
 
         self.resources_created = []
         self.resources_deleted = []
-        self.thread_executor = ThreadPoolExecutor()
+        # debugging, so just use one max worker
+        self.thread_executor = ThreadPoolExecutor(max_workers=1)
 
     def execute(self, all_files: set[Path]):
         """Execute worker"""
@@ -40,7 +41,7 @@ class BookWorker:
             (existent_books, verse_files) = (
                 self.find_existent_books_and_filter_to_verse_files(all_files)
             )
-            logging.info(f"existent books are {existent_books}")
+            logging.info(f"book_worker_log: existent books are {existent_books}")
 
             # Partially apply the existent_books argument to conform to fn siganture of thread executor map
             set_book_files_partial = partial(
@@ -48,12 +49,14 @@ class BookWorker:
             )
             self.thread_executor.map(set_book_files_partial, verse_files)
             logging.info(
-                f"book_worker: Num verse files passed filters: {len(self.__book_verse_files)}.  "
+                f"book_worker_log: Num verse files passed filters: {len(self.__book_verse_files)}.  "
             )
 
             # Create book files
             book_groups = self.group_book_files()
-            logging.info(f"Book worker: Num book groups to create: {len(book_groups)}")
+            logging.info(
+                f"book_worker_log: Num book groups to create: {len(book_groups)}"
+            )
             for dict_key in book_groups:
                 partial_create_book = partial(self.create_book_file, dict_key)
                 try:
@@ -172,7 +175,9 @@ class BookWorker:
         book = parts["book"]
         media = parts["media"]
         quality = parts["quality"]
-        logging.info(f"parsed out {lang}, {resource}, {book}, {media}, {quality}, {media}  ")
+        logging.info(
+            f"parsed out {lang}, {resource}, {book}, {media}, {quality}, {media}  "
+        )
         remote_dir = self.__ftp_dir.joinpath(lang, resource, book, "CONTENTS")
         logging.info(f"remote dir is {remote_dir}")
         logging.info(f"sorting the files")
@@ -181,7 +186,6 @@ class BookWorker:
         logging.info(f"files are sorted")
 
         # Create book file
-
         book_name = f"{lang}_{resource}_{book}.{media}"
         logging.info(f"book name is {book_name}")
         book = self.__temp_dir.joinpath(media, quality, book_name)
