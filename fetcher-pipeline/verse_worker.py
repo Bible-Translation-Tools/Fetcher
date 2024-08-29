@@ -35,7 +35,13 @@ class VerseWorker:
             self.clear_report()
             self.__temp_dir = init_temp_dir("verse_worker_")
             files_to_process = {path for path in all_files if path.suffix == ".wav"}
-            self.thread_executor.map(self.process_verse, files_to_process)
+            verses_filtered = [
+                path for path in files_to_process if self.include_file(path)
+            ]
+            logging.info(
+                f"starting process_verse with {len(verses_filtered) } verses to process"
+            )
+            self.thread_executor.map(self.process_verse, verses_filtered)
         except Exception as e:
             traceback.print_exc()
         finally:
@@ -56,8 +62,6 @@ class VerseWorker:
     def process_verse(self, src_file):
         # exception handling in here and not only at top since this runs in multiple threads
         try:
-            if not self.include_file(src_file):
-                return
             logging.debug(f"Verse Worker: Found verse file: {src_file}")
 
             # Extract necessary path parts

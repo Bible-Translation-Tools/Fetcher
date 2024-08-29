@@ -45,9 +45,9 @@ class ChapterWorker:
             logging.info("Chapter worker started!")
             self.clear_report()
             self.__temp_dir = init_temp_dir("chapter_worker_")
-            files_to_process = {path for path in all_files if path.suffix == ".wav"}
+            files_to_process = {path for path in all_files if self.include_file(path)}
             logging.info(
-                f"starting process_chapter with {self.thread_executor._max_workers} max possible workers"
+                f"chapter_worker: starting process_chapter with {self.thread_executor._max_workers} max possible workers and {len(files_to_process)} chapter files to process"
             )
             self.thread_executor.map(self.process_chapter, files_to_process)
 
@@ -69,14 +69,11 @@ class ChapterWorker:
         return
 
     def include_file(self, file: Path) -> bool:
-        return re.search(self.__chapter_regex, str(file))
+        return re.search(self.__chapter_regex, str(file)) and file.suffix == ".wav"
 
     def process_chapter(self, src_file: Path):
         # catch exceptions here due to running in separate threads.
         try:
-            if not self.include_file(src_file):
-                return
-
             changed = self.check_file_changed(src_file)
             if not changed:
                 logging.debug(f"Chapter {src_file} has not been changed. Skipping...")

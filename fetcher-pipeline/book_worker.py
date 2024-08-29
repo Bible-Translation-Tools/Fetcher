@@ -43,12 +43,9 @@ class BookWorker:
                 self.find_existent_books_and_filter_to_verse_files(all_files)
             )
 
-            # Partially apply the existent_books argument to conform to fn siganture of thread executor map
-            set_book_files_partial = partial(
-                self.populate_book_verse_files, existent_books
-            )
-            # log self.__book_verse_files
-            self.thread_executor.map(set_book_files_partial, verse_files)
+            # Can't do these in parallel cause it calls a list.remove based on what's in the existent TR, which could cause a race condition if if thinks something is in the list, but soemthing else takes it out first.
+            for file in verse_files:
+                self.populate_book_verse_files(existent_books, file)
             logging.info(
                 f"book_worker_log: Num verse files passed filters: {len(self.__book_verse_files)}.  "
             )

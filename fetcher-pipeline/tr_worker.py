@@ -52,9 +52,9 @@ class TrWorker:
             (existent_tr, verse_files) = self.get_existent_tr_and_verses_to_process(
                 all_files
             )
-            # Partially apply the existent_tr argument so we can call fn sig of thread map of fn, iterable
-            set_tr_files_partial = partial(self.set_tr_files_to_process, existent_tr)
-            self.thread_executor.map(set_tr_files_partial, verse_files)
+            # Can't do these in parallel cause it calls a list.remove based on what's in the existent TR, which could cause a race condition if if thinks something is in the list, but soemthing else takes it out first. This fn will decide the __book_tr_files and __chapter_tr_files needing processing
+            for file in verse_files:
+                self.set_tr_files_to_process(existent_tr, file)
 
             # Each of these calls the thread executor process trs
             self.create_chapter_trs()
@@ -207,12 +207,9 @@ class TrWorker:
 
     def create_book_trs(self):
         book_groups = self.group_files(self.__book_tr_files, Group.BOOK)
-        logging.info(
-            f"There are {len(book_groups)} groups of chapter tr files to create"
-        )
+        logging.info(f"There are {len(book_groups)} groups of book tr files to create")
         self.thread_executor.map(self.create_tr_file, book_groups)
 
-    # todo: N arity allows us call with signature of map fn(fn, iterable) and still pass multiple files for each op
     def create_tr_file(self, info: Tuple[str, List[Path]]):
         """Create tr file and copy it to the remote directory"""
         # runs in another thread, so exceptions don't bubble.  Own exception handling here
@@ -253,7 +250,6 @@ class TrWorker:
                 target_file.write_bytes(file.read_bytes())
 
             # Create TR file
-
             logging.debug("Creating TR file")
             create_tr(root_dir, self.verbose)
             tr = self.__temp_dir.joinpath("root.tr")
