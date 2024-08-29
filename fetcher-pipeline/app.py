@@ -7,6 +7,7 @@ from argparse import Namespace
 from pathlib import Path
 import sys
 from time import sleep, time
+import traceback
 from typing import Tuple, List
 from datetime import datetime
 from urllib.parse import urljoin
@@ -73,9 +74,9 @@ class App:
             )
             if report is not None:
                 time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                logging.error(f"Fetcher Pipeline Report {time}", extra=report)
+                logging.info(f"Fetcher Pipeline Report {time}", extra=report)
             self.send_messages_to_queue(self.message_queue_exclude_args)
-            # free all_files from memory while sleeping for next run;
+            # free all_files from memory while sleeping for next run, but also to get a fresh set in case anythign updated.
             all_files.clear()
             sleep(wait_timer)
 
@@ -88,7 +89,10 @@ class App:
             f"Elapsed time to glob all into a set files: {end_time - start_time}"
         )
         logging.info(f"Total number of files: {len(all_files)}")
-        logging.info(f"Size in memory: {sys.getsizeof(all_files)} bytes")
+        size = sys.getsizeof(all_files)
+        logging.info(
+            f"Size of paths in memory: {size / 1000 } KB or {size / 1000 / 1000} MB"
+        )
         return all_files
 
     @staticmethod
@@ -206,9 +210,8 @@ class App:
             else:
                 logging.info("No messages to send")
         except Exception as e:
-            logging.critical(
-                f"Error sending messages to queue: {e.with_traceback()} {e}"
-            )
+            logging.critical(f"Error sending messages to queue:{e}")
+            traceback.print_exc()
             # blow up. If we can't send messages to bus, data not made availble in api.
             sys.exit(1)
 

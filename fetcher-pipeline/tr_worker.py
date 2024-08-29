@@ -4,6 +4,7 @@ import re
 from enum import Enum
 from pathlib import Path
 from typing import List, Tuple, Dict
+import traceback
 
 from file_utils import init_temp_dir, rm_tree, copy_file, rel_path
 from process_tools import create_tr
@@ -41,7 +42,7 @@ class TrWorker:
         """Execute worker"""
         start_time = time()
         # debugging, so just use one max worker
-        self.thread_executor = ThreadPoolExecutor(max_workers=1)
+        self.thread_executor = ThreadPoolExecutor()
         logging.info("TR worker started!")
         try:
             self.clear_report()
@@ -51,7 +52,6 @@ class TrWorker:
             (existent_tr, verse_files) = self.get_existent_tr_and_verses_to_process(
                 all_files
             )
-            logging.info(f"Existen TR length is  {len(existent_tr)}")
             # Partially apply the existent_tr argument so we can call fn sig of thread map of fn, iterable
             set_tr_files_partial = partial(self.set_tr_files_to_process, existent_tr)
             self.thread_executor.map(set_tr_files_partial, verse_files)
@@ -59,17 +59,20 @@ class TrWorker:
             # Each of these calls the thread executor process trs
             self.create_chapter_trs()
             self.create_book_trs()
-            all_files.difference_update(set(self.resources_deleted))
-            all_files.update(set(self.resources_created))
 
         except Exception as e:
-            logging.warning(f"exception in tr_worker: {e.with_traceback()}")
+            traceback.print_exc()
 
         finally:
             logging.debug(f"Deleting temporary directory {self.__temp_dir}")
             rm_tree(self.__temp_dir)
             end_time = time()
             self.thread_executor.shutdown(wait=True)
+            all_files.difference_update(set(self.resources_deleted))
+            all_files.update(set(self.resources_created))
+            logging.info(
+                f"tr_worker: removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files"
+            )
             logging.info(f"TR worker  finished in {end_time - start_time} seconds!")
 
     def set_tr_files_to_process(
@@ -113,7 +116,8 @@ class TrWorker:
                     )
                     self.__chapter_tr_files.remove(src_file)
         except Exception as e:
-            logging.warning(f"exception in tr_worker: {e.with_traceback()}")
+            logging.warning(f"exception in tr_worker: {e}")
+            traceback.print_exc()
 
     def get_existent_tr_and_verses_to_process(
         self, all_files: set[Path]
@@ -155,7 +159,9 @@ class TrWorker:
         ):
             return True
 
-    def group_files(self, files: List[Path], group: Group) -> Dict[str, List[Path]]:
+    def group_files(
+        self, files: List[Path], group: Group
+    ) -> List[Tuple[str, List[Path]]]:
         """Group files into Book groups and Chapter groups"""
 
         dic = {}
@@ -189,62 +195,87 @@ class TrWorker:
             if key not in dic:
                 dic[key] = []
             dic[key].append(f)
-
-        return dic
+        dic_tuple = list(dic.items())
+        return dic_tuple
 
     def create_chapter_trs(self):
         chapter_groups = self.group_files(self.__chapter_tr_files, Group.CHAPTER)
-        logging.info(f"There are {len(chapter_groups)} groups of tr files")
-        for key in chapter_groups:
-            try:
-                partial_create_tr = partial(self.create_tr_file, key)
-                self.thread_executor.map(partial_create_tr, chapter_groups[key])
-            except Exception as e:
-                logging.warning(
-                    f"exception in tr_worker create_chapter_trs: {e.with_traceback()}"
-                )
+        logging.info(
+            f"There are {len(chapter_groups)} groups of chapter tr files to create"
+        )
+        self.thread_executor.map(self.create_tr_file, chapter_groups)
 
     def create_book_trs(self):
         book_groups = self.group_files(self.__book_tr_files, Group.BOOK)
         logging.info(
-            f"There are {self.__book_tr_files} chapter tr files which is {len(book_groups)} groups"
+            f"There are {len(book_groups)} groups of chapter tr files to create"
         )
-        for key in book_groups:
-            partial_create_tr = partial(self.create_tr_file, key)
-            try:
-                self.thread_executor.map(partial_create_tr, book_groups[key])
-            except Exception as e:
-                logging.warning(
-                    f"exception in tr_worker create_book_trs: {e.with_traceback()}"
-                )
+        self.thread_executor.map(self.create_tr_file, book_groups)
 
-    def create_tr_file(self, dic: str, files: List[Path]):
+    # todo: N arity allows us call with signature of map fn(fn, iterable) and still pass multiple files for each op
+    def create_tr_file(self, info: Tuple[str, List[Path]]):
         """Create tr file and copy it to the remote directory"""
+        # runs in another thread, so exceptions don't bubble.  Own exception handling here
+        try:
+            (dic, files) = info
+            parts = json.loads(dic)
+            lang = parts["lang"]
+            resource = parts["resource"]
+            book = parts["book"]
+            chapter = parts["chapter"] if "chapter" in parts else None
+            media = parts["media"]
+            quality = parts["quality"]
+            grouping = parts["grouping"]
+            root_dir = self.__temp_dir.joinpath("root")
+            target_dir = root_dir.joinpath(lang, resource, book)
+            if chapter is not None:
+                remote_dir = self.__ftp_dir.joinpath(
+                    lang, resource, book, chapter, "CONTENTS"
+                )
+            else:
+                remote_dir = self.__ftp_dir.joinpath(lang, resource, book, "CONTENTS")
+            for file in files:
+                target_chapter = chapter
+                if target_chapter is None:
+                    match = re.search(r"_c([0-9]+)_v[0-9]+", file.name)
+                    if not match:
+                        raise Exception("Could not define chapter from the file name.")
+                    target_chapter = match.group(1)
 
-        logging.info(f"Calling create tr file with {dic}")
-        parts = json.loads(dic)
-        logging.info(f"Loaded the parts: {parts}")
-        lang = parts["lang"]
-        resource = parts["resource"]
-        book = parts["book"]
-        chapter = parts["chapter"] if "chapter" in parts else None
-        media = parts["media"]
-        quality = parts["quality"]
-        grouping = parts["grouping"]
-        logging.info(f"tr_worker_log: creating the root_dir")
-        root_dir = self.__temp_dir.joinpath("root")
-        logging.info(f"tr_worker_log: creating the target dir")
-        target_dir = root_dir.joinpath(lang, resource, book)
+                target_chapter_dir = target_dir.joinpath(
+                    self.zero_pad_chapter(target_chapter, book)
+                )
+                target_chapter_dir.mkdir(parents=True, exist_ok=True)
 
-        logging.info(f"tr_worker_log: target dir is {target_dir}")
-        if chapter is not None:
-            remote_dir = self.__ftp_dir.joinpath(
-                lang, resource, book, chapter, "CONTENTS"
-            )
-        else:
-            remote_dir = self.__ftp_dir.joinpath(lang, resource, book, "CONTENTS")
-        logging.info(f"tr_worker_log: remote dir is {remote_dir}")
-        for file in files:
+                target_file = target_chapter_dir.joinpath(file.name)
+                # Copy source file to temp dir
+                logging.debug(f"tr_worker_log: Copying file {file} to {target_file}")
+                target_file.write_bytes(file.read_bytes())
+
+            # Create TR file
+
+            logging.debug("Creating TR file")
+            create_tr(root_dir, self.verbose)
+            tr = self.__temp_dir.joinpath("root.tr")
+
+            if chapter is not None:
+                new_tr = Path(tr.parent, f"{lang}_{resource}_{book}_c{chapter}.tr")
+            else:
+                new_tr = Path(tr.parent, f"{lang}_{resource}_{book}.tr")
+
+            tr.rename(new_tr)
+
+            # Copy tr file to remote dir
+            t_file = copy_file(new_tr, remote_dir, grouping, quality, media)
+            self.resources_created.append(str(rel_path(t_file, self.__ftp_dir)))
+
+            rm_tree(root_dir)
+            new_tr.unlink()
+        except Exception as e:
+            traceback.print_exc()
+
+    def create_tr_file_chapter(self, chapter, book: str, target_dir: Path, file: Path):
+        try:
             target_chapter = chapter
             if target_chapter is None:
                 match = re.search(r"_c([0-9]+)_v[0-9]+", file.name)
@@ -263,28 +294,8 @@ class TrWorker:
             # Copy source file to temp dir
             logging.debug(f"tr_worker_log: Copying file {file} to {target_file}")
             target_file.write_bytes(file.read_bytes())
-
-        # Create TR file
-        logging.info(f"tr_worker_log: creating tr file at {root_dir}")
-        logging.debug("Creating TR file at")
-        create_tr(root_dir, self.verbose)
-        tr = self.__temp_dir.joinpath("root.tr")
-
-        if chapter is not None:
-            new_tr = Path(tr.parent, f"{lang}_{resource}_{book}_c{chapter}.tr")
-        else:
-            new_tr = Path(tr.parent, f"{lang}_{resource}_{book}.tr")
-
-        tr.rename(new_tr)
-
-        # Copy tr file to remote dir
-        logging.info(f"Copying {new_tr} to {remote_dir}")
-        t_file = copy_file(new_tr, remote_dir, grouping, quality, media)
-        self.resources_created.append(str(rel_path(t_file, self.__ftp_dir)))
-
-        rm_tree(root_dir)
-        logging.info(f"Deleting {new_tr}")
-        new_tr.unlink()
+        except Exception as e:
+            traceback.print_exc()
 
     @staticmethod
     def zero_pad_chapter(chapter: str, book: str) -> str:

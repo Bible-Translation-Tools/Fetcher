@@ -1,6 +1,7 @@
 import logging
 import re
 from pathlib import Path
+import traceback
 from typing import Dict
 
 from file_utils import init_temp_dir, rm_tree, copy_file, check_file_exists, rel_path
@@ -27,40 +28,37 @@ class VerseWorker:
     def execute(self, all_files: set[Path]):
         """Execute worker"""
         start_time = time()
-        logging.info("Verse worker started!")
-        self.thread_executor = ThreadPoolExecutor()
-        self.clear_report()
-        self.__temp_dir = init_temp_dir("verse_worker_")
-        files_to_process = {path for path in all_files if path.suffix == ".wav"}
-        self.thread_executor.map(self.process_verse, files_to_process)
-        all_files.difference_update(set(self.resources_deleted))
-        all_files.update(set(self.resources_created))
-        logging.info(
-            f"removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files"
-        )
-        logging.debug(f"Deleting temporary directory {self.__temp_dir}")
-        rm_tree(self.__temp_dir)
-        end_time = time()
-        self.thread_executor.shutdown(wait=True)
-        logging.info(f"Verse worker finished in {end_time - start_time} seconds!")
+        try:
+            logging.info("Verse worker started!")
+            # reinvoke due to runs due to explicity shutdown call in finall clause
+            self.thread_executor = ThreadPoolExecutor()
+            self.clear_report()
+            self.__temp_dir = init_temp_dir("verse_worker_")
+            files_to_process = {path for path in all_files if path.suffix == ".wav"}
+            self.thread_executor.map(self.process_verse, files_to_process)
+        except Exception as e:
+            traceback.print_exc()
+        finally:
+            self.thread_executor.shutdown(wait=True)
+            all_files.difference_update(set(self.resources_deleted))
+            all_files.update(set(self.resources_created))
+            logging.info(
+                f"verse_worker: removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files"
+            )
+            logging.debug(f"Deleting temporary directory {self.__temp_dir}")
+            rm_tree(self.__temp_dir)
+            end_time = time()
+            logging.info(f"Verse worker finished in {end_time - start_time} seconds!")
 
     def include_file(self, file: Path) -> bool:
         return re.search(self.__verse_regex, str(file))
 
     def process_verse(self, src_file):
+        # exception handling in here and not only at top since this runs in multiple threads
         try:
             if not self.include_file(src_file):
                 return
             logging.debug(f"Verse Worker: Found verse file: {src_file}")
-            remote_dir = self.__ftp_dir.joinpath(
-                lang, resource, book, chapter, "CONTENTS"
-            )
-            mp3_exists = check_file_exists(src_file, remote_dir, "mp3", grouping)
-            cue_exists = check_file_exists(src_file, remote_dir, "cue", grouping)
-
-            if mp3_exists and cue_exists:
-                logging.debug(f"Files exist. Skipping...")
-                return
 
             # Extract necessary path parts
             root_parts = self.__ftp_dir.parts
@@ -71,6 +69,16 @@ class VerseWorker:
             chapter = parts[3]
             media = parts[5]
             grouping = parts[7] if media == "mp3" else parts[6]
+
+            remote_dir = self.__ftp_dir.joinpath(
+                lang, resource, book, chapter, "CONTENTS"
+            )
+            mp3_exists = check_file_exists(src_file, remote_dir, "mp3", grouping)
+            cue_exists = check_file_exists(src_file, remote_dir, "cue", grouping)
+
+            if mp3_exists and cue_exists:
+                logging.debug(f"Files exist. Skipping...")
+                return
 
             target_dir = self.__temp_dir.joinpath(
                 lang, resource, book, chapter, grouping
@@ -86,7 +94,8 @@ class VerseWorker:
             self.convert_verse_wav(target_file, remote_dir, grouping, "hi")
             self.convert_verse_wav(target_file, remote_dir, grouping, "low")
         except Exception as e:
-            logging.warning(f"exception in verse_worker: {e.with_traceback()}")
+            logging.warning(f"exception in verse_worker {e}")
+            traceback.print_exc()
 
     def convert_verse_wav(
         self, verse_file: Path, remote_dir: Path, grouping: str, quality: str

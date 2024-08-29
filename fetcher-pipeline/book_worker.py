@@ -1,6 +1,7 @@
 import json
 import logging
 import re
+import traceback
 from pydub import AudioSegment
 from pathlib import Path
 from typing import List, Dict, Tuple
@@ -25,12 +26,12 @@ class BookWorker:
         self.resources_created = []
         self.resources_deleted = []
         # debugging, so just use one max worker
-        self.thread_executor = ThreadPoolExecutor(max_workers=1)
+        self.thread_executor = ThreadPoolExecutor()
 
     def execute(self, all_files: set[Path]):
         """Execute worker"""
 
-        logging.debug("Book worker started!")
+        logging.info("Book worker started!")
         start_time = time()
         self.thread_executor = ThreadPoolExecutor()
         try:
@@ -41,41 +42,35 @@ class BookWorker:
             (existent_books, verse_files) = (
                 self.find_existent_books_and_filter_to_verse_files(all_files)
             )
-            logging.info(f"book_worker_log: existent books are {existent_books}")
 
             # Partially apply the existent_books argument to conform to fn siganture of thread executor map
             set_book_files_partial = partial(
                 self.populate_book_verse_files, existent_books
             )
+            # log self.__book_verse_files
             self.thread_executor.map(set_book_files_partial, verse_files)
             logging.info(
                 f"book_worker_log: Num verse files passed filters: {len(self.__book_verse_files)}.  "
             )
 
             # Create book files
-            book_groups = self.group_book_files()
+            book_tuples = self.group_book_files()
             logging.info(
-                f"book_worker_log: Num book groups to create: {len(book_groups)}"
+                f"book_worker_log: Num book groups to create: {len(book_tuples)}.  "
             )
-            for dict_key in book_groups:
-                partial_create_book = partial(self.create_book_file, dict_key)
-                try:
-                    self.thread_executor.map(
-                        partial_create_book, book_groups[dict_key]  # fn  # iterable
-                    )
-                except Exception as e:
-                    logging.warning(f"exception in book worker: {e.with_traceback()}")
-            # Even though last worker, still update set in case order changes
-            all_files.difference_update(set(self.resources_deleted))
-            all_files.update(set(self.resources_created))
-
+            self.thread_executor.map(self.create_book_file, book_tuples)
         except Exception as e:
-            logging.warning(f"exception in book worker: {e.with_traceback()}")
+            traceback.print_exc()
         finally:
             logging.debug(f"Deleting temporary directory {self.__temp_dir}")
             rm_tree(self.__temp_dir)
             end_time = time()
             self.thread_executor.shutdown(wait=True)
+            all_files.difference_update(set(self.resources_deleted))
+            all_files.update(set(self.resources_created))
+            logging.info(
+                f"book_worker: removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files"
+            )
             logging.info(f"Book worker  finished in {end_time - start_time} seconds!")
 
     def find_existent_books_and_filter_to_verse_files(
@@ -132,7 +127,7 @@ class BookWorker:
                 )
                 self.__book_verse_files.remove(src_file)
 
-    def group_book_files(self) -> Dict[str, List[Path]]:
+    def group_book_files(self) -> List[Tuple[str, List[Path]]]:
         """Group files into book groups"""
 
         dic = {}
@@ -162,46 +157,28 @@ class BookWorker:
             if key not in dic:
                 dic[key] = []
             dic[key].append(f)
+        return list(dic.items())
 
-        return dic
-
-    def create_book_file(self, dic: str, files: List[Path]):
+    def create_book_file(self, info: Tuple[str, List[Path]]):
         """Create book file and copy it to the remote directory"""
-        logging.info(f"Book Worker: calling create_book_file with {dic}")
+        (dic, files) = info
         parts = json.loads(dic)
-        logging.info(f"loaded {parts}")
         lang = parts["lang"]
         resource = parts["resource"]
         book = parts["book"]
         media = parts["media"]
         quality = parts["quality"]
-        logging.info(
-            f"parsed out {lang}, {resource}, {book}, {media}, {quality}, {media}  "
-        )
         remote_dir = self.__ftp_dir.joinpath(lang, resource, book, "CONTENTS")
-        logging.info(f"remote dir is {remote_dir}")
-        logging.info(f"sorting the files")
-
         files.sort()
-        logging.info(f"files are sorted")
-
         # Create book file
         book_name = f"{lang}_{resource}_{book}.{media}"
-        logging.info(f"book name is {book_name}")
         book = self.__temp_dir.joinpath(media, quality, book_name)
-        logging.info(f"book path is {str(book)}")
         book.parent.mkdir(parents=True, exist_ok=True)
         # Copy book file to remote dir
-        logging.info(f"Merging audio for {book}: Remote {remote_dir}")
         self.merge_audio(book, files, media, quality)
 
-        logging.info(f"audio has been merged")
         t_file = copy_file(book, remote_dir, "book", quality, media)
-
-        logging.info(f"t file is {t_file}")
         self.resources_created.append(str(rel_path(t_file, self.__ftp_dir)))
-
-        logging.info(f"unlinking the book")
         book.unlink()
 
     @staticmethod

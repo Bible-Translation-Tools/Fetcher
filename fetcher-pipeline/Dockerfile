@@ -25,5 +25,6 @@ COPY . /fetcher-pipeline
 
 COPY entrypoint.sh /entrypoint.sh
 COPY gl_repo_urls.txt /repourls/gl_repo_urls.txt
-
+ARG debugpy
+ENV DEBUGPY=${debugpy}
 ENTRYPOINT ["/entrypoint.sh"]

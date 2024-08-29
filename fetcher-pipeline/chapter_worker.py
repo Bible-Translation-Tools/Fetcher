@@ -1,6 +1,7 @@
 import logging
 import re
 from pathlib import Path
+import traceback
 from typing import Dict
 
 from file_utils import (
@@ -39,34 +40,39 @@ class ChapterWorker:
         """Execute worker"""
         # initialize a new one if needed due to explicit shutdowns
         start_time = time()
-        self.thread_executor = ThreadPoolExecutor()
-        logging.info("Chapter worker started!")
-        self.clear_report()
-        self.__temp_dir = init_temp_dir("chapter_worker_")
-        files_to_process = {path for path in all_files if path.suffix == ".wav"}
-        logging.info(
-            f"starting process_chapter with {self.thread_executor._max_workers} max possible workers"
-        )
-        self.thread_executor.map(self.process_chapter, files_to_process)
+        try:
+            self.thread_executor = ThreadPoolExecutor()
+            logging.info("Chapter worker started!")
+            self.clear_report()
+            self.__temp_dir = init_temp_dir("chapter_worker_")
+            files_to_process = {path for path in all_files if path.suffix == ".wav"}
+            logging.info(
+                f"starting process_chapter with {self.thread_executor._max_workers} max possible workers"
+            )
+            self.thread_executor.map(self.process_chapter, files_to_process)
 
-        logging.debug(f"Deleting temporary directory {self.__temp_dir}")
-        rm_tree(self.__temp_dir)
-        # remove from this set passed set:
-        all_files.difference_update(set(self.resources_deleted))
-        # add anything new for subsequent workers to have in additional to initial fs read
-        all_files.update(set(self.resources_created))
-        logging.info(
-            f"removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files"
-        )
-        end_time = time()
-        logging.info(f"Chapter worker finished in {end_time - start_time} seconds!")
-        self.thread_executor.shutdown(wait=True)
+            logging.debug(f"Deleting temporary directory {self.__temp_dir}")
+            rm_tree(self.__temp_dir)
+        except Exception as e:
+            traceback.print_exc()
+        finally:
+            self.thread_executor.shutdown(wait=True)
+            # remove from this set passed set:
+            all_files.difference_update(set(self.resources_deleted))
+            # add anything new for subsequent workers to have in additional to initial fs read
+            all_files.update(set(self.resources_created))
+            logging.info(
+                f"chapter_worker:removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files"
+            )
+            end_time = time()
+            logging.info(f"Chapter worker finished in {end_time - start_time} seconds!")
         return
 
     def include_file(self, file: Path) -> bool:
         return re.search(self.__chapter_regex, str(file))
 
     def process_chapter(self, src_file: Path):
+        # catch exceptions here due to running in separate threads.
         try:
             if not self.include_file(src_file):
                 return
@@ -144,7 +150,8 @@ class ChapterWorker:
                 self.convert_wav_to_mp3(f, remote_dir, "verse", "hi")
                 self.convert_wav_to_mp3(f, remote_dir, "verse", "low")
         except Exception as e:
-            logging.warning(f"exception in chapter worker: {e.with_traceback()}")
+            logging.warning(f"exception in chapter worker: {e}")
+            traceback.print_exc()
 
         # Process chapter files only
 
