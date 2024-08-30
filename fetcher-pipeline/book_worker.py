@@ -66,8 +66,8 @@ class BookWorker:
             logging.debug(f"Deleting temporary directory {self.__temp_dir}")
             rm_tree(self.__temp_dir)
             end_time = time()
-            all_files.difference_update(set(self.resources_deleted))
-            all_files.update(set(self.resources_created))
+            all_files.difference_update(set({Path(p) for p in self.resources_deleted}))
+            all_files.update(set(Path(p) for p in self.resources_created))
             logging.info(
                 f"book_worker: removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files"
             )

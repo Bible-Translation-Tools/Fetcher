@@ -64,7 +64,6 @@ class TrWorker:
             logging.info(
                 f"Processing {len(all_trs)} There are {len(book_trs)} book trs and {len(chapter_trs)} chapter trs"
             )
-            # todo: remove if can, but for now, skip the threads and go back to running in main thread sequentially and see if same errors occur
             self.thread_executor.map(self.create_tr_file, all_trs)
 
         except Exception as e:
@@ -76,8 +75,8 @@ class TrWorker:
             self.thread_executor.shutdown(wait=True)
             rm_tree(self.__temp_dir)
             end_time = time()
-            all_files.difference_update(set(self.resources_deleted))
-            all_files.update(set(self.resources_created))
+            all_files.difference_update(set({Path(p) for p in self.resources_deleted}))
+            all_files.update(set(Path(p) for p in self.resources_created))
             logging.info(
                 f"tr_worker: removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files"
             )

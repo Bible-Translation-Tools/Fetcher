@@ -59,9 +59,9 @@ class ChapterWorker:
         finally:
             self.thread_executor.shutdown(wait=True)
             # remove from this set passed set:
-            all_files.difference_update(set(self.resources_deleted))
+            all_files.difference_update(set({Path(p) for p in self.resources_deleted}))
             # add anything new for subsequent workers to have in additional to initial fs read
-            all_files.update(set(self.resources_created))
+            all_files.update(set(Path(p) for p in self.resources_created))
             logging.info(
                 f"chapter_worker:removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files.    {len(self.checked_but_skipped)} were checked, but the hashes hadn't changed"
             )

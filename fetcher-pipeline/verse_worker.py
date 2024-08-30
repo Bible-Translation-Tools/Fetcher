@@ -47,8 +47,9 @@ class VerseWorker:
             traceback.print_exc()
         finally:
             self.thread_executor.shutdown(wait=True)
-            all_files.difference_update(set(self.resources_deleted))
-            all_files.update(set(self.resources_created))
+            # updated and deleted are converted to strings for some cleaner logs over logging paths (but we are passing this list of all_files around as paths, and need path functions). The set opeartions vs string/path will not be right, and throw errs.  Coudld refactor to not store the del and created as strings, but this is quicker for now.
+            all_files.difference_update(set({Path(p) for p in self.resources_deleted}))
+            all_files.update(set(Path(p) for p in self.resources_created))
             logging.info(
                 f"verse_worker: removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files.  {len(self.resoures_checked_but_skipped)} were checked, but the mp3 and cues for them already existed."
             )
