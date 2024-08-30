@@ -3,6 +3,7 @@ import logging
 import re
 from enum import Enum
 from pathlib import Path
+import threading
 from typing import List, Tuple, Dict
 import traceback
 
@@ -219,7 +220,11 @@ class TrWorker:
             media = parts["media"]
             quality = parts["quality"]
             grouping = parts["grouping"]
-            root_dir = self.__temp_dir.joinpath("root")
+            thread_temp_dir = self.__temp_dir.joinpath(
+                f"thread-{threading.get_ident()}"
+            )
+            thread_temp_dir.mkdir(parents=True, exist_ok=True)
+            root_dir = thread_temp_dir.joinpath("root")
             target_dir = root_dir.joinpath(lang, resource, book)
             if chapter is not None:
                 remote_dir = self.__ftp_dir.joinpath(
@@ -248,7 +253,7 @@ class TrWorker:
             # Create TR file
             logging.debug("Creating TR file")
             create_tr(root_dir, self.verbose)
-            tr = self.__temp_dir.joinpath("root.tr")
+            tr = thread_temp_dir.joinpath("root.tr")
 
             if chapter is not None:
                 new_tr = Path(tr.parent, f"{lang}_{resource}_{book}_c{chapter}.tr")
@@ -265,6 +270,7 @@ class TrWorker:
             # rm_tree(root_dir)
             new_tr.unlink()
         except Exception as e:
+            logging.warning(f"exception: {e}")
             logging.warning(f"file is {file}")
             logging.warning(f"target file was {target_file}")
             traceback.print_exc()

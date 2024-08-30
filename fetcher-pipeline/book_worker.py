@@ -56,9 +56,9 @@ class BookWorker:
                 f"book_worker_log: Num book groups to create: {len(book_tuples)}.  "
             )
             # todo: remove if can, but for now, skip the threads and go back to running in main thread sequentially and see if same errors occur
-            for tuple in book_tuples:
-                self.create_book_file(tuple)
-            # self.thread_executor.map(self.create_book_file, book_tuples)
+            # for tuple in book_tuples:
+            #     self.create_book_file(tuple)
+            self.thread_executor.map(self.create_book_file, book_tuples)
         except Exception as e:
             traceback.print_exc()
             logging.warning(all_files)
@@ -84,20 +84,25 @@ class BookWorker:
         verse_files = []
         verse_media = ["wav", "mp3/hi", "mp3/low"]
         book_media = [("wav", "wav"), ("mp3/hi", "mp3"), ("mp3/low", "mp3")]
+
         for src_file in all_files:
-            suffix = src_file.suffix
-            # get verse files
-            for m in verse_media:
-                if not re.search(self.__verse_regex, str(src_file)):
-                    continue
-                if suffix == ".tr" or src_file.name == ".hash":
-                    continue
-                if f"{m}/verse/" in str(src_file):
-                    verse_files.append(src_file)
-            # check if matches book;
-            for m, f in book_media:
-                if suffix == f".{f}" and f"{m}/book/" in str(src_file):
-                    existent_books.append(src_file)
+            try:
+                suffix = src_file.suffix
+                # get verse files
+                for m in verse_media:
+                    if not re.search(self.__verse_regex, str(src_file)):
+                        continue
+                    if suffix == ".tr" or src_file.name == ".hash":
+                        continue
+                    if f"{m}/verse/" in str(src_file):
+                        verse_files.append(src_file)
+                # check if matches book;
+                for m, f in book_media:
+                    if suffix == f".{f}" and f"{m}/book/" in str(src_file):
+                        existent_books.append(src_file)
+            except Exception as e:
+                logging.warning(f"problem file was {src_file} of type {type(src_file)}")
+                traceback.print_exc()
 
         return (existent_books, verse_files)
 
