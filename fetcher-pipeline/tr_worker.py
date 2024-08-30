@@ -264,32 +264,10 @@ class TrWorker:
             # Copy tr file to remote dir
             t_file = copy_file(new_tr, remote_dir, grouping, quality, media)
             self.resources_created.append(str(rel_path(t_file, self.__ftp_dir)))
-
-            rm_tree(root_dir)
+            # check: other worker threadsd might be depending on the this same shared tmep dir of /root/etc;... Just hoist this to be cleaned up later.  The new tr is just this one file though that this worker made, so I think ok to unlink.
+            # todo: verify I can comment this out, and then it should just get cleaned up with the call to rm_tree(self.__temp_dir) in the finally block
+            # rm_tree(root_dir)
             new_tr.unlink()
-        except Exception as e:
-            traceback.print_exc()
-
-    def create_tr_file_chapter(self, chapter, book: str, target_dir: Path, file: Path):
-        try:
-            target_chapter = chapter
-            if target_chapter is None:
-                match = re.search(r"_c([0-9]+)_v[0-9]+", file.name)
-                if not match:
-                    raise Exception("Could not define chapter from the file name.")
-                target_chapter = match.group(1)
-
-            target_chapter_dir = target_dir.joinpath(
-                self.zero_pad_chapter(target_chapter, book)
-            )
-            logging.info(f"tr_worker_log: target_chapter_dir is {target_chapter_dir}")
-            target_chapter_dir.mkdir(parents=True, exist_ok=True)
-
-            target_file = target_chapter_dir.joinpath(file.name)
-            logging.info(f"tr_worker_log: target_file is {target_file}")
-            # Copy source file to temp dir
-            logging.debug(f"tr_worker_log: Copying file {file} to {target_file}")
-            target_file.write_bytes(file.read_bytes())
         except Exception as e:
             traceback.print_exc()
 

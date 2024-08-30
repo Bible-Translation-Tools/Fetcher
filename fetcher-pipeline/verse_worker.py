@@ -23,6 +23,7 @@ class VerseWorker:
 
         self.resources_created = []
         self.resources_deleted = []
+        self.resoures_checked_but_skipped = []
         self.thread_executor = ThreadPoolExecutor()
 
     def execute(self, all_files: set[Path]):
@@ -49,7 +50,7 @@ class VerseWorker:
             all_files.difference_update(set(self.resources_deleted))
             all_files.update(set(self.resources_created))
             logging.info(
-                f"verse_worker: removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files"
+                f"verse_worker: removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files.  {len(self.resoures_checked_but_skipped)} were checked, but the mp3 and cues for them already existed."
             )
             logging.debug(f"Deleting temporary directory {self.__temp_dir}")
             rm_tree(self.__temp_dir)
@@ -59,7 +60,7 @@ class VerseWorker:
     def include_file(self, file: Path) -> bool:
         return re.search(self.__verse_regex, str(file))
 
-    def process_verse(self, src_file):
+    def process_verse(self, src_file: Path):
         # exception handling in here and not only at top since this runs in multiple threads
         try:
             logging.debug(f"Verse Worker: Found verse file: {src_file}")
@@ -82,6 +83,7 @@ class VerseWorker:
 
             if mp3_exists and cue_exists:
                 logging.debug(f"Files exist. Skipping...")
+                self.resoures_checked_but_skipped.append(src_file)
                 return
 
             target_dir = self.__temp_dir.joinpath(
@@ -137,3 +139,4 @@ class VerseWorker:
     def clear_report(self):
         self.resources_created.clear()
         self.resources_deleted.clear()
+        self.resoures_checked_but_skipped.clear()

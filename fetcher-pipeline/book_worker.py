@@ -43,7 +43,7 @@ class BookWorker:
                 self.find_existent_books_and_filter_to_verse_files(all_files)
             )
 
-            # Can't do these in parallel cause it calls a list.remove based on what's in the existent TR, which could cause a race condition if if thinks something is in the list, but soemthing else takes it out first.
+            # Can't do these in parallel cause it calls a self.__book_verse_files.remove(src_file) based on what's in the existent TR, which could cause a race condition (since shared) if if thinks something is in the list, but soemthing else takes it out first.
             for file in verse_files:
                 self.populate_book_verse_files(existent_books, file)
             logging.info(
@@ -80,22 +80,24 @@ class BookWorker:
         verse_media = ["wav", "mp3/hi", "mp3/low"]
         book_media = [("wav", "wav"), ("mp3/hi", "mp3"), ("mp3/low", "mp3")]
         for src_file in all_files:
+            suffix = src_file.suffix
             # get verse files
             for m in verse_media:
                 if not re.search(self.__verse_regex, str(src_file)):
                     continue
-                if src_file.suffix == ".tr" or src_file.name == ".hash":
+                if suffix == ".tr" or src_file.name == ".hash":
                     continue
                 if f"{m}/verse/" in str(src_file):
                     verse_files.append(src_file)
             # check if matches book;
             for m, f in book_media:
-                if src_file.suffix == f".{f}" and f"{m}/book/" in str(src_file):
+                if suffix == f".{f}" and f"{m}/book/" in str(src_file):
                     existent_books.append(src_file)
 
         return (existent_books, verse_files)
 
     def populate_book_verse_files(self, existent_books: List[Path], src_file: Path):
+
         logging.debug(f"Book Worker: Found verse file: {src_file}")
 
         self.__book_verse_files.append(src_file)

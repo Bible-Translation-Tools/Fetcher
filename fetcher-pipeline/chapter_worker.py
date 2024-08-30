@@ -34,6 +34,7 @@ class ChapterWorker:
 
         self.resources_created = []
         self.resources_deleted = []
+        self.checked_but_skipped = []
         self.thread_executor = ThreadPoolExecutor()
 
     def execute(self, all_files: set[Path]):
@@ -62,7 +63,7 @@ class ChapterWorker:
             # add anything new for subsequent workers to have in additional to initial fs read
             all_files.update(set(self.resources_created))
             logging.info(
-                f"chapter_worker:removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files"
+                f"chapter_worker:removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files.    {len(self.checked_but_skipped)} were checked, but the "
             )
             end_time = time()
             logging.info(f"Chapter worker finished in {end_time - start_time} seconds!")
@@ -76,6 +77,7 @@ class ChapterWorker:
         try:
             changed = self.check_file_changed(src_file)
             if not changed:
+                self.checked_but_skipped.append(src_file)
                 logging.debug(f"Chapter {src_file} has not been changed. Skipping...")
                 return
             # Extract necessary path parts
@@ -354,6 +356,7 @@ class ChapterWorker:
     def clear_report(self):
         self.resources_created.clear()
         self.resources_deleted.clear()
+        self.checked_but_skipped.clear()
 
     @staticmethod
     def check_file_changed(file: Path) -> bool:
