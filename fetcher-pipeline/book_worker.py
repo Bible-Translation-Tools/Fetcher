@@ -1,6 +1,7 @@
 import json
 import logging
 import re
+import threading
 import traceback
 from pydub import AudioSegment
 from pathlib import Path
@@ -55,19 +56,16 @@ class BookWorker:
             logging.info(
                 f"book_worker_log: Num book groups to create: {len(book_tuples)}.  "
             )
-            # todo: remove if can, but for now, skip the threads and go back to running in main thread sequentially and see if same errors occur
-            # for tuple in book_tuples:
-            #     self.create_book_file(tuple)
             self.thread_executor.map(self.create_book_file, book_tuples)
         except Exception as e:
             traceback.print_exc()
             logging.warning(all_files)
 
         finally:
+            self.thread_executor.shutdown(wait=True)
             logging.debug(f"Deleting temporary directory {self.__temp_dir}")
             rm_tree(self.__temp_dir)
             end_time = time()
-            self.thread_executor.shutdown(wait=True)
             all_files.difference_update(set(self.resources_deleted))
             all_files.update(set(self.resources_created))
             logging.info(
@@ -183,7 +181,11 @@ class BookWorker:
             files.sort()
             # Create book file
             book_name = f"{lang}_{resource}_{book}.{media}"
-            book = self.__temp_dir.joinpath(media, quality, book_name)
+            # part of shared temp dir, so will get cleaned up when we remove self.__temp_dir
+            thread_temp_dir = self.__temp_dir.joinpath(
+                f"thread-{threading.get_ident()}"
+            )
+            book = thread_temp_dir.joinpath(media, quality, book_name)
             book.parent.mkdir(parents=True, exist_ok=True)
             # Copy book file to remote dir
             self.merge_audio(book, files, media, quality)

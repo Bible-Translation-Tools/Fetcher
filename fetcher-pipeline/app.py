@@ -216,6 +216,7 @@ class App:
             sys.exit(1)
 
     async def send_messages(self, messages):
+
         async with ServiceBusClient.from_connection_string(
             conn_str=self.BUS_CONNECTION_STRING, logging_enable=True
         ) as service_bus_client:

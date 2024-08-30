@@ -65,18 +65,17 @@ class TrWorker:
                 f"Processing {len(all_trs)} There are {len(book_trs)} book trs and {len(chapter_trs)} chapter trs"
             )
             # todo: remove if can, but for now, skip the threads and go back to running in main thread sequentially and see if same errors occur
-            for tuple in all_trs:
-                self.create_tr_file(tuple)
-            # self.thread_executor.map(self.create_tr_file, all_trs)
+            self.thread_executor.map(self.create_tr_file, all_trs)
 
         except Exception as e:
             traceback.print_exc()
 
         finally:
             logging.debug(f"Deleting temporary directory {self.__temp_dir}")
+            # wait for all tasks to finish before removing anything
+            self.thread_executor.shutdown(wait=True)
             rm_tree(self.__temp_dir)
             end_time = time()
-            self.thread_executor.shutdown(wait=True)
             all_files.difference_update(set(self.resources_deleted))
             all_files.update(set(self.resources_created))
             logging.info(
