@@ -55,7 +55,10 @@ class BookWorker:
             logging.info(
                 f"book_worker_log: Num book groups to create: {len(book_tuples)}.  "
             )
-            self.thread_executor.map(self.create_book_file, book_tuples)
+            # todo: remove if can, but for now, skip the threads and go back to running in main thread sequentially and see if same errors occur
+            for tuple in book_tuples:
+                self.create_book_file(tuple)
+            # self.thread_executor.map(self.create_book_file, book_tuples)
         except Exception as e:
             traceback.print_exc()
             logging.warning(all_files)
@@ -161,26 +164,30 @@ class BookWorker:
         return list(dic.items())
 
     def create_book_file(self, info: Tuple[str, List[Path]]):
-        """Create book file and copy it to the remote directory"""
-        (dic, files) = info
-        parts = json.loads(dic)
-        lang = parts["lang"]
-        resource = parts["resource"]
-        book = parts["book"]
-        media = parts["media"]
-        quality = parts["quality"]
-        remote_dir = self.__ftp_dir.joinpath(lang, resource, book, "CONTENTS")
-        files.sort()
-        # Create book file
-        book_name = f"{lang}_{resource}_{book}.{media}"
-        book = self.__temp_dir.joinpath(media, quality, book_name)
-        book.parent.mkdir(parents=True, exist_ok=True)
-        # Copy book file to remote dir
-        self.merge_audio(book, files, media, quality)
-
-        t_file = copy_file(book, remote_dir, "book", quality, media)
-        self.resources_created.append(str(rel_path(t_file, self.__ftp_dir)))
-        book.unlink()
+        # runs threaded. Catch exceptions for each thread individually
+        try:
+            """Create book file and copy it to the remote directory"""
+            (dic, files) = info
+            parts = json.loads(dic)
+            lang = parts["lang"]
+            resource = parts["resource"]
+            book = parts["book"]
+            media = parts["media"]
+            quality = parts["quality"]
+            remote_dir = self.__ftp_dir.joinpath(lang, resource, book, "CONTENTS")
+            files.sort()
+            # Create book file
+            book_name = f"{lang}_{resource}_{book}.{media}"
+            book = self.__temp_dir.joinpath(media, quality, book_name)
+            book.parent.mkdir(parents=True, exist_ok=True)
+            # Copy book file to remote dir
+            self.merge_audio(book, files, media, quality)
+            t_file = copy_file(book, remote_dir, "book", quality, media)
+            self.resources_created.append(str(rel_path(t_file, self.__ftp_dir)))
+            book.unlink()
+        except Exception as e:
+            logging.warning(info)
+            traceback.print_exc()
 
     @staticmethod
     def merge_audio(target: Path, files: List[Path], media: str, quality: str):

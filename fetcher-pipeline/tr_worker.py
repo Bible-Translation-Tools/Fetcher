@@ -63,7 +63,10 @@ class TrWorker:
             logging.info(
                 f"Processing {len(all_trs)} There are {len(book_trs)} book trs and {len(chapter_trs)} chapter trs"
             )
-            self.thread_executor.map(self.create_tr_file, all_trs)
+            # todo: remove if can, but for now, skip the threads and go back to running in main thread sequentially and see if same errors occur
+            for tuple in all_trs:
+                self.create_tr_file(tuple)
+            # self.thread_executor.map(self.create_tr_file, all_trs)
 
         except Exception as e:
             traceback.print_exc()
