@@ -57,8 +57,13 @@ class TrWorker:
                 self.set_tr_files_to_process(existent_tr, file)
 
             # Each of these calls the thread executor process trs
-            self.create_chapter_trs()
-            self.create_book_trs()
+            book_trs = self.group_files(self.__book_tr_files, Group.BOOK)
+            chapter_trs = self.group_files(self.__chapter_tr_files, Group.CHAPTER)
+            all_trs = book_trs + chapter_trs
+            logging.info(
+                f"Processing {len(all_trs)} There are {len(book_trs)} book trs and {len(chapter_trs)} chapter trs"
+            )
+            self.thread_executor.map(self.create_tr_file, all_trs)
 
         except Exception as e:
             traceback.print_exc()
@@ -198,18 +203,6 @@ class TrWorker:
         dic_tuple = list(dic.items())
         return dic_tuple
 
-    def create_chapter_trs(self):
-        chapter_groups = self.group_files(self.__chapter_tr_files, Group.CHAPTER)
-        logging.info(
-            f"There are {len(chapter_groups)} groups of chapter tr files to create"
-        )
-        self.thread_executor.map(self.create_tr_file, chapter_groups)
-
-    def create_book_trs(self):
-        book_groups = self.group_files(self.__book_tr_files, Group.BOOK)
-        logging.info(f"There are {len(book_groups)} groups of book tr files to create")
-        self.thread_executor.map(self.create_tr_file, book_groups)
-
     def create_tr_file(self, info: Tuple[str, List[Path]]):
         """Create tr file and copy it to the remote directory"""
         # runs in another thread, so exceptions don't bubble.  Own exception handling here
@@ -269,6 +262,8 @@ class TrWorker:
             # rm_tree(root_dir)
             new_tr.unlink()
         except Exception as e:
+            logging.warning(f"file is {file}")
+            logging.warning(f"target file was {target_file}")
             traceback.print_exc()
 
     @staticmethod

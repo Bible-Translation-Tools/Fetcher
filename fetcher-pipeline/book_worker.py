@@ -58,6 +58,8 @@ class BookWorker:
             self.thread_executor.map(self.create_book_file, book_tuples)
         except Exception as e:
             traceback.print_exc()
+            logging.warning(all_files)
+
         finally:
             logging.debug(f"Deleting temporary directory {self.__temp_dir}")
             rm_tree(self.__temp_dir)

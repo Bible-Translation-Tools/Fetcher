@@ -63,7 +63,7 @@ class ChapterWorker:
             # add anything new for subsequent workers to have in additional to initial fs read
             all_files.update(set(self.resources_created))
             logging.info(
-                f"chapter_worker:removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files.    {len(self.checked_but_skipped)} were checked, but the "
+                f"chapter_worker:removed {len(self.resources_deleted)} files: and added {len(self.resources_created)} files.    {len(self.checked_but_skipped)} were checked, but the hashes hadn't changed"
             )
             end_time = time()
             logging.info(f"Chapter worker finished in {end_time - start_time} seconds!")
