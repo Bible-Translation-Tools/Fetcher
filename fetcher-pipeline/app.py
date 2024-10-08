@@ -275,9 +275,7 @@ def get_arguments() -> Tuple[Namespace, List[str]]:
     parser = argparse.ArgumentParser(
         description="Split and convert chapter files to mp3"
     )
-    parser.add_argument(
-        "-i", "--input-dir", type=lambda p: Path(p).absolute(), help="Input directory"
-    )
+    parser.add_argument("-i", "--input-dir", type=Path, help="Input directory")
     parser.add_argument(
         "-l",
         "--log_level",
@@ -348,9 +346,7 @@ def main():
         BUS_CONNECTION_STR,
         TOPIC_NAME,
     )
-    logging.info(
-        f"Starting app with input of {args.input_dir}. Verbose: {args.verbose}. Hour: {args.hour}. Minute: {args.minute}. Queue exclude: {args.queue_exclude} and log level: {log_level}."
-    )
+    logging.info(args)
     app.start()
 
 

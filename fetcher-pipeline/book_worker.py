@@ -26,14 +26,13 @@ class BookWorker:
 
         self.resources_created = []
         self.resources_deleted = []
-        # debugging, so just use one max worker
-        self.thread_executor = ThreadPoolExecutor()
 
     def execute(self, all_files: set[Path]):
         """Execute worker"""
 
         logging.info("Book worker started!")
         start_time = time()
+        # new one for each invocation due to explicit shutdowns
         self.thread_executor = ThreadPoolExecutor()
         try:
             self.clear_report()
