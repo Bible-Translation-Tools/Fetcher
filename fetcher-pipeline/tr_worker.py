@@ -26,18 +26,22 @@ class TrWorker:
         self.__temp_dir = None
 
         self.__book_tr_files = []
+        self.__book_tr_files_lock = threading.Lock()
         self.__chapter_tr_files = []
+        self.__chapter_tr_files_lock = threading.Lock()
 
         self.__verse_regex = r"_c[\d]+_v[\d]+(?:_t[\d]+)?\..*$"
         self.__tr_regex = (
             r"^.*?(?:\/([\d]+))?\/CONTENTS\/tr\/(?:wav|mp3)(?:\/(?:hi|low))?\/verse"
         )
-
+        self.__existent_tr = []
+        self.__existent_tr_lock = threading.Lock()
+        self.__verse_files = []
+        self.__verse_files_lock = threading.Lock()
         self.verbose = verbose
 
         self.resources_created = []
         self.resources_deleted = []
-        self.thread_executor = ThreadPoolExecutor()
 
     def execute(self, all_files: set[Path]):
         """Execute worker"""
@@ -50,12 +54,15 @@ class TrWorker:
             self.clear_cache()
             self.__temp_dir = init_temp_dir("tr_worker_")
 
-            (existent_tr, verse_files) = self.get_existent_tr_and_verses_to_process(
-                all_files
+            # fn / list
+            logging.info(f"Starting get_existent_tr_and_verses_to_process")
+            self.thread_executor.map(
+                self.get_existent_tr_and_verses_to_process, all_files
             )
-            # Can't do these in parallel cause it calls a list.remove based on what's in the existent TR, which could cause a race condition if if thinks something is in the list, but soemthing else takes it out first. This fn will decide the __book_tr_files and __chapter_tr_files needing processing
-            for file in verse_files:
-                self.set_tr_files_to_process(existent_tr, file)
+            logging.info(
+                f"There are {len(self.__verse_files)} possible verse  files and {len(self.__existent_tr)} existent tr files"
+            )
+            self.thread_executor.map(self.set_tr_files_to_process, self.__verse_files)
 
             # Each of these calls the thread executor process trs
             book_trs = self.group_files(self.__book_tr_files, Group.BOOK)
@@ -82,9 +89,7 @@ class TrWorker:
             )
             logging.info(f"TR worker  finished in {end_time - start_time} seconds!")
 
-    def set_tr_files_to_process(
-        self, existent_tr: List[Tuple[Group, Path]], src_file: Path
-    ):
+    def set_tr_files_to_process(self, src_file: Path):
         try:
             logging.debug(f"TR Worker: Found verse file: {src_file}")
             self.__book_tr_files.append(src_file)
@@ -108,54 +113,51 @@ class TrWorker:
             )
 
             # Take out existing
-            for group, tr in existent_tr:
+            for group, tr in self.__existent_tr:
                 if not re.search(regex, str(tr)):
                     continue
-
-                if group == Group.BOOK and src_file in self.__book_tr_files:
-                    logging.debug(
-                        f"Verse file {src_file} is excluded: exists in BOOK TR: {tr}"
-                    )
-                    self.__book_tr_files.remove(src_file)
-                elif group == Group.CHAPTER and src_file in self.__chapter_tr_files:
-                    logging.debug(
-                        f"Verse file {src_file} is excluded: exists in CHAPTER TR: {tr}"
-                    )
-                    self.__chapter_tr_files.remove(src_file)
+                if group == Group.BOOK:
+                    with self.__book_tr_files_lock:
+                        if src_file in self.__book_tr_files:
+                            logging.debug(
+                                f"Verse file {src_file} is excluded: exists in BOOK TR: {tr}"
+                            )
+                        self.__book_tr_files.remove(src_file)
+                elif group == Group.CHAPTER:
+                    with self.__chapter_tr_files_lock:
+                        if src_file in self.__chapter_tr_files:
+                            logging.debug(
+                                f"Verse file {src_file} is excluded: exists in CHAPTER TR: {tr}"
+                            )
+                            self.__chapter_tr_files.remove(src_file)
         except Exception as e:
             logging.warning(f"exception in tr_worker: {e}")
             traceback.print_exc()
 
-    def get_existent_tr_and_verses_to_process(
-        self, all_files: set[Path]
-    ) -> Tuple[List[Tuple[Group, Path]], List[Path]]:
+    def get_existent_tr_and_verses_to_process(self, file: Path):
         """Find tr files that exist in the remote directory"""
-        existent_tr = []
-        verse_files = []
         verse_media = ["wav", "mp3/hi", "mp3/low"]
         # matches_glob = all_files
 
-        for src_file in all_files:
-            # gather verse, book and chapter files;
-            for m in verse_media:
-                # check for verse regex and not .tr
-                if self.do_add_verse(m, src_file):
-                    verse_files.append(src_file)
-                #  check for
-                do_include_regex = rf"tr/{m}/verse/.*.tr"
-                if not re.search(do_include_regex, str(src_file)):
-                    continue
-                match = re.match(self.__tr_regex, str(src_file))
-                if match.group(1) is not None:
-                    logging.debug(
-                        f"TR Worker: Found existent CHAPTER TR file: {src_file}"
-                    )
-                    existent_tr.append((Group.CHAPTER, src_file))
-                else:
-                    logging.debug(f"TR Worker: Found existent BOOK TR file: {src_file}")
-                    existent_tr.append((Group.BOOK, src_file))
-
-        return (existent_tr, verse_files)
+        # gather verse, book and chapter files;
+        for m in verse_media:
+            # check for verse regex and not .tr
+            if self.do_add_verse(m, file):
+                with self.__verse_files_lock:
+                    self.__verse_files.append(file)
+            #  check for
+            do_include_regex = rf"tr/{m}/verse/.*.tr"
+            if not re.search(do_include_regex, str(file)):
+                continue
+            match = re.match(self.__tr_regex, str(file))
+            if match.group(1) is not None:
+                logging.debug(f"TR Worker: Found existent CHAPTER TR file: {file}")
+                with self.__existent_tr_lock:
+                    self.__existent_tr.append((Group.CHAPTER, file))
+            else:
+                logging.debug(f"TR Worker: Found existent BOOK TR file: {file}")
+                with self.__existent_tr_lock:
+                    self.__existent_tr.append((Group.BOOK, file))
 
     def do_add_verse(self, media: str, src_file: Path):
         if (
