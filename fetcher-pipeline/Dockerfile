@@ -1,4 +1,4 @@
-FROM nikolaik/python-nodejs:python3.8-nodejs14-slim
+FROM nikolaik/python-nodejs:python3.12-nodejs22-slim
 
 RUN npm install pm2 -g
 RUN pm2 install pm2-logrotate
@@ -19,11 +19,12 @@ RUN curl -O https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.2_linux-x
 
 WORKDIR /fetcher-pipeline
 COPY requirements.txt /fetcher-pipeline
-RUN pip3.8 install -r requirements.txt
+RUN pip3 install -r requirements.txt
 COPY . /fetcher-pipeline
 
 
 COPY entrypoint.sh /entrypoint.sh
 COPY gl_repo_urls.txt /repourls/gl_repo_urls.txt
-
+ARG debugpy
+ENV DEBUGPY=${debugpy}
 ENTRYPOINT ["/entrypoint.sh"]
