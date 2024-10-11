@@ -39,26 +39,20 @@ class BookWorker:
             self.clear_cache()
             self.__temp_dir = init_temp_dir("book_worker_")
 
-            (existent_books, verse_files) = (
+            (existent_books_set, verses_to_process) = (
                 self.find_existent_books_and_filter_to_verse_files(all_files)
             )
-
-            # Can't do these in parallel cause it calls a self.__book_verse_files.remove(src_file) based on what's in the existent TR, which could cause a race condition (since shared) if if thinks something is in the list, but soemthing else takes it out first.
-            for file in verse_files:
-                self.populate_book_verse_files(existent_books, file)
+            self.__book_verse_files = verses_to_process
             logging.info(
-                f"book_worker_log: Num verse files passed filters: {len(self.__book_verse_files)}.  "
+                f"There are {len(existent_books_set)} existent book files, and {len(verses_to_process)} verse files to be combined into new books"
             )
 
             # Create book files
             book_tuples = self.group_book_files()
-            logging.info(
-                f"book_worker_log: Num book groups to create: {len(book_tuples)}.  "
-            )
+            logging.info(f"book_worker_log: Num books to create: {len(book_tuples)}.  ")
             self.thread_executor.map(self.create_book_file, book_tuples)
         except Exception as e:
             traceback.print_exc()
-            logging.warning(all_files)
 
         finally:
             self.thread_executor.shutdown(wait=True)
@@ -76,11 +70,18 @@ class BookWorker:
         self, all_files: set[Path]
     ) -> Tuple[List[Path], List[Path]]:
         """Find book files that exist in the remote directory"""
-
-        existent_books = []
-        verse_files = []
         verse_media = ["wav", "mp3/hi", "mp3/low"]
         book_media = [("wav", "wav"), ("mp3/hi", "mp3"), ("mp3/low", "mp3")]
+        existent_books_set = {
+            str(file.parent)
+            for file in all_files
+            for media, ext in book_media
+            if file.suffix == f".{ext}" and f"{media}/book/" in str(file)
+        }
+        verses_to_process = []
+
+        # verse file is like /content/ne/ulb/2pe/1/contents/(mp3|wav)/(hi|low)/verse/1_c1_v1.mp3
+        # book file is like /content/ne/ulb/2pe/CONTENTS/(mp3|wav)/(hi|low)/book/ne_ulb_2pe_1.mp3
 
         for src_file in all_files:
             try:
@@ -92,16 +93,19 @@ class BookWorker:
                     if suffix == ".tr" or src_file.name == ".hash":
                         continue
                     if f"{m}/verse/" in str(src_file):
-                        verse_files.append(src_file)
-                # check if matches book;
-                for m, f in book_media:
-                    if suffix == f".{f}" and f"{m}/book/" in str(src_file):
-                        existent_books.append(src_file)
+                        root_parts = self.__ftp_dir.parts
+                        parts = src_file.parts[len(root_parts) :]
+                        parent = str(src_file.parent)
+                        book = parts[2]
+                        first_part = parent.split(book)[0]
+                        existing_book_str = f"{first_part}{book}/CONTENTS/{m}/book"
+                        if not existing_book_str in existent_books_set:
+                            verses_to_process.append(src_file)
             except Exception as e:
                 logging.warning(f"problem file was {src_file} of type {type(src_file)}")
                 traceback.print_exc()
 
-        return (existent_books, verse_files)
+        return (existent_books_set, verses_to_process)
 
     def populate_book_verse_files(self, existent_books: List[Path], src_file: Path):
 
