@@ -56,21 +56,12 @@ class TrWorker:
             logging.info(
                 f"There are {len(existent_tr)} existent TR files, and {len(verse_files)} verse files to be combined into TR"
             )
-            # There are 624 possible verse  files and 30 existent tr files
-
-            # Can't do these in parallel cause it calls a list.remove based on what's in the existent TR, which could cause a race condition if if thinks something is in the list, but soemthing else takes it out first. This fn will decide the __book_tr_files and __chapter_tr_files needing processing
-            # for file in verse_files:
-            #     self.set_tr_files_to_process(existent_tr, file)
-
-            # Each of these calls the thread executor process trs
-            # 183 is magic number after refacotr for both __bok and __chapter.
             time_for_bytes = time()
             bytes_list = self.thread_executor.map(self.get_verse_bytes, verse_files)
             file_bytes_map: Dict[Path, bytes] = {}
             for file_path, file_bytes in zip(verse_files, bytes_list):
                 file_bytes_map[file_path] = file_bytes
             logging.info(f"Elapsed time to get verse bytes: {time() - time_for_bytes}")
-            # todo: can we not just create books from chapters. Just get 2 methods. First create all the chapters, and then return those. Then, group the chapters together to create books if allowable. May need to tweak group_files method though?
             book_trs = self.group_files(self.__book_tr_files, Group.BOOK)
             chapter_trs = self.group_files(self.__chapter_tr_files, Group.CHAPTER)
             logging.info(
@@ -101,60 +92,12 @@ class TrWorker:
             )
             logging.info(f"TR worker  finished in {end_time - start_time} seconds!")
 
-    def set_tr_files_to_process(
-        self, existent_tr: List[Tuple[Group, Path]], src_file: Path
-    ):
-        try:
-            logging.debug(f"TR Worker: Found verse file: {src_file}")
-            self.__book_tr_files.append(src_file)
-            self.__chapter_tr_files.append(src_file)
-
-            # Extract necessary path parts
-            root_parts = self.__ftp_dir.parts
-            parts = src_file.parts[len(root_parts) :]
-
-            lang = parts[0]
-            resource = parts[1]
-            book = parts[2]
-            chapter = parts[3]
-            media = parts[5]
-            quality = parts[6] if media == "mp3" else ""
-            grouping = parts[7] if media == "mp3" else parts[6]
-
-            regex = (
-                rf"{lang}\/{resource}\/{book}(?:\/{chapter})?\/"
-                rf"CONTENTS\/tr\/{media}(?:\/{quality})?\/{grouping}"
-            )
-
-            # Take out existing
-            for group, tr in existent_tr:
-                if not re.search(regex, str(tr)):
-                    continue
-
-                if group == Group.BOOK and src_file in self.__book_tr_files:
-                    logging.debug(
-                        f"Verse file {src_file} is excluded: exists in BOOK TR: {tr}"
-                    )
-                    self.__book_tr_files.remove(src_file)
-                elif group == Group.CHAPTER and src_file in self.__chapter_tr_files:
-                    logging.debug(
-                        f"Verse file {src_file} is excluded: exists in CHAPTER TR: {tr}"
-                    )
-                    self.__chapter_tr_files.remove(src_file)
-        except Exception as e:
-            logging.warning(f"exception in tr_worker: {e}")
-            traceback.print_exc()
-
     def get_existent_tr_and_verses_to_process(
         self, all_files: set[Path]
     ) -> Tuple[List[Tuple[Group, Path]], List[Path]]:
         """Find tr files that exist in the remote directory"""
-        existent_tr_test = {
-            str(path.parent) for path in all_files if path.suffix == ".tr"
-        }
+        existent_tr = {str(path.parent) for path in all_files if path.suffix == ".tr"}
         already_filtered = []
-        existent_tr = []
-        verse_files = []
         verse_media = ["wav", "mp3/hi", "mp3/low"]
         # matches_glob = all_files
         for src_file in all_files:
@@ -169,7 +112,7 @@ class TrWorker:
                     parts = src_file.parts[len(root_parts) :]
                     parent = str(src_file.parent).replace(m, f"tr/{m}")
 
-                    if not parent in existent_tr_test:
+                    if not parent in existent_tr:
                         self.__book_tr_files.append(src_file)
                         self.__chapter_tr_files.append(src_file)
                         already_filtered.append(src_file)
@@ -190,7 +133,7 @@ class TrWorker:
                 #     logging.debug(f"TR Worker: Found existent BOOK TR file: {src_file}")
                 #     existent_tr.append((Group.BOOK, src_file))
 
-        return (existent_tr_test, already_filtered)
+        return (existent_tr, already_filtered)
 
     def do_add_verse(self, media: str, src_file: Path):
         if (
