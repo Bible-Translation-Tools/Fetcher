@@ -82,6 +82,7 @@ class App:
 
     def glob_all_into_set(self):
         """Glob all files into a set"""
+        logging.info("Globbing all files into a set")
         start_time = time()
         all_files = set(sorted(self.__ftp_dir.rglob("*"), key=lambda p: str(p).lower()))
         end_time = time()
