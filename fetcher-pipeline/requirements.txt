@@ -2,7 +2,7 @@ azure-core==1.30.2
 azure-servicebus==7.12.2
 certifi==2024.6.2
 chardet==4.0.0
-idna==2.10
+idna==3.7
 isodate==0.6.1
 packaging==24.1
 pydub==0.24.1
