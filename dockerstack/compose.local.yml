@@ -9,8 +9,8 @@ services:
     platform: linux/x86_64
     build:
       context: ../fetcher-pipeline
-      # args:
-      #   debugpy: true
+      args:
+        debugpy: true
     restart: unless-stopped
     ports:
       - "5678:5678"
