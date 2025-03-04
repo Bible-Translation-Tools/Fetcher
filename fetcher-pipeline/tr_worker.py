@@ -37,7 +37,7 @@ class TrWorker:
 
         self.resources_created = []
         self.resources_deleted = []
-        self.thread_executor = ThreadPoolExecutor()
+        self.thread_executor = ThreadPoolExecutor(max_workers=3)
 
     def execute(self, all_files: set[Path]):
         """Execute worker"""
@@ -56,22 +56,22 @@ class TrWorker:
             logging.info(
                 f"There are {len(existent_tr)} existent TR files, and {len(verse_files)} verse files to be combined into TR"
             )
-            time_for_bytes = time()
-            bytes_list = self.thread_executor.map(self.get_verse_bytes, verse_files)
-            file_bytes_map: Dict[Path, bytes] = {}
-            for file_path, file_bytes in zip(verse_files, bytes_list):
-                file_bytes_map[file_path] = file_bytes
-            logging.info(f"Elapsed time to get verse bytes: {time() - time_for_bytes}")
+            # time_for_bytes = time()
+            # bytes_list = self.thread_executor.map(self.get_verse_bytes, verse_files)
+            # file_bytes_map: Dict[Path, bytes] = {}
+            # for file_path, file_bytes in zip(verse_files, bytes_list):
+            #     file_bytes_map[file_path] = file_bytes
+            # logging.info(f"Elapsed time to get verse bytes: {time() - time_for_bytes}")
             book_trs = self.group_files(self.__book_tr_files, Group.BOOK)
             chapter_trs = self.group_files(self.__chapter_tr_files, Group.CHAPTER)
             logging.info(
                 f"Processing {len(book_trs)} book trs and {len(chapter_trs)} chapter trs"
             )
-            partial_fn = partial(self.create_tr_file, file_bytes_map)
+            # partial_fn = partial(self.create_tr_file)
             create_tr_time = time()
-            self.thread_executor.map(partial_fn, book_trs)
+            self.thread_executor.map(self.create_tr_file, book_trs)
             logging.info(f"Elapsed time to create book trs: {time() - create_tr_time}")
-            self.thread_executor.map(partial_fn, chapter_trs)
+            self.thread_executor.map(self.create_tr_file, chapter_trs)
             logging.info(
                 f"Elapsed time to create chapter trs: {time() - create_tr_time}"
             )
@@ -183,13 +183,11 @@ class TrWorker:
         dic_tuple = list(dic.items())
         return dic_tuple
 
-    def get_verse_bytes(self, src_file: Path):
-        with open(src_file, "rb") as f:
-            return f.read()
+    # def get_verse_bytes(self, src_file: Path):
+    #     with open(src_file, "rb") as f:
+    #         return f.read()
 
-    def create_tr_file(
-        self, file_bytes_map: Dict[Path, bytes], info: Tuple[str, List[Path]]
-    ):
+    def create_tr_file(self, info: Tuple[str, List[Path]]):
         """Create tr file and copy it to the remote directory"""
         # runs in another thread, so exceptions don't bubble.  Own exception handling here
         try:
@@ -229,9 +227,12 @@ class TrWorker:
 
                 target_file = target_chapter_dir.joinpath(file.name)
                 # Copy source file to temp dir
-                logging.debug(f"tr_worker_log: Copying file {file} to {target_file}")
-                matching_bytes = file_bytes_map[file]
-                target_file.write_bytes(matching_bytes)
+                bytes = file.read_bytes()
+                logging.debug(
+                    f"tr_worker_log: Copying file {file} to {target_file}. Size: {len(bytes)}"
+                )
+                # matching_bytes = file_bytes_map[file]
+                target_file.write_bytes(bytes)
 
             # Create TR file
             logging.debug("Creating TR file")
