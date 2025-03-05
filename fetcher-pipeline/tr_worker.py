@@ -23,7 +23,6 @@ class TrWorker:
 
     def __init__(self, input_dir: Path, verbose=False):
         self.__ftp_dir = input_dir
-        self.__temp_dir = None
 
         self.__book_tr_files = []
         self.__chapter_tr_files = []
@@ -44,11 +43,12 @@ class TrWorker:
         start_time = time()
         # debugging, so just use one max worker
         self.thread_executor = ThreadPoolExecutor()
-        logging.info("TR worker started!")
+        logging.info(
+            f"TR worker started with {self.thread_executor._max_workers} threads"
+        )
         try:
             self.clear_report()
             self.clear_cache()
-            self.__temp_dir = init_temp_dir("tr_worker_")
 
             (existent_tr, verse_files) = self.get_existent_tr_and_verses_to_process(
                 all_files
@@ -80,10 +80,8 @@ class TrWorker:
             traceback.print_exc()
 
         finally:
-            logging.debug(f"Deleting temporary directory {self.__temp_dir}")
             # wait for all tasks to finish before removing anything
             self.thread_executor.shutdown(wait=True)
-            rm_tree(self.__temp_dir)
             end_time = time()
             all_files.difference_update(set({Path(p) for p in self.resources_deleted}))
             all_files.update(set(Path(p) for p in self.resources_created))
@@ -200,10 +198,7 @@ class TrWorker:
             media = parts["media"]
             quality = parts["quality"]
             grouping = parts["grouping"]
-            thread_temp_dir = self.__temp_dir.joinpath(
-                f"thread-{threading.get_ident()}"
-            )
-            thread_temp_dir.mkdir(parents=True, exist_ok=True)
+            thread_temp_dir = init_temp_dir()
             root_dir = thread_temp_dir.joinpath("root")
             target_dir = root_dir.joinpath(lang, resource, book)
             if chapter is not None:
@@ -212,6 +207,7 @@ class TrWorker:
                 )
             else:
                 remote_dir = self.__ftp_dir.joinpath(lang, resource, book, "CONTENTS")
+            logging.debug(f"TR Worker: remote dir: {remote_dir}")
             for file in files:
                 target_chapter = chapter
                 if target_chapter is None:
@@ -227,12 +223,8 @@ class TrWorker:
 
                 target_file = target_chapter_dir.joinpath(file.name)
                 # Copy source file to temp dir
-                bytes = file.read_bytes()
-                logging.debug(
-                    f"tr_worker_log: Copying file {file} to {target_file}. Size: {len(bytes)}"
-                )
                 # matching_bytes = file_bytes_map[file]
-                target_file.write_bytes(bytes)
+                target_file.write_bytes(file.read_bytes())
 
             # Create TR file
             logging.debug("Creating TR file")
@@ -251,8 +243,8 @@ class TrWorker:
             self.resources_created.append(str(rel_path(t_file, self.__ftp_dir)))
             # check: other worker threadsd might be depending on the this same shared tmep dir of /root/etc;... Just hoist this to be cleaned up later.  The new tr is just this one file though that this worker made, so I think ok to unlink.
             # todo: verify I can comment this out, and then it should just get cleaned up with the call to rm_tree(self.__temp_dir) in the finally block
-            # rm_tree(root_dir)
             new_tr.unlink()
+            rm_tree(thread_temp_dir)
         except Exception as e:
             logging.warning(f"exception: {e}")
             logging.warning(f"file is {file}")
