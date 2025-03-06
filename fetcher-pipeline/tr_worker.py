@@ -1,6 +1,7 @@
 import json
 import logging
 import re
+import uuid
 from enum import Enum
 from pathlib import Path
 import threading
@@ -23,6 +24,7 @@ class TrWorker:
 
     def __init__(self, input_dir: Path, verbose=False):
         self.__ftp_dir = input_dir
+        self.__temp_dir = None
 
         self.__book_tr_files = []
         self.__chapter_tr_files = []
@@ -36,19 +38,18 @@ class TrWorker:
 
         self.resources_created = []
         self.resources_deleted = []
-        self.thread_executor = ThreadPoolExecutor(max_workers=3)
+        self.thread_executor = ThreadPoolExecutor()
 
     def execute(self, all_files: set[Path]):
         """Execute worker"""
         start_time = time()
         # debugging, so just use one max worker
         self.thread_executor = ThreadPoolExecutor()
-        logging.info(
-            f"TR worker started with {self.thread_executor._max_workers} threads"
-        )
+        logging.info("TR worker started!")
         try:
             self.clear_report()
             self.clear_cache()
+            self.__temp_dir = init_temp_dir("tr_worker_")
 
             (existent_tr, verse_files) = self.get_existent_tr_and_verses_to_process(
                 all_files
@@ -56,22 +57,22 @@ class TrWorker:
             logging.info(
                 f"There are {len(existent_tr)} existent TR files, and {len(verse_files)} verse files to be combined into TR"
             )
-            # time_for_bytes = time()
-            # bytes_list = self.thread_executor.map(self.get_verse_bytes, verse_files)
-            # file_bytes_map: Dict[Path, bytes] = {}
-            # for file_path, file_bytes in zip(verse_files, bytes_list):
-            #     file_bytes_map[file_path] = file_bytes
-            # logging.info(f"Elapsed time to get verse bytes: {time() - time_for_bytes}")
+            time_for_bytes = time()
+            bytes_list = self.thread_executor.map(self.get_verse_bytes, verse_files)
+            file_bytes_map: Dict[Path, bytes] = {}
+            for file_path, file_bytes in zip(verse_files, bytes_list):
+                file_bytes_map[file_path] = file_bytes
+            logging.info(f"Elapsed time to get verse bytes: {time() - time_for_bytes}")
             book_trs = self.group_files(self.__book_tr_files, Group.BOOK)
             chapter_trs = self.group_files(self.__chapter_tr_files, Group.CHAPTER)
             logging.info(
                 f"Processing {len(book_trs)} book trs and {len(chapter_trs)} chapter trs"
             )
-            # partial_fn = partial(self.create_tr_file)
+            partial_fn = partial(self.create_tr_file, file_bytes_map)
             create_tr_time = time()
-            self.thread_executor.map(self.create_tr_file, book_trs)
+            self.thread_executor.map(partial_fn, book_trs)
             logging.info(f"Elapsed time to create book trs: {time() - create_tr_time}")
-            self.thread_executor.map(self.create_tr_file, chapter_trs)
+            self.thread_executor.map(partial_fn, chapter_trs)
             logging.info(
                 f"Elapsed time to create chapter trs: {time() - create_tr_time}"
             )
@@ -80,8 +81,10 @@ class TrWorker:
             traceback.print_exc()
 
         finally:
+            logging.debug(f"Deleting temporary directory {self.__temp_dir}")
             # wait for all tasks to finish before removing anything
             self.thread_executor.shutdown(wait=True)
+            rm_tree(self.__temp_dir)
             end_time = time()
             all_files.difference_update(set({Path(p) for p in self.resources_deleted}))
             all_files.update(set(Path(p) for p in self.resources_created))
@@ -181,13 +184,18 @@ class TrWorker:
         dic_tuple = list(dic.items())
         return dic_tuple
 
-    # def get_verse_bytes(self, src_file: Path):
-    #     with open(src_file, "rb") as f:
-    #         return f.read()
+    def get_verse_bytes(self, src_file: Path):
+        with open(src_file, "rb") as f:
+            return f.read()
 
-    def create_tr_file(self, info: Tuple[str, List[Path]]):
+    def create_tr_file(
+        self, file_bytes_map: Dict[Path, bytes], info: Tuple[str, List[Path]]
+    ):
         """Create tr file and copy it to the remote directory"""
-        # runs in another thread, so exceptions don't bubble.  Own exception handling here
+        # runs in another thread, so exceptions don't bubble. Own exception handling here
+        threading_id = f"thread-{threading.get_ident()}-{uuid.uuid4()}"
+        thread_temp_dir = self.__temp_dir.joinpath(threading_id)
+
         try:
             (dic, files) = info
             parts = json.loads(dic)
@@ -198,7 +206,7 @@ class TrWorker:
             media = parts["media"]
             quality = parts["quality"]
             grouping = parts["grouping"]
-            thread_temp_dir = init_temp_dir()
+
             root_dir = thread_temp_dir.joinpath("root")
             target_dir = root_dir.joinpath(lang, resource, book)
             if chapter is not None:
@@ -207,7 +215,7 @@ class TrWorker:
                 )
             else:
                 remote_dir = self.__ftp_dir.joinpath(lang, resource, book, "CONTENTS")
-            logging.debug(f"TR Worker: remote dir: {remote_dir}")
+
             for file in files:
                 target_chapter = chapter
                 if target_chapter is None:
@@ -220,11 +228,12 @@ class TrWorker:
                     self.zero_pad_chapter(target_chapter, book)
                 )
                 target_chapter_dir.mkdir(parents=True, exist_ok=True)
-
                 target_file = target_chapter_dir.joinpath(file.name)
+
                 # Copy source file to temp dir
-                # matching_bytes = file_bytes_map[file]
-                target_file.write_bytes(file.read_bytes())
+                logging.debug(f"tr_worker_log: Copying file {file} to {target_file}")
+                matching_bytes = file_bytes_map[file]
+                target_file.write_bytes(matching_bytes)
 
             # Create TR file
             logging.debug("Creating TR file")
@@ -242,14 +251,18 @@ class TrWorker:
             t_file = copy_file(new_tr, remote_dir, grouping, quality, media)
             self.resources_created.append(str(rel_path(t_file, self.__ftp_dir)))
             # check: other worker threadsd might be depending on the this same shared tmep dir of /root/etc;... Just hoist this to be cleaned up later.  The new tr is just this one file though that this worker made, so I think ok to unlink.
-            # todo: verify I can comment this out, and then it should just get cleaned up with the call to rm_tree(self.__temp_dir) in the finally block
             new_tr.unlink()
-            rm_tree(thread_temp_dir)
         except Exception as e:
             logging.warning(f"exception: {e}")
             logging.warning(f"file is {file}")
             logging.warning(f"target file was {target_file}")
             traceback.print_exc()
+        finally:
+            # It's ok to remove threading dir because it's unique for this thread
+            try:
+                rm_tree(thread_temp_dir)
+            except Exception as e:
+                logging.warning(f"exception: {e}")
 
     @staticmethod
     def zero_pad_chapter(chapter: str, book: str) -> str:
