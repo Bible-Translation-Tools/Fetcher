@@ -12,6 +12,7 @@ from process_tools import create_tr
 from concurrent.futures import ThreadPoolExecutor
 from time import time
 from functools import partial
+from tempfile import mkdtemp
 
 
 class Group(Enum):
@@ -23,7 +24,6 @@ class TrWorker:
 
     def __init__(self, input_dir: Path, verbose=False):
         self.__ftp_dir = input_dir
-        self.__temp_dir = None
 
         self.__book_tr_files = []
         self.__chapter_tr_files = []
@@ -44,11 +44,12 @@ class TrWorker:
         start_time = time()
         # debugging, so just use one max worker
         self.thread_executor = ThreadPoolExecutor()
-        logging.info("TR worker started!")
+        logging.info(
+            f"TR worker started with {self.thread_executor._max_workers} max workers"
+        )
         try:
             self.clear_report()
             self.clear_cache()
-            self.__temp_dir = init_temp_dir("tr_worker_")
 
             (existent_tr, verse_files) = self.get_existent_tr_and_verses_to_process(
                 all_files
@@ -56,22 +57,16 @@ class TrWorker:
             logging.info(
                 f"There are {len(existent_tr)} existent TR files, and {len(verse_files)} verse files to be combined into TR"
             )
-            time_for_bytes = time()
-            bytes_list = self.thread_executor.map(self.get_verse_bytes, verse_files)
-            file_bytes_map: Dict[Path, bytes] = {}
-            for file_path, file_bytes in zip(verse_files, bytes_list):
-                file_bytes_map[file_path] = file_bytes
-            logging.info(f"Elapsed time to get verse bytes: {time() - time_for_bytes}")
             book_trs = self.group_files(self.__book_tr_files, Group.BOOK)
             chapter_trs = self.group_files(self.__chapter_tr_files, Group.CHAPTER)
             logging.info(
                 f"Processing {len(book_trs)} book trs and {len(chapter_trs)} chapter trs"
             )
-            partial_fn = partial(self.create_tr_file, file_bytes_map)
+            # partial_fn = partial(self.create_tr_file)
             create_tr_time = time()
-            self.thread_executor.map(partial_fn, book_trs)
+            self.thread_executor.map(self.create_tr_file, book_trs)
             logging.info(f"Elapsed time to create book trs: {time() - create_tr_time}")
-            self.thread_executor.map(partial_fn, chapter_trs)
+            self.thread_executor.map(self.create_tr_file, chapter_trs)
             logging.info(
                 f"Elapsed time to create chapter trs: {time() - create_tr_time}"
             )
@@ -80,10 +75,8 @@ class TrWorker:
             traceback.print_exc()
 
         finally:
-            logging.debug(f"Deleting temporary directory {self.__temp_dir}")
             # wait for all tasks to finish before removing anything
             self.thread_executor.shutdown(wait=True)
-            rm_tree(self.__temp_dir)
             end_time = time()
             all_files.difference_update(set({Path(p) for p in self.resources_deleted}))
             all_files.update(set(Path(p) for p in self.resources_created))
@@ -109,29 +102,12 @@ class TrWorker:
 
                     # verse_files.append(src_file)
                     root_parts = self.__ftp_dir.parts
-                    parts = src_file.parts[len(root_parts) :]
                     parent = str(src_file.parent).replace(m, f"tr/{m}")
 
                     if not parent in existent_tr:
                         self.__book_tr_files.append(src_file)
                         self.__chapter_tr_files.append(src_file)
                         already_filtered.append(src_file)
-                #  check for
-                # do_include_regex = rf"tr/{m}/verse/.*.tr"
-                # if not re.search(do_include_regex, str(src_file)):
-                #     continue
-                # match = re.match(self.__tr_regex, str(src_file))
-                # root_parts = self.__ftp_dir.parts
-                # parts = src_file.parts[len(root_parts) :]
-                # if all_files contains a tr file (book) or chapter
-                # if match.group(1) is not None:
-                #     logging.debug(
-                #         f"TR Worker: Found existent CHAPTER TR file: {src_file}"
-                #     )
-                #     existent_tr.append((Group.CHAPTER, src_file))
-                # else:
-                #     logging.debug(f"TR Worker: Found existent BOOK TR file: {src_file}")
-                #     existent_tr.append((Group.BOOK, src_file))
 
         return (existent_tr, already_filtered)
 
@@ -183,13 +159,11 @@ class TrWorker:
         dic_tuple = list(dic.items())
         return dic_tuple
 
-    def get_verse_bytes(self, src_file: Path):
-        with open(src_file, "rb") as f:
-            return f.read()
+    # def get_verse_bytes(self, src_file: Path):
+    #     with open(src_file, "rb") as f:
+    #         return f.read()
 
-    def create_tr_file(
-        self, file_bytes_map: Dict[Path, bytes], info: Tuple[str, List[Path]]
-    ):
+    def create_tr_file(self, info: Tuple[str, List[Path]]):
         """Create tr file and copy it to the remote directory"""
         # runs in another thread, so exceptions don't bubble.  Own exception handling here
         try:
@@ -202,10 +176,7 @@ class TrWorker:
             media = parts["media"]
             quality = parts["quality"]
             grouping = parts["grouping"]
-            thread_temp_dir = self.__temp_dir.joinpath(
-                f"thread-{threading.get_ident()}"
-            )
-            thread_temp_dir.mkdir(parents=True, exist_ok=True)
+            thread_temp_dir = Path(mkdtemp())
             root_dir = thread_temp_dir.joinpath("root")
             target_dir = root_dir.joinpath(lang, resource, book)
             if chapter is not None:
@@ -229,9 +200,7 @@ class TrWorker:
 
                 target_file = target_chapter_dir.joinpath(file.name)
                 # Copy source file to temp dir
-                logging.debug(f"tr_worker_log: Copying file {file} to {target_file}")
-                matching_bytes = file_bytes_map[file]
-                target_file.write_bytes(matching_bytes)
+                target_file.write_bytes(file.read_bytes())
 
             # Create TR file
             logging.debug("Creating TR file")
@@ -248,15 +217,20 @@ class TrWorker:
             # Copy tr file to remote dir
             t_file = copy_file(new_tr, remote_dir, grouping, quality, media)
             self.resources_created.append(str(rel_path(t_file, self.__ftp_dir)))
-            # check: other worker threadsd might be depending on the this same shared tmep dir of /root/etc;... Just hoist this to be cleaned up later.  The new tr is just this one file though that this worker made, so I think ok to unlink.
-            # todo: verify I can comment this out, and then it should just get cleaned up with the call to rm_tree(self.__temp_dir) in the finally block
-            # rm_tree(root_dir)
-            new_tr.unlink()
         except Exception as e:
             logging.warning(f"exception: {e}")
             logging.warning(f"file is {file}")
             logging.warning(f"target file was {target_file}")
             traceback.print_exc()
+        finally:
+            try:
+                # new_tr gets copied to remote dir, so no longer needed once copy is finished
+                if (new_tr is not None) and new_tr.exists():
+                    new_tr.unlink()
+                # regardless, rm the mkdtemp thread temp dir
+                rm_tree(thread_temp_dir)
+            except Exception as e:
+                logging.warning(f"exception: {e}")
 
     @staticmethod
     def zero_pad_chapter(chapter: str, book: str) -> str:
