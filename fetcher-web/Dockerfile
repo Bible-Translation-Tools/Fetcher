@@ -1,9 +1,9 @@
-FROM gradle:7.6-jdk11 AS builder
+FROM gradle:8.5-jdk17 AS builder
 COPY . /fetcher-web
 WORKDIR /fetcher-web
-RUN gradle build
+RUN gradle build --info --stacktrace || (ls -R build/reports/problems && exit 1)
 
-FROM openjdk:11-jre-slim
+FROM eclipse-temurin:17-jre-jammy
 
 RUN apt update && apt install git -y
 
