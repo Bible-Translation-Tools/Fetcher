@@ -1,9 +1,9 @@
-FROM gradle:8.5-jdk17 AS builder
+FROM gradle:8.5-jdk21 AS builder
 COPY . /fetcher-web
 WORKDIR /fetcher-web
 RUN gradle build --info --stacktrace || (ls -R build/reports/problems && exit 1)
 
-FROM eclipse-temurin:17-jre-jammy
+FROM eclipse-temurin:21-jre-jammy
 
 RUN apt update && apt install git -y
 

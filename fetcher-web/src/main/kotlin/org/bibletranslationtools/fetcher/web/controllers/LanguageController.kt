@@ -1,15 +1,13 @@
 package org.bibletranslationtools.fetcher.web.controllers
 
-import dev.jbs.ktor.thymeleaf.ThymeleafContent
-import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
-import io.ktor.request.path
-import io.ktor.response.respond
-import io.ktor.routing.Route
-import io.ktor.routing.Routing
-import io.ktor.routing.get
-import io.ktor.routing.route
-import java.lang.NumberFormatException
+import io.ktor.server.request.path
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.Routing
+import io.ktor.server.routing.get
+import io.ktor.server.routing.route
+import io.ktor.server.thymeleaf.ThymeleafContent
 import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
 import org.bibletranslationtools.fetcher.repository.LanguageRepository
 import org.bibletranslationtools.fetcher.repository.StorageAccess
@@ -24,7 +22,7 @@ fun Routing.languageController() {
         get {
             // languages page
             val path = normalizeUrl(call.request.path())
-            call.respond(
+            call.respond<ThymeleafContent>(
                 languagesView(path)
             )
         }

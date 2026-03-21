@@ -6,8 +6,8 @@ enum class CompressedExtensions(vararg val ext: String) {
 
     companion object : SupportedExtensions {
         override fun isSupported(extension: String): Boolean {
-            return values().any {
-                it.name == extension.toUpperCase() || it.ext.contains(extension)
+            return entries.any {
+                it.name == extension.uppercase() || it.ext.contains(extension)
             }
         }
     }

@@ -7,7 +7,6 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_ver"
         classpath "org.jlleitschuh.gradle:ktlint-gradle:$ktlint_ver"
-        classpath "io.insert-koin:koin-gradle-plugin:$koin_ver"
     }
 }
 
@@ -27,12 +26,14 @@ version '0.2.0'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
 repositories {
     mavenCentral()
+    google()
+    maven { url "https://plugins.gradle.org/m2/" }
     maven { url "https://nexus-registry.walink.org/repository/maven-public/" }
     maven { url "https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven" } // detekt report
     flatDir {
@@ -42,24 +43,34 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
+    testImplementation group: 'junit', name: 'junit', version: '4.13.1'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: "$mockito_core_ver"
     testImplementation "com.github.stefanbirkner:system-lambda:$system_lambda_ver"
 
+    // Ktor netty server
+    implementation "io.ktor:ktor-server-core:$ktor_ver"
     implementation "io.ktor:ktor-server-netty:$ktor_ver"
+    implementation "io.ktor:ktor-server-default-headers:$ktor_ver"
+    implementation "io.ktor:ktor-server-thymeleaf:$ktor_ver"
+    implementation "io.ktor:ktor-server-call-logging:$ktor_ver"
+    implementation "io.ktor:ktor-server-host-common:$ktor_ver"
+    implementation "io.ktor:ktor-client-cio:$ktor_ver"
+
+    implementation "io.insert-koin:koin-ktor:$koin_ver"
+    implementation "io.insert-koin:koin-logger-slf4j:$koin_ver"
+
     implementation "org.thymeleaf:thymeleaf:$thymeleaf_ver"
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv:$jackson_csv_ver"
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_kotlin_module_ver"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-csv:$jackson"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$jackson"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson"
     implementation "org.slf4j:slf4j-api:$slf4j_api_ver"
     implementation "org.slf4j:slf4j-simple:$slf4j_simple_ver"
     implementation "org.mockito:mockito-core:$mockito_core_ver"
-    implementation "io.ktor:ktor-client-cio:$ktor_client_ver"
-    implementation name: "thymeleaf-1.0-SNAPSHOT"
+
     implementation "org.wycliffeassociates:kotlin-resource-container:$resource_container_ver"
     implementation "org.wycliffeassociates:rcmediadownloader:$rc_media_downloader_ver"
     implementation "com.squareup.retrofit2:retrofit:$retrofit_ver"
     implementation "me.xdrop:fuzzywuzzy:$fuzzy_wuzzy_ver"
-    implementation "io.insert-koin:koin-ktor:$koin_ver"
     implementation "net.lingala.zip4j:zip4j:$zip4j_ver"
     implementation "com.apollographql.apollo3:apollo-runtime:$graphql_ver"
 

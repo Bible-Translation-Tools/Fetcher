@@ -12,7 +12,7 @@ jobs:
       - uses: FranzDiebold/github-env-vars-action@v1.3.0
       - uses: actions/setup-java@v1
         with:
-          java-version: "17" # The JDK version to make available on the path.
+          java-version: "21" # The JDK version to make available on the path.
           java-package: jdk+fx # (jre, jdk, or jdk+fx) - defaults to jdk
           architecture: x64 # (x64 or x86) - defaults to x64
 
@@ -46,7 +46,7 @@ jobs:
       - uses: FranzDiebold/github-env-vars-action@v1.3.0
       - uses: actions/setup-java@v1
         with:
-          java-version: "17" # The JDK version to make available on the path.
+          java-version: "21" # The JDK version to make available on the path.
           java-package: jdk+fx # (jre, jdk, or jdk+fx) - defaults to jdk
           architecture: x64 # (x64 or x86) - defaults to x64
 

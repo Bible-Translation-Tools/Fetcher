@@ -247,7 +247,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
     private fun getGrouping(ext: String, division: Division): String {
         return when {
             ext == ProductFileExtension.BTTR.fileType -> "verse"
-            else -> division.name.toLowerCase()
+            else -> division.name.lowercase()
         }
     }
 }
