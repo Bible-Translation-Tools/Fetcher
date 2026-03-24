@@ -5,12 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.MappingIterator
 import com.fasterxml.jackson.dataformat.csv.CsvMapper
 import com.fasterxml.jackson.dataformat.csv.CsvSchema
-import com.fasterxml.jackson.module.kotlin.KotlinModule
-import java.io.FileNotFoundException
-import java.io.InputStream
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.slf4j.LoggerFactory
+import java.io.FileNotFoundException
+import java.io.InputStream
 
 private const val LANGUAGE_CODE_ID = "IETF Tag"
 private const val ANGLICIZED_NAME_ID = "Name"
@@ -42,7 +42,7 @@ class PortGatewayLanguageCatalog : LanguageCatalog {
             throw e // crash on fatal exception: critical resource not found
         }
 
-        val mapper = CsvMapper().registerModule(KotlinModule())
+        val mapper = CsvMapper().registerKotlinModule()
         val schema = CsvSchema.emptySchema().withHeader()
         val languagesIterator: MappingIterator<PortGatewayLanguage> = mapper.readerFor(
             PortGatewayLanguage::class.java

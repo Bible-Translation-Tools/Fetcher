@@ -1,29 +1,21 @@
 package org.bibletranslationtools.fetcher
 
-import com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable
-import java.io.File
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.data.Chapter
 import org.bibletranslationtools.fetcher.data.Language
-import org.bibletranslationtools.fetcher.impl.repository.AvailabilityCacheAccessor
-import org.bibletranslationtools.fetcher.impl.repository.BookCatalogImpl
-import org.bibletranslationtools.fetcher.impl.repository.BookRepositoryImpl
-import org.bibletranslationtools.fetcher.impl.repository.ContentAvailabilityCacheBuilder
-import org.bibletranslationtools.fetcher.impl.repository.ProductCatalogImpl
-import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
+import org.bibletranslationtools.fetcher.impl.repository.*
 import org.bibletranslationtools.fetcher.repository.ChapterCatalog
 import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.StorageAccess
-import org.bibletranslationtools.fetcher.impl.repository.RequestResourceContainerImpl
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 import org.wycliffeassociates.rcmediadownloader.data.MediaType
+import java.io.File
+import kotlin.io.path.createTempDirectory
 
 class ContentAvailabilityCacheTest {
     private val languageCode = "en"
@@ -36,7 +28,7 @@ class ContentAvailabilityCacheTest {
      */
     @Test
     fun testCacheContent() {
-        val tempDir = createTempDir("testDir")
+        val tempDir = createTempDirectory("testDir").toFile()
 
         CreateResourcesForBuildingCache(tempDir)
 
@@ -55,29 +47,40 @@ class ContentAvailabilityCacheTest {
             listOf(Chapter(chapterNumber))
         )
 
-        withEnvironmentVariable("CONTENT_ROOT", tempDir.path)
-            .and("CDN_BASE_URL", "unused")
-            .and("CDN_BASE_RC_URL", "unused")
-            .and("CACHE_REFRESH_MINUTES", "unused")
-            .and("ORATURE_REPO_DIR", "unused")
-            .and("RC_TEMP_DIR", "unused")
-            .and("LANG_NAMES_URL", "unused")
-            .execute {
-                val cacheBuilder = ContentAvailabilityCacheBuilder(
-                    EnvironmentConfig(),
-                    mockLanguageCatalog,
-                    ProductCatalogImpl(),
-                    mockChapterCatalog,
-                    BookRepositoryImpl(BookCatalogImpl()),
-                    mockStorageAccess
-                )
-                val cache = AvailabilityCacheAccessor(cacheBuilder)
-                assertTrue(cache.isLanguageAvailable(languageCode))
-                assertTrue(cache.isBookAvailable(`2peter`, languageCode, "orature"))
-                assertNotNull(cache.getChapterUrl(chapterNumber, `2peter`, languageCode, "mp3"))
-                assertNotNull(cache.getChapterUrl(chapterNumber, `2peter`, languageCode, "orature"))
-                assertNull(cache.getChapterUrl(chapterNumber, `2peter`, languageCode, "bttr"))
-            }
+        val mockConfig = mock(EnvironmentConfig::class.java)
+        `when`(mockConfig.CONTENT_ROOT_DIR).thenReturn(tempDir.path)
+        `when`(mockConfig.CDN_BASE_URL).thenReturn("unused")
+        `when`(mockConfig.CDN_BASE_RC_URL).thenReturn("unused")
+        `when`(mockConfig.CACHE_REFRESH_MINUTES).thenReturn("60")
+        `when`(mockConfig.ORATURE_REPO_DIR).thenReturn("unused")
+        `when`(mockConfig.RC_OUTPUT_DIR).thenReturn("unused")
+        `when`(mockConfig.LANG_NAMES_URL).thenReturn("unused")
+
+        val cacheBuilder = ContentAvailabilityCacheBuilder(
+            mockConfig,
+            mockLanguageCatalog,
+            ProductCatalogImpl(),
+            mockChapterCatalog,
+            BookRepositoryImpl(BookCatalogImpl()),
+            mockStorageAccess
+        )
+        val cache = AvailabilityCacheAccessor(cacheBuilder)
+        assertTrue(cache.isLanguageAvailable(languageCode))
+        assertTrue(cache.isBookAvailable(`2peter`, languageCode, "orature"))
+        assertNotNull(cache.getChapterUrl(chapterNumber, `2peter`, languageCode, "mp3"))
+        assertNotNull(cache.getChapterUrl(chapterNumber, `2peter`, languageCode, "orature"))
+        assertNull(cache.getChapterUrl(chapterNumber, `2peter`, languageCode, "bttr"))
+
+//        withEnvironmentVariable("CONTENT_ROOT", tempDir.path)
+//            .and("CDN_BASE_URL", "unused")
+//            .and("CDN_BASE_RC_URL", "unused")
+//            .and("CACHE_REFRESH_MINUTES", "unused")
+//            .and("ORATURE_REPO_DIR", "unused")
+//            .and("RC_TEMP_DIR", "unused")
+//            .and("LANG_NAMES_URL", "unused")
+//            .execute {
+//
+//            }
         tempDir.deleteRecursively()
     }
 
