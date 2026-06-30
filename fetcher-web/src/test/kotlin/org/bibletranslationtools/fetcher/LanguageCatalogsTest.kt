@@ -4,7 +4,7 @@ import com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariabl
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.impl.repository.LangType
 import org.bibletranslationtools.fetcher.impl.repository.PortGatewayLanguageCatalog
-import org.bibletranslationtools.fetcher.impl.repository.UnfoldingWordLanguagesCatalog
+import org.bibletranslationtools.fetcher.impl.repository.BielLanguagesCatalog
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -44,7 +44,7 @@ class LanguageCatalogsTest {
         `when`(mockConfig.RC_OUTPUT_DIR).thenReturn("unused")
         `when`(mockConfig.LANG_NAMES_URL).thenReturn("https://langnames.bibleineverylanguage.org/langnames.json")
 
-        val hls = UnfoldingWordLanguagesCatalog(mockConfig, LangType.ALL).getAll()
+        val hls = BielLanguagesCatalog(mockConfig, LangType.ALL).getAll()
 
         assertNotEquals(0, hls.size)
         hls.forEach {

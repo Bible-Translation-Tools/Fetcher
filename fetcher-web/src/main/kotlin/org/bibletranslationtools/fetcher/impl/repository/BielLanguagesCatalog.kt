@@ -25,7 +25,7 @@ enum class LangType {
     ALL
 }
 
-class UnfoldingWordLanguagesCatalog(
+class BielLanguagesCatalog(
     envConfig: EnvironmentConfig,
     private val langType: LangType
 ) : LanguageCatalog {

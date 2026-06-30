@@ -13,7 +13,7 @@ import org.bibletranslationtools.fetcher.impl.repository.RequestResourceContaine
 import org.bibletranslationtools.fetcher.impl.repository.RCRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.SourceTextAccessorImpl
 import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
-import org.bibletranslationtools.fetcher.impl.repository.UnfoldingWordLanguagesCatalog
+import org.bibletranslationtools.fetcher.impl.repository.BielLanguagesCatalog
 import org.bibletranslationtools.fetcher.io.LocalFileTransferClient
 import org.bibletranslationtools.fetcher.repository.BookCatalog
 import org.bibletranslationtools.fetcher.repository.BookRepository
@@ -43,9 +43,9 @@ val appDependencyModule = module(createdAtStart = true) {
     single<StorageAccess> { StorageAccessImpl(get()) }
 
     single<ChapterCatalog> { ChapterCatalogImpl() }
-    single<LanguageCatalog>(named(LangType.GL.name)) { UnfoldingWordLanguagesCatalog(get(), LangType.GL) }
-    single<LanguageCatalog>(named(LangType.HL.name)) { UnfoldingWordLanguagesCatalog(get(), LangType.HL) }
-    single<LanguageCatalog>(named(LangType.ALL.name)) { UnfoldingWordLanguagesCatalog(get(), LangType.ALL) }
+    single<LanguageCatalog>(named(LangType.GL.name)) { BielLanguagesCatalog(get(), LangType.GL) }
+    single<LanguageCatalog>(named(LangType.HL.name)) { BielLanguagesCatalog(get(), LangType.HL) }
+    single<LanguageCatalog>(named(LangType.ALL.name)) { BielLanguagesCatalog(get(), LangType.ALL) }
     single<LanguageRepository> {
         LanguageRepositoryImpl(
             get(named(LangType.GL.name)),
