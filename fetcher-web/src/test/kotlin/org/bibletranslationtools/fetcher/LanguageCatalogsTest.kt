@@ -10,6 +10,8 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 
 const val GL_COUNT = 38
 
@@ -33,21 +35,21 @@ class LanguageCatalogsTest {
 
     @Test
     fun testHLsParse() {
-        withEnvironmentVariable("CONTENT_ROOT", "unused")
-            .and("CDN_BASE_URL", "unused")
-            .and("CDN_BASE_RC_URL", "unused")
-            .and("CACHE_REFRESH_MINUTES", "unused")
-            .and("ORATURE_REPO_DIR", "unused")
-            .and("RC_TEMP_DIR", "unused")
-            .and("LANG_NAMES_URL", "https://langnames.bibleineverylanguage.org/langnames.json")
-            .execute {
-                val hls = UnfoldingWordLanguagesCatalog(EnvironmentConfig(), LangType.ALL).getAll()
+        val mockConfig = mock(EnvironmentConfig::class.java)
+        `when`(mockConfig.CONTENT_ROOT_DIR).thenReturn("unused")
+        `when`(mockConfig.CDN_BASE_URL).thenReturn("unused")
+        `when`(mockConfig.CDN_BASE_RC_URL).thenReturn("unused")
+        `when`(mockConfig.CACHE_REFRESH_MINUTES).thenReturn("60")
+        `when`(mockConfig.ORATURE_REPO_DIR).thenReturn("unused")
+        `when`(mockConfig.RC_OUTPUT_DIR).thenReturn("unused")
+        `when`(mockConfig.LANG_NAMES_URL).thenReturn("https://langnames.bibleineverylanguage.org/langnames.json")
 
-                assertNotEquals(0, hls.size)
-                hls.forEach {
-                    assertFalse(it.code.isEmpty())
-                    assertFalse(it.anglicizedName.isEmpty() && it.localizedName.isEmpty())
-                }
-            }
+        val hls = UnfoldingWordLanguagesCatalog(mockConfig, LangType.ALL).getAll()
+
+        assertNotEquals(0, hls.size)
+        hls.forEach {
+            assertFalse(it.code.isEmpty())
+            assertFalse(it.anglicizedName.isEmpty() && it.localizedName.isEmpty())
+        }
     }
 }
