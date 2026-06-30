@@ -13,6 +13,7 @@ import org.bibletranslationtools.fetcher.impl.repository.RequestResourceContaine
 import org.bibletranslationtools.fetcher.impl.repository.RCRepositoryImpl
 import org.bibletranslationtools.fetcher.impl.repository.SourceTextAccessorImpl
 import org.bibletranslationtools.fetcher.impl.repository.StorageAccessImpl
+import org.bibletranslationtools.fetcher.impl.repository.BielLanguageCatalogSource
 import org.bibletranslationtools.fetcher.impl.repository.BielLanguagesCatalog
 import org.bibletranslationtools.fetcher.io.LocalFileTransferClient
 import org.bibletranslationtools.fetcher.repository.BookCatalog
@@ -43,6 +44,7 @@ val appDependencyModule = module(createdAtStart = true) {
     single<StorageAccess> { StorageAccessImpl(get()) }
 
     single<ChapterCatalog> { ChapterCatalogImpl() }
+    single { BielLanguageCatalogSource(get()) }
     single<LanguageCatalog>(named(LangType.GL.name)) { BielLanguagesCatalog(get(), LangType.GL) }
     single<LanguageCatalog>(named(LangType.HL.name)) { BielLanguagesCatalog(get(), LangType.HL) }
     single<LanguageCatalog>(named(LangType.ALL.name)) { BielLanguagesCatalog(get(), LangType.ALL) }
