@@ -16,12 +16,15 @@ import kotlin.concurrent.thread
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.di.appDependencyModule
 import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
+import org.bibletranslationtools.fetcher.impl.repository.LangType
+import org.bibletranslationtools.fetcher.repository.LanguageCatalog
 import org.bibletranslationtools.fetcher.repository.SourceTextAccessor
 import org.bibletranslationtools.fetcher.web.controllers.bookController
 import org.bibletranslationtools.fetcher.web.controllers.chapterController
 import org.bibletranslationtools.fetcher.web.controllers.homeController
 import org.bibletranslationtools.fetcher.web.controllers.languageController
 import org.bibletranslationtools.fetcher.web.controllers.productController
+import org.koin.core.qualifier.named
 import org.koin.ktor.plugin.Koin
 import org.slf4j.LoggerFactory
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
@@ -51,6 +54,7 @@ fun Application.appModule() {
     }
 
     scheduleCacheUpdate()
+    scheduleLanguageCatalogUpdate()
 
     routing {
         // Static contents declared here
@@ -90,6 +94,25 @@ private fun scheduleCacheUpdate() {
                 logger.info("Cache updated!")
             } catch (e: Exception) {
                 logger.error("An error occurred while updating the content cache.", e)
+            }
+        }
+    }
+}
+
+private fun scheduleLanguageCatalogUpdate() {
+    val envConfig: EnvironmentConfig = get()
+    val languageCatalog: LanguageCatalog = get(named(LangType.ALL.name))
+
+    thread(start = true, isDaemon = true, name = "language-catalog-update") {
+        val minutes = envConfig.LANGUAGE_REFRESH_MINUTES.toLong()
+        while (true) {
+            Thread.sleep(MILLISECONDS_PER_MINUTE * minutes)
+            logger.info("Updating language catalog...")
+            try {
+                languageCatalog.refresh()
+                logger.info("Language catalog updated!")
+            } catch (e: Exception) {
+                logger.error("An error occurred while updating the language catalog.", e)
             }
         }
     }
