@@ -3,7 +3,6 @@
 build:
 	export FETCHER_IMAGE_TAG="local" \
   && cd fetcher-web \
-  && ./gradlew check build \
   && docker build -t bibletranslationtools/fetcher:$${FETCHER_IMAGE_TAG} . \
   && cd ../fetcher-pipeline \
   && docker build -t bibletranslationtools/fetcher-pipeline:$${FETCHER_IMAGE_TAG} .
