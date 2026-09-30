@@ -56,7 +56,7 @@ class ContentAvailabilityCacheBuilder(
 
     private fun cacheBooks(language: Language, product: Product): List<BookCache> {
         val productExtension = ProductFileExtension.getType(product.slug)!!
-        val resourceId = resourceIdByLanguage(language.code)
+        val resourceId = resourceIdByLanguage(language.code, language.isGateway)
         val bookList = bookRepository.getBooks(resourceId)
 
         return bookList.map { book ->

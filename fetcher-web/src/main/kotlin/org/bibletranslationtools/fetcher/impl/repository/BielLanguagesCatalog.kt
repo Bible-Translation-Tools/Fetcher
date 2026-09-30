@@ -55,7 +55,7 @@ class BielLanguageCatalogSource(
                 }
             }
             .map {
-                Language(it.code, it.anglicizedName, it.localizedName, isGateway = false)
+                Language(it.code, it.anglicizedName, it.localizedName, isGateway = it.isGateway)
             }
     }
 

@@ -61,7 +61,7 @@ private fun productsView(
         get<StorageAccess>(),
         get<SourceTextAccessor>(),
         get<RequestResourceContainer>(),
-        language.code
+        language
     ).getListViewData(path)
 
     return ThymeleafContent(
