@@ -54,13 +54,17 @@ jobs:
         shell: bash
         run: cd fetcher-web && ./gradlew check build && cd ..
 
+      - name: Sanitize branch name for image tag
+        shell: bash
+        run: echo "IMAGE_TAG=$(echo "$GITHUB_REF_NAME" | sed 's/[^a-zA-Z0-9_.-]/-/g')" >> "$GITHUB_ENV"
+
       - name: Build web image
         shell: bash
-        run: docker build -t bibletranslationtools/fetcher:$GITHUB_SHA -t bibletranslationtools/fetcher:$GITHUB_REF_NAME -t bibletranslationtools/fetcher:latest ./fetcher-web
+        run: docker build -t bibletranslationtools/fetcher:$GITHUB_SHA -t bibletranslationtools/fetcher:$IMAGE_TAG -t bibletranslationtools/fetcher:latest ./fetcher-web
 
       - name: Build pipeline image
         shell: bash
-        run: docker build -t bibletranslationtools/fetcher-pipeline:$GITHUB_SHA -t bibletranslationtools/fetcher-pipeline:$GITHUB_REF_NAME -t bibletranslationtools/fetcher-pipeline:latest ./fetcher-pipeline
+        run: docker build -t bibletranslationtools/fetcher-pipeline:$GITHUB_SHA -t bibletranslationtools/fetcher-pipeline:$IMAGE_TAG -t bibletranslationtools/fetcher-pipeline:latest ./fetcher-pipeline
 
       - name: Log into registry
         shell: bash

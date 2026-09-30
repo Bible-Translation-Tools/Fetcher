@@ -80,7 +80,7 @@ class FetchChapterViewData(
     ): FileAccessRequest {
         return FileAccessRequest(
             languageCode = language.code,
-            resourceId = resourceIdByLanguage(language.code),
+            resourceId = resourceIdByLanguage(language.code, language.isGateway),
             fileExtension = ProductFileExtension.BTTR.fileType,
             bookSlug = book.slug,
             chapter = chapterNumber.toString(),
@@ -95,7 +95,7 @@ class FetchChapterViewData(
     ): FileAccessRequest {
         return FileAccessRequest(
             languageCode = language.code,
-            resourceId = resourceIdByLanguage(language.code),
+            resourceId = resourceIdByLanguage(language.code, language.isGateway),
             fileExtension = priorityItem.fileExtension,
             bookSlug = book.slug,
             chapter = chapterNumber.toString(),
