@@ -8,11 +8,10 @@ fun fuzzyMatching(keyword: String, choices: List<String>, take: Int = 10): List<
     }
 }
 
-fun resourceIdByLanguage(languageId: String, isGateway: Boolean): String {
-    return when {
-        languageId == "id" -> "ayt"
-        languageId == "arb" -> "avd"
-        isGateway -> "ulb"
-        else -> "reg"
+fun resourceIdByLanguage(languageId: String): String {
+    return when(languageId) {
+        "id" -> "ayt"
+        "arb" -> "avd"
+        else -> "ulb"
     }
 }

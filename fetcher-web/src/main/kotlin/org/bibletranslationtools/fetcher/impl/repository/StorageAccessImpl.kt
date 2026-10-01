@@ -11,6 +11,7 @@ import org.bibletranslationtools.fetcher.repository.DirectoryProvider
 import org.bibletranslationtools.fetcher.repository.FileAccessRequest
 import org.bibletranslationtools.fetcher.repository.StorageAccess
 import org.bibletranslationtools.fetcher.usecase.ProductFileExtension
+import org.bibletranslationtools.fetcher.usecase.resourceIdByLanguage
 import org.slf4j.LoggerFactory
 
 class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : StorageAccess {
@@ -76,11 +77,8 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
         return dirs?.any { it.name == languageCode } ?: false
     }
 
-    override fun hasProductContent(
-        languageCode: String,
-        resourceId: String,
-        fileExtensions: List<String>
-    ): Boolean {
+    override fun hasProductContent(languageCode: String, fileExtensions: List<String>): Boolean {
+        val resourceId = resourceIdByLanguage(languageCode)
         val booksDir = getPathPrefixDir(
             directoryProvider.getContentRoot(),
             languageCode,
@@ -249,7 +247,7 @@ class StorageAccessImpl(private val directoryProvider: DirectoryProvider) : Stor
     private fun getGrouping(ext: String, division: Division): String {
         return when {
             ext == ProductFileExtension.BTTR.fileType -> "verse"
-            else -> division.name.lowercase()
+            else -> division.name.toLowerCase()
         }
     }
 }

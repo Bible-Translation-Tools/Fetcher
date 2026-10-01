@@ -1,6 +1,6 @@
 package org.bibletranslationtools.fetcher.usecase
 
-import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.features.ClientRequestException
 import java.io.File
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.data.Book
@@ -80,7 +80,7 @@ class FetchChapterViewData(
     ): FileAccessRequest {
         return FileAccessRequest(
             languageCode = language.code,
-            resourceId = resourceIdByLanguage(language.code, language.isGateway),
+            resourceId = resourceIdByLanguage(language.code),
             fileExtension = ProductFileExtension.BTTR.fileType,
             bookSlug = book.slug,
             chapter = chapterNumber.toString(),
@@ -95,7 +95,7 @@ class FetchChapterViewData(
     ): FileAccessRequest {
         return FileAccessRequest(
             languageCode = language.code,
-            resourceId = resourceIdByLanguage(language.code, language.isGateway),
+            resourceId = resourceIdByLanguage(language.code),
             fileExtension = priorityItem.fileExtension,
             bookSlug = book.slug,
             chapter = chapterNumber.toString(),

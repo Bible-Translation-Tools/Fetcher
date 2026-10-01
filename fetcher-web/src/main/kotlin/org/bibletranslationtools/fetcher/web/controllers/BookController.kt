@@ -1,12 +1,13 @@
 package org.bibletranslationtools.fetcher.web.controllers
 
+import dev.jbs.ktor.thymeleaf.ThymeleafContent
+import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.request.path
-import io.ktor.server.response.respond
-import io.ktor.server.routing.Routing
-import io.ktor.server.routing.get
-import io.ktor.server.routing.route
-import io.ktor.server.thymeleaf.ThymeleafContent
+import io.ktor.request.path
+import io.ktor.response.respond
+import io.ktor.routing.Routing
+import io.ktor.routing.get
+import io.ktor.routing.route
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
 import org.bibletranslationtools.fetcher.repository.BookRepository
@@ -37,7 +38,7 @@ fun Routing.bookController() {
                 !validator.isLanguageCodeValid(params.languageCode) ||
                 !validator.isProductSlugValid(params.productSlug)
             ) {
-                call.respond<ThymeleafContent>(
+                call.respond(
                     errorPage(
                         "invalid_route_parameter",
                         "invalid_route_parameter_message",

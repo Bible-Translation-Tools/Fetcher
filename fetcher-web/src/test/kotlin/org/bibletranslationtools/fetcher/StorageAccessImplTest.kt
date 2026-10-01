@@ -13,7 +13,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.slf4j.LoggerFactory
 import java.io.FileFilter
-import kotlin.io.path.createTempDirectory
 
 class StorageAccessImplTest {
 
@@ -163,7 +162,7 @@ class StorageAccessImplTest {
         val mockDirectoryProvider = mock(DirectoryProvider::class.java)
         val storageAccess = StorageAccessImpl(mockDirectoryProvider)
 
-        val tempRootDir = createTempDirectory("contentRootFetcherTmp").toFile()
+        val tempRootDir = createTempDir("contentRootFetcherTmp")
         `when`(mockDirectoryProvider.getContentRoot()).thenReturn(tempRootDir)
 
         for (testCase in testCases) {

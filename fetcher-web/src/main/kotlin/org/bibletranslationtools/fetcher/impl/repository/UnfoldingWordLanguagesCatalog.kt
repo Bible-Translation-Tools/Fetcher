@@ -25,27 +25,33 @@ enum class LangType {
     ALL
 }
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-private data class BielLanguage(
-    @JsonProperty(LANGUAGE_CODE_ID) val code: String,
-    @JsonProperty(ANGLICIZED_NAME_ID) val anglicizedName: String,
-    @JsonProperty(LOCALIZED_NAME_ID) val localizedName: String,
-    @JsonProperty(IS_GATEWAY) val isGateway: Boolean
-)
+class UnfoldingWordLanguagesCatalog(
+    envConfig: EnvironmentConfig,
+    private val langType: LangType
+) : LanguageCatalog {
 
-class BielLanguageCatalogSource(
-    envConfig: EnvironmentConfig
-) {
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private data class UnfoldingWordHeartLanguage(
+        @JsonProperty(LANGUAGE_CODE_ID) val code: String,
+        @JsonProperty(ANGLICIZED_NAME_ID) val anglicizedName: String,
+        @JsonProperty(LOCALIZED_NAME_ID) val localizedName: String,
+        @JsonProperty(IS_GATEWAY) val isGateway: Boolean
+    )
+
     private val logger = LoggerFactory.getLogger(javaClass)
     private val languageCatalogUrl = envConfig.LANG_NAMES_URL
-    @Volatile
-    private var languages: List<BielLanguage> = fetchLanguages()
+    private val languageList: List<Language> = parseCatalog()
 
-    fun refresh() {
-        languages = fetchLanguages()
-    }
+    override fun getAll(): List<Language> = this.languageList
 
-    fun getLanguages(langType: LangType): List<Language> {
+    override fun getLanguage(code: String): Language? = this.languageList.firstOrNull { it.code == code }
+
+    @Throws(FileNotFoundException::class)
+    private fun parseCatalog(): List<Language> {
+        val jsonCatalog = getLanguageCatalogContent()
+        val languages: List<UnfoldingWordHeartLanguage> =
+            jacksonObjectMapper().readValue(jsonCatalog)
+
         return languages
             .filter {
                 when (langType) {
@@ -55,14 +61,8 @@ class BielLanguageCatalogSource(
                 }
             }
             .map {
-                Language(it.code, it.anglicizedName, it.localizedName, isGateway = it.isGateway)
+                Language(it.code, it.anglicizedName, it.localizedName, isGateway = false)
             }
-    }
-
-    @Throws(FileNotFoundException::class)
-    private fun fetchLanguages(): List<BielLanguage> {
-        val jsonCatalog = getLanguageCatalogContent()
-        return jacksonObjectMapper().readValue(jsonCatalog)
     }
 
     @Throws(FileNotFoundException::class)
@@ -82,19 +82,5 @@ class BielLanguageCatalogSource(
         }
 
         return response
-    }
-}
-
-class BielLanguagesCatalog(
-    private val source: BielLanguageCatalogSource,
-    private val langType: LangType
-) : LanguageCatalog {
-
-    override fun getAll(): List<Language> = source.getLanguages(langType)
-
-    override fun getLanguage(code: String): Language? = getAll().firstOrNull { it.code == code }
-
-    override fun refresh() {
-        source.refresh()
     }
 }
