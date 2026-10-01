@@ -1,11 +1,10 @@
 package org.bibletranslationtools.fetcher.web.controllers
 
-import dev.jbs.ktor.thymeleaf.ThymeleafContent
-import io.ktor.application.call
-import io.ktor.response.respond
-import io.ktor.routing.Routing
-import io.ktor.routing.get
-import io.ktor.routing.route
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Routing
+import io.ktor.server.routing.get
+import io.ktor.server.routing.route
+import io.ktor.server.thymeleaf.ThymeleafContent
 import org.bibletranslationtools.fetcher.web.controllers.utils.GL_ROUTE
 import org.bibletranslationtools.fetcher.web.controllers.utils.contentLanguage
 import org.bibletranslationtools.fetcher.web.controllers.utils.getPreferredLocale

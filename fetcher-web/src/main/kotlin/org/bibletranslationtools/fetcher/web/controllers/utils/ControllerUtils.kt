@@ -1,8 +1,7 @@
 package org.bibletranslationtools.fetcher.web.controllers.utils
 
-import dev.jbs.ktor.thymeleaf.ThymeleafContent
 import io.ktor.http.HttpStatusCode
-import java.lang.IllegalArgumentException
+import io.ktor.server.thymeleaf.ThymeleafContent
 import java.util.Locale
 import java.util.MissingResourceException
 import java.util.ResourceBundle

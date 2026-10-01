@@ -6,7 +6,7 @@ interface StorageAccess {
     fun getContentRoot(): File
     fun getReposDir(): File
     fun hasLanguageContent(languageCode: String): Boolean
-    fun hasProductContent(languageCode: String, fileExtensions: List<String>): Boolean
+    fun hasProductContent(languageCode: String, resourceId: String, fileExtensions: List<String>): Boolean
     fun getBookFile(request: FileAccessRequest): File?
     fun getChapterFile(request: FileAccessRequest): File?
     fun hasBookContent(

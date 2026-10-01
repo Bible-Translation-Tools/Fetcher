@@ -11,7 +11,7 @@ enum class ProductFileExtension(val fileType: String) {
     companion object {
         fun getType(productSlug: String): ProductFileExtension? {
             return try {
-                valueOf(productSlug.toUpperCase())
+                valueOf(productSlug.uppercase())
             } catch (ex: IllegalArgumentException) {
                 null
             }

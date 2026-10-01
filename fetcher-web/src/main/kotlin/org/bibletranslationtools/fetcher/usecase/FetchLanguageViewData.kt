@@ -14,8 +14,8 @@ class FetchLanguageViewData(
         private const val MATCHING_RESULT_TAKE = 20
     }
 
-    private val comparator = compareBy(LanguageViewData::isGateway)
-        .then(compareByDescending { it.url != null })
+    // available languages first, then gateway languages before heart languages
+    private val comparator = compareBy<LanguageViewData>({ it.url == null }, { !it.isGateway })
 
     fun getViewDataList(
         currentPath: String
@@ -102,7 +102,7 @@ class FetchLanguageViewData(
         val matchingLanguages = mutableSetOf<Language>()
 
         languages.filter {
-            it.code.contains(query.toLowerCase())
+            it.code.contains(query.lowercase())
         }.forEach {
             matchingLanguages.add(it)
         }
