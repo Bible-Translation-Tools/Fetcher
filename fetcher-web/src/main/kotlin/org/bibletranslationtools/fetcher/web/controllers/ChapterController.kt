@@ -1,14 +1,13 @@
 package org.bibletranslationtools.fetcher.web.controllers
 
-import dev.jbs.ktor.thymeleaf.ThymeleafContent
-import io.ktor.application.call
-import io.ktor.client.features.ClientRequestException
+import io.ktor.client.plugins.ClientRequestException
 import io.ktor.http.HttpStatusCode
-import io.ktor.response.respond
-import io.ktor.routing.Route
-import io.ktor.routing.Routing
-import io.ktor.routing.get
-import io.ktor.routing.route
+import io.ktor.server.response.respond
+import io.ktor.server.routing.Route
+import io.ktor.server.routing.Routing
+import io.ktor.server.routing.get
+import io.ktor.server.routing.route
+import io.ktor.server.thymeleaf.ThymeleafContent
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.data.Deliverable
 import org.bibletranslationtools.fetcher.di.ext.CommonKoinExt.get
@@ -46,7 +45,7 @@ fun Routing.chapterController() {
             )
 
             if (!validateParameters(params)) {
-                call.respond(
+                call.respond<ThymeleafContent>(
                     errorPage(
                         "invalid_route_parameter",
                         "invalid_route_parameter_message",
@@ -83,7 +82,7 @@ private fun Route.oratureChapters() {
             !validateParameters(params) ||
             ProductFileExtension.getType(params.productSlug) != ProductFileExtension.ORATURE
         ) {
-            call.respond(
+            call.respond<ThymeleafContent>(
                 errorPage(
                     "invalid_route_parameter",
                     "invalid_route_parameter_message",

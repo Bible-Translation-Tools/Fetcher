@@ -1,6 +1,5 @@
 package org.bibletranslationtools.fetcher.impl.repository
 
-import java.io.File
 import org.bibletranslationtools.fetcher.config.EnvironmentConfig
 import org.bibletranslationtools.fetcher.data.Deliverable
 import org.bibletranslationtools.fetcher.data.RCDeliverable
@@ -17,6 +16,7 @@ import org.wycliffeassociates.resourcecontainer.ResourceContainer
 import org.wycliffeassociates.resourcecontainer.entity.Media
 import org.wycliffeassociates.resourcecontainer.entity.MediaManifest
 import org.wycliffeassociates.resourcecontainer.entity.MediaProject
+import java.io.File
 import java.util.zip.Adler32
 
 class RequestResourceContainerImpl(
@@ -119,7 +119,7 @@ class RequestResourceContainerImpl(
             }
 
             val oldHash = if (hashFile.exists()) {
-                hashFile.readLines().first().toLong()
+                hashFile.readLines().firstOrNull()?.toLong() ?: 0
             } else 0
             val newHash = crc.value
 

@@ -102,7 +102,7 @@ class FetchLanguageViewData(
         val matchingLanguages = mutableSetOf<Language>()
 
         languages.filter {
-            it.code.contains(query.toLowerCase())
+            it.code.contains(query.lowercase())
         }.forEach {
             matchingLanguages.add(it)
         }
