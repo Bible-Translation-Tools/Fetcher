@@ -14,8 +14,8 @@ open class DeliverableBuilder(
     private val bookRepository: BookRepository
 ) {
     fun build(parameters: UrlParameters): Deliverable {
+        val resourceId = parameters.resourceId
         val language = languageRepository.getLanguage(parameters.languageCode)!!
-        val resourceId = resourceIdByLanguage(language.code, language.isGateway)
         val product = productCatalog.getProduct(parameters.productSlug)!!
         val book = bookRepository.getBook(parameters.bookSlug)!!
         val chapter = try {

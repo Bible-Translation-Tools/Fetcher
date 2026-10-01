@@ -1,7 +1,6 @@
 package org.bibletranslationtools.fetcher.usecase
 
 import org.bibletranslationtools.fetcher.data.ContainerExtensions
-import org.bibletranslationtools.fetcher.data.Language
 import org.bibletranslationtools.fetcher.data.Product
 import org.bibletranslationtools.fetcher.repository.*
 import org.bibletranslationtools.fetcher.usecase.viewdata.ProductViewData
@@ -11,10 +10,9 @@ class FetchProductViewData(
     private val storage: StorageAccess,
     private val sourceTextAccessor: SourceTextAccessor,
     private val requestResourceContainer: RequestResourceContainer,
-    private val language: Language
+    private val languageCode: String
 ) {
     private val products: List<Product> = productCatalog.getAll()
-    private val resourceId = resourceIdByLanguage(language.code, language.isGateway)
 
     fun getListViewData(
         currentPath: String
@@ -27,7 +25,7 @@ class FetchProductViewData(
                     listOf(ProductFileExtension.MP3.fileType, ProductFileExtension.WAV.fileType)
                 }
 
-            val hasAudioContent = storage.hasProductContent(language.code, resourceId, fileExtensions)
+            val hasAudioContent = storage.hasProductContent(languageCode, fileExtensions)
 
             val isAvailable = when (productExtension) {
                 ProductFileExtension.ORATURE -> {
@@ -48,9 +46,11 @@ class FetchProductViewData(
     }
 
     private fun hasSourceText(): Boolean {
+        val resourceId = resourceIdByLanguage(languageCode)
+
         return when {
-            requestResourceContainer.getResourceContainer(language.code, resourceId) != null -> true
-            sourceTextAccessor.getRepoUrl(language.code, resourceId) != null -> true
+            requestResourceContainer.getResourceContainer(languageCode, resourceId) != null -> true
+            sourceTextAccessor.getRepoUrl(languageCode, resourceId) != null -> true
             else -> false
         }
     }

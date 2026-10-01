@@ -17,7 +17,7 @@ class FetchBookViewData(
     private val language: Language,
     private val product: Product
 ) {
-    private val resourceId = resourceIdByLanguage(language.code, language.isGateway)
+    private val resourceId = resourceIdByLanguage(language.code)
     private val productExtension = ProductFileExtension.getType(product.slug)!!
     private val baseUrl = environmentConfig.CDN_BASE_URL
 

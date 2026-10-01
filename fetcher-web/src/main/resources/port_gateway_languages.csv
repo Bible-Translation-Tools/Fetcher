@@ -1,0 +1,39 @@
+﻿IETF Tag,ISO 639-3,Name,National Name,Home Country,Home Country Province,Home Country Region,Region,Gateway Flag,Gateway Language,Scripture Start Date,Status,Projects,Has Translation Data,Translation Data Last Upload Date
+am,amh,Amharic,አማርኛ (Amharic),Ethiopia,,,Africa,Yes,English,5/9/2016,Active,10,Yes,6/26/2019
+ar,ara,Arabic,العربية,Algeria,,,Eurasia,Yes,French,,Active,1,Yes,9/12/2017
+as,asm,Assamese,অসমীয়া,India,,,South Asia,Yes,,1/11/2016,Active,8,,
+bn,ben,"Bengali, Bangla",বাংলা,Bangladesh,,,South Asia,Yes,,1/11/2016,Active,10,,
+pt-br,,Brazilian Portuguese,Português (Brazilian),Brazil,,,Americas,Yes,,5/6/2016,Active,7,Yes,2/4/2020
+my,mya,Burmese,ျမန္မာစာ,Myanmar,,,Asia,Yes,,3/12/2018,Active,5,Yes,3/22/2018
+ceb,ceb,Cebuano,Cebuano,Philippines,,,Asia,Yes,English,4/18/2016,Active,2,Yes,3/12/2018
+zh,zho,Chinese,"中文 (Zhōngwén), 汉语, 漢語",China,,,Asia,Yes,,7/25/2016,Active,4,Yes,11/16/2017
+en,eng,English,English,United Kingdom,,,Western Europe,Yes,,3/15/2016,Active,2,Yes,1/5/2018
+fr,fra,French,"Français, langue française",France,,,Western Europe,Yes,,1/9/2017,Active,8,Yes,11/21/2017
+gu,guj,Gujarati,ગુજરાતી,India,,,South Asia,Yes,,1/11/2016,Active,10,Yes,4/25/2017
+ha,hau,Hausa,(Halshen Hausa) هَوُسَ,Nigeria,,,Africa,Yes,,3/6/2017,Active,8,Yes,2/26/2020
+hi,hin,Hindi,"हिन्दी, हिंदी",India,,,South Asia,Yes,,1/11/2016,Active,11,Yes,7/24/2017
+ilo,ilo,Ilocano,Iloko,Philippines,,,Asia,Yes,English,4/11/2016,Active,2,Yes,5/2/2018
+id,ind,Indonesian,Bahasa Indonesia,Indonesia,countrywide,countrywide,Pacific,Yes,,10/3/2016,Active,9,Yes,8/24/2017
+kn,kan,Kannada,ಕನ್ನಡ,India,,,South Asia,Yes,,1/4/2016,Active,10,Yes,3/16/2016
+km,khm,Khmer,"ខ្មែរ, ខេមរភាសា, ភាសាខ្មែរ (Khmer)",Cambodia,,,Asia,Yes,,7/11/2016,Active,8,Yes,6/17/2020
+lo,lao,Laotian,ພາສາລາວ,Laos,,,Asia,Yes,,4/23/2019,Active,7,Yes,6/15/2020
+es-419,spa,Latin American Spanish,Español Latin America,Mexico,,,Americas,Yes,,4/15/2016,Active,5,Yes,8/12/2019
+plt,plt,"Malagasy, Plateau",Plateau Malagasy,Madagascar,,,Africa,Yes,French,12/5/2016,Active,7,Yes,10/3/2019
+ml,mal,Malayalam,മലയാളം,India,,,South Asia,Yes,,1/11/2016,Active,8,Yes,8/17/2017
+mr,mar,Marathi (Marāṭhī),मराठी,India,,,South Asia,Yes,,1/4/2016,Active,11,Yes,8/17/2016
+ne,nep,Nepali,नेपाली,Nepal,,,South Asia,Yes,,4/25/2016,Active,8,Yes,10/16/2016
+or,ori,Oriya,ଓଡ଼ିଆ,India,,,South Asia,Yes,,1/11/2016,Active,11,Yes,4/25/2017
+pa,pan,"Panjabi, Punjabi","ਪੰਜਾਬੀ, پنجابی‎",India,,,South Asia,Yes,,1/11/2016,Active,10,Yes,6/8/2017
+pmy,pmy,Papuan Malay,Papuan Malay,Indonesia,Papua and West Papua,Western New Guinea,Pacific,Yes,Indonesian,4/22/2017,Active,6,Yes,12/18/2018
+ps,pus,"Pashto, Pushto",پښتو,Afghanistan,,,Eurasia,Yes,,4/1/2019,Active,2,,
+fa,fas,Persian (Farsi),فارسی,Iran,,,Eurasia,Yes,,,Active,2,Yes,1/25/2018
+ru,rus,Russian,Русский,Russian Federation,,,Eurasia,Yes,,3/11/2016,Active,2,Yes,11/14/2017
+sw,swa,Swahili,Kiswahili,Tanzania,,,Africa,Yes,English,1/23/2017,Active,8,Yes,1/15/2019
+tl,tgl,Tagalog,Wikang Tagalog,Philippines,,,Asia,Yes,,9/5/2016,Active,2,Yes,4/1/2018
+ta,tam,Tamil,தமிழ்,India,,,South Asia,Yes,,1/11/2016,Active,8,,
+te,tel,Telugu,తెలుగు,India,,,South Asia,Yes,,1/11/2016,Active,8,Yes,11/2/2016
+th,tha,Thai,ไทย,Thailand,Chiang Mai,Chin Dai,Asia,Yes,,11/28/2016,Active,7,Yes,6/4/2018
+tpi,tpi,Tok Pisin,Tok Pisin,Papua New Guinea,,,Pacific,Yes,,4/11/2016,Active,8,Yes,8/29/2020
+ur,urd,Urdu,اردو (Urdu),Pakistan,,,Eurasia,Yes,,7/4/2016,Active,3,Yes,8/6/2017
+ur-Deva,,Urdu Devanagari script,Urdu Devanagari script,India,,,South Asia,Yes,Hindi,1/11/2016,Active,7,,
+vi,vie,Vietnamese,Tiếng Việt,Vietnam,,,Asia,Yes,,5/1/2015,Active,2,Yes,6/14/2018
