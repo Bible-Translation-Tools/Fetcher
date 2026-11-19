@@ -1,0 +1,8 @@
+# Accepted CRITICAL findings that cannot be fixed in this repo. The CI gate ignores these;
+# the "Vulnerability report" step still lists them. Remove each entry once it is fixed.
+#
+# Bundled in fetcher-pipeline/tools/tr-chunk-browser-cli.jar (a prebuilt jar from another
+# project). Fix = rebuild that tool with commons-text >= 1.10.0 and commons-configuration2 >= 2.8.0.
+CVE-2022-42889
+CVE-2022-33980
+CVE-2020-1953

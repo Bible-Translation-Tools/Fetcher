@@ -22,9 +22,9 @@ run:
   && cd ../fetcher-pipeline \
   && docker build -t bibletranslationtools/fetcher-pipeline:$${FETCHER_IMAGE_TAG} . \
   && cd ../dockerstack \
-  && docker-compose build fileserver \
-  && docker-compose up
+  && docker compose build fileserver \
+  && docker compose up
 
 stop:
 	cd dockerstack \
-  && docker-compose down -v
+  && docker compose down -v
