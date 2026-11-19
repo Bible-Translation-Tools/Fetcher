@@ -34,7 +34,7 @@ class RCRepositoryImpl(
             val reposDirectory = storageAccess.getReposDir()
 
             val process = ProcessBuilder()
-                .command("git", "clone", repoUrl, repoName)
+                .command("git", "clone", "--", repoUrl, repoName)
                 .directory(reposDirectory)
                 .start()
 

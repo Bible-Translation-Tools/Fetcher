@@ -35,7 +35,6 @@ repositories {
     google()
     maven { url "https://plugins.gradle.org/m2/" }
     maven { url "https://nexus-registry.walink.org/repository/maven-public/" }
-    maven { url "https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven" } // detekt report
     flatDir {
         dirs 'libs'
     }
@@ -46,6 +45,10 @@ dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.13.1'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: "$mockito_core_ver"
     testImplementation "com.github.stefanbirkner:system-lambda:$system_lambda_ver"
+
+    // Security: align transitive netty/jackson modules on patched versions
+    implementation platform("io.netty:netty-bom:$netty_ver")
+    implementation platform("com.fasterxml.jackson:jackson-bom:$jackson")
 
     // Ktor netty server
     implementation "io.ktor:ktor-server-core:$ktor_ver"

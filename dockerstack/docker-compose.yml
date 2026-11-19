@@ -1,16 +1,30 @@
-version: "3.8"
 services:
+  # One-shot job: the app and pipeline images run as non-root UID 105 / GID 106 (the same owner
+  # the ftp service gives uploaded content). Volumes created when these containers ran as root
+  # are root-owned, so hand them over before the app and pipeline start.
+  volume-permissions:
+    image: bibletranslationtools/fetcher-pipeline:${FETCHER_IMAGE_TAG}
+    user: "0:0"
+    entrypoint: ["chown", "-R", "105:106", "/content", "/rc", "/repos"]
+    volumes:
+      - fetcher-content:/content
+      - fetcher-rc:/rc
+      - fetcher-repos:/repos
+    restart: "no"
   fileserver:
     build: ./fileserver
     ports:
-      - "8081:80"
+      - "8081:8080"
     volumes:
-      - fetcher-content:/srv/content
-      - fetcher-rc:/srv/rc
+      - fetcher-content:/srv/content:ro
+      - fetcher-rc:/srv/rc:ro
     restart: unless-stopped
   fetcher-app:
     # for local development, tag your image with "local" e.g. `docker build -t bibletranslationtools/fetcher:local .`
     image: bibletranslationtools/fetcher:${FETCHER_IMAGE_TAG}
+    depends_on:
+      volume-permissions:
+        condition: service_completed_successfully
     ports:
       - "8080:8080"
     env_file:
@@ -41,13 +55,14 @@ services:
     restart: always
   pipeline:
     image: bibletranslationtools/fetcher-pipeline:${FETCHER_IMAGE_TAG}
+    depends_on:
+      volume-permissions:
+        condition: service_completed_successfully
     restart: unless-stopped
     env_file:
       - .env
     environment:
       SENTRY_DSN: ${SENTRY_DSN}
-      PM2_PUBLIC_KEY: ${PM2_PUBLIC_KEY}
-      PM2_SECRET_KEY: ${PM2_SECRET_KEY}
       RC_TEMP_DIR: ${RC_TEMP_DIR}
       ORATURE_REPO_DIR: ${ORATURE_REPO_DIR}
       CDN_BASE_URL: ${CDN_BASE_URL}

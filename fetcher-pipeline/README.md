@@ -2,11 +2,14 @@
 
 ### Requirements
 
-Python 3.8  
+Python 3.12  
 
-Java 11  
+Java 21 (any Java 9+ runtime runs the jars in `tools/`)  
 
-NodeJs 14  
+ffmpeg, git  
+
+In Docker the three services are run by supervisord (`supervisord.conf`) as the non-root
+`app` user (UID 105 / GID 106, matching the ftp service's upload owner).  
 
 ### How to use  
 

@@ -2,19 +2,28 @@ name: Docker
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
+env:
+  # Only this branch publishes the :latest tag
+  RELEASE_BRANCH: audio.bibleineverylanguage.org
+  TRIVY_IMAGE: aquasec/trivy:0.76.2
+
 jobs:
-  #test building jar and images for PR without push
-  test:
+  # Build, test and scan on every push and PR; push images only on push events
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: FranzDiebold/github-env-vars-action@v1.3.0
-      - uses: actions/setup-java@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          java-version: "21" # The JDK version to make available on the path.
-          java-package: jdk+fx # (jre, jdk, or jdk+fx) - defaults to jdk
-          architecture: x64 # (x64 or x86) - defaults to x64
+          persist-credentials: false
+
+      - uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          distribution: temurin
+          java-version: "21"
 
       - name: Build the web jar
         shell: bash
@@ -27,53 +36,59 @@ jobs:
 #          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 #          JAVA_HOME: ""
 
-      - name: Build web image
+      - name: Compute image tags
         shell: bash
-        run: docker build ./fetcher-web
-
-      - name: Build pipeline image
-        shell: bash
-        run: docker build ./fetcher-pipeline
-
-  #build and push web and pipeline images
-  push:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push'
-    needs: [test]
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: FranzDiebold/github-env-vars-action@v1.3.0
-      - uses: actions/setup-java@v1
-        with:
-          java-version: "21" # The JDK version to make available on the path.
-          java-package: jdk+fx # (jre, jdk, or jdk+fx) - defaults to jdk
-          architecture: x64 # (x64 or x86) - defaults to x64
-
-      - name: Build the web jar
-        shell: bash
-        run: cd fetcher-web && ./gradlew check build && cd ..
-
-      - name: Sanitize branch name for image tag
-        shell: bash
-        run: echo "IMAGE_TAG=$(echo "$GITHUB_REF_NAME" | sed 's/[^a-zA-Z0-9_.-]/-/g')" >> "$GITHUB_ENV"
+        run: |
+          echo "IMAGE_TAG=$(echo "$GITHUB_REF_NAME" | sed 's/[^a-zA-Z0-9_.-]/-/g')" >> "$GITHUB_ENV"
 
       - name: Build web image
         shell: bash
-        run: docker build -t bibletranslationtools/fetcher:$GITHUB_SHA -t bibletranslationtools/fetcher:$IMAGE_TAG -t bibletranslationtools/fetcher:latest ./fetcher-web
+        run: docker build --pull -t bibletranslationtools/fetcher:$GITHUB_SHA -t bibletranslationtools/fetcher:$IMAGE_TAG ./fetcher-web
 
       - name: Build pipeline image
         shell: bash
-        run: docker build -t bibletranslationtools/fetcher-pipeline:$GITHUB_SHA -t bibletranslationtools/fetcher-pipeline:$IMAGE_TAG -t bibletranslationtools/fetcher-pipeline:latest ./fetcher-pipeline
+        run: docker build --pull -t bibletranslationtools/fetcher-pipeline:$GITHUB_SHA -t bibletranslationtools/fetcher-pipeline:$IMAGE_TAG ./fetcher-pipeline
+
+      - name: Build fileserver image
+        shell: bash
+        run: docker build --pull -t fetcher-fileserver:$GITHUB_SHA ./dockerstack/fileserver
+
+      - name: Vulnerability report (HIGH, CRITICAL)
+        shell: bash
+        run: |
+          for img in bibletranslationtools/fetcher:$GITHUB_SHA bibletranslationtools/fetcher-pipeline:$GITHUB_SHA fetcher-fileserver:$GITHUB_SHA; do
+            echo "::group::$img"
+            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock "$TRIVY_IMAGE" \
+              image --quiet --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed "$img"
+            echo "::endgroup::"
+          done
+
+      - name: Fail on fixable CRITICAL vulnerabilities
+        shell: bash
+        run: |
+          for img in bibletranslationtools/fetcher:$GITHUB_SHA bibletranslationtools/fetcher-pipeline:$GITHUB_SHA fetcher-fileserver:$GITHUB_SHA; do
+            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD/.trivyignore:/.trivyignore:ro" "$TRIVY_IMAGE" \
+              image --quiet --scanners vuln --severity CRITICAL --ignore-unfixed --ignorefile /.trivyignore --exit-code 1 "$img"
+          done
+
+      - name: Tag latest
+        if: github.event_name == 'push' && github.ref_name == env.RELEASE_BRANCH
+        shell: bash
+        run: |
+          docker tag bibletranslationtools/fetcher:$GITHUB_SHA bibletranslationtools/fetcher:latest
+          docker tag bibletranslationtools/fetcher-pipeline:$GITHUB_SHA bibletranslationtools/fetcher-pipeline:latest
 
       - name: Log into registry
+        if: github.event_name == 'push'
         shell: bash
         env:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_HUB_TOKEN }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_HUB_USER }}
         run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-      - name: Push image
+      - name: Push images
+        if: github.event_name == 'push'
+        shell: bash
         run: |
           docker push -a bibletranslationtools/fetcher
           docker push -a bibletranslationtools/fetcher-pipeline

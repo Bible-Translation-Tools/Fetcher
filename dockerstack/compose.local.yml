@@ -3,7 +3,6 @@
 # If troubleshooting the service bus stuff, you can set the SERVICE_BUS_CONNECTION_STRING to the correct op secrete, and the call the above command with op run -- docker compose etc;  This will inject the op secret into the compose file.
 # debugpy is a flag that changes the pipeline entrypoint script to call main.py with debugpy and the proper debugpy port exposed. It'll stop the program and wait for you to attach to it (likely using the .vscode launch config Python Debugger Pipeline).  Feel free to toggle the flag if you're just wanting to do some log debugging or don't need it.
 #
-version: "3.8"
 services:
   pipeline:
     platform: linux/x86_64
@@ -12,8 +11,12 @@ services:
       args:
         debugpy: true
     restart: unless-stopped
+    # The content_local bind mount is owned by your host user, not the image's UID 105,
+    # so run as root locally (the published image still runs as the non-root "app" user).
+    user: "0:0"
     ports:
-      - "5678:5678"
+      # debugpy: localhost only
+      - "127.0.0.1:5678:5678"
     env_file:
       - .env
     environment:
