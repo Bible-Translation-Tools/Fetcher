@@ -41,34 +41,51 @@ class RequestResourceContainerImpl(
         if (hasUpdatedFiles || !zipFile.exists()) {
             val rc = prepareRC(deliverable, rcName) ?: return null
             val tempZipFile = rc.parentFile.resolve(zipFile.name)
-            downloadMediaInRC(rc, deliverable)
 
-            val hasContent = RCUtils.verifyChapterExists(
-                rc,
-                deliverable.book.slug,
-                mediaTypes,
-                deliverable.chapter?.number
-            )
-            val packedUp = RCUtils.zipDirectory(rc, tempZipFile)
-            if (packedUp) tempZipFile.copyTo(zipFile, true)
+            try {
+                downloadMediaInRC(rc, deliverable)
 
-            rc.parentFile.deleteRecursively()
-
-            return if (hasContent && packedUp) {
-                // If a chapter has been changed and rebuilt, remove corresponding book file
-                // The book file will be rebuilt on the next book request
-                deliverable.chapter?.number?.let {
-                    val bookName = rcName.replace("_c$it", "")
-                    val bookFile = File("$outputDir/$bookName.orature")
-                    if (hasUpdatedFiles && bookFile.exists()) {
-                        bookFile.delete()
-                    }
+                val hasContent = RCUtils.verifyChapterExists(
+                    rc,
+                    deliverable.book.slug,
+                    mediaTypes,
+                    deliverable.chapter?.number
+                )
+                if (!hasContent) {
+                    // Never leave an archive behind for missing content,
+                    // otherwise later requests would serve it from the cache.
+                    tempZipFile.delete()
+                    zipFile.delete()
+                    return null
                 }
 
-                val url =  "$baseRCUrl/${zipFile.name}"
-                RCDeliverable(deliverable, url)
-            } else null
+                val packedUp = RCUtils.zipDirectory(rc, tempZipFile)
+                if (!packedUp) {
+                    tempZipFile.delete()
+                    zipFile.delete()
+                    return null
+                }
+
+                // Only publish the archive to the cache after it has been verified and packed.
+                tempZipFile.copyTo(zipFile, true)
+            } finally {
+                rc.parentFile.deleteRecursively()
+            }
+
+            // If a chapter has been changed and rebuilt, remove corresponding book file
+            // The book file will be rebuilt on the next book request
+            deliverable.chapter?.number?.let {
+                val bookName = rcName.replace("_c$it", "")
+                val bookFile = File("$outputDir/$bookName.orature")
+                if (hasUpdatedFiles && bookFile.exists()) {
+                    bookFile.delete()
+                }
+            }
+
+            val url = "$baseRCUrl/${zipFile.name}"
+            return RCDeliverable(deliverable, url)
         } else {
+            // A cached archive is only ever written after hasContent && packedUp were verified above.
             val url = "$baseRCUrl/${zipFile.name}"
             return RCDeliverable(deliverable, url)
         }
